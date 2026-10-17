@@ -28,6 +28,7 @@ Importeer alleen via de public API (`index.ts`) van een laag. Een laag mag allee
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch, open een pull request en merge pas als alle CI-checks groen zijn.
+- Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.
 - Na een wijziging aan het spel: test op mobiel (390 px) en tablet (1024 px). Behoud veilige marges (`env(safe-area-inset-*)`) en touch-targets van minimaal 44 px.
 - Dokumenteer architectuur-, privacy- of deploymentbeslissingen in `docs/adr/`.
 

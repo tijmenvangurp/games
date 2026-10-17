@@ -15,7 +15,7 @@ Publieke spelletjes-app voor kinderen. Het eerste spel is sudoku in 4 × 4, 6 ×
 ## Ontwikkelen
 
 ```bash
-pnpm install
+pnpm install    # Node.js 24 of nieuwer
 pnpm dev        # http://127.0.0.1:5180
 pnpm quality    # ts-only, format, typecheck, coverage, build, boundaries, fallow
 pnpm quality:full
@@ -47,6 +47,7 @@ Dezelfde gate als `homelab-control`:
 - Feature-Sliced Design via Steiger
 - Fallow boundary-check en audit
 - Playwright E2E, inclusief mobiel en tablet viewport
+- GitHub Actions vastgezet op volledige commit-SHA's; Dependabot houdt de pins wekelijks bij
 - Husky pre-commit (`pnpm quality`), pre-push (blokkeert `main`) en commitlint met verplichte scope
 
 De pnpm-instelling `minimumReleaseAge` uit `homelab-control` is bij de start bewust niet actief: een verse lockfile kan anders geen actuele toolchain resolven. Zie `docs/adr/0002-kwaliteitsgate.md`.

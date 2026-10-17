@@ -67,5 +67,8 @@
     "vitest": "^5.0.5",
     "wrangler": "^4.151.1"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "packageManager": "pnpm@12.9.1"
 }
