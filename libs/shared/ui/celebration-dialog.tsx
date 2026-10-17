@@ -1,5 +1,7 @@
+import { useEffect } from "react";
+import { playSound } from "@shared/lib";
 import { Button } from "./button";
-import { RotateCcw, Sparkles, Star, Trophy } from "./icons";
+import { LayoutGrid, Sparkles, Star, Trophy } from "./icons";
 
 interface CelebrationDialogProps {
   title: string;
@@ -7,6 +9,9 @@ interface CelebrationDialogProps {
   onAgain: () => void;
   onChoose: () => void;
   onHome: () => void;
+  againLabel?: string;
+  chooseLabel?: string;
+  homeLabel?: string;
 }
 
 export function CelebrationDialog({
@@ -15,37 +20,53 @@ export function CelebrationDialog({
   onAgain,
   onChoose,
   onHome,
+  againLabel = "Nog een keer",
+  chooseLabel = "Ander spel kiezen",
+  homeLabel = "Naar het menu",
 }: CelebrationDialogProps) {
+  useEffect(() => {
+    playSound("win");
+  }, []);
+
   return (
     <div
+      aria-describedby="celebration-description"
       aria-labelledby="celebration-title"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       role="dialog"
+      onKeyDown={(event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          onHome();
+        }
+      }}
     >
       <div className="animate-pop w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl">
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
-          <span className="animate-rise">🎉</span>
+          <Sparkles className="animate-rise size-10 text-rose-400" />
           <Star className="size-10 text-amber-400" />
-          <span className="animate-rise">⭐</span>
+          <Sparkles className="animate-rise size-10 text-amber-400" />
         </div>
         <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-amber-500" />
         <h2 className="text-2xl font-black" id="celebration-title">
           {title}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        <p className="mt-1 text-sm text-muted-foreground" id="celebration-description">
+          {description}
+        </p>
 
         <div className="mt-6 space-y-2">
           <Button autoFocus className="w-full" size="lg" variant="success" onClick={onAgain}>
             <Sparkles aria-hidden="true" className="size-5" />
-            Nog een keer
+            {againLabel}
           </Button>
           <Button className="w-full" variant="outline" onClick={onChoose}>
-            <RotateCcw aria-hidden="true" className="size-4" />
-            Ander spel kiezen
+            <LayoutGrid aria-hidden="true" className="size-4" />
+            {chooseLabel}
           </Button>
           <Button className="w-full" variant="ghost" onClick={onHome}>
-            Naar het menu
+            {homeLabel}
           </Button>
         </div>
       </div>

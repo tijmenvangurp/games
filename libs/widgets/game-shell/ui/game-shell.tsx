@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button, PageHeader, Plus } from "@shared/ui";
+import { Button, PageHeader, Plus, SoundToggle } from "@shared/ui";
 
 interface GameShellProps {
   title: string;
@@ -22,11 +22,14 @@ export function GameShell({
     <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-3 pb-safe pt-safe sm:px-4">
       <PageHeader
         actions={
-          onNewGame ? (
-            <Button aria-label="Nieuw spel" size="icon" variant="outline" onClick={onNewGame}>
-              <Plus aria-hidden="true" className="size-5" />
-            </Button>
-          ) : null
+          <div className="flex items-center gap-0.5">
+            <SoundToggle />
+            {onNewGame ? (
+              <Button aria-label="Nieuw spel" size="icon" variant="outline" onClick={onNewGame}>
+                <Plus aria-hidden="true" className="size-5" />
+              </Button>
+            ) : null}
+          </div>
         }
         onBack={onBack}
         subtitle={subtitle}

@@ -8,7 +8,7 @@ interface GameCatalogBase {
 
 export type GameCatalogEntry = GameCatalogBase &
   (
-    | { status: "available"; to: "/sudoku" | "/zoeken" | "/memory" | "/raad" }
+    | { status: "available"; to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" }
     | { status: "coming-soon" }
   );
 
@@ -21,6 +21,15 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/sudoku",
     accentClassName: "from-sky-100 via-sky-50 to-white",
+  },
+  {
+    id: "arrows",
+    name: "Pijlen",
+    description: "Haal alle pijlen weg zonder dat ze tegen elkaar botsen.",
+    emoji: "🏹",
+    status: "available",
+    to: "/pijlen",
+    accentClassName: "from-rose-100 via-orange-50 to-white",
   },
   {
     id: "seek",

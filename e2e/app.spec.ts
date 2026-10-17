@@ -45,6 +45,28 @@ test.describe("op een tablet", () => {
   });
 });
 
+test.describe("pijlen op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("start een level en gebruikt de hint", async ({ page }) => {
+    await page.goto("/pijlen");
+    await expect(page.getByRole("heading", { name: "Hart" })).toBeVisible();
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const board = page.getByRole("group", { name: /pijlenpuzzel/i });
+    await expect(board).toBeVisible();
+    await expect(page.getByRole("progressbar")).toBeVisible();
+
+    await page.getByRole("button", { name: "Hint" }).click();
+    await expect(page.locator('[data-hint="true"]')).toHaveCount(1);
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+});
+
 test.describe("zoeken op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
@@ -52,7 +74,7 @@ test.describe("zoeken op een telefoon", () => {
     await page.goto("/zoeken");
     await page.getByRole("button", { name: "Spelen" }).click();
 
-    await expect(page.getByRole("img", { name: /Zoek de Wobbel met de ster/i })).toBeVisible();
+    await expect(page.getByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeVisible();
 
     await page.getByRole("button", { name: "Hint" }).click();
     const hint = page.getByTestId("hint-region");

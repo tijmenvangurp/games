@@ -15,6 +15,9 @@
     "scripts/hooks/pre-commit.ts",
     "scripts/hooks/pre-push.ts"
   ],
+  "rules": {
+    "css-selector-complexity": "error"
+  },
   "boundaries": {
     "zones": [
       { "name": "app", "patterns": ["apps/games/src/app/**"] },
