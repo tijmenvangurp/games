@@ -8,13 +8,6 @@ import {
 
 const EPSILON = 0.001;
 
-interface Box {
-  minX: number;
-  maxX: number;
-  minY: number;
-  maxY: number;
-}
-
 export function arrowHead(arrow: MazeArrow): Point {
   return arrow.points[arrow.points.length - 1] as Point;
 }
@@ -72,50 +65,71 @@ export function levelBounds(level: MazeLevel): {
   };
 }
 
-function segmentBox(segment: { a: Point; b: Point }): Box {
-  return {
-    minX: Math.min(segment.a.x, segment.b.x),
-    maxX: Math.max(segment.a.x, segment.b.x),
-    minY: Math.min(segment.a.y, segment.b.y),
-    maxY: Math.max(segment.a.y, segment.b.y),
-  };
+/** Is a coordinate strictly in front of the head on this axis? */
+function isAhead(head: number, coordinate: number, forward: number): boolean {
+  return forward > 0 ? coordinate > head + EPSILON : coordinate < head - EPSILON;
 }
 
-function rayBox(head: Point, direction: MazeDirection, level: MazeLevel): Box {
-  const minX = -MAZE_PADDING;
-  const minY = -MAZE_PADDING;
-  const maxX = level.width + MAZE_PADDING;
-  const maxY = level.height + MAZE_PADDING;
-  const startX = head.x + (direction === "right" ? EPSILON : direction === "left" ? -EPSILON : 0);
-  const startY = head.y + (direction === "down" ? EPSILON : direction === "up" ? -EPSILON : 0);
-  const endX = direction === "right" ? maxX : direction === "left" ? minX : startX;
-  const endY = direction === "down" ? maxY : direction === "up" ? minY : startY;
-
-  return {
-    minX: Math.min(startX, endX),
-    maxX: Math.max(startX, endX),
-    minY: Math.min(startY, endY),
-    maxY: Math.max(startY, endY),
-  };
+/** Does any part of the segment's extent lie strictly in front of the head? */
+function extendsAhead(head: number, low: number, high: number, forward: number): boolean {
+  return forward > 0 ? high > head + EPSILON : low < head - EPSILON;
 }
 
-function boxesOverlap(first: Box, second: Box): boolean {
-  return (
-    first.maxX >= second.minX &&
-    first.minX <= second.maxX &&
-    first.maxY >= second.minY &&
-    first.minY <= second.maxY
-  );
+function spans(value: number, low: number, high: number): boolean {
+  return value > low && value < high;
 }
 
-/** All segments in a level are axis-aligned, so two boxes overlap exactly when the segments cross. */
-function hitsAxisAlignedRay(
+function blocksHorizontalRay(
+  head: Point,
+  forward: number,
+  segment: { a: Point; b: Point },
+): boolean {
+  const lowY = Math.min(segment.a.y, segment.b.y);
+  const highY = Math.max(segment.a.y, segment.b.y);
+
+  if (segment.a.y !== segment.b.y) {
+    return isAhead(head.x, segment.a.x, forward) && spans(head.y, lowY, highY);
+  }
+  if (segment.a.y !== head.y) {
+    return false;
+  }
+  const lowX = Math.min(segment.a.x, segment.b.x);
+  const highX = Math.max(segment.a.x, segment.b.x);
+  return extendsAhead(head.x, lowX, highX, forward);
+}
+
+function blocksVerticalRay(head: Point, forward: number, segment: { a: Point; b: Point }): boolean {
+  const lowX = Math.min(segment.a.x, segment.b.x);
+  const highX = Math.max(segment.a.x, segment.b.x);
+
+  if (segment.a.x !== segment.b.x) {
+    return isAhead(head.y, segment.a.y, forward) && spans(head.x, lowX, highX);
+  }
+  if (segment.a.x !== head.x) {
+    return false;
+  }
+  const lowY = Math.min(segment.a.y, segment.b.y);
+  const highY = Math.max(segment.a.y, segment.b.y);
+  return extendsAhead(head.y, lowY, highY, forward);
+}
+
+/**
+ * An axis-aligned segment blocks a ray when it crosses the lane in front of the
+ * head. Grazing a corner counts as free: arrows in these mazes touch each other
+ * end to end and at right angles all the time, and only a real obstruction on
+ * the lane should cost a heart. A collinear segment that starts anywhere in
+ * front of the head does block, because the arrow would hit it.
+ */
+function blocksRay(
   head: Point,
   direction: MazeDirection,
   segment: { a: Point; b: Point },
-  level: MazeLevel,
 ): boolean {
-  return boxesOverlap(segmentBox(segment), rayBox(head, direction, level));
+  const forward = direction === "left" || direction === "up" ? -1 : 1;
+  const horizontal = direction === "left" || direction === "right";
+  return horizontal
+    ? blocksHorizontalRay(head, forward, segment)
+    : blocksVerticalRay(head, forward, segment);
 }
 
 export function isArrowRemovable(
@@ -131,7 +145,7 @@ export function isArrowRemovable(
       continue;
     }
     for (const segment of arrowSegments(other)) {
-      if (hitsAxisAlignedRay(head, direction, segment, level)) {
+      if (blocksRay(head, direction, segment)) {
         return false;
       }
     }

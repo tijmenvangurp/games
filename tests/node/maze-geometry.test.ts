@@ -59,6 +59,35 @@ describe("maze geometry", () => {
     expect(findHint(testLevel, new Set())).toBe(blocker);
   });
 
+  it("does not treat a corner touch as a blocker", () => {
+    const mover = arrow(1, [
+      [1, 1],
+      [2, 1],
+    ]);
+    const corner = arrow(2, [
+      [3, 1],
+      [3, 3],
+    ]);
+    const testLevel = level([mover, corner]);
+
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(true);
+  });
+
+  it("treats a collinear arrow directly ahead as a blocker", () => {
+    const mover = arrow(1, [
+      [1, 1],
+      [2, 1],
+    ]);
+    const ahead = arrow(2, [
+      [4, 1],
+      [3, 1],
+    ]);
+    const testLevel = level([mover, ahead]);
+
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
+    expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
+  });
+
   it("solves a small chain and detects a deadlock", () => {
     const chain = level([
       arrow(1, [

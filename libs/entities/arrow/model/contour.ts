@@ -6,14 +6,6 @@ import type { ShapeMask } from "./shapes";
 interface Edge {
   a: Point;
   b: Point;
-  out: Point;
-}
-
-interface EdgeDefinition {
-  neighbor: (point: Point) => Point;
-  a: (point: Point) => Point;
-  b: (point: Point) => Point;
-  out: Point;
 }
 
 interface ContourOptions {
@@ -30,32 +22,38 @@ const NEIGHBORS: readonly Point[] = [
   { x: 0, y: -1 },
 ];
 
-const EDGE_DEFINITIONS: readonly EdgeDefinition[] = [
+/**
+ * Cell boundary edges, oriented so the inside of the current layer is on the
+ * right. That makes every contour a clockwise walk in screen coordinates.
+ */
+const EDGE_DEFINITIONS: readonly {
+  neighbor: (point: Point) => Point;
+  a: (point: Point) => Point;
+  b: (point: Point) => Point;
+}[] = [
   {
     neighbor: (point) => ({ x: point.x, y: point.y - 1 }),
     a: (point) => ({ x: point.x, y: point.y }),
     b: (point) => ({ x: point.x + 1, y: point.y }),
-    out: { x: 0, y: -1 },
   },
   {
     neighbor: (point) => ({ x: point.x + 1, y: point.y }),
     a: (point) => ({ x: point.x + 1, y: point.y }),
     b: (point) => ({ x: point.x + 1, y: point.y + 1 }),
-    out: { x: 1, y: 0 },
   },
   {
     neighbor: (point) => ({ x: point.x, y: point.y + 1 }),
     a: (point) => ({ x: point.x + 1, y: point.y + 1 }),
     b: (point) => ({ x: point.x, y: point.y + 1 }),
-    out: { x: 0, y: 1 },
   },
   {
     neighbor: (point) => ({ x: point.x - 1, y: point.y }),
     a: (point) => ({ x: point.x, y: point.y + 1 }),
     b: (point) => ({ x: point.x, y: point.y }),
-    out: { x: -1, y: 0 },
   },
 ];
+
+const EMPTY_REMOVED: ReadonlySet<number> = new Set();
 
 function key(point: Point): string {
   return `${point.x},${point.y}`;
@@ -63,6 +61,14 @@ function key(point: Point): string {
 
 function add(a: Point, b: Point): Point {
   return { x: a.x + b.x, y: a.y + b.y };
+}
+
+function samePoint(a: Point, b: Point): boolean {
+  return a.x === b.x && a.y === b.y;
+}
+
+function directionBetween(from: Point, to: Point): Point {
+  return { x: Math.sign(to.x - from.x), y: Math.sign(to.y - from.y) };
 }
 
 function inside(mask: ShapeMask, point: Point): boolean {
@@ -83,30 +89,24 @@ function forEachCell(mask: ShapeMask, visit: (point: Point) => void): void {
   }
 }
 
-function hasOutsideNeighbor(mask: ShapeMask, point: Point): boolean {
-  return NEIGHBORS.some((direction) => !inside(mask, add(point, direction)));
-}
-
+/** Distance in cells from the outside of the silhouette, one-based. */
 function layerMap(mask: ShapeMask): Map<string, number> {
   const distance = new Map<string, number>();
   const queue: Point[] = [];
 
   forEachCell(mask, (point) => {
-    if (inside(mask, point) && hasOutsideNeighbor(mask, point)) {
+    if (inside(mask, point) && NEIGHBORS.some((step) => !inside(mask, add(point, step)))) {
       distance.set(key(point), 1);
       queue.push(point);
     }
   });
 
   while (queue.length > 0) {
-    const point = queue.shift();
-    if (!point) {
-      break;
-    }
-    const current = distance.get(key(point)) ?? 0;
+    const point = queue.shift() as Point;
+    const current = distance.get(key(point)) as number;
 
-    for (const direction of NEIGHBORS) {
-      const next = add(point, direction);
+    for (const step of NEIGHBORS) {
+      const next = add(point, step);
       if (!inside(mask, next) || (distance.get(key(next)) ?? Infinity) <= current + 1) {
         continue;
       }
@@ -119,22 +119,16 @@ function layerMap(mask: ShapeMask): Map<string, number> {
 }
 
 function contourEdges(mask: ShapeMask, layers: Map<string, number>, layer: number): Edge[] {
-  const cellInside = (point: Point) =>
-    inside(mask, point) && (layers.get(key(point)) ?? 0) >= layer;
-  const cellOutside = (point: Point) => !cellInside(point);
+  const inRegion = (point: Point) => inside(mask, point) && (layers.get(key(point)) ?? 0) >= layer;
   const edges: Edge[] = [];
 
   forEachCell(mask, (point) => {
-    if (!cellInside(point)) {
+    if (!inRegion(point)) {
       return;
     }
     for (const definition of EDGE_DEFINITIONS) {
-      if (cellOutside(definition.neighbor(point))) {
-        edges.push({
-          a: definition.a(point),
-          b: definition.b(point),
-          out: definition.out,
-        });
+      if (!inRegion(definition.neighbor(point))) {
+        edges.push({ a: definition.a(point), b: definition.b(point) });
       }
     }
   });
@@ -142,104 +136,86 @@ function contourEdges(mask: ShapeMask, layers: Map<string, number>, layer: numbe
   return edges;
 }
 
-function buildAdjacency(edges: readonly Edge[]): Map<string, Edge[]> {
-  const atPoint = new Map<string, Edge[]>();
+type EdgesByStart = Map<string, Edge[]>;
 
-  for (const edge of edges) {
-    for (const point of [edge.a, edge.b]) {
-      const list = atPoint.get(key(point)) ?? [];
-      list.push(edge);
-      atPoint.set(key(point), list);
-    }
-  }
-
-  return atPoint;
+function turnOrder(incoming: Point): Point[] {
+  const right = { x: -incoming.y, y: incoming.x };
+  const left = { x: incoming.y, y: -incoming.x };
+  return [right, incoming, left, { x: -incoming.x, y: -incoming.y }];
 }
 
-function walkLoop(start: Edge, unused: Set<string>, atPoint: Map<string, Edge[]>): Edge[] {
-  const loop: Edge[] = [start];
-  unused.delete(`${key(start.a)}|${key(start.b)}`);
-  let current = start.b;
+function nextEdge(current: Edge, byStart: EdgesByStart, unused: ReadonlySet<string>): Edge | null {
+  const options = (byStart.get(key(current.b)) ?? []).filter((candidate) =>
+    unused.has(`${key(candidate.a)}|${key(candidate.b)}`),
+  );
+  if (options.length === 0) {
+    return null;
+  }
+  const order = turnOrder(directionBetween(current.a, current.b));
+  const rank = (edge: Edge) =>
+    order.findIndex((step) => samePoint(step, directionBetween(edge.a, edge.b)));
+  return options.reduce((best, edge) => (rank(edge) < rank(best) ? edge : best));
+}
+
+function traceLoop(start: Edge, byStart: EdgesByStart, unused: Set<string>): Point[] {
+  const points: Point[] = [start.a];
+  let current = start;
 
   while (true) {
-    const options = (atPoint.get(key(current)) ?? []).filter((edge) =>
-      unused.has(`${key(edge.a)}|${key(edge.b)}`),
-    );
-    if (options.length === 0) {
+    unused.delete(`${key(current.a)}|${key(current.b)}`);
+    points.push(current.b);
+    if (samePoint(current.b, start.a)) {
       break;
     }
-    const next = options[0] as Edge;
-    loop.push(next);
-    unused.delete(`${key(next.a)}|${key(next.b)}`);
-    current = next.b;
-    if (key(current) === key(start.a)) {
+    const next = nextEdge(current, byStart, unused);
+    if (!next) {
       break;
     }
+    current = next;
   }
 
-  return loop;
+  return samePoint(points[0] as Point, points[points.length - 1] as Point)
+    ? points.slice(0, -1)
+    : [];
 }
 
-function contourLoops(edges: readonly Edge[]): Edge[][] {
+/**
+ * Walks the boundary with a right-hand rule. At a diagonal pinch point four
+ * edges meet; turning right keeps the two touching loops separate instead of
+ * stitching them into a figure eight.
+ */
+function contourLoops(edges: readonly Edge[]): Point[][] {
   const unused = new Set(edges.map((edge) => `${key(edge.a)}|${key(edge.b)}`));
-  const atPoint = buildAdjacency(edges);
-  const loops: Edge[][] = [];
+  const byStart: EdgesByStart = new Map();
 
+  for (const edge of edges) {
+    const list = byStart.get(key(edge.a)) ?? [];
+    list.push(edge);
+    byStart.set(key(edge.a), list);
+  }
+
+  const loops: Point[][] = [];
   for (const edge of edges) {
     if (!unused.has(`${key(edge.a)}|${key(edge.b)}`)) {
       continue;
     }
-    loops.push(walkLoop(edge, unused, atPoint));
+    const loop = traceLoop(edge, byStart, unused);
+    if (loop.length > 1) {
+      loops.push(loop);
+    }
   }
 
   return loops;
 }
 
-function uniquePoints(points: readonly Point[]): Point[] {
-  const result: Point[] = [];
-  for (const point of points) {
-    const last = result[result.length - 1];
-    if (!last || last.x !== point.x || last.y !== point.y) {
-      result.push(point);
-    }
+function isCorner(points: readonly Point[], index: number): boolean {
+  const n = points.length;
+  if (index <= 0 || index >= n - 1) {
+    return false;
   }
-  return result;
-}
-
-function buildLayerArrows(
-  mask: ShapeMask,
-  layers: Map<string, number>,
-  layer: number,
-  random: () => number,
-  minChunk: number,
-  maxChunk: number,
-  nextId: () => number,
-): MazeArrow[] {
-  const arrows: MazeArrow[] = [];
-
-  for (const loop of contourLoops(contourEdges(mask, layers, layer))) {
-    const points = uniquePoints([loop[0]?.a as Point, ...loop.map((edge) => edge.b)]);
-    let start = 0;
-
-    while (start < points.length - 1) {
-      const length = minChunk + Math.floor(random() * (maxChunk - minChunk + 1));
-      const end = Math.min(start + length, points.length - 1);
-      const chunk = points.slice(start, end + 1);
-      const firstEdge = loop[start];
-
-      if (chunk.length >= 2 && firstEdge) {
-        const head = chunk[0] as Point;
-        const radial = add(head, firstEdge.out);
-        const tailToHead = [...chunk].reverse();
-        tailToHead.push(radial);
-        arrows.push({ id: nextId(), points: uniquePoints(tailToHead) });
-      }
-
-      start = end;
-    }
-  }
-
-  return arrows;
+  const previous = directionBetween(points[index - 1] as Point, points[index] as Point);
+  const next = directionBetween(points[index] as Point, points[index + 1] as Point);
+  return !samePoint(previous, next);
 }
 
 function shuffle<T>(items: readonly T[], random: () => number): T[] {
@@ -253,70 +229,203 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
   return copy;
 }
 
-function buildAttempt(
-  candidates: readonly { arrow: MazeArrow; layer: number }[],
-  maxLayer: number,
+function cornerIndices(loop: readonly Point[]): number[] {
+  const count = loop.length;
+  const corners: number[] = [];
+  for (let index = 0; index < count; index += 1) {
+    const previous = directionBetween(
+      loop[(index - 1 + count) % count] as Point,
+      loop[index] as Point,
+    );
+    const next = directionBetween(loop[index] as Point, loop[(index + 1) % count] as Point);
+    if (!samePoint(previous, next)) {
+      corners.push(index);
+    }
+  }
+  return corners;
+}
+
+/** A cut between two corners leaves a gap that the escape lane can pass through. */
+function cutLoop(loop: readonly Point[], random: () => number): Point[] {
+  const corners = cornerIndices(loop);
+  const cut = corners[Math.floor(random() * corners.length)] ?? 0;
+  const chain: Point[] = [];
+  for (let index = 0; index < loop.length; index += 1) {
+    chain.push(loop[(cut + index) % loop.length] as Point);
+  }
+  return chain;
+}
+
+function chunkEnd(
+  chain: readonly Point[],
+  start: number,
+  minChunk: number,
+  maxChunk: number,
+  random: () => number,
+): number {
+  const target = minChunk + Math.floor(random() * (maxChunk - minChunk + 1));
+  let end = Math.min(start + target, chain.length - 1);
+
+  // Avoid a one-segment stub at the end of a contour.
+  if (chain.length - 1 - end === 1 && end > start + 1) {
+    end -= 1;
+  }
+
+  if (end >= chain.length - 1) {
+    return end;
+  }
+  for (let candidate = end; candidate >= start + 2; candidate -= 1) {
+    if (isCorner(chain, candidate)) {
+      return candidate;
+    }
+  }
+  return end;
+}
+
+/**
+ * Cuts a closed contour open at a corner and splits the resulting chain into
+ * arrows. Every arrow starts and ends on a lattice point; the final segment is
+ * the escape direction, exactly like the rest of the arrow.
+ */
+function chunkLoop(
+  loop: readonly Point[],
+  minChunk: number,
+  maxChunk: number,
+  random: () => number,
+): Point[][] {
+  if (loop.length < 2) {
+    return [];
+  }
+  const chain = cutLoop(loop, random);
+  const chunks: Point[][] = [];
+  let start = 0;
+
+  while (start < chain.length - 1) {
+    const end = chunkEnd(chain, start, minChunk, maxChunk, random);
+    chunks.push(chain.slice(start, end + 1));
+    start = end;
+  }
+
+  return chunks;
+}
+
+function reverse(arrow: MazeArrow): MazeArrow {
+  return { id: arrow.id, points: [...arrow.points].reverse() };
+}
+
+function buildCandidates(
+  loopsByLayer: readonly (readonly Point[][])[],
+  minChunk: number,
+  maxChunk: number,
+  random: () => number,
+): MazeArrow[] {
+  const candidates: MazeArrow[] = [];
+  let nextId = 1;
+
+  for (const loops of loopsByLayer) {
+    for (const loop of loops) {
+      for (const chunk of chunkLoop(loop, minChunk, maxChunk, random)) {
+        if (chunk.length >= 2) {
+          candidates.push({ id: nextId, points: chunk });
+          nextId += 1;
+        }
+      }
+    }
+  }
+
+  return candidates;
+}
+
+function contourLoopsByLayer(mask: ShapeMask, maxLayers: number): Point[][][] {
+  const layers = layerMap(mask);
+  const deepest = Math.min(maxLayers, Math.max(0, ...layers.values()));
+  const loopsByLayer: Point[][][] = [];
+
+  for (let layer = 1; layer <= deepest; layer += 1) {
+    loopsByLayer.push(contourLoops(contourEdges(mask, layers, layer)));
+  }
+
+  return loopsByLayer;
+}
+
+function levelWith(arrows: readonly MazeArrow[], width: number, height: number): MazeLevel {
+  return {
+    id: "candidate",
+    name: "candidate",
+    difficulty: "makkelijk",
+    width,
+    height,
+    arrows,
+  };
+}
+
+/**
+ * Removes arrows one by one, flipping an arrow when only its reverse direction
+ * is clear. The recorded order is a valid solution and every arrow that can be
+ * cleared is kept.
+ */
+function clearCandidates(
+  candidates: readonly MazeArrow[],
   width: number,
   height: number,
   random: () => number,
 ): MazeArrow[] {
-  const placed: MazeArrow[] = [];
-  const tempLevel: MazeLevel = {
-    id: "temp",
-    name: "temp",
-    difficulty: "makkelijk",
-    width,
-    height,
-    arrows: [],
-  };
+  const remaining = shuffle(candidates, random);
+  const order: MazeArrow[] = [];
 
-  for (let layer = maxLayer; layer >= 1; layer -= 1) {
-    const layerArrows = shuffle(
-      candidates.filter((candidate) => candidate.layer === layer),
-      random,
+  while (remaining.length > 0) {
+    const freeIndex = remaining.findIndex((arrow) =>
+      isArrowRemovable(arrow, levelWith(remaining, width, height), EMPTY_REMOVED),
     );
+    if (freeIndex >= 0) {
+      order.push(remaining[freeIndex] as MazeArrow);
+      remaining.splice(freeIndex, 1);
+      continue;
+    }
 
-    for (const { arrow } of layerArrows) {
-      tempLevel.arrows = placed;
-      if (!isArrowRemovable(arrow, tempLevel, new Set())) {
-        continue;
+    let flipped = false;
+    for (let index = 0; index < remaining.length && !flipped; index += 1) {
+      const candidate = reverse(remaining[index] as MazeArrow);
+      const others = remaining.filter((_, otherIndex) => otherIndex !== index);
+      if (isArrowRemovable(candidate, levelWith(others, width, height), EMPTY_REMOVED)) {
+        remaining[index] = candidate;
+        order.push(candidate);
+        remaining.splice(index, 1);
+        flipped = true;
       }
-      placed.push({ id: arrow.id, points: arrow.points });
+    }
+
+    if (!flipped) {
+      break;
     }
   }
 
-  return placed;
+  return order;
 }
 
 /**
- * Builds the contours from the outside in, then places arrows from the inside
- * out. Each new arrow must have a free lane against the arrows already placed,
- * so reversing the placement order is always a valid solution.
+ * Builds the contours from the outside in and cuts them into arrows. Arrows
+ * only ever follow lattice edges; no arrow extends into a neighbouring lane.
+ * Each attempt keeps the arrows that a greedy solver can clear, and the level
+ * uses the attempt that keeps the most arrows.
  */
 export function buildContourArrows(mask: ShapeMask, options: ContourOptions): MazeArrow[] {
-  const layers = layerMap(mask);
-  const maxLayer = Math.min(options.maxLayers, Math.max(0, ...layers.values()));
-  const random = mulberry32(options.seed);
-  const minChunk = Math.max(2, Math.min(options.minChunk, options.maxChunk));
-  const maxChunk = Math.max(minChunk, options.maxChunk);
-  let next = 1;
-  const nextId = () => next++;
-  const candidates: { arrow: MazeArrow; layer: number }[] = [];
-
-  for (let layer = 1; layer <= maxLayer; layer += 1) {
-    for (const arrow of buildLayerArrows(mask, layers, layer, random, minChunk, maxChunk, nextId)) {
-      candidates.push({ arrow, layer });
-    }
-  }
-
   const width = mask[0]?.length ?? 0;
   const height = mask.length;
+  const minChunk = Math.max(2, Math.min(options.minChunk, options.maxChunk));
+  const maxChunk = Math.max(minChunk, options.maxChunk);
+  const loopsByLayer = contourLoopsByLayer(mask, options.maxLayers);
   let best: MazeArrow[] = [];
 
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const placed = buildAttempt(candidates, maxLayer, width, height, random);
-    if (placed.length > best.length) {
-      best = placed;
+  for (let attempt = 0; attempt < 16; attempt += 1) {
+    const random = mulberry32(options.seed + attempt * 977);
+    const candidates = buildCandidates(loopsByLayer, minChunk, maxChunk, random);
+    const cleared = clearCandidates(candidates, width, height, random);
+    if (cleared.length > best.length) {
+      best = cleared;
+    }
+    if (best.length === candidates.length) {
+      break;
     }
   }
 

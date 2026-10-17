@@ -70,8 +70,14 @@ function MazeDots({ level }: { level: MazeLevel }) {
   return (
     <>
       <defs>
-        <pattern height="1" id={`maze-dots-${level.id}`} patternUnits="userSpaceOnUse" width="1">
-          <circle cx="0.5" cy="0.5" fill="#d8d8e8" r="0.045" />
+        <pattern
+          height="1"
+          id={`maze-dots-${level.id}`}
+          patternTransform="translate(-0.5 -0.5)"
+          patternUnits="userSpaceOnUse"
+          width="1"
+        >
+          <circle cx="0.5" cy="0.5" fill="#d8d8e8" r="0.06" />
         </pattern>
       </defs>
       <rect
