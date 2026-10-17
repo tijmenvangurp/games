@@ -33,11 +33,20 @@ function pointsAttribute(points: readonly Point[]): string {
   return points.map((point) => `${point.x},${point.y}`).join(" ");
 }
 
-/** Visual gap between an arrow end and any arrow it shares a lattice point with. */
+/** Visual gap between an arrow tail and anything it shares a lattice point with. */
 const ARROW_INSET = 0.2;
+const HEAD_LENGTH = 0.55;
+const HEAD_HALF_WIDTH = 0.25;
+const HEAD_OVERLAP = 0.05;
 
 function segmentLength(from: Point, to: Point): number {
   return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
+}
+
+function polylineLength(points: readonly Point[]): number {
+  return points
+    .slice(1)
+    .reduce((sum, point, index) => sum + segmentLength(points[index] as Point, point), 0);
 }
 
 function pointAlong(points: readonly Point[], distance: number): Point {
@@ -59,22 +68,17 @@ function pointAlong(points: readonly Point[], distance: number): Point {
 }
 
 /**
- * Shortens an arrow at both ends so arrows that meet on the same lattice point
- * stay visibly separate. The underlying level keeps its exact grid geometry.
+ * Trims an arrow at both ends. The tail gets a visible gap; the head end is
+ * trimmed to the base of the arrowhead so the rounded stroke can never poke
+ * through the tip.
  */
-function insetPolyline(points: readonly Point[], inset: number): Point[] {
+function trimPolyline(points: readonly Point[], startInset: number, endInset: number): Point[] {
   if (points.length < 2) {
     return [...points];
   }
-  const total = points
-    .slice(1)
-    .reduce((sum, point, index) => sum + segmentLength(points[index] as Point, point), 0);
-  if (total <= inset * 2) {
-    return [...points];
-  }
-
-  const startDistance = inset;
-  const endDistance = total - inset;
+  const total = polylineLength(points);
+  const startDistance = Math.min(startInset, total);
+  const endDistance = Math.max(startDistance, total - endInset);
   const result: Point[] = [pointAlong(points, startDistance)];
   let travelled = 0;
 
@@ -89,32 +93,51 @@ function insetPolyline(points: readonly Point[], inset: number): Point[] {
   return result;
 }
 
+/** Heads that meet another head need a gap; all other heads sit on the end. */
+function arrowsWithTouchingHeads(level: MazeLevel): ReadonlySet<number> {
+  const firstHeadAt = new Map<string, number>();
+  const touching = new Set<number>();
+
+  for (const arrow of level.arrows) {
+    const head = arrow.points[arrow.points.length - 1] as Point;
+    const pointId = `${head.x},${head.y}`;
+    const other = firstHeadAt.get(pointId);
+    if (other === undefined) {
+      firstHeadAt.set(pointId, arrow.id);
+    } else {
+      touching.add(other);
+      touching.add(arrow.id);
+    }
+  }
+
+  return touching;
+}
+
 function headAttribute(head: Point, direction: MazeDirection): string {
   const dx = direction === "right" ? 1 : direction === "left" ? -1 : 0;
   const dy = direction === "down" ? 1 : direction === "up" ? -1 : 0;
-  const base = { x: head.x - dx * 0.55, y: head.y - dy * 0.55 };
+  const base = { x: head.x - dx * HEAD_LENGTH, y: head.y - dy * HEAD_LENGTH };
   const px = -dy;
   const py = dx;
-  const first = { x: base.x + px * 0.25, y: base.y + py * 0.25 };
-  const second = { x: base.x - px * 0.25, y: base.y - py * 0.25 };
+  const first = { x: base.x + px * HEAD_HALF_WIDTH, y: base.y + py * HEAD_HALF_WIDTH };
+  const second = { x: base.x - px * HEAD_HALF_WIDTH, y: base.y - py * HEAD_HALF_WIDTH };
   return `${head.x},${head.y} ${first.x},${first.y} ${second.x},${second.y}`;
 }
 
-function ArrowShape({ arrow }: { arrow: MazeArrow }) {
-  const points = insetPolyline(arrow.points, ARROW_INSET);
-  const head = points[points.length - 1] as Point;
-  const before = points[points.length - 2] ?? head;
+function ArrowShape({ arrow, headInset }: { arrow: MazeArrow; headInset: number }) {
+  const total = polylineLength(arrow.points);
+  const head = pointAlong(arrow.points, total - headInset);
+  const base = pointAlong(arrow.points, Math.max(0, total - headInset - HEAD_LENGTH));
   const direction =
-    before.x === head.x && before.y === head.y
-      ? arrowDirection(arrow)
-      : directionBetween(before, head);
+    base.x === head.x && base.y === head.y ? arrowDirection(arrow) : directionBetween(base, head);
+  const line = trimPolyline(arrow.points, ARROW_INSET, headInset + HEAD_LENGTH - HEAD_OVERLAP);
 
   return (
     <>
       <polyline
         className="maze-line"
         fill="none"
-        points={pointsAttribute(points)}
+        points={pointsAttribute(line)}
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -153,13 +176,21 @@ function MazeDots({ level }: { level: MazeLevel }) {
 
 interface MazeArrowNodeProps {
   arrow: MazeArrow;
+  headInset: boolean;
   hintId: number | null;
   blockedId: number | null;
   disabled: boolean;
   onTap: (id: number) => void;
 }
 
-function MazeArrowNode({ arrow, hintId, blockedId, disabled, onTap }: MazeArrowNodeProps) {
+function MazeArrowNode({
+  arrow,
+  headInset,
+  hintId,
+  blockedId,
+  disabled,
+  onTap,
+}: MazeArrowNodeProps) {
   return (
     <g
       aria-label={`Pijl naar ${DIRECTION_LABELS[arrowDirection(arrow)]}`}
@@ -187,12 +218,20 @@ function MazeArrowNode({ arrow, hintId, blockedId, disabled, onTap }: MazeArrowN
         strokeLinejoin="round"
         strokeWidth={0.38}
       />
-      <ArrowShape arrow={arrow} />
+      <ArrowShape arrow={arrow} headInset={headInset ? ARROW_INSET : 0} />
     </g>
   );
 }
 
-function MazeFlying({ flying, onFlyingEnd }: { flying: FlyingArrow; onFlyingEnd: () => void }) {
+function MazeFlying({
+  flying,
+  headInset,
+  onFlyingEnd,
+}: {
+  flying: FlyingArrow;
+  headInset: boolean;
+  onFlyingEnd: () => void;
+}) {
   return (
     <g
       key={flying.key}
@@ -201,7 +240,7 @@ function MazeFlying({ flying, onFlyingEnd }: { flying: FlyingArrow; onFlyingEnd:
       pointerEvents="none"
       onAnimationEnd={onFlyingEnd}
     >
-      <ArrowShape arrow={flying.arrow} />
+      <ArrowShape arrow={flying.arrow} headInset={headInset ? ARROW_INSET : 0} />
     </g>
   );
 }
@@ -251,6 +290,7 @@ export function MazeBoard({
 }: MazeBoardProps) {
   const bounds = levelBounds(level);
   const removed = new Set(removedIds);
+  const insetHeads = arrowsWithTouchingHeads(level);
   const { ref, onPointerDown } = useMazePointer(level, removed, disabled, onTap);
 
   return (
@@ -271,13 +311,20 @@ export function MazeBoard({
             arrow={arrow}
             blockedId={blockedId}
             disabled={disabled}
+            headInset={insetHeads.has(arrow.id)}
             hintId={hintId}
             onTap={onTap}
           />
         ),
       )}
 
-      {flying ? <MazeFlying flying={flying} onFlyingEnd={onFlyingEnd} /> : null}
+      {flying ? (
+        <MazeFlying
+          flying={flying}
+          headInset={insetHeads.has(flying.arrow.id)}
+          onFlyingEnd={onFlyingEnd}
+        />
+      ) : null}
     </svg>
   );
 }
