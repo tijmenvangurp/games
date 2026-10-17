@@ -90,6 +90,31 @@ describe("maze levels", () => {
     }
   });
 
+  it("never lets an arrow body touch another arrow", () => {
+    for (const level of MAZE_LEVELS) {
+      const uses = new Map<string, { id: number; mid: boolean }[]>();
+
+      for (const arrow of level.arrows) {
+        for (let index = 0; index < arrow.points.length; index += 1) {
+          const point = arrow.points[index] as Point;
+          const pointId = `${point.x},${point.y}`;
+          const list = uses.get(pointId) ?? [];
+          list.push({ id: arrow.id, mid: index > 0 && index < arrow.points.length - 1 });
+          uses.set(pointId, list);
+        }
+      }
+
+      for (const [pointId, list] of uses) {
+        if (list.length > 1) {
+          expect(
+            list.some((use) => use.mid),
+            `arrows touch at ${pointId}: ${list.map((use) => use.id).join(", ")}`,
+          ).toBe(false);
+        }
+      }
+    }
+  });
+
   it("looks up levels by index and rejects unknown indexes", () => {
     expect(levelAt(0)).toBe(MAZE_LEVELS[0]);
     expect(levelAt(LEVEL_COUNT - 1)).toBe(MAZE_LEVELS[LEVEL_COUNT - 1]);

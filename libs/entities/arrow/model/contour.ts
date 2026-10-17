@@ -22,6 +22,14 @@ const NEIGHBORS: readonly Point[] = [
   { x: 0, y: -1 },
 ];
 
+const LAYER_NEIGHBORS: readonly Point[] = [
+  ...NEIGHBORS,
+  { x: 1, y: 1 },
+  { x: 1, y: -1 },
+  { x: -1, y: 1 },
+  { x: -1, y: -1 },
+];
+
 /**
  * Cell boundary edges, oriented so the inside of the current layer is on the
  * right. That makes every contour a clockwise walk in screen coordinates.
@@ -89,13 +97,17 @@ function forEachCell(mask: ShapeMask, visit: (point: Point) => void): void {
   }
 }
 
-/** Distance in cells from the outside of the silhouette, one-based. */
+/**
+ * Chebyshev distance from the outside of the silhouette, one-based. Diagonal
+ * neighbours count too: without them, consecutive contour layers touch at the
+ * corners of diagonal steps and two arrow bodies would overlap there.
+ */
 function layerMap(mask: ShapeMask): Map<string, number> {
   const distance = new Map<string, number>();
   const queue: Point[] = [];
 
   forEachCell(mask, (point) => {
-    if (inside(mask, point) && NEIGHBORS.some((step) => !inside(mask, add(point, step)))) {
+    if (inside(mask, point) && LAYER_NEIGHBORS.some((step) => !inside(mask, add(point, step)))) {
       distance.set(key(point), 1);
       queue.push(point);
     }
@@ -105,7 +117,7 @@ function layerMap(mask: ShapeMask): Map<string, number> {
     const point = queue.shift() as Point;
     const current = distance.get(key(point)) as number;
 
-    for (const step of NEIGHBORS) {
+    for (const step of LAYER_NEIGHBORS) {
       const next = add(point, step);
       if (!inside(mask, next) || (distance.get(key(next)) ?? Infinity) <= current + 1) {
         continue;
@@ -403,6 +415,66 @@ function clearCandidates(
   return order;
 }
 
+interface VertexUse {
+  id: number;
+  mid: boolean;
+}
+
+function vertexUses(arrows: readonly MazeArrow[]): Map<string, VertexUse[]> {
+  const uses = new Map<string, VertexUse[]>();
+  for (const arrow of arrows) {
+    for (let index = 0; index < arrow.points.length; index += 1) {
+      const point = arrow.points[index] as Point;
+      const list = uses.get(key(point)) ?? [];
+      list.push({ id: arrow.id, mid: index > 0 && index < arrow.points.length - 1 });
+      uses.set(key(point), list);
+    }
+  }
+  return uses;
+}
+
+function shortestArrow(list: readonly VertexUse[], byId: ReadonlyMap<number, MazeArrow>): number {
+  let victim = list[0]?.id ?? 0;
+  let length = Infinity;
+  for (const use of list) {
+    const arrow = byId.get(use.id);
+    if (arrow && arrow.points.length < length) {
+      victim = use.id;
+      length = arrow.points.length;
+    }
+  }
+  return victim;
+}
+
+function contactVictim(
+  uses: ReadonlyMap<string, VertexUse[]>,
+  byId: ReadonlyMap<number, MazeArrow>,
+): number | null {
+  for (const list of uses.values()) {
+    if (list.length > 1 && list.some((use) => use.mid)) {
+      return shortestArrow(list, byId);
+    }
+  }
+  return null;
+}
+
+/** Arrows may meet end to end, but a body may never touch another arrow. */
+function removeBodyContacts(arrows: MazeArrow[]): MazeArrow[] {
+  const kept = [...arrows];
+
+  while (true) {
+    const byId = new Map(kept.map((arrow) => [arrow.id, arrow]));
+    const victim = contactVictim(vertexUses(kept), byId);
+    if (victim === null) {
+      return kept;
+    }
+    kept.splice(
+      kept.findIndex((arrow) => arrow.id === victim),
+      1,
+    );
+  }
+}
+
 /**
  * Builds the contours from the outside in and cuts them into arrows. Arrows
  * only ever follow lattice edges; no arrow extends into a neighbouring lane.
@@ -420,7 +492,7 @@ export function buildContourArrows(mask: ShapeMask, options: ContourOptions): Ma
   for (let attempt = 0; attempt < 16; attempt += 1) {
     const random = mulberry32(options.seed + attempt * 977);
     const candidates = buildCandidates(loopsByLayer, minChunk, maxChunk, random);
-    const cleared = clearCandidates(candidates, width, height, random);
+    const cleared = removeBodyContacts(clearCandidates(candidates, width, height, random));
     if (cleared.length > best.length) {
       best = cleared;
     }

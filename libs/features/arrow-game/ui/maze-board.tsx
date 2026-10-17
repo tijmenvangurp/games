@@ -1,7 +1,7 @@
 import { useRef, type PointerEvent, type RefObject } from "react";
 import {
   arrowDirection,
-  arrowHead,
+  directionBetween,
   levelBounds,
   nearestArrow,
   type MazeArrow,
@@ -33,6 +33,62 @@ function pointsAttribute(points: readonly Point[]): string {
   return points.map((point) => `${point.x},${point.y}`).join(" ");
 }
 
+/** Visual gap between an arrow end and any arrow it shares a lattice point with. */
+const ARROW_INSET = 0.2;
+
+function segmentLength(from: Point, to: Point): number {
+  return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
+}
+
+function pointAlong(points: readonly Point[], distance: number): Point {
+  let remaining = distance;
+  for (let index = 1; index < points.length; index += 1) {
+    const from = points[index - 1] as Point;
+    const to = points[index] as Point;
+    const length = segmentLength(from, to);
+    if (length === 0) {
+      continue;
+    }
+    if (remaining <= length) {
+      const ratio = remaining / length;
+      return { x: from.x + (to.x - from.x) * ratio, y: from.y + (to.y - from.y) * ratio };
+    }
+    remaining -= length;
+  }
+  return points[points.length - 1] as Point;
+}
+
+/**
+ * Shortens an arrow at both ends so arrows that meet on the same lattice point
+ * stay visibly separate. The underlying level keeps its exact grid geometry.
+ */
+function insetPolyline(points: readonly Point[], inset: number): Point[] {
+  if (points.length < 2) {
+    return [...points];
+  }
+  const total = points
+    .slice(1)
+    .reduce((sum, point, index) => sum + segmentLength(points[index] as Point, point), 0);
+  if (total <= inset * 2) {
+    return [...points];
+  }
+
+  const startDistance = inset;
+  const endDistance = total - inset;
+  const result: Point[] = [pointAlong(points, startDistance)];
+  let travelled = 0;
+
+  for (let index = 1; index < points.length; index += 1) {
+    travelled += segmentLength(points[index - 1] as Point, points[index] as Point);
+    if (travelled > startDistance && travelled < endDistance) {
+      result.push(points[index] as Point);
+    }
+  }
+
+  result.push(pointAlong(points, endDistance));
+  return result;
+}
+
 function headAttribute(head: Point, direction: MazeDirection): string {
   const dx = direction === "right" ? 1 : direction === "left" ? -1 : 0;
   const dy = direction === "down" ? 1 : direction === "up" ? -1 : 0;
@@ -45,22 +101,26 @@ function headAttribute(head: Point, direction: MazeDirection): string {
 }
 
 function ArrowShape({ arrow }: { arrow: MazeArrow }) {
+  const points = insetPolyline(arrow.points, ARROW_INSET);
+  const head = points[points.length - 1] as Point;
+  const before = points[points.length - 2] ?? head;
+  const direction =
+    before.x === head.x && before.y === head.y
+      ? arrowDirection(arrow)
+      : directionBetween(before, head);
+
   return (
     <>
       <polyline
         className="maze-line"
         fill="none"
-        points={pointsAttribute(arrow.points)}
+        points={pointsAttribute(points)}
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={0.16}
       />
-      <polygon
-        className="maze-head"
-        fill="currentColor"
-        points={headAttribute(arrowHead(arrow), arrowDirection(arrow))}
-      />
+      <polygon className="maze-head" fill="currentColor" points={headAttribute(head, direction)} />
     </>
   );
 }
