@@ -47,6 +47,7 @@ Dezelfde gate als `homelab-control`:
 - Feature-Sliced Design via Steiger
 - Fallow boundary-check en audit
 - Playwright E2E, inclusief mobiel en tablet viewport
+- GitHub Actions vastgezet op volledige commit-SHA's; Dependabot houdt de pins wekelijks bij
 - Husky pre-commit (`pnpm quality`), pre-push (blokkeert `main`) en commitlint met verplichte scope
 
 De pnpm-instelling `minimumReleaseAge` uit `homelab-control` is bij de start bewust niet actief: een verse lockfile kan anders geen actuele toolchain resolven. Zie `docs/adr/0002-kwaliteitsgate.md`.
