@@ -39,6 +39,29 @@ const HEAD_LENGTH = 0.55;
 const HEAD_HALF_WIDTH = 0.25;
 const HEAD_OVERLAP = 0.05;
 
+/** Duration of a flight in milliseconds; keep in sync with `--maze-flight` in the stylesheet. */
+const FLIGHT_MS = 380;
+
+/** Every integer lattice point an arrow occupies, from tail to head. */
+function trailPoints(points: readonly Point[]): Point[] {
+  if (points.length === 0) {
+    return [];
+  }
+  const dots: Point[] = [];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const from = points[index] as Point;
+    const to = points[index + 1] as Point;
+    const dx = Math.sign(to.x - from.x);
+    const dy = Math.sign(to.y - from.y);
+    const steps = Math.max(1, Math.round(Math.abs(to.x - from.x) + Math.abs(to.y - from.y)));
+    for (let step = 0; step < steps; step += 1) {
+      dots.push({ x: from.x + dx * step, y: from.y + dy * step });
+    }
+  }
+  dots.push(points[points.length - 1] as Point);
+  return dots;
+}
+
 function segmentLength(from: Point, to: Point): number {
   return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
 }
@@ -160,7 +183,7 @@ function MazeDots({ level }: { level: MazeLevel }) {
           patternUnits="userSpaceOnUse"
           width="1"
         >
-          <circle cx="0.5" cy="0.5" fill="#d8d8e8" r="0.06" />
+          <circle cx="0.5" cy="0.5" fill="#e4e4f0" r="0.055" />
         </pattern>
       </defs>
       <rect
@@ -170,6 +193,49 @@ function MazeDots({ level }: { level: MazeLevel }) {
         x={bounds.minX}
         y={bounds.minY}
       />
+    </>
+  );
+}
+
+/**
+ * Dots that light up on the lattice points an arrow vacates. The delay follows
+ * the flight: each dot fades in just as the departing body uncovers it, so the
+ * path reads as a trail instead of a block of dots appearing at once.
+ */
+function MazeTrail({
+  level,
+  removed,
+  insetHeads,
+}: {
+  level: MazeLevel;
+  removed: ReadonlySet<number>;
+  insetHeads: ReadonlySet<number>;
+}) {
+  const bounds = levelBounds(level);
+  return (
+    <>
+      {level.arrows.map((arrow) => {
+        if (!removed.has(arrow.id)) {
+          return null;
+        }
+        const { travel } = flyingGeometry(arrow, bounds, insetHeads.has(arrow.id));
+        return (
+          <g key={`${level.id}:${arrow.id}`}>
+            {trailPoints(arrow.points).map((point, index) => (
+              <circle
+                key={index}
+                className="maze-trail-dot"
+                cx={point.x}
+                cy={point.y}
+                r={0.11}
+                style={{
+                  animationDelay: `${Math.min(1, index / travel) * FLIGHT_MS}ms`,
+                }}
+              />
+            ))}
+          </g>
+        );
+      })}
     </>
   );
 }
@@ -341,12 +407,22 @@ function MazeFlying({
       className="maze-flying"
       data-direction={flying.direction}
       pointerEvents="none"
+      style={{ "--maze-flight": `${FLIGHT_MS}ms` } as CSSProperties}
       onAnimationEnd={onFlyingEnd}
     >
       <FlyingArrowShape arrow={flying.arrow} bounds={bounds} headInset={headInset} />
     </g>
   );
 }
+
+interface PendingTap {
+  pointerId: number;
+  clientX: number;
+  clientY: number;
+}
+
+/** Movement (in screen px) beyond which a gesture is a drag/scroll, not a tap. */
+const TAP_SLOP_PX = 10;
 
 function useMazePointer(
   level: MazeLevel,
@@ -356,21 +432,27 @@ function useMazePointer(
 ): {
   ref: RefObject<SVGSVGElement | null>;
   onPointerDown: (event: PointerEvent<SVGSVGElement>) => void;
+  onPointerMove: (event: PointerEvent<SVGSVGElement>) => void;
+  onPointerUp: (event: PointerEvent<SVGSVGElement>) => void;
+  onPointerCancel: (event: PointerEvent<SVGSVGElement>) => void;
 } {
   const ref = useRef<SVGSVGElement>(null);
+  const pending = useRef<PendingTap | null>(null);
+  const activePointers = useRef<Set<number>>(new Set());
   const bounds = levelBounds(level);
 
-  const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
-    if (disabled || !ref.current) {
+  const tapAt = (clientX: number, clientY: number) => {
+    const node = ref.current;
+    if (!node) {
       return;
     }
-    const rect = ref.current.getBoundingClientRect();
+    const rect = node.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) {
       return;
     }
     const point = {
-      x: bounds.minX + ((event.clientX - rect.left) / rect.width) * bounds.width,
-      y: bounds.minY + ((event.clientY - rect.top) / rect.height) * bounds.height,
+      x: bounds.minX + ((clientX - rect.left) / rect.width) * bounds.width,
+      y: bounds.minY + ((clientY - rect.top) / rect.height) * bounds.height,
     };
     const arrow = nearestArrow(level, removed, point, 1.35);
     if (arrow) {
@@ -378,7 +460,60 @@ function useMazePointer(
     }
   };
 
-  return { ref, onPointerDown };
+  /**
+   * Only a single, primary, stationary pointer may select an arrow. Sliding the
+   * screen, a second finger or a mouse button other than the first never reads
+   * as a tap: the pending gesture is dropped as soon as any of those happen.
+   */
+  const onPointerDown = (event: PointerEvent<SVGSVGElement>) => {
+    activePointers.current.add(event.pointerId);
+    if (disabled || !event.isPrimary || event.button !== 0 || activePointers.current.size > 1) {
+      pending.current = null;
+      return;
+    }
+    pending.current = {
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY,
+    };
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // jsdom and older engines have no pointer capture; movement checks still work.
+    }
+  };
+
+  const onPointerMove = (event: PointerEvent<SVGSVGElement>) => {
+    const start = pending.current;
+    if (!start || start.pointerId !== event.pointerId) {
+      return;
+    }
+    if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) > TAP_SLOP_PX) {
+      pending.current = null;
+    }
+  };
+
+  const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
+    activePointers.current.delete(event.pointerId);
+    const start = pending.current;
+    pending.current = null;
+    if (disabled || !start || start.pointerId !== event.pointerId) {
+      return;
+    }
+    if (Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY) > TAP_SLOP_PX) {
+      return;
+    }
+    tapAt(start.clientX, start.clientY);
+  };
+
+  const onPointerCancel = (event: PointerEvent<SVGSVGElement>) => {
+    activePointers.current.delete(event.pointerId);
+    if (pending.current?.pointerId === event.pointerId) {
+      pending.current = null;
+    }
+  };
+
+  return { ref, onPointerDown, onPointerMove, onPointerUp, onPointerCancel };
 }
 
 export function MazeBoard({
@@ -394,7 +529,12 @@ export function MazeBoard({
   const bounds = levelBounds(level);
   const removed = new Set(removedIds);
   const insetHeads = arrowsWithTouchingHeads(level);
-  const { ref, onPointerDown } = useMazePointer(level, removed, disabled, onTap);
+  const { ref, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useMazePointer(
+    level,
+    removed,
+    disabled,
+    onTap,
+  );
 
   return (
     <svg
@@ -403,9 +543,13 @@ export function MazeBoard({
       className="block w-full touch-manipulation select-none"
       role="group"
       viewBox={`${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}`}
+      onPointerCancel={onPointerCancel}
       onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
     >
       <MazeDots level={level} />
+      <MazeTrail insetHeads={insetHeads} level={level} removed={removed} />
 
       {level.arrows.map((arrow) =>
         removed.has(arrow.id) ? null : (

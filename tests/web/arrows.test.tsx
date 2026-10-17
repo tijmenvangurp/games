@@ -3,7 +3,14 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { levelAt, MAX_HEARTS, removableArrows, solveMaze, type MazeArrow } from "@entities/arrow";
+import {
+  levelAt,
+  levelBounds,
+  MAX_HEARTS,
+  removableArrows,
+  solveMaze,
+  type MazeArrow,
+} from "@entities/arrow";
 import { useArrowsStore } from "@features/arrow-game";
 
 const STORAGE_KEY = "games.arrows.v2";
@@ -159,5 +166,136 @@ describe("arrows maze", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Level 1,/ }));
     expect(await screen.findByRole("group", { name: /pijlenpuzzel/i })).toBeTruthy();
+  });
+});
+
+function boardSvg(): SVGSVGElement {
+  return screen.getByRole("group", { name: /pijlenpuzzel/i }) as unknown as SVGSVGElement;
+}
+
+function mockBoardRect(svg: SVGSVGElement, bounds: ReturnType<typeof levelBounds>): void {
+  svg.getBoundingClientRect = () =>
+    ({
+      bottom: bounds.height,
+      height: bounds.height,
+      left: 0,
+      right: bounds.width,
+      top: 0,
+      width: bounds.width,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }) as DOMRect;
+}
+
+/** A point in the middle of the arrow's first segment, unique to that arrow. */
+function segmentMidpoint(arrow: MazeArrow): { x: number; y: number } {
+  const from = arrow.points[0] as { x: number; y: number };
+  const to = arrow.points[1] as { x: number; y: number };
+  return { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+}
+
+function latticeDotCount(arrow: MazeArrow): number {
+  let count = 1;
+  for (let index = 1; index < arrow.points.length; index += 1) {
+    const from = arrow.points[index - 1] as { x: number; y: number };
+    const to = arrow.points[index] as { x: number; y: number };
+    count += Math.max(1, Math.round(Math.abs(to.x - from.x) + Math.abs(to.y - from.y)));
+  }
+  return count;
+}
+
+describe("arrows pointer gestures", () => {
+  async function tapTarget(): Promise<{
+    svg: SVGSVGElement;
+    x: number;
+    y: number;
+    arrow: MazeArrow;
+  }> {
+    await startGame();
+    const level = currentLevel();
+    const bounds = levelBounds(level);
+    const svg = boardSvg();
+    mockBoardRect(svg, bounds);
+    const arrow = firstRemovable();
+    const point = segmentMidpoint(arrow);
+    return { arrow, svg, x: point.x - bounds.minX, y: point.y - bounds.minY };
+  }
+
+  it("selects an arrow on a single stationary pointer tap", async () => {
+    const { arrow, svg, x, y } = await tapTarget();
+
+    fireEvent.pointerDown(svg, {
+      button: 0,
+      clientX: x,
+      clientY: y,
+      isPrimary: true,
+      pointerId: 1,
+    });
+    fireEvent.pointerUp(svg, { button: 0, clientX: x, clientY: y, isPrimary: true, pointerId: 1 });
+
+    expect(useArrowsStore.getState().removedIds).toContain(arrow.id);
+  });
+
+  it("ignores a gesture that turns into a drag", async () => {
+    const { svg, x, y } = await tapTarget();
+
+    fireEvent.pointerDown(svg, {
+      button: 0,
+      clientX: x,
+      clientY: y,
+      isPrimary: true,
+      pointerId: 1,
+    });
+    fireEvent.pointerMove(svg, { clientX: x + 40, clientY: y, isPrimary: true, pointerId: 1 });
+    fireEvent.pointerUp(svg, {
+      button: 0,
+      clientX: x + 40,
+      clientY: y,
+      isPrimary: true,
+      pointerId: 1,
+    });
+
+    expect(useArrowsStore.getState().removedIds).toEqual([]);
+    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
+  });
+
+  it("ignores a tap while a second finger is down", async () => {
+    const { svg, x, y } = await tapTarget();
+
+    fireEvent.pointerDown(svg, {
+      button: 0,
+      clientX: x,
+      clientY: y,
+      isPrimary: true,
+      pointerId: 1,
+    });
+    fireEvent.pointerDown(svg, {
+      button: 0,
+      clientX: x + 30,
+      clientY: y + 30,
+      isPrimary: false,
+      pointerId: 2,
+    });
+    fireEvent.pointerUp(svg, { button: 0, clientX: x, clientY: y, isPrimary: true, pointerId: 1 });
+
+    expect(useArrowsStore.getState().removedIds).toEqual([]);
+    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
+  });
+
+  it("lights up the lattice points a departed arrow vacated", async () => {
+    await startGame();
+    const arrow = firstRemovable();
+    fireEvent.click(arrowNode(arrow.id));
+
+    const dots = document.querySelectorAll(".maze-trail-dot");
+    expect(dots).toHaveLength(latticeDotCount(arrow));
+
+    const head = arrow.points[arrow.points.length - 1] as { x: number; y: number };
+    const headDot = [...dots].find(
+      (dot) =>
+        dot.getAttribute("cx") === String(head.x) && dot.getAttribute("cy") === String(head.y),
+    );
+    expect(headDot).toBeTruthy();
   });
 });

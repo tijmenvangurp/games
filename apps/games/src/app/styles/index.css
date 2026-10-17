@@ -220,11 +220,30 @@
 
 .maze-flying .maze-snake-body {
   stroke-dasharray: var(--maze-window) var(--maze-track);
-  animation: maze-snake-body 380ms ease-in forwards;
+  animation: maze-snake-body var(--maze-flight, 380ms) ease-in forwards;
 }
 
 .maze-flying .maze-snake-head {
-  animation: maze-snake-head 380ms ease-in forwards;
+  animation: maze-snake-head var(--maze-flight, 380ms) ease-in forwards;
+}
+
+@keyframes maze-trail-dot {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.maze-trail-dot {
+  fill: #111827;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: maze-trail-dot 160ms ease-out forwards;
 }
 
 [data-creature-id]:focus-visible {
@@ -239,5 +258,9 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .maze-trail-dot {
+    animation-delay: 0ms !important;
   }
 }
