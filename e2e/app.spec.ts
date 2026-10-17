@@ -90,3 +90,27 @@ test.describe("memory op een telefoon", () => {
     expect(overflows).toBe(false);
   });
 });
+
+test.describe("pokémon quiz op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("kiest een naam en krijgt feedback", async ({ page }) => {
+    await page.goto("/raad");
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const options = page.getByRole("group", { name: "Kies de juiste naam" });
+    await expect(options.getByRole("button")).toHaveCount(4);
+
+    await options.getByRole("button").first().click();
+    await expect(page.getByRole("button", { name: /Volgende Pokémon/ })).toBeVisible();
+    await expect(page.locator('[data-answer-state="correct"]')).toHaveCount(1);
+    await expect(
+      page.locator('[data-answer-state="wrong"], [data-answer-state="muted"]'),
+    ).toHaveCount(3);
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+});

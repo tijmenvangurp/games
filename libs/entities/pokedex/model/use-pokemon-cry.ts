@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { Pokemon } from "@entities/memory";
+import type { Pokemon } from "./types";
 import { pokemonCrySrc } from "./assets";
 
 /**

@@ -2,18 +2,18 @@ import { describe, expect, it } from "vitest";
 import {
   MEMORY_DIFFICULTIES,
   MEMORY_PAIRS,
-  POKEMON,
+  MEMORY_POKEMON_POOL_SIZE,
   createMemoryScene,
-  getPokemon,
 } from "@entities/memory";
+import { POKEDEX, getPokemon } from "@entities/pokedex";
 
 describe("pokémon memory generator", () => {
   it("contains the complete Generation 1 Pokédex", () => {
-    expect(POKEMON).toHaveLength(151);
-    expect(POKEMON.map((pokemon) => pokemon.id)).toEqual(
-      Array.from({ length: 151 }, (_, index) => index + 1),
+    expect(POKEDEX).toHaveLength(MEMORY_POKEMON_POOL_SIZE);
+    expect(POKEDEX.map((pokemon) => pokemon.id)).toEqual(
+      Array.from({ length: MEMORY_POKEMON_POOL_SIZE }, (_, index) => index + 1),
     );
-    expect(new Set(POKEMON.map((pokemon) => pokemon.slug)).size).toBe(151);
+    expect(new Set(POKEDEX.map((pokemon) => pokemon.slug)).size).toBe(MEMORY_POKEMON_POOL_SIZE);
     expect(getPokemon(25)?.name).toBe("Pikachu");
     expect(getPokemon(122)?.slug).toBe("mrmime");
     expect(getPokemon(0)).toBeUndefined();

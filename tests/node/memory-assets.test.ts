@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getPokemon } from "@entities/memory";
-import { pokemonAnimatedSrc, pokemonArtworkSrc, pokemonCrySrc } from "@features/memory-game";
+import {
+  getPokemon,
+  pokemonAnimatedSrc,
+  pokemonArtworkSrc,
+  pokemonCrySrc,
+} from "@entities/pokedex";
 
 describe("local pokémon assets", () => {
   it("builds paths without contacting a third-party host", () => {

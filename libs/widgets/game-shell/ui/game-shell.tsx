@@ -6,10 +6,18 @@ interface GameShellProps {
   subtitle: string;
   onBack: () => void;
   onNewGame?: () => void;
+  titleClassName?: string;
   children: ReactNode;
 }
 
-export function GameShell({ title, subtitle, onBack, onNewGame, children }: GameShellProps) {
+export function GameShell({
+  title,
+  subtitle,
+  onBack,
+  onNewGame,
+  titleClassName,
+  children,
+}: GameShellProps) {
   return (
     <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-3 pb-safe pt-safe sm:px-4">
       <PageHeader
@@ -23,6 +31,7 @@ export function GameShell({ title, subtitle, onBack, onNewGame, children }: Game
         onBack={onBack}
         subtitle={subtitle}
         title={title}
+        titleClassName={titleClassName}
       />
       {children}
     </div>

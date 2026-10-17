@@ -1,4 +1,4 @@
-import type { Pokemon } from "@entities/memory";
+import type { Pokemon } from "./types";
 
 const POKEMON_ASSET_ROOT = "/pokemon";
 

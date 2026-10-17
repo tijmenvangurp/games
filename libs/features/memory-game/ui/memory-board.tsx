@@ -1,7 +1,7 @@
-import { getPokemon, type MemoryDifficulty } from "@entities/memory";
+import type { MemoryDifficulty } from "@entities/memory";
+import { getPokemon, usePokemonCry } from "@entities/pokedex";
 import { cn } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
-import { usePokemonCry } from "../model/use-pokemon-cry";
 import { MemoryCard } from "./memory-card";
 
 const COLUMN_CLASSES: Record<MemoryDifficulty, string> = {
