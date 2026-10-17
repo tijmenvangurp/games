@@ -228,9 +228,11 @@ function MazeTrail({
                 cx={point.x}
                 cy={point.y}
                 r={0.11}
-                style={{
-                  animationDelay: `${Math.min(1, index / travel) * FLIGHT_MS}ms`,
-                }}
+                style={
+                  {
+                    "--maze-dot-delay": `${Math.min(1, index / travel) * FLIGHT_MS}ms`,
+                  } as CSSProperties
+                }
               />
             ))}
           </g>
