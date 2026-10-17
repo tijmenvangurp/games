@@ -31,6 +31,7 @@
     { "action": "shell", "resource": "fallow *", "effect": "allow" },
     { "action": "shell", "resource": "wrangler *", "effect": "allow" },
     { "action": "shell", "resource": "playwright *", "effect": "allow" },
+    { "action": "shell", "resource": "opencode *", "effect": "allow" },
     { "action": "shell", "resource": "git status *", "effect": "allow" },
     { "action": "shell", "resource": "git diff *", "effect": "allow" },
     { "action": "shell", "resource": "git log *", "effect": "allow" },
@@ -63,8 +64,15 @@
     { "action": "shell", "resource": "test *", "effect": "allow" },
     { "action": "shell", "resource": "true", "effect": "allow" },
 
-    // Destructive operations keep asking or stay blocked.
-    { "action": "shell", "resource": "git push *", "effect": "ask" },
+    // Delivery commands: branch, push, PR, checks and merge.
+    { "action": "shell", "resource": "gh *", "effect": "allow" },
+    { "action": "shell", "resource": "git fetch *", "effect": "allow" },
+    { "action": "shell", "resource": "git pull *", "effect": "allow" },
+    { "action": "shell", "resource": "git remote *", "effect": "allow" },
+    { "action": "shell", "resource": "git commit *", "effect": "allow" },
+    { "action": "shell", "resource": "git push *", "effect": "allow" },
+
+    // Destructive operations stay blocked.
     { "action": "shell", "resource": "git reset --hard *", "effect": "deny" },
     { "action": "shell", "resource": "git clean *", "effect": "deny" },
     { "action": "shell", "resource": "rm -rf *", "effect": "deny" },
