@@ -15,7 +15,7 @@ Publieke spelletjes-app voor kinderen. Het eerste spel is sudoku in 4 × 4, 6 ×
 ## Ontwikkelen
 
 ```bash
-pnpm install
+pnpm install    # Node.js 24 of nieuwer
 pnpm dev        # http://127.0.0.1:5180
 pnpm quality    # ts-only, format, typecheck, coverage, build, boundaries, fallow
 pnpm quality:full
