@@ -1,2 +1,79 @@
-# games
-Spelletjes voor kinderen: sudoku en meer.
+# Spellen
+
+Publieke spelletjes-app voor kinderen. Het eerste spel is sudoku in 4 × 4, 6 × 6 en 9 × 9, met cijfers of dieren en drie moeilijkheidsgraden. De app werkt op telefoon en tablet.
+
+**Live:** <https://games.tijmenvangurp.workers.dev/> (verschijnt na de eerste deploy)
+
+## Hoe het werkt
+
+- Statische React-SPA: Vite, React 19, TypeScript, Tailwind CSS, TanStack Router en Zustand.
+- Sudoku's worden volledig in de browser gemaakt. Elke puzzel heeft precies één oplossing.
+- Geen backend, accounts, analytics, tracking of externe requests.
+- Voortgang en instellingen staan alleen in `localStorage` op het apparaat zelf.
+- Strikte Content-Security-Policy, `noindex` en `nosniff` via `public/_headers`.
+
+## Ontwikkelen
+
+```bash
+pnpm install
+pnpm dev        # http://127.0.0.1:5180
+pnpm quality    # ts-only, format, typecheck, coverage, build, boundaries, fallow
+pnpm quality:full
+pnpm e2e        # Playwright; bouwt eerst met pnpm build
+```
+
+Andere scripts: `pnpm lint`, `pnpm format`, `pnpm fsd`, `pnpm icons`, `pnpm build`, `pnpm deploy`.
+
+## Deployment
+
+De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workernaam `games`). Elke push naar `main` deployt via GitHub Actions.
+
+Eenmalig instellen in de repository (Settings → Secrets and variables → Actions):
+
+| Secret | Waarde |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare API-token met **Workers Scripts: Edit** voor dit account |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account-ID |
+
+Zonder deze secrets slaat de deploy-stap over en blijft de workflow groen. Tokens horen nooit in de repo, in een commit of in chat.
+
+## Kwaliteit
+
+Dezelfde gate als `homelab-control`:
+
+- OXC: `oxlint` en `oxfmt`
+- Gesplitste TypeScript-configuratie (`tsconfig.node.json`, `tsconfig.web.json`)
+- Vitest met coverage-drempel van 80% op statements, branches, functies en regels
+- Feature-Sliced Design via Steiger
+- Fallow boundary-check en audit
+- Playwright E2E, inclusief mobiel en tablet viewport
+- Husky pre-commit (`pnpm quality`), pre-push (blokkeert `main`) en commitlint met verplichte scope
+
+De pnpm-instelling `minimumReleaseAge` uit `homelab-control` is bij de start bewust niet actief: een verse lockfile kan anders geen actuele toolchain resolven. Zie `docs/adr/0002-kwaliteitsgate.md`.
+
+## Structuur
+
+```
+src/
+  app/         router, providers, globale styles
+  pages/       home, sudoku
+  widgets/     page-header, game-menu
+  features/    sudoku-game (store, setup, bord, numpad, winst)
+  entities/    sudoku (generator, solver, spelregels), game (catalogus)
+  shared/      ui (button, icons), lib (cn)
+tests/
+  node/        engine- en spellogica
+  web/         React-componenten en storage
+e2e/           Playwright
+docs/adr/      architectuur- en privacybeslissingen
+```
+
+## Privacy en veiligheid
+
+Deze repository en de site zijn openbaar. Zet er daarom nooit in:
+
+- tokens, `.env`-waarden of credentials;
+- interne hostnames, tailnet-namen, IP-adressen of paden uit het homelab;
+- namen, foto's of andere persoonsgegevens van gezinsleden.
+
+Nieuwe spellen blijven statisch en lokaal. Zodra een idee een server, account, analytics of gedeelde scores nodig heeft, eerst een ADR toevoegen en de eigenaar laten beslissen.

@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/fallow/schema.json",
+  "entry": [
+    "src/app/main.tsx",
+    "steiger.config.ts",
+    "commitlint.config.ts",
+    "scripts/check-ts-only.ts",
+    "scripts/generate-app-icons.ts",
+    "scripts/run-playwright.ts",
+    "scripts/hooks/commit-msg.ts",
+    "scripts/hooks/pre-commit.ts",
+    "scripts/hooks/pre-push.ts"
+  ],
+  "boundaries": {
+    "preset": "feature-sliced"
+  }
+}
