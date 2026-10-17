@@ -76,7 +76,7 @@ test.describe("memory op een telefoon", () => {
     await page.getByRole("button", { name: "Spelen" }).click();
 
     const cards = page.locator("[data-card-index]");
-    await expect(cards).toHaveCount(12);
+    await expect(cards).toHaveCount(16);
 
     await cards.nth(0).click();
     await cards.nth(1).click();

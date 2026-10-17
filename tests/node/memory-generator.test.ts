@@ -1,7 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { MEMORY_DIFFICULTIES, MEMORY_PAIRS, MONSTERS, createMemoryScene } from "@entities/memory";
+import {
+  MEMORY_DIFFICULTIES,
+  MEMORY_PAIRS,
+  POKEMON,
+  createMemoryScene,
+  getPokemon,
+} from "@entities/memory";
 
-describe("memory generator", () => {
+describe("pokémon memory generator", () => {
+  it("contains the complete Generation 1 Pokédex", () => {
+    expect(POKEMON).toHaveLength(151);
+    expect(POKEMON.map((pokemon) => pokemon.id)).toEqual(
+      Array.from({ length: 151 }, (_, index) => index + 1),
+    );
+    expect(new Set(POKEMON.map((pokemon) => pokemon.slug)).size).toBe(151);
+    expect(getPokemon(25)?.name).toBe("Pikachu");
+    expect(getPokemon(122)?.slug).toBe("mrmime");
+    expect(getPokemon(0)).toBeUndefined();
+    expect(getPokemon(152)).toBeUndefined();
+  });
+
   for (const difficulty of MEMORY_DIFFICULTIES) {
     it(`builds a ${difficulty} deck with pairs`, () => {
       const scene = createMemoryScene(difficulty, 2026);
@@ -12,9 +30,9 @@ describe("memory generator", () => {
 
       const counts = new Map<number, number>();
       for (const id of scene.cards) {
-        expect(id).toBeGreaterThanOrEqual(0);
-        expect(id).toBeLessThan(MONSTERS.length);
-        expect(MONSTERS[id].id).toBe(id);
+        expect(id).toBeGreaterThanOrEqual(1);
+        expect(id).toBeLessThanOrEqual(151);
+        expect(getPokemon(id)?.id).toBe(id);
         counts.set(id, (counts.get(id) ?? 0) + 1);
       }
 

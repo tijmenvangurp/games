@@ -40,12 +40,12 @@ function cardNode(index: number): HTMLElement {
   return node;
 }
 
-function indexesByMonster(scene: MemoryScene): Map<number, number[]> {
+function indexesByPokemon(scene: MemoryScene): Map<number, number[]> {
   const byId = new Map<number, number[]>();
-  scene.cards.forEach((monsterId, index) => {
-    const list = byId.get(monsterId) ?? [];
+  scene.cards.forEach((pokemonId, index) => {
+    const list = byId.get(pokemonId) ?? [];
     list.push(index);
-    byId.set(monsterId, list);
+    byId.set(pokemonId, list);
   });
   return byId;
 }
@@ -60,7 +60,7 @@ function matchAllPairs(): void {
   if (!scene) {
     throw new Error("No memory scene");
   }
-  for (const indices of indexesByMonster(scene).values()) {
+  for (const indices of indexesByPokemon(scene).values()) {
     clickPair(indices);
   }
 }
@@ -72,7 +72,7 @@ async function startGame(): Promise<void> {
   await screen.findAllByRole("button", { name: "Omgedraaide kaart" });
 }
 
-describe("monster memory", () => {
+describe("pokémon memory", () => {
   it("flips cards, handles a mismatch and celebrates a full board", async () => {
     await startGame();
 
@@ -80,9 +80,9 @@ describe("monster memory", () => {
     if (!scene) {
       throw new Error("No memory scene");
     }
-    expect(scene.cards).toHaveLength(12);
+    expect(scene.cards).toHaveLength(16);
 
-    const byId = indexesByMonster(scene);
+    const byId = indexesByPokemon(scene);
     const entries = [...byId.entries()];
     const [matchedId, pair] = entries[0];
     clickPair(pair);
@@ -95,7 +95,7 @@ describe("monster memory", () => {
     const other = entries.find(([id]) => id !== matchedId);
     const third = entries.find(([id]) => id !== matchedId && id !== other?.[0]);
     if (!other || !third) {
-      throw new Error("Not enough monsters for a mismatch");
+      throw new Error("Not enough Pokémon for a mismatch");
     }
     clickPair([other[1][0], third[1][0]]);
 
@@ -108,11 +108,11 @@ describe("monster memory", () => {
 
     matchAllPairs();
 
-    expect(await screen.findByRole("heading", { name: "Alle paren gevonden!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Alle Pokémon gevonden!" })).toBeTruthy();
     expect(screen.getByText(/zetten over/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Alle paren gevonden!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Alle Pokémon gevonden!" })).toBeNull();
     expect(useMemoryStore.getState().moves).toBe(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
@@ -141,7 +141,7 @@ describe("monster memory", () => {
   it("can switch to another game from the win dialog", async () => {
     await startGame();
     matchAllPairs();
-    expect(await screen.findByRole("heading", { name: "Alle paren gevonden!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Alle Pokémon gevonden!" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Ander spel kiezen/ }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -150,7 +150,7 @@ describe("monster memory", () => {
   it("returns to the menu from the win dialog", async () => {
     await startGame();
     matchAllPairs();
-    expect(await screen.findByRole("heading", { name: "Alle paren gevonden!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Alle Pokémon gevonden!" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Naar het menu/ }));
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();

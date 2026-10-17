@@ -30,9 +30,9 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   },
   {
     id: "memory",
-    name: "Monster Memory",
-    description: "Zoek de paren tussen de monstertjes.",
-    emoji: "🃏",
+    name: "Pokémon Memory",
+    description: "Zoek de paren tussen de 151 Pokémon uit Generatie 1.",
+    emoji: "⚡",
     status: "available",
     to: "/memory",
     accentClassName: "from-amber-100 via-amber-50 to-white",

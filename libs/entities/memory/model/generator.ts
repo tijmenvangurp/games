@@ -1,15 +1,17 @@
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
-import { MEMORY_PAIRS, MONSTERS } from "./config";
+import { MEMORY_PAIRS, POKEMON } from "./config";
 import type { MemoryDifficulty, MemoryScene } from "./types";
 
-/** Builds a shuffled deck with exactly two cards per chosen monster. */
+/** Builds a shuffled deck with exactly two cards per chosen Pokémon. */
 export function createMemoryScene(
   difficulty: MemoryDifficulty,
   seed: number = createSeed(),
 ): MemoryScene {
   const random = mulberry32(seed);
   const pairs = MEMORY_PAIRS[difficulty];
-  const chosen = shuffledIndexes(MONSTERS.length, random).slice(0, pairs);
+  const chosen = shuffledIndexes(POKEMON.length, random)
+    .slice(0, pairs)
+    .map((index) => POKEMON[index].id);
 
   const cards = [...chosen, ...chosen];
   for (let index = cards.length - 1; index > 0; index -= 1) {
