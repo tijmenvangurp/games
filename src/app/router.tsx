@@ -11,6 +11,7 @@ import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 
 export function createAppRouter(history?: RouterHistory) {
+  const basepath = import.meta.env.BASE_URL.replace(/\/$/, "");
   const rootRoute = createRootRoute({
     component: Outlet,
   });
@@ -41,7 +42,11 @@ export function createAppRouter(history?: RouterHistory) {
 
   const routeTree = rootRoute.addChildren([homeRoute, sudokuRoute, seekRoute, memoryRoute]);
 
-  return createRouter({ routeTree, ...(history ? { history } : {}) });
+  return createRouter({
+    routeTree,
+    ...(basepath ? { basepath } : {}),
+    ...(history ? { history } : {}),
+  });
 }
 
 export type AppRouter = ReturnType<typeof createAppRouter>;
