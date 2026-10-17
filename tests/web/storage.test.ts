@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPlayState, generatePuzzle } from "@entities/sudoku";
-import { DEFAULT_SETTINGS } from "@features/sudoku-game";
-import { loadSudokuState, saveSudokuState } from "@features/sudoku-game/model/storage";
+import { DEFAULT_SETTINGS, loadSudokuState, saveSudokuState } from "@features/sudoku-game";
 
 const STORAGE_KEY = "games.sudoku.v1";
 

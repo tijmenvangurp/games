@@ -7,6 +7,7 @@ export default defineConfig({
   },
   webServer: {
     command: "corepack pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    cwd: "apps/games",
     port: 4173,
     reuseExistingServer: !process.env.CI,
   },

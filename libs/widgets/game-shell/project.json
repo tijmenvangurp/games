@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "widgets-game-shell",
+  "projectType": "library",
+  "sourceRoot": "libs/widgets/game-shell",
+  "tags": ["layer:widgets", "scope:games", "type:ui"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/widgets/game-shell"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-ui"]
+}

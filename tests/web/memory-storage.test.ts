@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_MEMORY_SETTINGS } from "@features/memory-game";
-import { loadMemorySettings, saveMemorySettings } from "@features/memory-game/model/storage";
+import {
+  DEFAULT_MEMORY_SETTINGS,
+  loadMemorySettings,
+  saveMemorySettings,
+} from "@features/memory-game";
 
 const STORAGE_KEY = "games.memory.v1";
 

@@ -43,9 +43,9 @@ for (const target of TARGETS) {
   await page.setContent(
     `<!doctype html><html><head><style>html,body{margin:0;padding:0;background:#f6f4ee}svg{display:block}</style></head><body>${ICON_SVG}</body></html>`,
   );
-  await page.screenshot({ path: `public/${target.file}` });
+  await page.screenshot({ path: `apps/games/public/${target.file}` });
   await page.close();
-  console.log(`wrote public/${target.file} (${target.size}x${target.size})`);
+  console.log(`wrote apps/games/public/${target.file} (${target.size}x${target.size})`);
 }
 
 await browser.close();

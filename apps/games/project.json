@@ -1,0 +1,82 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "games",
+  "projectType": "application",
+  "sourceRoot": "apps/games/src",
+  "tags": ["layer:app", "scope:games", "type:app"],
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "vite build",
+        "cwd": "apps/games"
+      }
+    },
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vite --host 127.0.0.1 --port 5180",
+        "cwd": "apps/games"
+      }
+    },
+    "preview": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+        "cwd": "apps/games"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint src vite.config.ts",
+        "cwd": "apps/games"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/apps/**/*",
+        "{workspaceRoot}/libs/**/*",
+        "{workspaceRoot}/tests/**/*",
+        "{workspaceRoot}/scripts/**/*",
+        "{workspaceRoot}/tools/**/*",
+        "{workspaceRoot}/tsconfig*.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "options": {
+        "commands": ["tsc --project tsconfig.web.json", "tsc --project tsconfig.node.json"],
+        "cwd": "."
+      }
+    },
+    "e2e": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build"],
+      "options": {
+        "command": "tsx scripts/run-playwright.ts",
+        "cwd": "."
+      }
+    }
+  },
+  "implicitDependencies": [
+    "pages-home",
+    "pages-sudoku",
+    "pages-memory",
+    "pages-seek",
+    "widgets-game-menu",
+    "widgets-game-shell",
+    "features-sudoku-game",
+    "features-memory-game",
+    "features-seek-and-find",
+    "entities-game",
+    "entities-sudoku",
+    "entities-memory",
+    "entities-hidden-object",
+    "shared-lib",
+    "shared-ui"
+  ]
+}

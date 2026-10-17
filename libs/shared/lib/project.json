@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-lib",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/lib",
+  "tags": ["layer:shared", "scope:shared", "type:lib"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/shared/lib"
+      }
+    }
+  },
+  "implicitDependencies": []
+}

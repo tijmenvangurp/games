@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { flipCard, type FlipState } from "@features/memory-game/model/flip-card";
+import { flipCard, type FlipState } from "@features/memory-game";
 
 function state(overrides: Partial<FlipState> = {}): FlipState {
   return {

@@ -1,14 +1,15 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ES2024"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "types": ["node", "vitest/globals"]
   },
   "include": [
     "scripts/**/*.ts",
     "tests/node/**/*.ts",
     "e2e/**/*.ts",
-    "vite.config.ts",
+    "tools/**/*.ts",
+    "apps/games/vite.config.ts",
     "vitest.config.ts",
     "playwright.config.ts",
     "steiger.config.ts",

@@ -1,17 +1,9 @@
-import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vitest/config";
+import { aliases } from "./tools/aliases.ts";
 
 export default defineConfig({
   resolve: {
-    alias: {
-      "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@app": fileURLToPath(new URL("./src/app", import.meta.url)),
-      "@pages": fileURLToPath(new URL("./src/pages", import.meta.url)),
-      "@widgets": fileURLToPath(new URL("./src/widgets", import.meta.url)),
-      "@features": fileURLToPath(new URL("./src/features", import.meta.url)),
-      "@entities": fileURLToPath(new URL("./src/entities", import.meta.url)),
-      "@shared": fileURLToPath(new URL("./src/shared", import.meta.url)),
-    },
+    alias: aliases,
   },
   test: {
     projects: [
@@ -36,8 +28,8 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/app/main.tsx", "src/entities/sudoku/model/types.ts"],
+      include: ["apps/games/src/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}"],
+      exclude: ["apps/games/src/app/main.tsx", "libs/entities/sudoku/model/types.ts", "**/*.d.ts"],
       thresholds: {
         branches: 80,
         functions: 80,

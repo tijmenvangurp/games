@@ -6,25 +6,30 @@ Publieke, statische spelletjes-app voor kinderen. Lees `README.md` en de relevan
 
 - **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, tailnet-namen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
 - **Alleen TypeScript.** Geen `.js`, `.mjs`, `.cjs`, `.jsx` of Python. `pnpm run ts-only` en de commit-hook bewaken dit.
-- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` via `@shared/ui` of uit `public/`.
+- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` via `@shared/ui` of uit `apps/games/public/`.
 - **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de eigenaar. Spellen zijn client-side en lokaal.
 
 ## Architectuur
 
-Feature-Sliced Design met dezelfde lagen als `homelab-control`:
+Nx monorepo met Feature-Sliced Design. Elke slice is een eigen Nx-project:
 
-- `src/app` — router, providers, globale styles
-- `src/pages` — schermen die lagen samenstellen
-- `src/widgets` — samengestelde UI-blokken
-- `src/features` — spellogica/UX per feature, Zustand-stores in `model/`
-- `src/entities` — domeinmodellen en pure regels (sudoku-generator, speler-state)
-- `src/shared` — herbruikbare UI en helpers
+- `apps/games` — Vite-app: `index.html`, `public/`, router, providers en globale styles
+- `libs/pages/*` — schermen die lagen samenstellen
+- `libs/widgets/*` — samengestelde UI-blokken
+- `libs/features/*` — spellogica/UX per feature, Zustand-stores in `model/`
+- `libs/entities/*` — domeinmodellen en pure regels (sudoku-generator, speler-state)
+- `libs/shared/lib` — herbruikbare helpers
+- `libs/shared/ui` — UI-primitives en iconen
+- `tests/` — gedeelde Vitest-suites voor de kwaliteitsgate
 
-Importeer alleen via de public API (`index.ts`) van een laag. Een laag mag alleen van lager gelegen lagen importeren. UI-primitives staan in `src/shared/ui`, helpers in `src/shared/lib`.
+Elke lib heeft een `project.json`, een `tsconfig.json` en een public API (`index.ts`). Importeer alleen via die public API en via de aliassen (`@pages/...`, `@features/...`, `@entities/...`, `@shared/...`, `@app/...`). Een laag mag alleen van lager gelegen lagen importeren. Nx-tags (`layer:*`, `scope:*`, `type:*`) documenteren dezelfde grens; Steiger en Fallow bewaken hem.
+
+De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/games/dist`.
 
 ## Werkwijze
 
-- Gebruik `corepack pnpm` voor alle commando's.
+- Gebruik `corepack pnpm` voor alle commando's. Nx-taken staan in `project.json`; gebruik `pnpm run graph` voor de projectgraaf en `pnpm run affected` voor gerichte checks.
+- `pnpm run build`, `pnpm run typecheck`, `pnpm run test:coverage` en `pnpm run lint` draaien via Nx en profiteren van de lokale cache. Geen Nx Cloud: de app en CI sturen niets naar externe diensten.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch, open een pull request en merge pas als alle CI-checks groen zijn.
@@ -34,8 +39,8 @@ Importeer alleen via de public API (`index.ts`) van een laag. Een laag mag allee
 
 ## Deployment
 
-- Cloudflare Worker `games` met static assets uit `dist/` (`wrangler.jsonc`).
+- Cloudflare Worker `games` met static assets uit `apps/games/dist` (`wrangler.jsonc`).
 - **Cloudflare Workers Builds** bouwt en deployt bij een push naar `main`. Er zijn geen GitHub-deploysecrets of API-tokens nodig.
 - Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.9.1`.
 - De workernaam in het dashboard moet exact `games` zijn.
-- `public/_headers` bevat de CSP en `noindex`; verzwak die niet zonder ADR.
+- `apps/games/public/_headers` bevat de CSP en `noindex`; verzwak die niet zonder ADR.
