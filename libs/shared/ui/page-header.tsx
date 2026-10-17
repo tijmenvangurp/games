@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { cn } from "@shared/lib";
 import { Button } from "./button";
 import { ArrowLeft } from "./icons";
 
@@ -7,9 +8,10 @@ interface PageHeaderProps {
   subtitle?: string;
   onBack?: () => void;
   actions?: ReactNode;
+  titleClassName?: string;
 }
 
-export function PageHeader({ title, subtitle, onBack, actions }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, onBack, actions, titleClassName }: PageHeaderProps) {
   return (
     <header className="flex items-center gap-2">
       {onBack ? (
@@ -20,7 +22,9 @@ export function PageHeader({ title, subtitle, onBack, actions }: PageHeaderProps
         <span aria-hidden="true" className="size-11" />
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-2xl font-black tracking-tight">{title}</h1>
+        <h1 className={cn("truncate text-2xl font-black tracking-tight", titleClassName)}>
+          {title}
+        </h1>
         {subtitle ? <p className="truncate text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
       {actions}

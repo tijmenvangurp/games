@@ -1,5 +1,6 @@
 export {
   ArrowLeft,
+  Check,
   Eraser,
   Gamepad2,
   Lightbulb,
@@ -10,4 +11,5 @@ export {
   Sparkles,
   Star,
   Trophy,
+  X,
 } from "lucide-react";

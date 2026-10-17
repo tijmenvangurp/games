@@ -54,6 +54,7 @@ describe("games app", () => {
 
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();
     expect(screen.getByRole("link", { name: /pokémon memory/i })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /wie is deze pokémon/i })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("link", { name: /sudoku/i }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();

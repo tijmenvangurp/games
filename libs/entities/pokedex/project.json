@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-pokedex",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/pokedex",
+  "tags": ["layer:entities", "scope:pokedex", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/pokedex"
+      }
+    }
+  },
+  "implicitDependencies": []
+}

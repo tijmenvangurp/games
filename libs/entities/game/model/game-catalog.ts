@@ -7,7 +7,10 @@ interface GameCatalogBase {
 }
 
 export type GameCatalogEntry = GameCatalogBase &
-  ({ status: "available"; to: "/sudoku" | "/zoeken" | "/memory" } | { status: "coming-soon" });
+  (
+    | { status: "available"; to: "/sudoku" | "/zoeken" | "/memory" | "/raad" }
+    | { status: "coming-soon" }
+  );
 
 export const gameCatalog: readonly GameCatalogEntry[] = [
   {
@@ -36,5 +39,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/memory",
     accentClassName: "from-amber-100 via-amber-50 to-white",
+  },
+  {
+    id: "pokemon-quiz",
+    name: "Wie is deze Pokémon?",
+    description: "Kies de juiste naam bij het plaatje. 3, 4 of 5 namen.",
+    emoji: "❓",
+    status: "available",
+    to: "/raad",
+    accentClassName: "from-indigo-100 via-indigo-50 to-white",
   },
 ];

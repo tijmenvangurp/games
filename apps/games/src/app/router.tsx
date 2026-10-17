@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-router";
 import { HomePage } from "@pages/home";
 import { MemoryPage } from "@pages/memory";
+import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 
@@ -39,7 +40,19 @@ export function createAppRouter(history?: RouterHistory) {
     component: MemoryPage,
   });
 
-  const routeTree = rootRoute.addChildren([homeRoute, sudokuRoute, seekRoute, memoryRoute]);
+  const pokemonQuizRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/raad",
+    component: PokemonQuizPage,
+  });
+
+  const routeTree = rootRoute.addChildren([
+    homeRoute,
+    sudokuRoute,
+    seekRoute,
+    memoryRoute,
+    pokemonQuizRoute,
+  ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });
 }

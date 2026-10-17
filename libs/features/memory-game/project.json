@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-memory", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-memory", "entities-pokedex", "shared-lib", "shared-ui"]
 }

@@ -6,7 +6,7 @@
 
 ## Context
 
-De eigenaar wil van Monster Memory een Pokémon Memory maken voor jonge kinderen. De game gebruikt officiële artwork, cries en animated sprites. Die bestanden staan al publiek online, maar de app mag ze niet tijdens het spelen bij een derde partij ophalen:
+De eigenaar wil van Monster Memory een Pokémon Memory maken voor jonge kinderen. Dezelfde lokale assets worden gebruikt door de quiz **Wie is deze Pokémon?**. De game gebruikt officiële artwork, cries en animated sprites. Die bestanden staan al publiek online, maar de app mag ze niet tijdens het spelen bij een derde partij ophalen:
 
 - `apps/games/public/_headers` heeft een strikte CSP (`img-src 'self' data:`, `connect-src 'none'`).
 - De app moet offline en zonder tracking blijven werken.
