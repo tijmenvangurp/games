@@ -3,6 +3,13 @@
 @source "../../..";
 @source "../../../../../libs";
 
+/*
+ * Tailwind declares `theme, base, components, utilities` on import. Appending
+ * `games` and `motion` puts game styles above the utilities and the reduced
+ * motion overrides above everything, so they never need `!important`.
+ */
+@layer games, motion;
+
 @theme {
   --font-sans:
     ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
@@ -62,205 +69,209 @@
   padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
 }
 
-.memory-card {
-  perspective: 900px;
-}
-
-.memory-card-inner {
-  position: relative;
-  display: block;
-  height: 100%;
-  width: 100%;
-  transform-style: preserve-3d;
-  transition: transform 350ms ease;
-}
-
-.memory-card[data-flipped="true"] .memory-card-inner {
-  transform: rotateY(180deg);
-}
-
-.memory-card-face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: 1rem;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.memory-card-face--pokemon {
-  transform: rotateY(180deg);
-}
-
-.memory-card[data-matched="true"] .memory-card-face--pokemon {
-  animation: memory-match 420ms ease-out;
-}
-
-.pokemon-sprite {
-  image-rendering: pixelated;
-}
-
-.memory-card-name {
-  font-size: clamp(0.58rem, 0.45rem + 0.8vw, 0.75rem);
-  line-height: 1.1;
-  text-align: center;
-}
-
-.memory-card-pattern {
-  background-color: #e11d48;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.28) 0 3px, transparent 3.5px),
-    radial-gradient(rgba(255, 255, 255, 0.35) 1.5px, transparent 1.5px);
-  background-position:
-    center,
-    0 0;
-  background-size:
-    52px 52px,
-    14px 14px;
-}
-
-@keyframes memory-match {
-  0% {
-    transform: rotateY(180deg) scale(1);
+@layer games {
+  .memory-card {
+    perspective: 900px;
   }
-  45% {
-    transform: rotateY(180deg) scale(1.07);
-  }
-  100% {
-    transform: rotateY(180deg) scale(1);
-  }
-}
 
-@keyframes pop {
-  from {
+  .memory-card-inner {
+    position: relative;
+    display: block;
+    height: 100%;
+    width: 100%;
+    transform-style: preserve-3d;
+    transition: transform 350ms ease;
+  }
+
+  .memory-card[data-flipped="true"] .memory-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .memory-card-face {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 1rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .memory-card-face--pokemon {
+    transform: rotateY(180deg);
+  }
+
+  .memory-card[data-matched="true"] .memory-card-face--pokemon {
+    animation: memory-match 420ms ease-out;
+  }
+
+  .pokemon-sprite {
+    image-rendering: pixelated;
+  }
+
+  .memory-card-name {
+    font-size: clamp(0.58rem, 0.45rem + 0.8vw, 0.75rem);
+    line-height: 1.1;
+    text-align: center;
+  }
+
+  .memory-card-pattern {
+    background-color: #e11d48;
+    background-image:
+      radial-gradient(rgba(255, 255, 255, 0.28) 0 3px, transparent 3.5px),
+      radial-gradient(rgba(255, 255, 255, 0.35) 1.5px, transparent 1.5px);
+    background-position:
+      center,
+      0 0;
+    background-size:
+      52px 52px,
+      14px 14px;
+  }
+
+  @keyframes memory-match {
+    0% {
+      transform: rotateY(180deg) scale(1);
+    }
+    45% {
+      transform: rotateY(180deg) scale(1.07);
+    }
+    100% {
+      transform: rotateY(180deg) scale(1);
+    }
+  }
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .maze-arrow {
+    color: #111827;
+  }
+
+  .maze-arrow .maze-line,
+  .maze-arrow .maze-head {
+    transition:
+      stroke 120ms ease,
+      fill 120ms ease;
+  }
+
+  .maze-arrow[data-hint="true"] {
+    color: #ef4444;
+  }
+
+  .maze-arrow[data-blocked="true"] {
+    color: #ef4444;
+    animation: maze-shake 220ms ease-in-out;
+  }
+
+  .maze-focus {
     opacity: 0;
-    transform: scale(0.92);
   }
-  to {
+
+  .maze-arrow:focus-visible {
+    outline: none;
+  }
+
+  .maze-arrow:focus-visible .maze-focus {
     opacity: 1;
-    transform: scale(1);
+    stroke: #0ea5e9;
   }
-}
 
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
+  @keyframes maze-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-1px);
+    }
+    75% {
+      transform: translateX(1px);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  /**
+   * A flying arrow slithers out: the body dash slides along the extended track
+   * (tail first through every bend) while the head glides straight out ahead.
+   */
+  @keyframes maze-snake-body {
+    to {
+      stroke-dashoffset: var(--maze-travel);
+    }
   }
-}
 
-.maze-arrow {
-  color: #111827;
-}
-
-.maze-arrow .maze-line,
-.maze-arrow .maze-head {
-  transition:
-    stroke 120ms ease,
-    fill 120ms ease;
-}
-
-.maze-arrow[data-hint="true"] {
-  color: #ef4444;
-}
-
-.maze-arrow[data-blocked="true"] {
-  color: #ef4444;
-  animation: maze-shake 220ms ease-in-out;
-}
-
-.maze-focus {
-  opacity: 0;
-}
-
-.maze-arrow:focus-visible {
-  outline: none;
-}
-
-.maze-arrow:focus-visible .maze-focus {
-  opacity: 1;
-  stroke: #0ea5e9;
-}
-
-@keyframes maze-shake {
-  0%,
-  100% {
-    transform: translateX(0);
+  @keyframes maze-snake-head {
+    to {
+      translate: var(--maze-dx) var(--maze-dy);
+    }
   }
-  25% {
-    transform: translateX(-1px);
+
+  .maze-flying .maze-snake-body {
+    stroke-dasharray: var(--maze-window) var(--maze-track);
+    animation: maze-snake-body var(--maze-flight, 380ms) ease-in forwards;
   }
-  75% {
-    transform: translateX(1px);
+
+  .maze-flying .maze-snake-head {
+    animation: maze-snake-head var(--maze-flight, 380ms) ease-in forwards;
   }
-}
 
-/**
- * A flying arrow slithers out: the body dash slides along the extended track
- * (tail first through every bend) while the head glides straight out ahead.
- */
-@keyframes maze-snake-body {
-  to {
-    stroke-dashoffset: var(--maze-travel);
-  }
-}
-
-@keyframes maze-snake-head {
-  to {
-    translate: var(--maze-dx) var(--maze-dy);
-  }
-}
-
-.maze-flying .maze-snake-body {
-  stroke-dasharray: var(--maze-window) var(--maze-track);
-  animation: maze-snake-body var(--maze-flight, 380ms) ease-in forwards;
-}
-
-.maze-flying .maze-snake-head {
-  animation: maze-snake-head var(--maze-flight, 380ms) ease-in forwards;
-}
-
-@keyframes maze-trail-dot {
-  from {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.maze-trail-dot {
-  fill: #111827;
-  opacity: 0;
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: maze-trail-dot 160ms ease-out forwards;
-}
-
-[data-creature-id]:focus-visible {
-  outline: 3px solid #0ea5e9;
-  outline-offset: 4px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+  @keyframes maze-trail-dot {
+    from {
+      opacity: 0;
+      transform: scale(0.3);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   .maze-trail-dot {
-    animation-delay: 0ms !important;
+    fill: #111827;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: maze-trail-dot 160ms ease-out var(--maze-dot-delay, 0ms) forwards;
+  }
+
+  [data-creature-id]:focus-visible {
+    outline: 3px solid #0ea5e9;
+    outline-offset: 4px;
+  }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms;
+      animation-iteration-count: 1;
+      transition-duration: 0.01ms;
+    }
+
+    .maze-trail-dot {
+      animation-delay: 0ms;
+    }
   }
 }
