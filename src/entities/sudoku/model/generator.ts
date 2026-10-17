@@ -1,38 +1,12 @@
+import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 import { CLUE_TARGETS, geometryFor } from "./geometry";
 import { countSolutions, generateSolution } from "./solver";
 import type { Difficulty, Geometry, SudokuPuzzle, SudokuSize } from "./types";
 
 const MAX_ATTEMPTS = 5;
 
-/** Small, fast, deterministic PRNG so a seed always produces the same puzzle. */
-export function mulberry32(seed: number): () => number {
-  let state = seed >>> 0;
-  return () => {
-    state = (state + 0x6d_2b_79_f5) >>> 0;
-    let value = state;
-    value = Math.imul(value ^ (value >>> 15), value | 1);
-    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
-    return ((value ^ (value >>> 14)) >>> 0) / 4_294_967_296;
-  };
-}
-
-function createSeed(): number {
-  return Math.floor(Math.random() * 0xffff_ffff);
-}
-
 export function clueCount(givens: readonly number[]): number {
   return givens.reduce((total, value) => (value === 0 ? total : total + 1), 0);
-}
-
-function shuffledIndexes(total: number, random: () => number): number[] {
-  const indexes = Array.from({ length: total }, (_, index) => index);
-  for (let index = indexes.length - 1; index > 0; index -= 1) {
-    const swapWith = Math.floor(random() * (index + 1));
-    const current = indexes[index];
-    indexes[index] = indexes[swapWith];
-    indexes[swapWith] = current;
-  }
-  return indexes;
 }
 
 interface CarveState {

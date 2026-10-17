@@ -6,6 +6,7 @@ import {
   type RouterHistory,
 } from "@tanstack/react-router";
 import { HomePage } from "@pages/home";
+import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 
 export function createAppRouter(history?: RouterHistory) {
@@ -25,7 +26,13 @@ export function createAppRouter(history?: RouterHistory) {
     component: SudokuPage,
   });
 
-  const routeTree = rootRoute.addChildren([homeRoute, sudokuRoute]);
+  const seekRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/zoeken",
+    component: SeekPage,
+  });
+
+  const routeTree = rootRoute.addChildren([homeRoute, sudokuRoute, seekRoute]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });
 }

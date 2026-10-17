@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@widgets/page-header";
-import { SetupPanel, SudokuPlay, useSudokuStore, WinDialog } from "@features/sudoku-game";
-import { Button, Plus } from "@shared/ui";
+import { SetupPanel, SudokuPlay, useSudokuStore } from "@features/sudoku-game";
+import { Button, CelebrationDialog, Plus } from "@shared/ui";
 
 export function SudokuPage() {
   const navigate = useNavigate();
@@ -66,7 +66,9 @@ export function SudokuPage() {
       )}
 
       {play?.solved && !setupVisible ? (
-        <WinDialog
+        <CelebrationDialog
+          description="Je hebt de sudoku helemaal opgelost."
+          title="Goed gedaan!"
           onAgain={() => useSudokuStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

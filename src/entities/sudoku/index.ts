@@ -1,4 +1,4 @@
-export { clueCount, generatePuzzle, mulberry32 } from "./model/generator";
+export { clueCount, generatePuzzle } from "./model/generator";
 export { countSolutions, generateSolution, solveSudoku } from "./model/solver";
 export { CLUE_TARGETS, boxIndexFor, geometryFor, isPeer, isSudokuSize } from "./model/geometry";
 export { DIFFICULTIES, SUDOKU_SIZES } from "./model/types";

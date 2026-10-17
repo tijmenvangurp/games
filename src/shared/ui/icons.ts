@@ -6,6 +6,7 @@ export {
   Play,
   Plus,
   RotateCcw,
+  Search,
   Sparkles,
   Star,
   Trophy,
