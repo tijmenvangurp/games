@@ -35,5 +35,7 @@ Importeer alleen via de public API (`index.ts`) van een laag. Een laag mag allee
 ## Deployment
 
 - Cloudflare Worker `games` met static assets uit `dist/` (`wrangler.jsonc`).
-- Deploy verloopt via GitHub Actions op `main` met `CLOUDFLARE_API_TOKEN` en `CLOUDFLARE_ACCOUNT_ID` als repository-secrets. Nooit tokens committen of in chat plakken.
+- **Cloudflare Workers Builds** bouwt en deployt bij een push naar `main`. Er zijn geen GitHub-deploysecrets of API-tokens nodig.
+- Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.9.1`.
+- De workernaam in het dashboard moet exact `games` zijn.
 - `public/_headers` bevat de CSP en `noindex`; verzwak die niet zonder ADR.
