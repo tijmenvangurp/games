@@ -35,6 +35,10 @@ corepack pnpm affected         # gerichte checks voor de huidige branch
 
 Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet geen externe requests.
 
+## Pokémon-assets
+
+De memory gebruikt de 151 Pokémon uit Generatie 1. Artwork, cries en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
+
 ## Deployment
 
 De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workernaam `games`). **Cloudflare Workers Builds** bouwt en deployt bij elke push naar `main`; er zijn geen GitHub-secrets of API-tokens nodig.

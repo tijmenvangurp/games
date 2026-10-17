@@ -24,8 +24,8 @@ export function MemoryPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={scene ? () => setShowSetup(true) : undefined}
-      subtitle={scene ? `${scene.difficulty} · ${scene.pairs} paren` : "Kies je spel"}
-      title="Monster Memory"
+      subtitle={scene ? `${scene.pairs} paren · Generatie 1` : "Kies je spel"}
+      title="Pokémon Memory"
     >
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
@@ -47,10 +47,10 @@ export function MemoryPage() {
         <CelebrationDialog
           description={
             moves === scene?.pairs
-              ? "Foutloos! Je vond elk paar meteen."
+              ? "Foutloos! Je vond elk Pokémon-paar meteen."
               : `Je deed er ${moves} zetten over.`
           }
-          title="Alle paren gevonden!"
+          title="Alle Pokémon gevonden!"
           onAgain={() => useMemoryStore.getState().newGame()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

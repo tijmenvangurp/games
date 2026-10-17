@@ -2,26 +2,19 @@ export const MEMORY_DIFFICULTIES = ["makkelijk", "gemiddeld", "moeilijk"] as con
 
 export type MemoryDifficulty = (typeof MEMORY_DIFFICULTIES)[number];
 
-export type MonsterShape = "blob" | "tall" | "round" | "spiky" | "square";
-
-export type MonsterHorns = "none" | "one" | "two" | "antenna";
-
-export type MonsterEyes = 1 | 2 | 3;
-
-export interface MemoryMonster {
+export interface Pokemon {
+  /** National Pokédex number, 1 through 151. */
   id: number;
+  /** Display name, for example "Pikachu" or "Mr. Mime". */
   name: string;
-  body: string;
-  accent: string;
-  shape: MonsterShape;
-  eyes: MonsterEyes;
-  horns: MonsterHorns;
+  /** Lowercase name used for local cry and animation files. */
+  slug: string;
 }
 
 export interface MemoryScene {
   seed: number;
   difficulty: MemoryDifficulty;
-  /** Monster IDs, two of each, already shuffled into card order. */
+  /** Pokémon IDs, two of each, already shuffled into card order. */
   cards: number[];
   pairs: number;
 }

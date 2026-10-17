@@ -1,7 +1,7 @@
-import type { MemoryDifficulty } from "@entities/memory";
-import { MONSTERS } from "@entities/memory";
+import { getPokemon, type MemoryDifficulty } from "@entities/memory";
 import { cn } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
+import { usePokemonCry } from "../model/use-pokemon-cry";
 import { MemoryCard } from "./memory-card";
 
 const COLUMN_CLASSES: Record<MemoryDifficulty, string> = {
@@ -14,23 +14,48 @@ export function MemoryBoard() {
   const scene = useMemoryStore((state) => state.scene);
   const matched = useMemoryStore((state) => state.matched);
   const flipped = useMemoryStore((state) => state.flipped);
+  const playCry = usePokemonCry();
 
   if (!scene) {
     return null;
   }
 
+  const flipCard = (index: number) => {
+    const state = useMemoryStore.getState();
+    if (!state.scene || state.locked || state.found) {
+      return;
+    }
+    if (state.matched[index] || state.flipped.includes(index)) {
+      return;
+    }
+
+    const pokemon = getPokemon(state.scene.cards[index]);
+    state.flip(index);
+    if (pokemon) {
+      playCry(pokemon);
+    }
+  };
+
   return (
-    <div className={cn("mx-auto grid w-full max-w-2xl gap-2", COLUMN_CLASSES[scene.difficulty])}>
-      {scene.cards.map((monsterId, index) => (
-        <MemoryCard
-          key={index}
-          faceUp={matched[index] || flipped.includes(index)}
-          index={index}
-          matched={matched[index]}
-          monster={MONSTERS[monsterId]}
-          onFlip={(cardIndex) => useMemoryStore.getState().flip(cardIndex)}
-        />
-      ))}
+    <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/70 bg-gradient-to-br from-amber-50 via-rose-50 to-sky-50 p-2 shadow-sm sm:p-3">
+      <div className={cn("grid w-full gap-2 sm:gap-3", COLUMN_CLASSES[scene.difficulty])}>
+        {scene.cards.map((pokemonId, index) => {
+          const pokemon = getPokemon(pokemonId);
+          if (!pokemon) {
+            return null;
+          }
+          return (
+            <MemoryCard
+              key={index}
+              faceUp={matched[index] || flipped.includes(index)}
+              index={index}
+              matched={matched[index]}
+              pokemon={pokemon}
+              onFlip={flipCard}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

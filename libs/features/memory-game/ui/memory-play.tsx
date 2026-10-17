@@ -14,7 +14,7 @@ export function MemoryPlay() {
     if (!locked) {
       return;
     }
-    const timer = window.setTimeout(() => useMemoryStore.getState().resolveMismatch(), 900);
+    const timer = window.setTimeout(() => useMemoryStore.getState().resolveMismatch(), 1000);
     return () => window.clearTimeout(timer);
   }, [locked]);
 
@@ -24,10 +24,10 @@ export function MemoryPlay() {
 
   const matchedPairs = matched.filter(Boolean).length / 2;
   const status = locked
-    ? "Bijna… twee kaartjes omgedraaid."
+    ? "Bijna… twee kaarten omgedraaid."
     : found
-      ? "Alle paren gevonden!"
-      : "Draai twee kaartjes om en zoek een paar.";
+      ? "Alle Pokémon gevonden!"
+      : "Draai twee kaarten om en zoek hetzelfde Pokémon-paar.";
 
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
@@ -35,7 +35,7 @@ export function MemoryPlay() {
         <div className="order-1 flex items-center justify-between gap-3 rounded-3xl border bg-card p-4 shadow-sm">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Memory
+              Pokémon Memory
             </p>
             <p className="text-base font-black leading-tight">Vind alle paren</p>
             <p className="text-xs text-muted-foreground">
