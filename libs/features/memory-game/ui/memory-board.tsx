@@ -1,6 +1,6 @@
 import type { MemoryDifficulty } from "@entities/memory";
 import { getPokemon, usePokemonCry } from "@entities/pokedex";
-import { cn } from "@shared/lib";
+import { cn, playSound } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryCard } from "./memory-card";
 
@@ -9,6 +9,18 @@ const COLUMN_CLASSES: Record<MemoryDifficulty, string> = {
   gemiddeld: "grid-cols-4",
   moeilijk: "grid-cols-4 sm:grid-cols-5",
 };
+
+function playFlipFeedback(beforeMatched: number): void {
+  const next = useMemoryStore.getState();
+  if (next.found) {
+    return;
+  }
+  if (next.matched.filter(Boolean).length > beforeMatched) {
+    playSound("match");
+  } else if (next.locked) {
+    playSound("wrong");
+  }
+}
 
 export function MemoryBoard() {
   const scene = useMemoryStore((state) => state.scene);
@@ -30,7 +42,10 @@ export function MemoryBoard() {
     }
 
     const pokemon = getPokemon(state.scene.cards[index]);
+    const beforeMatched = state.matched.filter(Boolean).length;
     state.flip(index);
+    playFlipFeedback(beforeMatched);
+
     if (pokemon) {
       playCry(pokemon);
     }

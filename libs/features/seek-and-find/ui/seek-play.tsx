@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { findTarget } from "@entities/hidden-object";
+import { playSound } from "@shared/lib";
 import { Button, RotateCcw, Search } from "@shared/ui";
 import { useSeekStore } from "../model/use-seek-store";
 import { CreatureGlyph } from "./creature-glyph";
@@ -38,6 +39,15 @@ export function SeekPlay() {
       ? "Nog niet — kijk goed naar de ster."
       : "Tik op de Wobbel met de ster.";
 
+  const handleTap = (id: number) => {
+    const wasFound = useSeekStore.getState().found;
+    useSeekStore.getState().tap(id);
+    const next = useSeekStore.getState();
+    if (!wasFound && !next.found && next.wrongId === id) {
+      playSound("wrong");
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
@@ -65,12 +75,21 @@ export function SeekPlay() {
             <Button
               disabled={found}
               variant="outline"
-              onClick={() => useSeekStore.getState().showHint()}
+              onClick={() => {
+                playSound("hint");
+                useSeekStore.getState().showHint();
+              }}
             >
               <Search aria-hidden="true" className="size-4 text-amber-500" />
               Hint
             </Button>
-            <Button variant="outline" onClick={() => useSeekStore.getState().newScene()}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                playSound("tap");
+                useSeekStore.getState().newScene();
+              }}
+            >
               <RotateCcw aria-hidden="true" className="size-4" />
               Nieuw
             </Button>
@@ -88,7 +107,7 @@ export function SeekPlay() {
           hintVisible={hintVisible}
           scene={scene}
           wrongId={wrongId}
-          onTap={(id) => useSeekStore.getState().tap(id)}
+          onTap={handleTap}
         />
       </div>
     </div>

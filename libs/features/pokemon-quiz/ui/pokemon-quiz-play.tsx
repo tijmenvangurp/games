@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { getPokemon, usePokemonCry, type Pokemon } from "@entities/pokedex";
+import { playSound } from "@shared/lib";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
 import { QuizFeedback } from "./quiz-feedback";
@@ -30,6 +31,20 @@ export function PokemonQuizPlay() {
   if (!question || !target) {
     return null;
   }
+
+  const handleAnswer = (pokemonId: number) => {
+    const wasAnswered = usePokemonQuizStore.getState().answered;
+    usePokemonQuizStore.getState().answer(pokemonId);
+    const next = usePokemonQuizStore.getState();
+    if (!wasAnswered && next.answered && next.question) {
+      playSound(pokemonId === next.question.targetId ? "match" : "wrong");
+    }
+  };
+
+  const handleNext = () => {
+    playSound("tap");
+    usePokemonQuizStore.getState().newQuestion();
+  };
 
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5 lg:items-start lg:gap-4">
@@ -63,17 +78,13 @@ export function PokemonQuizPlay() {
               option={option}
               selectedId={selectedId}
               targetId={target.id}
-              onSelect={(pokemonId) => usePokemonQuizStore.getState().answer(pokemonId)}
+              onSelect={handleAnswer}
             />
           ))}
         </div>
 
         {answered ? (
-          <QuizFeedback
-            correct={correct}
-            targetName={target.name}
-            onNext={() => usePokemonQuizStore.getState().newQuestion()}
-          />
+          <QuizFeedback correct={correct} targetName={target.name} onNext={handleNext} />
         ) : (
           <p aria-live="polite" className="text-center text-xs text-muted-foreground">
             Kies een naam. Daarna hoor je de Pokémon.

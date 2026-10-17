@@ -57,7 +57,7 @@ describe("seek and find", () => {
     fireEvent.click(screen.getByRole("button", { name: /Onder water/ }));
     fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
 
-    expect(await screen.findByRole("img", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
+    expect(await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
 
     const scene = currentScene();
     expect(scene.difficulty).toBe("moeilijk");
@@ -93,13 +93,31 @@ describe("seek and find", () => {
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Terug naar je zoekveld/ }));
-    expect(await screen.findByRole("img", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
+    expect(await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
+  });
+
+  it("is playable with the keyboard", async () => {
+    renderApp();
+    fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
+    await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i });
+
+    const scene = currentScene();
+    const decoy = scene.creatures.find((creature) => creature.id !== scene.targetId);
+    if (!decoy) {
+      throw new Error("No decoy found");
+    }
+
+    fireEvent.keyDown(creatureNode(decoy.id), { key: "Enter" });
+    expect(useSeekStore.getState().tries).toBe(1);
+
+    fireEvent.keyDown(creatureNode(scene.targetId), { key: " " });
+    expect(useSeekStore.getState().found).toBe(true);
   });
 
   it("can switch to another game from the win dialog", async () => {
     renderApp();
     fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
-    await screen.findByRole("img", { name: /Zoek de Wobbel met de ster/i });
+    await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i });
     fireEvent.click(creatureNode(currentScene().targetId));
 
     fireEvent.click(await screen.findByRole("button", { name: /Ander spel kiezen/ }));
@@ -109,7 +127,7 @@ describe("seek and find", () => {
   it("returns to the menu from the win dialog", async () => {
     renderApp();
     fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
-    await screen.findByRole("img", { name: /Zoek de Wobbel met de ster/i });
+    await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i });
     fireEvent.click(creatureNode(currentScene().targetId));
 
     fireEvent.click(await screen.findByRole("button", { name: /Naar het menu/ }));

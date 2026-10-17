@@ -20,7 +20,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
       <svg
         aria-label="Zoek de Wobbel met de ster tussen alle andere Wobbels"
         className="block h-auto w-full touch-manipulation"
-        role="img"
+        role="group"
         viewBox={`0 0 ${SCENE_SIZE} ${SCENE_SIZE}`}
       >
         <defs>
@@ -65,7 +65,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
           />
         ) : null}
 
-        {scene.creatures.map((creature) => {
+        {scene.creatures.map((creature, index) => {
           const isTarget = creature.id === scene.targetId;
           const faded = found && !isTarget;
           const ringSize = creature.size * 0.74;
@@ -73,11 +73,20 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
           return (
             <g
               key={creature.id}
-              className="cursor-pointer transition-opacity"
+              aria-label={`Wobbel ${index + 1}`}
+              className="cursor-pointer transition-opacity focus-visible:outline-none"
               data-creature-id={creature.id}
               opacity={faded ? 0.3 : 1}
+              role="button"
+              tabIndex={0}
               transform={`translate(${creature.x} ${creature.y})`}
               onClick={() => onTap(creature.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onTap(creature.id);
+                }
+              }}
             >
               <circle fill="transparent" pointerEvents="all" r={creature.size * 0.62} />
               {creature.id === wrongId ? (

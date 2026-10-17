@@ -1,9 +1,14 @@
 export {
   ArrowLeft,
+  ArrowUp,
   Check,
   Eraser,
   Gamepad2,
+  Heart,
+  Home,
+  LayoutGrid,
   Lightbulb,
+  Lock,
   Play,
   Plus,
   RotateCcw,
@@ -11,5 +16,8 @@ export {
   Sparkles,
   Star,
   Trophy,
+  Undo2,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";

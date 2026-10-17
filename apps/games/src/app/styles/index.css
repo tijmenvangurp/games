@@ -156,6 +156,101 @@
   }
 }
 
+.maze-arrow {
+  color: #111827;
+}
+
+.maze-arrow .maze-line,
+.maze-arrow .maze-head {
+  transition:
+    stroke 120ms ease,
+    fill 120ms ease;
+}
+
+.maze-arrow[data-hint="true"] {
+  color: #ef4444;
+}
+
+.maze-arrow[data-blocked="true"] {
+  color: #ef4444;
+  animation: maze-shake 220ms ease-in-out;
+}
+
+.maze-focus {
+  opacity: 0;
+}
+
+.maze-arrow:focus-visible {
+  outline: none;
+}
+
+.maze-arrow:focus-visible .maze-focus {
+  opacity: 1;
+  stroke: #0ea5e9;
+}
+
+@keyframes maze-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-1px);
+  }
+  75% {
+    transform: translateX(1px);
+  }
+}
+
+@keyframes maze-fly-up {
+  to {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
+@keyframes maze-fly-right {
+  to {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+}
+
+@keyframes maze-fly-down {
+  to {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+@keyframes maze-fly-left {
+  to {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+}
+
+.maze-flying[data-direction="up"] {
+  animation: maze-fly-up 380ms ease-in forwards;
+}
+
+.maze-flying[data-direction="right"] {
+  animation: maze-fly-right 380ms ease-in forwards;
+}
+
+.maze-flying[data-direction="down"] {
+  animation: maze-fly-down 380ms ease-in forwards;
+}
+
+.maze-flying[data-direction="left"] {
+  animation: maze-fly-left 380ms ease-in forwards;
+}
+
+[data-creature-id]:focus-visible {
+  outline: 3px solid #0ea5e9;
+  outline-offset: 4px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

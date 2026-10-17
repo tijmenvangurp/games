@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { countMistakes, filledCount } from "@entities/sudoku";
+import { playSound } from "@shared/lib";
 import { Button, Eraser, Lightbulb, RotateCcw } from "@shared/ui";
 import { symbolsFor } from "../model/settings";
 import { useSudokuKeyboard } from "../model/use-sudoku-keyboard";
@@ -27,6 +28,25 @@ export function SudokuPlay() {
       ? null
       : play.puzzle.givens[play.selected] || play.entries[play.selected];
 
+  const handleSelect = (index: number) => {
+    playSound("tap");
+    useSudokuStore.getState().select(index);
+  };
+
+  const handlePick = (value: number) => {
+    const current = useSudokuStore.getState().play;
+    if (!current) {
+      return;
+    }
+    const before = countMistakes(current.entries, current.puzzle.solution).length;
+    useSudokuStore.getState().enter(value);
+    const next = useSudokuStore.getState().play;
+    if (next && !next.solved) {
+      const after = countMistakes(next.entries, next.puzzle.solution).length;
+      playSound(after > before ? "wrong" : "select");
+    }
+  };
+
   return (
     <div className="grid gap-4 lg:grid-cols-3 lg:items-start">
       <div className="mx-auto w-full max-w-lg lg:sticky lg:top-4 lg:col-span-2">
@@ -36,7 +56,7 @@ export function SudokuPlay() {
           puzzle={play.puzzle}
           selected={play.selected}
           symbols={symbols}
-          onSelect={(index) => useSudokuStore.getState().select(index)}
+          onSelect={handleSelect}
         />
       </div>
 
@@ -45,19 +65,37 @@ export function SudokuPlay() {
           activeValue={selectedValue}
           size={play.puzzle.size}
           symbols={symbols}
-          onPick={(value) => useSudokuStore.getState().enter(value)}
+          onPick={handlePick}
         />
 
         <div className="grid grid-cols-3 gap-2">
-          <Button variant="outline" onClick={() => useSudokuStore.getState().hint()}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              playSound("hint");
+              useSudokuStore.getState().hint();
+            }}
+          >
             <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
             Hint
           </Button>
-          <Button variant="outline" onClick={() => useSudokuStore.getState().erase()}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              playSound("tap");
+              useSudokuStore.getState().erase();
+            }}
+          >
             <Eraser aria-hidden="true" className="size-4" />
             Wissen
           </Button>
-          <Button variant="outline" onClick={() => useSudokuStore.getState().restart()}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              playSound("tap");
+              useSudokuStore.getState().restart();
+            }}
+          >
             <RotateCcw aria-hidden="true" className="size-4" />
             Opnieuw
           </Button>
