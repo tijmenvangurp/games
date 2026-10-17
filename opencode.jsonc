@@ -17,6 +17,11 @@
 
     // Routine package, build, test and inspection commands.
     { "action": "shell", "resource": "corepack *", "effect": "allow" },
+    // Ad-hoc Playwright scripts need the bundled browser libraries and fonts.
+    // The env prefix makes the command different from plain `corepack *`, so
+    // allow the two prefix orders explicitly instead of prompting every time.
+    { "action": "shell", "resource": "LD_LIBRARY_PATH=* corepack *", "effect": "allow" },
+    { "action": "shell", "resource": "FONTCONFIG_PATH=* corepack *", "effect": "allow" },
     { "action": "shell", "resource": "pnpm *", "effect": "allow" },
     { "action": "shell", "resource": "npx *", "effect": "allow" },
     { "action": "shell", "resource": "node *", "effect": "allow" },
@@ -48,6 +53,9 @@
     { "action": "shell", "resource": "find *", "effect": "allow" },
     { "action": "shell", "resource": "rg *", "effect": "allow" },
     { "action": "shell", "resource": "grep *", "effect": "allow" },
+    // Read-only inspection. Create or replace files with the write tool, not
+    // `cat > file`, so the shell scanner does not need to approve a write.
+    { "action": "shell", "resource": "cat *", "effect": "allow" },
     { "action": "shell", "resource": "head *", "effect": "allow" },
     { "action": "shell", "resource": "tail *", "effect": "allow" },
     { "action": "shell", "resource": "wc *", "effect": "allow" },
@@ -63,6 +71,7 @@
     { "action": "shell", "resource": "basename *", "effect": "allow" },
     { "action": "shell", "resource": "test *", "effect": "allow" },
     { "action": "shell", "resource": "true", "effect": "allow" },
+    { "action": "shell", "resource": "exit *", "effect": "allow" },
 
     // Delivery commands: branch, push, PR, checks and merge.
     { "action": "shell", "resource": "gh *", "effect": "allow" },
@@ -78,6 +87,11 @@
     { "action": "shell", "resource": "rm -rf *", "effect": "deny" },
     { "action": "shell", "resource": "sudo *", "effect": "deny" },
 
+    // Narrow cleanup allowances for temporary files created during a task.
+    // General `rm` remains an explicit decision instead of a blanket allow.
+    { "action": "shell", "resource": "rm -f .tmp-*", "effect": "allow" },
+    { "action": "shell", "resource": "rm -f /tmp/opencode/*", "effect": "allow" },
+
     // Agent tooling used while working in this repository.
     { "action": "execute", "resource": "*", "effect": "allow" },
     { "action": "skill", "resource": "*", "effect": "allow" },
@@ -85,7 +99,11 @@
     { "action": "webfetch", "resource": "*", "effect": "allow" },
     { "action": "websearch", "resource": "*", "effect": "allow" },
 
-    // Scratch space only; every other external directory still asks.
+    // Scratch space only; every other external directory still asks. The read
+    // and edit rules make the allow explicit for the tools, not just for the
+    // external-directory boundary check.
     { "action": "external_directory", "resource": "/tmp/opencode/*", "effect": "allow" },
+    { "action": "read", "resource": "/tmp/opencode/*", "effect": "allow" },
+    { "action": "edit", "resource": "/tmp/opencode/*", "effect": "allow" },
   ],
 }
