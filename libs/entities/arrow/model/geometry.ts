@@ -65,89 +65,235 @@ export function levelBounds(level: MazeLevel): {
   };
 }
 
-/** Is a coordinate strictly in front of the head on this axis? */
-function isAhead(head: number, coordinate: number, forward: number): boolean {
-  return forward > 0 ? coordinate > head + EPSILON : coordinate < head - EPSILON;
-}
-
-/** Does any part of the segment's extent lie strictly in front of the head? */
-function extendsAhead(head: number, low: number, high: number, forward: number): boolean {
-  return forward > 0 ? high > head + EPSILON : low < head - EPSILON;
-}
-
-function spans(value: number, low: number, high: number): boolean {
-  return value > low && value < high;
-}
-
-function blocksHorizontalRay(
-  head: Point,
-  forward: number,
-  segment: { a: Point; b: Point },
+function intervalOverlap(
+  firstLow: number,
+  firstHigh: number,
+  secondLow: number,
+  secondHigh: number,
 ): boolean {
-  const lowY = Math.min(segment.a.y, segment.b.y);
-  const highY = Math.max(segment.a.y, segment.b.y);
-
-  if (segment.a.y !== segment.b.y) {
-    return isAhead(head.x, segment.a.x, forward) && spans(head.y, lowY, highY);
-  }
-  if (segment.a.y !== head.y) {
-    return false;
-  }
-  const lowX = Math.min(segment.a.x, segment.b.x);
-  const highX = Math.max(segment.a.x, segment.b.x);
-  return extendsAhead(head.x, lowX, highX, forward);
+  return Math.min(firstHigh, secondHigh) > Math.max(firstLow, secondLow) + EPSILON;
 }
 
-function blocksVerticalRay(head: Point, forward: number, segment: { a: Point; b: Point }): boolean {
-  const lowX = Math.min(segment.a.x, segment.b.x);
-  const highX = Math.max(segment.a.x, segment.b.x);
+function spansStrictly(value: number, low: number, high: number): boolean {
+  return value > low + EPSILON && value < high - EPSILON;
+}
 
-  if (segment.a.x !== segment.b.x) {
-    return isAhead(head.y, segment.a.y, forward) && spans(head.x, lowX, highX);
-  }
-  if (segment.a.x !== head.x) {
+/** Is the point beyond the moving range in the travel direction? */
+function pointAhead(point: number, low: number, high: number, direction: number): boolean {
+  return direction > 0 ? point > low + EPSILON : point < high - EPSILON;
+}
+
+/** Does the other range reach past the moving range in the travel direction? */
+function overlapsAhead(
+  movingLow: number,
+  movingHigh: number,
+  otherLow: number,
+  otherHigh: number,
+  direction: number,
+): boolean {
+  return direction > 0 ? otherHigh > movingLow + EPSILON : otherLow < movingHigh - EPSILON;
+}
+
+function xRange(segment: { a: Point; b: Point }): [number, number] {
+  return [Math.min(segment.a.x, segment.b.x), Math.max(segment.a.x, segment.b.x)];
+}
+
+function yRange(segment: { a: Point; b: Point }): [number, number] {
+  return [Math.min(segment.a.y, segment.b.y), Math.max(segment.a.y, segment.b.y)];
+}
+
+function horizontalParallelSweep(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  if (other.a.y !== other.b.y) {
     return false;
   }
-  const lowY = Math.min(segment.a.y, segment.b.y);
-  const highY = Math.max(segment.a.y, segment.b.y);
-  return extendsAhead(head.y, lowY, highY, forward);
+  const [movingLow, movingHigh] = xRange(moving);
+  const [otherLow, otherHigh] = xRange(other);
+
+  if (dx !== 0) {
+    return (
+      other.a.y === moving.a.y && overlapsAhead(movingLow, movingHigh, otherLow, otherHigh, dx)
+    );
+  }
+  return (
+    pointAhead(other.a.y, moving.a.y, moving.a.y, dy) &&
+    intervalOverlap(movingLow, movingHigh, otherLow, otherHigh)
+  );
+}
+
+function verticalParallelSweep(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  if (other.a.x !== other.b.x) {
+    return false;
+  }
+  const [movingLow, movingHigh] = yRange(moving);
+  const [otherLow, otherHigh] = yRange(other);
+
+  if (dy !== 0) {
+    return (
+      other.a.x === moving.a.x && overlapsAhead(movingLow, movingHigh, otherLow, otherHigh, dy)
+    );
+  }
+  return (
+    pointAhead(other.a.x, moving.a.x, moving.a.x, dx) &&
+    intervalOverlap(movingLow, movingHigh, otherLow, otherHigh)
+  );
+}
+
+function parallelSweepHits(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  return moving.a.y === moving.b.y
+    ? horizontalParallelSweep(moving, dx, dy, other)
+    : verticalParallelSweep(moving, dx, dy, other);
+}
+
+function horizontalPerpendicularSweep(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  const [movingLowX, movingHighX] = xRange(moving);
+  const [otherLowY, otherHighY] = yRange(other);
+
+  if (dx !== 0) {
+    return (
+      spansStrictly(moving.a.y, otherLowY, otherHighY) &&
+      pointAhead(other.a.x, movingLowX, movingHighX, dx)
+    );
+  }
+  return (
+    spansStrictly(other.a.x, movingLowX, movingHighX) &&
+    overlapsAhead(moving.a.y, moving.a.y, otherLowY, otherHighY, dy)
+  );
+}
+
+function verticalPerpendicularSweep(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  const [movingLowX, movingHighX] = xRange(moving);
+  const [movingLowY, movingHighY] = yRange(moving);
+  const [otherLowX, otherHighX] = xRange(other);
+
+  if (dx !== 0) {
+    return (
+      spansStrictly(other.a.y, movingLowY, movingHighY) &&
+      overlapsAhead(moving.a.x, moving.a.x, otherLowX, otherHighX, dx)
+    );
+  }
+  return (
+    spansStrictly(moving.a.x, otherLowX, otherHighX) &&
+    pointAhead(other.a.y, movingLowY, movingHighY, dy)
+  );
+}
+
+/** Does translating the moving segment in the escape direction hit the other segment? */
+function sweepHitsSegment(
+  moving: { a: Point; b: Point },
+  dx: number,
+  dy: number,
+  other: { a: Point; b: Point },
+): boolean {
+  const movingHorizontal = moving.a.y === moving.b.y;
+  const otherHorizontal = other.a.y === other.b.y;
+
+  if (movingHorizontal === otherHorizontal) {
+    return parallelSweepHits(moving, dx, dy, other);
+  }
+  return movingHorizontal
+    ? horizontalPerpendicularSweep(moving, dx, dy, other)
+    : verticalPerpendicularSweep(moving, dx, dy, other);
+}
+
+function boundsOf(points: readonly Point[]): {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+} {
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (const point of points) {
+    minX = Math.min(minX, point.x);
+    maxX = Math.max(maxX, point.x);
+    minY = Math.min(minY, point.y);
+    maxY = Math.max(maxY, point.y);
+  }
+
+  return { minX, maxX, minY, maxY };
+}
+
+/** Cheap broad phase: can the moving body reach the other arrow at all? */
+function mightMeet(
+  body: ReturnType<typeof boundsOf>,
+  dx: number,
+  dy: number,
+  other: ReturnType<typeof boundsOf>,
+): boolean {
+  if (dx !== 0) {
+    if (body.minY > other.maxY || body.maxY < other.minY) {
+      return false;
+    }
+    return dx > 0 ? other.maxX >= body.minX : other.minX <= body.maxX;
+  }
+  if (body.minX > other.maxX || body.maxX < other.minX) {
+    return false;
+  }
+  return dy > 0 ? other.maxY >= body.minY : other.minY <= body.maxY;
+}
+
+function bodyHitsArrow(arrow: MazeArrow, other: MazeArrow, dx: number, dy: number): boolean {
+  for (const moving of arrowSegments(arrow)) {
+    for (const segment of arrowSegments(other)) {
+      if (sweepHitsSegment(moving, dx, dy, segment)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 /**
- * An axis-aligned segment blocks a ray when it crosses the lane in front of the
- * head. Grazing a corner counts as free: arrows in these mazes touch each other
- * end to end and at right angles all the time, and only a real obstruction on
- * the lane should cost a heart. A collinear segment that starts anywhere in
- * front of the head does block, because the arrow would hit it.
+ * An arrow may only fly when its whole body can travel in the escape direction
+ * without touching another arrow. Every point of the arrow follows the head, so
+ * checking only the lane in front of the head is not enough: a long tail would
+ * sweep through neighbouring arrows.
  */
-function blocksRay(
-  head: Point,
-  direction: MazeDirection,
-  segment: { a: Point; b: Point },
-): boolean {
-  const forward = direction === "left" || direction === "up" ? -1 : 1;
-  const horizontal = direction === "left" || direction === "right";
-  return horizontal
-    ? blocksHorizontalRay(head, forward, segment)
-    : blocksVerticalRay(head, forward, segment);
-}
-
 export function isArrowRemovable(
   arrow: MazeArrow,
   level: MazeLevel,
   removed: ReadonlySet<number>,
 ): boolean {
-  const head = arrowHead(arrow);
   const direction = arrowDirection(arrow);
+  const dx = direction === "right" ? 1 : direction === "left" ? -1 : 0;
+  const dy = direction === "down" ? 1 : direction === "up" ? -1 : 0;
+  const body = boundsOf(arrow.points);
 
   for (const other of level.arrows) {
     if (other.id === arrow.id || removed.has(other.id)) {
       continue;
     }
-    for (const segment of arrowSegments(other)) {
-      if (blocksRay(head, direction, segment)) {
-        return false;
-      }
+    if (mightMeet(body, dx, dy, boundsOf(other.points)) && bodyHitsArrow(arrow, other, dx, dy)) {
+      return false;
     }
   }
 

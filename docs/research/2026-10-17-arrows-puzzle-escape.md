@@ -44,7 +44,7 @@ De belangrijkste video is [Arrows – Puzzle Escape: Level 1–15 Walkthrough](h
 ### Wat waarschijnlijk is, maar niet hard is bevestigd
 
 - Een geblokkeerde pijl blijft staan; alleen de tik mislukt. De gidsen zeggen “the move fails” en “the arrow stays put”; de video bevat geen foutmoment.
-- Alleen de **baan vóór de pijlpunt** telt voor collision, niet de hele lichaamspolyline. De gidsen beschrijven “trace the lane from the arrowhead”; de video laat zien dat de hele pijl daarna wegvliegt.
+- Alleen de **baan vóór de pijlpunt** telt voor collision. De gidsen beschrijven “trace the lane from the arrowhead”; de video laat zien dat de hele pijl daarna wegvliegt. **Correctie:** in onze app telt de volledige pijl, zie 5.2.
 - De rode pijlen in de Play Store-screenshot met één hart zijn een **hint- of foutmarkering**. Niet duidelijk welke van de twee; in onze app kiezen we één eenduidige betekenis.
 - Undo herstelt geen hart. Onbekend; we kiezen in onze app voor “undo herstelt de pijl, niet het hart”.
 
@@ -143,21 +143,20 @@ Regels:
 
 ### 5.2 Collision
 
-Voor pijl `A` met pijlpunt `H` en richting `d`:
+Een pijl mag alleen wegvliegen als zijn **volledige lichaam** in de richting van de punt kan schuiven zonder een andere pijl te raken. De staart mag dus niet door een buurpijl heen schuiven terwijl de punt nog vrij baan heeft.
 
-1. Maak een ray `R(t) = H + t·d`, met `t` van een kleine epsilon tot de rand van het bord.
-2. Bekijk elk segment van elke andere, nog aanwezige pijl.
-3. Als een segment de ray snijdt, is de pijl geblokkeerd.
-4. Negeer snijpunten op `t ≈ 0` (het eigen pijlpunt en gedeelde eindpunten).
+Voor elk segment `S` van pijl `A` en elk segment `T` van een andere, nog aanwezige pijl:
+
+1. Schuif `S` met `t ≥ 0` in richting `d` van de pijlpunt.
+2. Bepaal of `S(t)` en `T` elkaar voor enige `t > 0` raken.
+3. Zo ja, dan is de pijl geblokkeerd.
 
 Omdat alle segmenten orthogonaal zijn, kan dit zonder algemene lijnalgebra:
 
-- Bij een horizontale ray op hoogte `y`, naar rechts:
-  - een horizontaal segment op dezelfde `y`met een `x`-bereik dat de ray overlapt, blokkeert;
-  - een verticaal segment met `x > H.x` dat `y` kruist, blokkeert.
-- Bij een verticale ray analoog.
+- **Parallel:** twee horizontale segmenten op dezelfde `y` blokkeren als het bereik van `T` vóór `S` ligt in de schuifrichting; verticaal analoog. Bij loodrechte beweging blokkeert `T` zodra de bewegende lijn zijn `y` (of `x`) bereikt en de bereiken overlappen.
+- **Loodrecht:** het kruispunt moet in de schuifrichting vóór `S` liggen en `T` moet `S` in zijn eigen richting echt snijden.
 
-Gebruik een kleine marge voor lijndikte en gedeelde hoekpunten. De collision gaat over de **baan van de punt**, niet over de hele polyline. Dat is de eenvoudigste interpretatie die past bij de gidsen en de video.
+Gebruik een kleine marge voor lijndikte en gedeelde hoekpunten. Contact op `t ≈ 0` (pijlen die op hetzelfde rasterpunt eindigen) telt niet als botsing; zodra de pijl in beweging komt en een ander segment écht kruist, wel.
 
 ### 5.3 Solver en hints
 

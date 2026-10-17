@@ -88,6 +88,22 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
   });
 
+  it("blocks an arrow when only its tail would sweep through another arrow", () => {
+    const mover = arrow(1, [
+      [2, 4],
+      [2, 2],
+      [3, 2],
+    ]);
+    const blocker = arrow(2, [
+      [4, 3],
+      [5, 3],
+    ]);
+    const testLevel = level([mover, blocker], 8, 8);
+
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
+    expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
+  });
+
   it("solves a small chain and detects a deadlock", () => {
     const chain = level([
       arrow(1, [
