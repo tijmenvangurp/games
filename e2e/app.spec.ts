@@ -67,3 +67,26 @@ test.describe("zoeken op een telefoon", () => {
     await expect(page.getByRole("heading", { name: "Gevonden!" })).toBeVisible();
   });
 });
+
+test.describe("memory op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("draait kaartjes om", async ({ page }) => {
+    await page.goto("/memory");
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const cards = page.locator("[data-card-index]");
+    await expect(cards).toHaveCount(12);
+
+    await cards.nth(0).click();
+    await cards.nth(1).click();
+
+    await expect(cards.nth(0)).toHaveAttribute("aria-pressed", "true");
+    await expect(cards.nth(1)).toHaveAttribute("aria-pressed", "true");
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+});

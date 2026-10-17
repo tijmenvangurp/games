@@ -1,6 +1,6 @@
 # Spellen
 
-Publieke spelletjes-app voor kinderen. Sudoku in 4 × 4, 6 × 6 en 9 × 9 en het zoekspel "Waar is Wobbel?". Alles werkt op telefoon en tablet.
+Publieke spelletjes-app voor kinderen. Sudoku, het zoekspel "Waar is Wobbel?" en Monster Memory. Alles werkt op telefoon en tablet.
 
 **Live:** <https://games.tijmenvangurp.workers.dev/> (verschijnt na de eerste deploy)
 
@@ -16,7 +16,7 @@ Publieke spelletjes-app voor kinderen. Sudoku in 4 × 4, 6 × 6 en 9 × 9 en het
 
 - **Sudoku** — 4 × 4, 6 × 6 en 9 × 9; cijfers of dieren; drie moeilijkheidsgraden.
 - **Waar is Wobbel?** — zoek het ene monstertje met de ster tussen tientallen soortgenoten, in een tuin of onder water.
-- **Memory** — gepland.
+- **Monster Memory** — draai kaartjes om en vind de paren tussen tien originele monstertjes.
 
 ## Ontwikkelen
 
@@ -63,11 +63,11 @@ De pnpm-instelling `minimumReleaseAge` uit `homelab-control` is bij de start bew
 ```
 src/
   app/         router, providers, globale styles
-  pages/       home, sudoku, seek
-  widgets/     page-header, game-menu
-  features/    sudoku-game, seek-and-find (stores, setup, speelveld)
-  entities/    sudoku (generator, solver), hidden-object (zoekscène), game (catalogus)
-  shared/      ui (button, celebration-dialog, icons), lib (cn, random)
+  pages/       home, sudoku, seek, memory
+  widgets/     game-menu, game-shell
+  features/    sudoku-game, seek-and-find, memory-game
+  entities/    sudoku, hidden-object, memory, game (catalogus)
+  shared/      ui (button, dialogs, pickers, icons), lib (cn, random)
 tests/
   node/        engines en spellogica
   web/         React-componenten en storage

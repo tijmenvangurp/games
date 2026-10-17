@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ArrowLeft, Button } from "@shared/ui";
+import { Button } from "./button";
+import { ArrowLeft } from "./icons";
 
 interface PageHeaderProps {
   title: string;

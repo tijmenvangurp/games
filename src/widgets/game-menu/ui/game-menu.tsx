@@ -5,7 +5,7 @@ import { cn } from "@shared/lib";
 
 export function GameMenu() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {gameCatalog.map((game) =>
         game.status === "available" ? (
           <Link

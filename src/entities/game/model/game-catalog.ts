@@ -7,7 +7,7 @@ interface GameCatalogBase {
 }
 
 export type GameCatalogEntry = GameCatalogBase &
-  ({ status: "available"; to: "/sudoku" | "/zoeken" } | { status: "coming-soon" });
+  ({ status: "available"; to: "/sudoku" | "/zoeken" | "/memory" } | { status: "coming-soon" });
 
 export const gameCatalog: readonly GameCatalogEntry[] = [
   {
@@ -30,10 +30,11 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   },
   {
     id: "memory",
-    name: "Memory",
-    description: "Zoek de paren. Komt binnenkort.",
+    name: "Monster Memory",
+    description: "Zoek de paren tussen de monstertjes.",
     emoji: "🃏",
-    status: "coming-soon",
+    status: "available",
+    to: "/memory",
     accentClassName: "from-amber-100 via-amber-50 to-white",
   },
 ];
