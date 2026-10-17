@@ -1,4 +1,5 @@
 export { Button } from "./button";
+export { CelebrationDialog } from "./celebration-dialog";
 export {
   ArrowLeft,
   Eraser,
@@ -7,7 +8,6 @@ export {
   Play,
   Plus,
   RotateCcw,
+  Search,
   Sparkles,
-  Star,
-  Trophy,
 } from "./icons";

@@ -44,3 +44,26 @@ test.describe("op een tablet", () => {
     await expect(page.getByRole("button", { name: "Kies 🐶" })).toBeVisible();
   });
 });
+
+test.describe("zoeken op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("vindt Wobbel met de hint", async ({ page }) => {
+    await page.goto("/zoeken");
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    await expect(page.getByRole("img", { name: /Zoek de Wobbel met de ster/i })).toBeVisible();
+
+    await page.getByRole("button", { name: "Hint" }).click();
+    const hint = page.getByTestId("hint-region");
+    await expect(hint).toBeVisible();
+
+    const box = await hint.boundingBox();
+    if (!box) {
+      throw new Error("Hint region has no bounding box");
+    }
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+
+    await expect(page.getByRole("heading", { name: "Gevonden!" })).toBeVisible();
+  });
+});

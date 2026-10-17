@@ -1,15 +1,24 @@
-import { Button, RotateCcw, Sparkles, Star, Trophy } from "@shared/ui";
+import { Button } from "./button";
+import { RotateCcw, Sparkles, Star, Trophy } from "./icons";
 
-interface WinDialogProps {
+interface CelebrationDialogProps {
+  title: string;
+  description: string;
   onAgain: () => void;
   onChoose: () => void;
   onHome: () => void;
 }
 
-export function WinDialog({ onAgain, onChoose, onHome }: WinDialogProps) {
+export function CelebrationDialog({
+  title,
+  description,
+  onAgain,
+  onChoose,
+  onHome,
+}: CelebrationDialogProps) {
   return (
     <div
-      aria-labelledby="win-title"
+      aria-labelledby="celebration-title"
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       role="dialog"
@@ -21,10 +30,10 @@ export function WinDialog({ onAgain, onChoose, onHome }: WinDialogProps) {
           <span className="animate-rise">⭐</span>
         </div>
         <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-amber-500" />
-        <h2 className="text-2xl font-black" id="win-title">
-          Goed gedaan!
+        <h2 className="text-2xl font-black" id="celebration-title">
+          {title}
         </h2>
-        <p className="mt-1 text-sm text-muted-foreground">Je hebt de sudoku helemaal opgelost.</p>
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
 
         <div className="mt-6 space-y-2">
           <Button autoFocus className="w-full" size="lg" variant="success" onClick={onAgain}>

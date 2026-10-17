@@ -1,16 +1,22 @@
 # Spellen
 
-Publieke spelletjes-app voor kinderen. Het eerste spel is sudoku in 4 × 4, 6 × 6 en 9 × 9, met cijfers of dieren en drie moeilijkheidsgraden. De app werkt op telefoon en tablet.
+Publieke spelletjes-app voor kinderen. Sudoku in 4 × 4, 6 × 6 en 9 × 9 en het zoekspel "Waar is Wobbel?". Alles werkt op telefoon en tablet.
 
 **Live:** <https://games.tijmenvangurp.workers.dev/> (verschijnt na de eerste deploy)
 
 ## Hoe het werkt
 
 - Statische React-SPA: Vite, React 19, TypeScript, Tailwind CSS, TanStack Router en Zustand.
-- Sudoku's worden volledig in de browser gemaakt. Elke puzzel heeft precies één oplossing.
+- Sudoku's en zoekscènes worden volledig in de browser gemaakt. Elke sudoku heeft precies één oplossing.
 - Geen backend, accounts, analytics, tracking of externe requests.
 - Voortgang en instellingen staan alleen in `localStorage` op het apparaat zelf.
 - Strikte Content-Security-Policy, `noindex` en `nosniff` via `public/_headers`.
+
+## Spellen
+
+- **Sudoku** — 4 × 4, 6 × 6 en 9 × 9; cijfers of dieren; drie moeilijkheidsgraden.
+- **Waar is Wobbel?** — zoek het ene monstertje met de ster tussen tientallen soortgenoten, in een tuin of onder water.
+- **Memory** — gepland.
 
 ## Ontwikkelen
 
@@ -57,13 +63,13 @@ De pnpm-instelling `minimumReleaseAge` uit `homelab-control` is bij de start bew
 ```
 src/
   app/         router, providers, globale styles
-  pages/       home, sudoku
+  pages/       home, sudoku, seek
   widgets/     page-header, game-menu
-  features/    sudoku-game (store, setup, bord, numpad, winst)
-  entities/    sudoku (generator, solver, spelregels), game (catalogus)
-  shared/      ui (button, icons), lib (cn)
+  features/    sudoku-game, seek-and-find (stores, setup, speelveld)
+  entities/    sudoku (generator, solver), hidden-object (zoekscène), game (catalogus)
+  shared/      ui (button, celebration-dialog, icons), lib (cn, random)
 tests/
-  node/        engine- en spellogica
+  node/        engines en spellogica
   web/         React-componenten en storage
 e2e/           Playwright
 docs/adr/      architectuur- en privacybeslissingen

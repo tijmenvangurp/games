@@ -6,9 +6,9 @@ import {
   geometryFor,
   isPeer,
   isSudokuSize,
-  mulberry32,
   solveSudoku,
 } from "@entities/sudoku";
+import { mulberry32 } from "@shared/lib";
 import { isValidSolution, parseGrid } from "./sudoku-fixtures";
 
 const PUZZLE = parseGrid(`

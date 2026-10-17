@@ -1,11 +1,13 @@
-export interface GameCatalogEntry {
+interface GameCatalogBase {
   id: string;
   name: string;
   description: string;
   emoji: string;
-  status: "available" | "coming-soon";
   accentClassName: string;
 }
+
+export type GameCatalogEntry = GameCatalogBase &
+  ({ status: "available"; to: "/sudoku" | "/zoeken" } | { status: "coming-soon" });
 
 export const gameCatalog: readonly GameCatalogEntry[] = [
   {
@@ -14,7 +16,17 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Puzzel met cijfers of dieren. Kies 4 × 4, 6 × 6 of 9 × 9.",
     emoji: "🧩",
     status: "available",
+    to: "/sudoku",
     accentClassName: "from-sky-100 via-sky-50 to-white",
+  },
+  {
+    id: "seek",
+    name: "Waar is Wobbel?",
+    description: "Zoek het monstertje met de ster tussen alle andere Wobbels.",
+    emoji: "🔍",
+    status: "available",
+    to: "/zoeken",
+    accentClassName: "from-emerald-100 via-emerald-50 to-white",
   },
   {
     id: "memory",

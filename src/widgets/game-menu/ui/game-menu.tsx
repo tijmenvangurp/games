@@ -14,7 +14,7 @@ export function GameMenu() {
               "group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
               game.accentClassName,
             )}
-            to="/sudoku"
+            to={game.to}
           >
             <div className="flex items-start justify-between">
               <span aria-hidden="true" className="text-4xl">
