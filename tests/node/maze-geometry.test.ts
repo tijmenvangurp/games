@@ -104,6 +104,61 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
   });
 
+  it("blocks a tail that would sweep through an arrow in every direction", () => {
+    const cases: [MazeArrow, MazeArrow][] = [
+      [
+        arrow(1, [
+          [1, 2],
+          [1, 0],
+          [2, 0],
+        ]),
+        arrow(2, [
+          [3, 1],
+          [4, 1],
+        ]),
+      ],
+      [
+        arrow(1, [
+          [1, 2],
+          [1, 0],
+          [0, 0],
+        ]),
+        arrow(2, [
+          [-2, 1],
+          [-1, 1],
+        ]),
+      ],
+      [
+        arrow(1, [
+          [0, 1],
+          [2, 1],
+          [2, 2],
+        ]),
+        arrow(2, [
+          [1, 3],
+          [1, 4],
+        ]),
+      ],
+      [
+        arrow(1, [
+          [0, 1],
+          [2, 1],
+          [2, 0],
+        ]),
+        arrow(2, [
+          [1, -2],
+          [1, -1],
+        ]),
+      ],
+    ];
+
+    for (const [mover, blocker] of cases) {
+      const testLevel = level([mover, blocker], 8, 8);
+      expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
+      expect(isArrowRemovable(mover, testLevel, new Set([blocker.id]))).toBe(true);
+    }
+  });
+
   it("solves a small chain and detects a deadlock", () => {
     const chain = level([
       arrow(1, [
