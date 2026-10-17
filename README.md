@@ -34,6 +34,8 @@ Andere scripts: `pnpm lint`, `pnpm format`, `pnpm fsd`, `pnpm icons`, `pnpm buil
 
 De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workernaam `games`). Elke push naar `main` deployt via GitHub Actions.
 
+Tijdelijke spiegel: <https://tijmenvangurp.github.io/games/>. Dezelfde statische build wordt via GitHub Pages gepubliceerd zolang de Cloudflare-build niet automatisch bijwerkt. Zie `docs/adr/0004-github-pages-spiegel.md`.
+
 Eenmalig instellen in de repository (Settings → Secrets and variables → Actions):
 
 | Secret | Waarde |
