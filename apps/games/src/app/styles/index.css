@@ -202,48 +202,29 @@
   }
 }
 
-@keyframes maze-fly-up {
+/**
+ * A flying arrow slithers out: the body dash slides along the extended track
+ * (tail first through every bend) while the head glides straight out ahead.
+ */
+@keyframes maze-snake-body {
   to {
-    opacity: 0;
-    transform: translateY(-50px);
+    stroke-dashoffset: var(--maze-travel);
   }
 }
 
-@keyframes maze-fly-right {
+@keyframes maze-snake-head {
   to {
-    opacity: 0;
-    transform: translateX(50px);
+    translate: var(--maze-dx) var(--maze-dy);
   }
 }
 
-@keyframes maze-fly-down {
-  to {
-    opacity: 0;
-    transform: translateY(50px);
-  }
+.maze-flying .maze-snake-body {
+  stroke-dasharray: var(--maze-window) var(--maze-track);
+  animation: maze-snake-body 380ms ease-in forwards;
 }
 
-@keyframes maze-fly-left {
-  to {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-}
-
-.maze-flying[data-direction="up"] {
-  animation: maze-fly-up 380ms ease-in forwards;
-}
-
-.maze-flying[data-direction="right"] {
-  animation: maze-fly-right 380ms ease-in forwards;
-}
-
-.maze-flying[data-direction="down"] {
-  animation: maze-fly-down 380ms ease-in forwards;
-}
-
-.maze-flying[data-direction="left"] {
-  animation: maze-fly-left 380ms ease-in forwards;
+.maze-flying .maze-snake-head {
+  animation: maze-snake-head 380ms ease-in forwards;
 }
 
 [data-creature-id]:focus-visible {

@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent, type RefObject } from "react";
+import { useRef, type CSSProperties, type PointerEvent, type RefObject } from "react";
 import {
   arrowDirection,
   directionBetween,
@@ -223,12 +223,115 @@ function MazeArrowNode({
   );
 }
 
+type BoardBounds = ReturnType<typeof levelBounds>;
+
+/** Extra distance past the board edge so the tail is fully gone when the flight ends. */
+const FLY_CLEARANCE = 1;
+
+interface FlyingGeometry {
+  /** Body polyline extended by the escape ray; the visible dash travels along it. */
+  track: Point[];
+  bodyLength: number;
+  trackLength: number;
+  travel: number;
+  dx: number;
+  dy: number;
+  head: Point;
+  direction: MazeDirection;
+}
+
+/**
+ * A flying arrow does not glide out as one rigid shape. Instead its body runs
+ * along its own polyline and out through the tip, like a snake leaving a
+ * burrow: the tail weaves through every bend while the head slides straight
+ * ahead. The window below is the slice of the extended track that stays visible.
+ */
+function flyingGeometry(arrow: MazeArrow, bounds: BoardBounds, headInset: boolean): FlyingGeometry {
+  const body = trimPolyline(arrow.points, ARROW_INSET, 0);
+  const bodyLength = polylineLength(body);
+  const direction = arrowDirection(arrow);
+  const tip = body[body.length - 1] as Point;
+  const head = pointAlong(body, bodyLength - (headInset ? ARROW_INSET : 0));
+  const margin =
+    (direction === "right"
+      ? bounds.minX + bounds.width - tip.x
+      : direction === "left"
+        ? tip.x - bounds.minX
+        : direction === "down"
+          ? bounds.minY + bounds.height - tip.y
+          : tip.y - bounds.minY) + FLY_CLEARANCE;
+  const travel = bodyLength + margin;
+  const dx = direction === "right" ? travel : direction === "left" ? -travel : 0;
+  const dy = direction === "down" ? travel : direction === "up" ? -travel : 0;
+
+  return {
+    track: [...body, { x: tip.x + dx, y: tip.y + dy }],
+    bodyLength,
+    trackLength: bodyLength + travel,
+    travel,
+    dx,
+    dy,
+    head,
+    direction,
+  };
+}
+
+function FlyingArrowShape({
+  arrow,
+  bounds,
+  headInset,
+}: {
+  arrow: MazeArrow;
+  bounds: BoardBounds;
+  headInset: boolean;
+}) {
+  const geometry = flyingGeometry(arrow, bounds, headInset);
+
+  return (
+    <>
+      <polyline
+        className="maze-line maze-snake-body"
+        fill="none"
+        points={pointsAttribute(geometry.track)}
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={0.16}
+        style={
+          {
+            "--maze-window": `${geometry.bodyLength}px`,
+            "--maze-track": `${geometry.trackLength}px`,
+            "--maze-travel": `${-geometry.travel}px`,
+          } as CSSProperties
+        }
+      />
+      <g
+        className="maze-snake-head"
+        style={
+          {
+            "--maze-dx": `${geometry.dx}px`,
+            "--maze-dy": `${geometry.dy}px`,
+          } as CSSProperties
+        }
+      >
+        <polygon
+          className="maze-head"
+          fill="currentColor"
+          points={headAttribute(geometry.head, geometry.direction)}
+        />
+      </g>
+    </>
+  );
+}
+
 function MazeFlying({
   flying,
+  bounds,
   headInset,
   onFlyingEnd,
 }: {
   flying: FlyingArrow;
+  bounds: BoardBounds;
   headInset: boolean;
   onFlyingEnd: () => void;
 }) {
@@ -240,7 +343,7 @@ function MazeFlying({
       pointerEvents="none"
       onAnimationEnd={onFlyingEnd}
     >
-      <ArrowShape arrow={flying.arrow} headInset={headInset ? ARROW_INSET : 0} />
+      <FlyingArrowShape arrow={flying.arrow} bounds={bounds} headInset={headInset} />
     </g>
   );
 }
@@ -321,6 +424,7 @@ export function MazeBoard({
       {flying ? (
         <MazeFlying
           flying={flying}
+          bounds={bounds}
           headInset={insetHeads.has(flying.arrow.id)}
           onFlyingEnd={onFlyingEnd}
         />
