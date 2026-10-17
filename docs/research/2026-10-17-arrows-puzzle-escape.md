@@ -44,7 +44,7 @@ De belangrijkste video is [Arrows – Puzzle Escape: Level 1–15 Walkthrough](h
 ### Wat waarschijnlijk is, maar niet hard is bevestigd
 
 - Een geblokkeerde pijl blijft staan; alleen de tik mislukt. De gidsen zeggen “the move fails” en “the arrow stays put”; de video bevat geen foutmoment.
-- Alleen de **baan vóór de pijlpunt** telt voor collision. De gidsen beschrijven “trace the lane from the arrowhead”; de video laat zien dat de hele pijl daarna wegvliegt. **Correctie:** in onze app telt de volledige pijl, zie 5.2.
+- Alleen de **baan vóór de pijlpunt** telt voor collision. De gidsen beschrijven “trace the lane from the arrowhead”. **Correctie (2026-10-17):** dit volgen we nu. De pijl glijdt als een slang langs zijn eigen polyline naar buiten, dus hij bezet alleen nieuwe cellen vóór de punt; zie 5.2.
 - De rode pijlen in de Play Store-screenshot met één hart zijn een **hint- of foutmarkering**. Niet duidelijk welke van de twee; in onze app kiezen we één eenduidige betekenis.
 - Undo herstelt geen hart. Onbekend; we kiezen in onze app voor “undo herstelt de pijl, niet het hart”.
 
@@ -143,7 +143,9 @@ Regels:
 
 ### 5.2 Collision
 
-Een pijl mag alleen wegvliegen als zijn **volledige lichaam** in de richting van de punt kan schuiven zonder een andere pijl te raken. De staart mag dus niet door een buurpijl heen schuiven terwijl de punt nog vrij baan heeft.
+**Runtime (sinds 2026-10-17).** Een pijl glijdt als een slang langs zijn eigen polyline naar buiten: de kop schuift recht vooruit en het lijf volgt hetzelfde spoor. Daardoor bezet de pijl alleen nieuwe cellen in de **baan vóór de pijlpunt**, en een pijl kan weg zodra die baan vrij is. Een buur die de baan slechts in een hoekpunt raakt blokkeert niet; een buur die de baan echt kruist of er collineair vóór ligt wel. Zie `isArrowRemovable` in `libs/entities/arrow/model/geometry.ts`. Dit vervangt de eerdere regel “het volledige lichaam moet vrij baan hebben”, die te streng was: twee pijlen met naast elkaar liggende, loodrechte punten konden daardoor onnodig geblokkeerd raken.
+
+**Levelgenerator.** De generator gebruikt bewust nog de strengere regel: een **star lichaam** dat recht in de richting van de punt schuift, zodat ook de staart zijwaarts kan vegen (`isArrowRemovableRigid`). Een star-vrije volgorde is altijd ook baan-vrij, dus zo blijven de levels gegarandeerd oplosbaar én verandert hun uiterlijk niet.
 
 Voor elk segment `S` van pijl `A` en elk segment `T` van een andere, nog aanwezige pijl:
 

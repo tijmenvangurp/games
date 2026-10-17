@@ -88,23 +88,40 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
   });
 
-  it("blocks an arrow when only its tail would sweep through another arrow", () => {
+  it("lets a bent arrow leave when only a rigid tail sweep would cross a neighbour", () => {
     const mover = arrow(1, [
       [2, 4],
       [2, 2],
       [3, 2],
     ]);
-    const blocker = arrow(2, [
+    const neighbour = arrow(2, [
       [4, 3],
       [5, 3],
     ]);
-    const testLevel = level([mover, blocker], 8, 8);
+    const testLevel = level([mover, neighbour], 8, 8);
 
-    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
-    expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(true);
   });
 
-  it("blocks a tail that would sweep through an arrow in every direction", () => {
+  it("lets two arrows with adjacent perpendicular heads leave", () => {
+    const right = arrow(1, [
+      [1, 0],
+      [1, 2],
+      [2, 2],
+      [3, 2],
+    ]);
+    const up = arrow(2, [
+      [4, 0],
+      [4, 1],
+      [4, 2],
+    ]);
+    const testLevel = level([right, up], 8, 8);
+
+    expect(isArrowRemovable(right, testLevel, new Set())).toBe(true);
+    expect(isArrowRemovable(up, testLevel, new Set())).toBe(true);
+  });
+
+  it("blocks a bent arrow when a neighbour sits in its lane in every direction", () => {
     const cases: [MazeArrow, MazeArrow][] = [
       [
         arrow(1, [
@@ -113,8 +130,8 @@ describe("maze geometry", () => {
           [2, 0],
         ]),
         arrow(2, [
-          [3, 1],
-          [4, 1],
+          [3, 0],
+          [4, 0],
         ]),
       ],
       [
@@ -124,8 +141,8 @@ describe("maze geometry", () => {
           [0, 0],
         ]),
         arrow(2, [
-          [-2, 1],
-          [-1, 1],
+          [-1, 0],
+          [-2, 0],
         ]),
       ],
       [
@@ -135,8 +152,8 @@ describe("maze geometry", () => {
           [2, 2],
         ]),
         arrow(2, [
-          [1, 3],
-          [1, 4],
+          [2, 3],
+          [2, 4],
         ]),
       ],
       [
@@ -146,16 +163,16 @@ describe("maze geometry", () => {
           [2, 0],
         ]),
         arrow(2, [
-          [1, -2],
-          [1, -1],
+          [2, -1],
+          [2, -2],
         ]),
       ],
     ];
 
-    for (const [mover, blocker] of cases) {
-      const testLevel = level([mover, blocker], 8, 8);
+    for (const [mover, neighbour] of cases) {
+      const testLevel = level([mover, neighbour], 8, 8);
       expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
-      expect(isArrowRemovable(mover, testLevel, new Set([blocker.id]))).toBe(true);
+      expect(isArrowRemovable(mover, testLevel, new Set([neighbour.id]))).toBe(true);
     }
   });
 

@@ -273,12 +273,13 @@ function bodyHitsArrow(arrow: MazeArrow, other: MazeArrow, dx: number, dy: numbe
 }
 
 /**
- * An arrow may only fly when its whole body can travel in the escape direction
- * without touching another arrow. Every point of the arrow follows the head, so
- * checking only the lane in front of the head is not enough: a long tail would
- * sweep through neighbouring arrows.
+ * Conservative check used by the level builder (see `contour.ts`): the arrow is
+ * modelled as a rigid shape that slides straight in its escape direction, so a
+ * bent tail can sweep sideways through neighbours. It is stricter than the
+ * runtime rule in `isArrowRemovable`, which keeps the generated layouts stable
+ * while still guaranteeing they are solvable.
  */
-export function isArrowRemovable(
+export function isArrowRemovableRigid(
   arrow: MazeArrow,
   level: MazeLevel,
   removed: ReadonlySet<number>,
@@ -294,6 +295,97 @@ export function isArrowRemovable(
     }
     if (mightMeet(body, dx, dy, boundsOf(other.points)) && bodyHitsArrow(arrow, other, dx, dy)) {
       return false;
+    }
+  }
+
+  return true;
+}
+
+const DIRECTION_STEPS: Record<MazeDirection, Point> = {
+  up: { x: 0, y: -1 },
+  down: { x: 0, y: 1 },
+  left: { x: -1, y: 0 },
+  right: { x: 1, y: 0 },
+};
+
+/**
+ * Does the escape lane cross this perpendicular segment? The segment's fixed
+ * coordinate must sit strictly ahead of the head and the head's cross
+ * coordinate must sit strictly inside the segment, so a tip that only grazes
+ * the lane does not block.
+ */
+function crossesHorizontalLane(
+  segment: { a: Point; b: Point },
+  head: Point,
+  stepX: number,
+): boolean {
+  const low = Math.min(segment.a.y, segment.b.y);
+  const high = Math.max(segment.a.y, segment.b.y);
+  const ahead = stepX > 0 ? segment.a.x > head.x : segment.a.x < head.x;
+  return ahead && low < head.y && head.y < high;
+}
+
+function crossesVerticalLane(segment: { a: Point; b: Point }, head: Point, stepY: number): boolean {
+  const low = Math.min(segment.a.x, segment.b.x);
+  const high = Math.max(segment.a.x, segment.b.x);
+  const ahead = stepY > 0 ? segment.a.y > head.y : segment.a.y < head.y;
+  return ahead && low < head.x && head.x < high;
+}
+
+/** Does this segment lie collinear with the lane and reach past the head? */
+function liesInHorizontalLane(
+  segment: { a: Point; b: Point },
+  head: Point,
+  stepX: number,
+): boolean {
+  const low = Math.min(segment.a.x, segment.b.x);
+  const high = Math.max(segment.a.x, segment.b.x);
+  return segment.a.y === head.y && (stepX > 0 ? high > head.x : low < head.x);
+}
+
+function liesInVerticalLane(segment: { a: Point; b: Point }, head: Point, stepY: number): boolean {
+  const low = Math.min(segment.a.y, segment.b.y);
+  const high = Math.max(segment.a.y, segment.b.y);
+  return segment.a.x === head.x && (stepY > 0 ? high > head.y : low < head.y);
+}
+
+/**
+ * Does the segment lie in the escape lane: the ray that leaves the head in the
+ * arrow's direction? The body slides along its own polyline and out through the
+ * tip, so the only cells the arrow newly occupies are ahead of the head.
+ */
+function laneHitsSegment(segment: { a: Point; b: Point }, head: Point, step: Point): boolean {
+  if (step.x !== 0) {
+    return segment.a.x === segment.b.x
+      ? crossesHorizontalLane(segment, head, step.x)
+      : liesInHorizontalLane(segment, head, step.x);
+  }
+  return segment.a.y === segment.b.y
+    ? crossesVerticalLane(segment, head, step.y)
+    : liesInVerticalLane(segment, head, step.y);
+}
+
+/**
+ * An arrow flies out like a snake: its body runs along its own polyline and out
+ * through the tip, so it only newly occupies the straight lane ahead of the
+ * head. A neighbour blocks the escape only when it crosses that lane.
+ */
+export function isArrowRemovable(
+  arrow: MazeArrow,
+  level: MazeLevel,
+  removed: ReadonlySet<number>,
+): boolean {
+  const step = DIRECTION_STEPS[arrowDirection(arrow)];
+  const head = arrowHead(arrow);
+
+  for (const other of level.arrows) {
+    if (other.id === arrow.id || removed.has(other.id)) {
+      continue;
+    }
+    for (const segment of arrowSegments(other)) {
+      if (laneHitsSegment(segment, head, step)) {
+        return false;
+      }
     }
   }
 
