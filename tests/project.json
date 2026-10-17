@@ -1,0 +1,75 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "tests",
+  "projectType": "library",
+  "sourceRoot": "tests",
+  "tags": ["type:test"],
+  "targets": {
+    "test": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/tests/**/*",
+        "{workspaceRoot}/apps/**/*",
+        "{workspaceRoot}/libs/**/*",
+        "{workspaceRoot}/tools/**/*",
+        "{workspaceRoot}/vitest.config.ts",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/tsconfig.web.json",
+        "{workspaceRoot}/tsconfig.node.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "options": {
+        "command": "vitest run",
+        "cwd": "."
+      }
+    },
+    "coverage": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/tests/**/*",
+        "{workspaceRoot}/apps/**/*",
+        "{workspaceRoot}/libs/**/*",
+        "{workspaceRoot}/tools/**/*",
+        "{workspaceRoot}/vitest.config.ts",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/tsconfig.web.json",
+        "{workspaceRoot}/tsconfig.node.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "options": {
+        "command": "vitest run --coverage",
+        "cwd": "."
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint tests scripts e2e tools vitest.config.ts playwright.config.ts steiger.config.ts commitlint.config.ts",
+        "cwd": "."
+      }
+    }
+  },
+  "implicitDependencies": [
+    "games",
+    "pages-home",
+    "pages-sudoku",
+    "pages-memory",
+    "pages-seek",
+    "widgets-game-menu",
+    "widgets-game-shell",
+    "features-sudoku-game",
+    "features-memory-game",
+    "features-seek-and-find",
+    "entities-game",
+    "entities-sudoku",
+    "entities-memory",
+    "entities-hidden-object",
+    "shared-lib",
+    "shared-ui"
+  ]
+}

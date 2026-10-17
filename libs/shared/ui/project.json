@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-ui",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/ui",
+  "tags": ["layer:shared", "scope:shared", "type:ui"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/shared/ui"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}

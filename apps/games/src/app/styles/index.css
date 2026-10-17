@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+@source "../../..";
+@source "../../../../../libs";
+
+@theme {
+  --font-sans:
+    ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --animate-pop: pop 0.25s ease-out;
+  --animate-rise: rise 0.25s ease-out;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-success: var(--success);
+}
+
+:root {
+  --background: oklch(0.985 0.012 85);
+  --foreground: oklch(0.27 0.03 265);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.58 0.16 255);
+  --primary-foreground: oklch(0.99 0 0);
+  --muted: oklch(0.95 0.012 85);
+  --muted-foreground: oklch(0.5 0.02 265);
+  --border: oklch(0.9 0.012 85);
+  --success: oklch(0.66 0.15 155);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply m-0 bg-background font-sans text-foreground antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@utility pt-safe {
+  padding-top: max(1.5rem, env(safe-area-inset-top));
+}
+
+@utility pb-safe {
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+
+.memory-card {
+  perspective: 900px;
+}
+
+.memory-card-inner {
+  position: relative;
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: transform 350ms ease;
+}
+
+.memory-card[data-flipped="true"] .memory-card-inner {
+  transform: rotateY(180deg);
+}
+
+.memory-card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 1rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.memory-card-face--monster {
+  transform: rotateY(180deg);
+}
+
+.memory-card-pattern {
+  background-color: #4f46e5;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.45) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

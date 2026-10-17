@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-sudoku-game",
+  "projectType": "library",
+  "sourceRoot": "libs/features/sudoku-game",
+  "tags": ["layer:features", "scope:sudoku", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/sudoku-game"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-sudoku", "shared-lib", "shared-ui"]
+}

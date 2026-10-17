@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_SEEK_SETTINGS } from "@features/seek-and-find";
-import { loadSeekSettings, saveSeekSettings } from "@features/seek-and-find/model/storage";
+import { DEFAULT_SEEK_SETTINGS, loadSeekSettings, saveSeekSettings } from "@features/seek-and-find";
 
 const STORAGE_KEY = "games.seek.v1";
 

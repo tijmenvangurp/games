@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-memory",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/memory",
+  "tags": ["layer:pages", "scope:memory", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/memory"
+      }
+    }
+  },
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-memory-game",
+    "entities-memory",
+    "shared-ui"
+  ]
+}

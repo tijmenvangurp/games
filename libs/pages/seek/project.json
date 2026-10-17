@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-seek",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/seek",
+  "tags": ["layer:pages", "scope:hidden-object", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/seek"
+      }
+    }
+  },
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-seek-and-find",
+    "entities-hidden-object",
+    "shared-ui"
+  ]
+}

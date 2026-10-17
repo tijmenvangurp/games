@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DIFFICULTY_OPTIONS, SIZE_OPTIONS, symbolsFor } from "@features/sudoku-game/model/settings";
+import { DIFFICULTY_OPTIONS, SIZE_OPTIONS, symbolsFor } from "@features/sudoku-game";
 import { SUDOKU_SIZES } from "@entities/sudoku";
 
 describe("sudoku settings", () => {

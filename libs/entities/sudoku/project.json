@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-sudoku",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/sudoku",
+  "tags": ["layer:entities", "scope:sudoku", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/sudoku"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}

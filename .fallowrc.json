@@ -1,9 +1,13 @@
 {
   "$schema": "./node_modules/fallow/schema.json",
   "entry": [
-    "src/app/main.tsx",
+    "apps/games/src/app/main.tsx",
     "steiger.config.ts",
     "commitlint.config.ts",
+    "vitest.config.ts",
+    "playwright.config.ts",
+    "apps/games/vite.config.ts",
+    "tools/aliases.ts",
     "scripts/check-ts-only.ts",
     "scripts/generate-app-icons.ts",
     "scripts/run-playwright.ts",
@@ -12,6 +16,21 @@
     "scripts/hooks/pre-push.ts"
   ],
   "boundaries": {
-    "preset": "feature-sliced"
+    "zones": [
+      { "name": "app", "patterns": ["apps/games/src/app/**"] },
+      { "name": "pages", "patterns": ["libs/pages/**"] },
+      { "name": "widgets", "patterns": ["libs/widgets/**"] },
+      { "name": "features", "patterns": ["libs/features/**"] },
+      { "name": "entities", "patterns": ["libs/entities/**"] },
+      { "name": "shared", "patterns": ["libs/shared/**"] }
+    ],
+    "rules": [
+      { "from": "app", "allow": ["pages", "widgets", "features", "entities", "shared"] },
+      { "from": "pages", "allow": ["widgets", "features", "entities", "shared"] },
+      { "from": "widgets", "allow": ["features", "entities", "shared"] },
+      { "from": "features", "allow": ["entities", "shared"] },
+      { "from": "entities", "allow": ["shared"] },
+      { "from": "shared", "allow": ["shared"] }
+    ]
   }
 }

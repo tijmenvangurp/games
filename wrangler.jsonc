@@ -3,9 +3,10 @@
   "name": "games",
   "compatibility_date": "2026-10-17",
   "assets": {
-    "directory": "./dist",
+    "directory": "./apps/games/dist",
     "not_found_handling": "single-page-application",
   },
+  "previews": {},
   "workers_dev": true,
   "preview_urls": true,
 }
