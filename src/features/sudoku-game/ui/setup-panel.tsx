@@ -1,5 +1,5 @@
 import type { Difficulty, SudokuSize } from "@entities/sudoku";
-import { ArrowLeft, Button, Play, Sparkles } from "@shared/ui";
+import { OptionPicker, SetupActions } from "@shared/ui";
 import { cn } from "@shared/lib";
 import {
   DIFFICULTY_OPTIONS,
@@ -51,33 +51,12 @@ export function SetupPanel({
         </div>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="mb-2 text-sm font-semibold">Grootte</legend>
-        <div className="grid grid-cols-3 gap-2">
-          {SIZE_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              aria-pressed={settings.size === option.value}
-              className={cn(
-                "flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
-                settings.size === option.value
-                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
-              )}
-              onClick={() => onSizeChange(option.value)}
-            >
-              <span aria-hidden="true" className="text-2xl">
-                {option.emoji}
-              </span>
-              <span className="text-sm font-bold">{option.label}</span>
-              <span className="text-center text-xs leading-tight text-muted-foreground">
-                {option.hint}
-              </span>
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <OptionPicker
+        legend="Grootte"
+        onSelect={onSizeChange}
+        options={SIZE_OPTIONS}
+        selected={settings.size}
+      />
 
       <fieldset className="mt-5 space-y-2">
         <legend className="mb-2 text-sm font-semibold">Moeilijkheid</legend>
@@ -132,32 +111,12 @@ export function SetupPanel({
         </fieldset>
       ) : null}
 
-      <Button
-        className="mt-6 w-full"
-        disabled={isGenerating}
-        size="lg"
-        variant="success"
-        onClick={onStart}
-      >
-        {isGenerating ? (
-          <>
-            <Sparkles aria-hidden="true" className="size-5 animate-pulse" />
-            Spel maken…
-          </>
-        ) : (
-          <>
-            <Play aria-hidden="true" className="size-5" />
-            Spelen
-          </>
-        )}
-      </Button>
-
-      {hasActiveGame ? (
-        <Button className="mt-2 w-full" variant="ghost" onClick={onBack}>
-          <ArrowLeft aria-hidden="true" className="size-4" />
-          Terug naar je puzzel
-        </Button>
-      ) : null}
+      <SetupActions
+        backLabel="Terug naar je puzzel"
+        loading={isGenerating}
+        onBack={hasActiveGame ? onBack : undefined}
+        onStart={onStart}
+      />
     </section>
   );
 }

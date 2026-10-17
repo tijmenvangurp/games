@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { createSeekScene } from "@entities/hidden-object";
 import { SeekPlay, SeekSetup, useSeekStore } from "@features/seek-and-find";
-import { PageHeader } from "@widgets/page-header";
-import { Button, CelebrationDialog, Plus } from "@shared/ui";
+import { GameShell } from "@widgets/game-shell";
+import { CelebrationDialog } from "@shared/ui";
 
 const THEME_LABELS = {
   tuin: "in de tuin",
@@ -26,25 +26,12 @@ export function SeekPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-3 pb-safe pt-safe sm:px-4">
-      <PageHeader
-        actions={
-          scene ? (
-            <Button
-              aria-label="Nieuw spel"
-              size="icon"
-              variant="outline"
-              onClick={() => setShowSetup(true)}
-            >
-              <Plus aria-hidden="true" className="size-5" />
-            </Button>
-          ) : null
-        }
-        onBack={() => navigate({ to: "/" })}
-        subtitle={scene ? `${scene.difficulty} · ${THEME_LABELS[scene.theme]}` : "Kies je zoekveld"}
-        title="Waar is Wobbel?"
-      />
-
+    <GameShell
+      onBack={() => navigate({ to: "/" })}
+      onNewGame={scene ? () => setShowSetup(true) : undefined}
+      subtitle={scene ? `${scene.difficulty} · ${THEME_LABELS[scene.theme]}` : "Kies je zoekveld"}
+      title="Waar is Wobbel?"
+    >
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <SeekSetup
@@ -75,6 +62,6 @@ export function SeekPage() {
           onHome={() => navigate({ to: "/" })}
         />
       ) : null}
-    </div>
+    </GameShell>
   );
 }

@@ -1,5 +1,5 @@
 import type { SeekDifficulty, SeekTheme } from "@entities/hidden-object";
-import { ArrowLeft, Button, Play } from "@shared/ui";
+import { OptionPicker, SetupActions } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { SEEK_DIFFICULTY_OPTIONS, SEEK_THEME_OPTIONS, type SeekSettings } from "../model/settings";
 
@@ -29,31 +29,12 @@ export function SeekSetup({
         </p>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="mb-2 text-sm font-semibold">Moeilijkheid</legend>
-        <div className="grid grid-cols-3 gap-2">
-          {SEEK_DIFFICULTY_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              aria-pressed={settings.difficulty === option.value}
-              className={cn(
-                "flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
-                settings.difficulty === option.value
-                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
-              )}
-              onClick={() => onDifficultyChange(option.value)}
-            >
-              <span aria-hidden="true" className="text-2xl">
-                {option.emoji}
-              </span>
-              <span className="text-sm font-bold">{option.label}</span>
-              <span className="text-xs text-muted-foreground">{option.hint}</span>
-            </button>
-          ))}
-        </div>
-      </fieldset>
+      <OptionPicker
+        legend="Moeilijkheid"
+        options={SEEK_DIFFICULTY_OPTIONS}
+        selected={settings.difficulty}
+        onSelect={onDifficultyChange}
+      />
 
       <fieldset className="mt-5 space-y-2">
         <legend className="mb-2 text-sm font-semibold">Waar zoek je?</legend>
@@ -80,17 +61,11 @@ export function SeekSetup({
         </div>
       </fieldset>
 
-      <Button className="mt-6 w-full" size="lg" variant="success" onClick={onStart}>
-        <Play aria-hidden="true" className="size-5" />
-        Spelen
-      </Button>
-
-      {hasActiveGame ? (
-        <Button className="mt-2 w-full" variant="ghost" onClick={onBack}>
-          <ArrowLeft aria-hidden="true" className="size-4" />
-          Terug naar je zoekveld
-        </Button>
-      ) : null}
+      <SetupActions
+        backLabel="Terug naar je zoekveld"
+        onBack={hasActiveGame ? onBack : undefined}
+        onStart={onStart}
+      />
     </section>
   );
 }

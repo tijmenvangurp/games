@@ -53,7 +53,7 @@ describe("games app", () => {
     renderApp("/");
 
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();
-    expect(screen.getByText("Binnenkort")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /monster memory/i })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("link", { name: /sudoku/i }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();

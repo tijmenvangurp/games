@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { PageHeader } from "@widgets/page-header";
+import { GameShell } from "@widgets/game-shell";
 import { SetupPanel, SudokuPlay, useSudokuStore } from "@features/sudoku-game";
-import { Button, CelebrationDialog, Plus } from "@shared/ui";
+import { CelebrationDialog } from "@shared/ui";
 
 export function SudokuPage() {
   const navigate = useNavigate();
@@ -23,29 +23,16 @@ export function SudokuPage() {
   };
 
   return (
-    <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-3 pb-safe pt-safe sm:px-4">
-      <PageHeader
-        actions={
-          play ? (
-            <Button
-              aria-label="Nieuw spel"
-              size="icon"
-              variant="outline"
-              onClick={() => setShowSetup(true)}
-            >
-              <Plus aria-hidden="true" className="size-5" />
-            </Button>
-          ) : null
-        }
-        onBack={() => navigate({ to: "/" })}
-        subtitle={
-          play
-            ? `${play.puzzle.size} × ${play.puzzle.size} · ${play.puzzle.difficulty}`
-            : "Kies je puzzel"
-        }
-        title="Sudoku"
-      />
-
+    <GameShell
+      onBack={() => navigate({ to: "/" })}
+      onNewGame={play ? () => setShowSetup(true) : undefined}
+      subtitle={
+        play
+          ? `${play.puzzle.size} × ${play.puzzle.size} · ${play.puzzle.difficulty}`
+          : "Kies je puzzel"
+      }
+      title="Sudoku"
+    >
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <SetupPanel
@@ -74,6 +61,6 @@ export function SudokuPage() {
           onHome={() => navigate({ to: "/" })}
         />
       ) : null}
-    </div>
+    </GameShell>
   );
 }
