@@ -22,9 +22,12 @@
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
 - `research/2026-10-18-frans-luisterspel.md` — bestaande content, TTS-stemmen en spelconcept voor een Frans luisterspel met flipcards en sorteren.
+- `research/2026-10-18-letters-leren-basisschool.md` — methodiek voor letters leren in groep 1–3, de lettervolgordes van VLL en Lijn 3, en ontwerpimplicaties voor een letter-spel.
+- `research/2026-10-18-letterdidactiek-en-spelletjes.md` — didactische principes, klassenspelletjes, digitale letter-apps en concrete spelmodi voor een letter-spel.
 - `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
+- `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.
 - `ideas/spelideeen.md` — verzamelde educatieve spelideeën, prioriteiten en aandachtspunten.
 
 Nieuwe architectuur-, privacy-, routing- of deploymentbeslissingen krijgen een eigen ADR in `adr/`.
