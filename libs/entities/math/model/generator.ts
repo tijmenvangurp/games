@@ -164,6 +164,24 @@ export function createRound(
   return { mode, level, seed, questions };
 }
 
+interface DotGrouping {
+  groups: number;
+  perGroup: number;
+}
+
+/**
+ * De verdeling in groepjes die bij een som hoort. Alleen zinvol voor keer en delen.
+ * Bij delen is het aantal groepjes de deler, zodat "15 ÷ 3" als drie groepjes van vijf
+ * wordt getekend en niet als vijf groepjes van drie.
+ */
+export function groupingFor(question: MathQuestion): DotGrouping {
+  if (question.mode === "deel") {
+    return { groups: question.right, perGroup: question.answer };
+  }
+
+  return { groups: question.left, perGroup: question.right };
+}
+
 export function explanationFor(question: MathQuestion): string {
   const { mode, left, right, answer } = question;
 
@@ -172,9 +190,13 @@ export function explanationFor(question: MathQuestion): string {
       return `${left} + ${right} = ${answer}. Tel verder vanaf ${left}.`;
     case "min":
       return `${left} − ${right} = ${answer}. Tel terug vanaf ${left}.`;
-    case "keer":
-      return `${left} × ${right} = ${answer}. Dat zijn ${left} groepjes van ${right}.`;
-    case "deel":
-      return `${left} ÷ ${right} = ${answer}. ${left} eerlijk verdelen over ${right} groepjes geeft ${answer} per groep.`;
+    case "keer": {
+      const { groups, perGroup } = groupingFor(question);
+      return `${left} × ${right} = ${answer}. Dat zijn ${groups} groepjes van ${perGroup}.`;
+    }
+    case "deel": {
+      const { groups, perGroup } = groupingFor(question);
+      return `${left} ÷ ${right} = ${answer}. ${left} eerlijk verdelen over ${groups} groepjes geeft ${perGroup} per groep.`;
+    }
   }
 }
