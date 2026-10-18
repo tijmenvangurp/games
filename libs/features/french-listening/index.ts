@@ -1,4 +1,9 @@
-export { FRENCH_OPTION_COUNT, createFrenchQuestion, createFrenchQueue } from "./model/quiz";
+export {
+  FRENCH_MASTER_OPTION_COUNT,
+  FRENCH_OPTION_COUNT,
+  createFrenchQuestion,
+  createFrenchQueue,
+} from "./model/quiz";
 export { createSentencePuzzle, isSentenceCorrect, tokenizeSentence } from "./model/sentence";
 export { createSortRound, isSortCorrect } from "./model/sort";
 export { useFrenchProgressStore } from "./model/use-french-progress-store";

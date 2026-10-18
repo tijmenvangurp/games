@@ -8,7 +8,7 @@ import {
   useFrenchQuizStore,
 } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, LayoutGrid, Play, Puzzle, Sparkles } from "@shared/ui";
+import { Button, LayoutGrid, Play, Puzzle, Sparkles, Trophy } from "@shared/ui";
 
 type FrenchMode = "intro" | "quiz" | "cards" | "build";
 
@@ -39,8 +39,8 @@ export function FrenchLessonPage() {
     );
   }
 
-  const startQuiz = () => {
-    useFrenchQuizStore.getState().start(lesson);
+  const startQuiz = (master = false) => {
+    useFrenchQuizStore.getState().start(lesson, lesson.items, master);
     setMode("quiz");
   };
 
@@ -83,9 +83,13 @@ export function FrenchLessonPage() {
             </p>
           </section>
 
-          <Button size="lg" onClick={startQuiz}>
+          <Button size="lg" onClick={() => startQuiz(false)}>
             <Play aria-hidden="true" className="size-5" />
             Start luisteroefening
+          </Button>
+          <Button size="lg" variant="outline" onClick={() => startQuiz(true)}>
+            <Trophy aria-hidden="true" className="size-5" />
+            Meestermodus
           </Button>
           <Button size="lg" variant="outline" onClick={startCards}>
             <LayoutGrid aria-hidden="true" className="size-5" />

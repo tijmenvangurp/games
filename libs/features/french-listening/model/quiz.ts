@@ -8,10 +8,11 @@ import {
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 
 export const FRENCH_OPTION_COUNT = 4;
+export const FRENCH_MASTER_OPTION_COUNT = 5;
 
 export interface FrenchQuestion {
   item: FrenchItem;
-  /** Four Dutch options, including the correct one, already shuffled. */
+  /** Dutch options, including the correct one, already shuffled. */
   options: string[];
   correctIndex: number;
   seed: number;
@@ -52,15 +53,16 @@ function chooseDistractors(
   candidates: readonly string[],
   fallback: readonly string[],
   random: () => number,
+  optionCount: number,
 ): string[] {
-  if (candidates.length >= FRENCH_OPTION_COUNT - 1) {
+  if (candidates.length >= optionCount - 1) {
     return shuffledIndexes(candidates.length, random)
-      .slice(0, FRENCH_OPTION_COUNT - 1)
+      .slice(0, optionCount - 1)
       .map((index) => candidates[index]);
   }
 
   const fill = shuffledIndexes(fallback.length, random)
-    .slice(0, FRENCH_OPTION_COUNT - 1 - candidates.length)
+    .slice(0, optionCount - 1 - candidates.length)
     .map((index) => fallback[index]);
   return [...candidates, ...fill];
 }
@@ -74,6 +76,7 @@ export function createFrenchQuestion(
   item: FrenchItem,
   pool: readonly FrenchItem[],
   seed: number = createSeed(),
+  optionCount: number = FRENCH_OPTION_COUNT,
 ): FrenchQuestion {
   const random = mulberry32(seed);
   const sameKind = pool.filter((candidate) => candidate.kind === item.kind);
@@ -87,7 +90,7 @@ export function createFrenchQuestion(
     pool.map((candidate) => candidate.nl),
     item.nl,
   ).filter((value) => !candidates.includes(value));
-  const distractors = chooseDistractors(candidates, fallback, random);
+  const distractors = chooseDistractors(candidates, fallback, random, optionCount);
 
   const options = [item.nl, ...distractors];
   for (let index = options.length - 1; index > 0; index -= 1) {

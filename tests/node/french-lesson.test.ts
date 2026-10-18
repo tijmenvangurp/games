@@ -8,6 +8,7 @@ import {
   frenchExampleAudioSrc,
 } from "@entities/french";
 import {
+  FRENCH_MASTER_OPTION_COUNT,
   FRENCH_OPTION_COUNT,
   createFrenchQuestion,
   createFrenchQueue,
@@ -64,6 +65,19 @@ describe("Frans luisterspel", () => {
       }
     });
   }
+
+  it("bouwt vijf opties in de meestermodus", () => {
+    const item = LESSON_ANIMAUX.items[0];
+    const question = createFrenchQuestion(
+      item,
+      LESSON_ANIMAUX.items,
+      3,
+      FRENCH_MASTER_OPTION_COUNT,
+    );
+    expect(question.options).toHaveLength(FRENCH_MASTER_OPTION_COUNT);
+    expect(new Set(question.options).size).toBe(FRENCH_MASTER_OPTION_COUNT);
+    expect(question.options[question.correctIndex]).toBe(item.nl);
+  });
 
   it("is deterministisch per seed en varieert tussen seeds", () => {
     const item = LESSON_ANIMAUX.items[0];

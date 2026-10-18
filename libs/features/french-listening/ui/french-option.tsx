@@ -2,7 +2,7 @@ import { Check, X } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { frenchAnswerState } from "../lib/answer-state";
 
-const OPTION_LETTERS = ["A", "B", "C", "D"] as const;
+const OPTION_LETTERS = ["A", "B", "C", "D", "E"] as const;
 
 const OPTION_CLASSES = {
   idle: "border-border bg-card hover:bg-muted",

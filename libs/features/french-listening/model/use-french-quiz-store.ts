@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { FrenchItem, FrenchLesson } from "@entities/french";
-import { createFrenchQuestion, createFrenchQueue, type FrenchQuestion } from "./quiz";
+import {
+  FRENCH_MASTER_OPTION_COUNT,
+  FRENCH_OPTION_COUNT,
+  createFrenchQuestion,
+  createFrenchQueue,
+  type FrenchQuestion,
+} from "./quiz";
 import { useFrenchProgressStore } from "./use-french-progress-store";
 
 interface FrenchQuizStore {
@@ -13,7 +19,8 @@ interface FrenchQuizStore {
   answered: boolean;
   correctCount: number;
   finished: boolean;
-  start: (lesson: FrenchLesson, pool?: readonly FrenchItem[]) => void;
+  master: boolean;
+  start: (lesson: FrenchLesson, pool?: readonly FrenchItem[], master?: boolean) => void;
   answer: (option: string) => void;
   next: () => void;
   reset: () => void;
@@ -23,9 +30,11 @@ function questionFor(
   queue: FrenchItem[],
   index: number,
   pool: readonly FrenchItem[],
+  master: boolean,
 ): FrenchQuestion | null {
   const item = queue[index];
-  return item ? createFrenchQuestion(item, pool) : null;
+  const optionCount = master ? FRENCH_MASTER_OPTION_COUNT : FRENCH_OPTION_COUNT;
+  return item ? createFrenchQuestion(item, pool, undefined, optionCount) : null;
 }
 
 export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
@@ -38,8 +47,9 @@ export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
   answered: false,
   correctCount: 0,
   finished: false,
+  master: false,
 
-  start: (lesson, pool = lesson.items) => {
+  start: (lesson, pool = lesson.items, master = false) => {
     const progress = useFrenchProgressStore.getState().progress;
     const queue = createFrenchQueue(lesson, { progress });
     const questionPool = [...pool];
@@ -48,11 +58,12 @@ export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
       pool: questionPool,
       queue,
       index: 0,
-      question: questionFor(queue, 0, questionPool),
+      question: questionFor(queue, 0, questionPool, master),
       selected: null,
       answered: false,
       correctCount: 0,
       finished: queue.length === 0,
+      master,
     });
   },
 
@@ -69,7 +80,7 @@ export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
     }),
 
   next: () => {
-    const { pool, queue, index } = get();
+    const { master, pool, queue, index } = get();
     const nextIndex = index + 1;
     if (nextIndex >= queue.length) {
       set({ question: null, selected: null, answered: false, finished: true });
@@ -77,7 +88,7 @@ export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
     }
     set({
       index: nextIndex,
-      question: questionFor(queue, nextIndex, pool),
+      question: questionFor(queue, nextIndex, pool, master),
       selected: null,
       answered: false,
     });
@@ -94,5 +105,6 @@ export const useFrenchQuizStore = create<FrenchQuizStore>((set, get) => ({
       answered: false,
       correctCount: 0,
       finished: false,
+      master: false,
     }),
 }));

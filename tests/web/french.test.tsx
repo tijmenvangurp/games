@@ -55,6 +55,16 @@ describe("Frans luisterspel", () => {
     expect(useFrenchQuizStore.getState().correctCount).toBe(0);
   });
 
+  it("start de meestermodus met vijf opties", async () => {
+    await openLesson();
+    fireEvent.click(screen.getByRole("button", { name: "Meestermodus" }));
+
+    const group = await screen.findByRole("group", { name: "Kies de juiste vertaling" });
+    expect(within(group).getAllByRole("button")).toHaveLength(5);
+    expect(screen.getByText("Meester")).toBeTruthy();
+    expect(useFrenchQuizStore.getState().master).toBe(true);
+  });
+
   it("accepteert het juiste antwoord en gaat verder", async () => {
     await startQuiz();
 

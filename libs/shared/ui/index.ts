@@ -22,6 +22,7 @@ export {
   Search,
   Sparkles,
   Star,
+  Trophy,
   Undo2,
   Volume2,
   X,
