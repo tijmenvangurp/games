@@ -1,6 +1,6 @@
 # ADR 0009: Woordzoeker met een kleine generator-bibliotheek
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR 0011](0011-woordzoeker-richtingen.md) voor de generator en de richtingen. De UI-keuzes hieronder blijven geldig.
 - **Datum:** 2026-10-18
 
 ## Context

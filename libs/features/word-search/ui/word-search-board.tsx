@@ -1,6 +1,7 @@
-import type { Cell, WordSearchPuzzle } from "@entities/word-search";
+import type { Cell, WordSearchPlacement, WordSearchPuzzle } from "@entities/word-search";
 import { cn } from "@shared/lib";
 import { useWordSearchDrag } from "./use-word-search-drag";
+import { WordSearchStrokes } from "./word-search-strokes";
 
 interface WordSearchCellProps {
   cell: Cell;
@@ -11,6 +12,17 @@ interface WordSearchCellProps {
   hint: boolean;
   wrong: boolean;
   onSelect: (cell: Cell) => void;
+}
+
+interface WordSearchGridProps {
+  puzzle: WordSearchPuzzle;
+  selectedKeys: ReadonlySet<string>;
+  foundKeys: ReadonlySet<string>;
+  hintKeys: ReadonlySet<string>;
+  foundPlacements: readonly WordSearchPlacement[];
+  wrong: boolean;
+  zoomed: boolean;
+  onCellClick: (cell: Cell) => void;
 }
 
 interface WordSearchBoardProps {
@@ -48,6 +60,25 @@ function cellLabel(
   }`;
 }
 
+function foundCellKeys(puzzle: WordSearchPuzzle, found: readonly string[]): Set<string> {
+  return new Set(
+    found
+      .flatMap(
+        (word) => puzzle.placements.find((placement) => placement.word === word)?.cells ?? [],
+      )
+      .map(cellKey),
+  );
+}
+
+function foundPlacementsFor(
+  puzzle: WordSearchPuzzle,
+  found: readonly string[],
+): WordSearchPlacement[] {
+  return found
+    .map((word) => puzzle.placements.find((placement) => placement.word === word))
+    .filter((placement): placement is WordSearchPlacement => placement !== undefined);
+}
+
 function WordSearchCell({
   cell,
   letter,
@@ -63,9 +94,10 @@ function WordSearchCell({
       aria-label={cellLabel(letter, cell, found, hint, selected)}
       aria-pressed={selected}
       className={cn(
-        "relative grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-slate-200/80 bg-white font-bold leading-none text-slate-700 transition-colors hover:bg-slate-50",
+        "relative z-10 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-slate-200/80 font-bold leading-none text-slate-700 transition-colors",
         letterSize(size),
-        found && "bg-emerald-100 text-emerald-700",
+        !found && "bg-white hover:bg-slate-50",
+        found && "bg-emerald-100/25 text-emerald-700 ring-1 ring-inset ring-emerald-200",
         hint && "bg-amber-100 text-amber-700 ring-2 ring-inset ring-amber-400",
         selected && !wrong && "bg-sky-100 text-sky-700 ring-2 ring-inset ring-sky-500",
         selected && wrong && "bg-rose-100 text-rose-700 ring-2 ring-inset ring-rose-400",
@@ -80,6 +112,52 @@ function WordSearchCell({
   );
 }
 
+function WordSearchGrid({
+  puzzle,
+  selectedKeys,
+  foundKeys,
+  hintKeys,
+  foundPlacements,
+  wrong,
+  zoomed,
+  onCellClick,
+}: WordSearchGridProps) {
+  return (
+    <div
+      className="relative grid w-full"
+      style={{
+        gap: "2px",
+        gridTemplateColumns: `repeat(${puzzle.size}, ${
+          zoomed ? "minmax(44px, 1fr)" : "minmax(0, 1fr)"
+        })`,
+        touchAction: zoomed ? "pan-x pan-y" : "none",
+      }}
+    >
+      {puzzle.grid.map((row, rowIndex) =>
+        row.map((letter, colIndex) => {
+          const cell = { row: rowIndex, col: colIndex };
+          const key = cellKey(cell);
+
+          return (
+            <WordSearchCell
+              key={key}
+              cell={cell}
+              found={foundKeys.has(key)}
+              hint={hintKeys.has(key)}
+              letter={letter}
+              selected={selectedKeys.has(key)}
+              size={puzzle.size}
+              wrong={wrong}
+              onSelect={onCellClick}
+            />
+          );
+        }),
+      )}
+      <WordSearchStrokes placements={foundPlacements} size={puzzle.size} />
+    </div>
+  );
+}
+
 export function WordSearchBoard({
   puzzle,
   selected,
@@ -91,13 +169,8 @@ export function WordSearchBoard({
 }: WordSearchBoardProps) {
   const selectedKeys = new Set(selected.map(cellKey));
   const hintKeys = new Set(hintCells.map(cellKey));
-  const foundKeys = new Set(
-    found
-      .flatMap(
-        (word) => puzzle.placements.find((placement) => placement.word === word)?.cells ?? [],
-      )
-      .map(cellKey),
-  );
+  const foundKeys = foundCellKeys(puzzle, found);
+  const foundPlacements = foundPlacementsFor(puzzle, found);
   const drag = useWordSearchDrag(!zoomed);
 
   const handleCellClick = (cell: Cell) => {
@@ -120,37 +193,16 @@ export function WordSearchBoard({
       onPointerMove={drag.onPointerMove}
       onPointerUp={drag.onPointerUp}
     >
-      <div
-        className="grid w-full"
-        style={{
-          gap: "2px",
-          gridTemplateColumns: `repeat(${puzzle.size}, ${
-            zoomed ? "minmax(44px, 1fr)" : "minmax(0, 1fr)"
-          })`,
-          touchAction: zoomed ? "pan-x pan-y" : "none",
-        }}
-      >
-        {puzzle.grid.map((row, rowIndex) =>
-          row.map((letter, colIndex) => {
-            const cell = { row: rowIndex, col: colIndex };
-            const key = cellKey(cell);
-
-            return (
-              <WordSearchCell
-                key={key}
-                cell={cell}
-                found={foundKeys.has(key)}
-                hint={hintKeys.has(key)}
-                letter={letter}
-                selected={selectedKeys.has(key)}
-                size={puzzle.size}
-                wrong={wrong}
-                onSelect={handleCellClick}
-              />
-            );
-          }),
-        )}
-      </div>
+      <WordSearchGrid
+        foundKeys={foundKeys}
+        foundPlacements={foundPlacements}
+        hintKeys={hintKeys}
+        puzzle={puzzle}
+        selectedKeys={selectedKeys}
+        wrong={wrong}
+        zoomed={zoomed}
+        onCellClick={handleCellClick}
+      />
     </div>
   );
 }

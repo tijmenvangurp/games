@@ -62,8 +62,15 @@ function findWrongPair(puzzle: WordSearchPuzzle): [Cell, Cell] {
   throw new Error("No wrong pair found");
 }
 
+async function startDefaultGame() {
+  renderApp();
+  fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
+  const board = await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i });
+  return { board, puzzle: currentPuzzle() };
+}
+
 describe("word search", () => {
-  it("starts a puzzle, finds a word and celebrates when everything is found", async () => {
+  it("starts a 12 bij 12 puzzle and finds a word", async () => {
     renderApp();
 
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -99,7 +106,15 @@ describe("word search", () => {
     const wordButton = screen.getByRole("button", { name: placement.word });
     expect(wordButton.getAttribute("aria-pressed")).toBe("true");
 
+    await waitFor(() => {
+      expect(board.querySelector(`[data-word="${placement.word}"]`)).toBeTruthy();
+    });
+  }, 30_000);
+
+  it("gives feedback on a wrong line and shows a hint", async () => {
+    const { board, puzzle } = await startDefaultGame();
     const [wrongStart, wrongEnd] = findWrongPair(puzzle);
+
     fireEvent.click(cellNode(board, wrongStart));
     fireEvent.click(cellNode(board, wrongEnd));
     expect(useWordSearchStore.getState().wrong).toBe(true);
@@ -108,13 +123,13 @@ describe("word search", () => {
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
     expect(useWordSearchStore.getState().hint).not.toBeNull();
     expect(board.querySelector('[aria-label*="hint"]')).toBeTruthy();
+  }, 30_000);
 
-    fireEvent.click(screen.getByRole("button", { name: /Vergroot/ }));
-    expect(screen.getByRole("button", { name: /Heel bord/ })).toBeTruthy();
-
+  it("celebrates a complete board and starts a new round", async () => {
+    const { puzzle } = await startDefaultGame();
     useWordSearchStore.setState({ found: puzzle.placements.map((item) => item.word) });
-    expect(await screen.findByRole("heading", { name: "Knap gedaan!" })).toBeTruthy();
 
+    expect(await screen.findByRole("heading", { name: "Knap gedaan!" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
     expect(screen.queryByRole("heading", { name: "Knap gedaan!" })).toBeNull();
     expect(useWordSearchStore.getState().found).toEqual([]);
@@ -122,11 +137,7 @@ describe("word search", () => {
   }, 30_000);
 
   it("marks a word found when the selection is dragged", async () => {
-    renderApp();
-    fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
-    const board = await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i });
-
-    const puzzle = currentPuzzle();
+    const { board, puzzle } = await startDefaultGame();
     const placement = puzzle.placements[0];
     if (!placement) {
       throw new Error("No placement");
@@ -149,12 +160,11 @@ describe("word search", () => {
     await waitFor(() => {
       expect(board.querySelector('[aria-label*="gevonden"]')).toBeTruthy();
     });
+    expect(board.querySelector(`[data-word="${placement.word}"]`)).toBeTruthy();
   }, 30_000);
 
   it("opens the setup again and can go back to the active game", async () => {
-    renderApp();
-    fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
-    await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i });
+    await startDefaultGame();
 
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();

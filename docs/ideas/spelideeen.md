@@ -23,29 +23,29 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken*
 
 ## Overzicht
 
-| Prioriteit | Idee             | Domein                | Effort      | Kern                                                      |
-| ---------- | ---------------- | --------------------- | ----------- | --------------------------------------------------------- |
-| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0009 en het bibliotheekonderzoek |
-| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                             |
-| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                         |
-| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen            |
-| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen     |
-| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Provincies en hoofdsteden van Nederland                   |
-| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                     |
-| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                              |
-| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden      |
+| Prioriteit | Idee             | Domein                | Effort      | Kern                                                     |
+| ---------- | ---------------- | --------------------- | ----------- | -------------------------------------------------------- |
+| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0011 en het richtingenonderzoek |
+| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                            |
+| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                        |
+| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen           |
+| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen    |
+| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Provincies en hoofdsteden van Nederland                  |
+| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                    |
+| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                             |
+| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden     |
 
 ## 1. Woordzoeker
 
 **Leerdoel:** woorden herkennen, spelling oefenen, visueel scannen en de woordenschat van een thema versterken.
 
-**Vorm:** een klassieke woordzoeker met de thema's **Tuin** en **Onder water** uit _Waar is Wobbel?_. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden worden doorgestreept. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
+**Vorm:** een klassieke woordzoeker met de thema's **Tuin** en **Onder water** uit _Waar is Wobbel?_. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden krijgen een handgetekende streep. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Makkelijk zoekt alleen links-naar-rechts en boven-naar-beneden, gemiddeld voegt de diagonale richtingen toe en moeilijk opent alle acht richtingen. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
 
 **Waarom:** taal is het grootste gat in het huidige aanbod. Een woordzoeker is laagdrempelig, goed te herspelen en vraagt geen nieuwe backend of externe assets.
 
-**Techniek:** `libs/entities/word-search` voor de generator en selectieregels, `libs/features/word-search` voor de Zustand-store en UI, `libs/pages/word-search` voor het scherm. De generator komt uit `@aydee-app/word-search` (MIT, ESM, TypeScript, 1,8 KB). De hele puzzel wordt lokaal bewaard, niet alleen een seed. Zie [ADR 0009](../adr/0009-woordzoeker.md).
+**Techniek:** `libs/entities/word-search` bevat een eigen seedbare generator en de selectieregels, `libs/features/word-search` de Zustand-store en UI, `libs/pages/word-search` het scherm. Er is geen generator-dependency meer. De hele puzzel wordt lokaal bewaard. Zie [ADR 0011](../adr/0011-woordzoeker-richtingen.md).
 
-**Aandachtspunten:** de bibliotheek is jong; pin de exacte versie en houd de adapter klein. Voor 44 px-cellen is op mobiel de zoomstand nodig. Zie `research/2026-10-18-woordzoeker-libraries.md` voor de onderbouwing.
+**Aandachtspunten:** de richtingen zijn per niveau vastgelegd; zo blijft makkelijk echt makkelijk. Voor 44 px-cellen is op mobiel de zoomstand nodig. Zie `research/2026-10-18-woordzoeker-libraries.md` voor de onderbouwing.
 
 ## 2. Tafel Topper
 

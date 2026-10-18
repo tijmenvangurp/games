@@ -37,6 +37,9 @@ export function WordSearchSetup({
         selected={settings.difficulty}
         onSelect={onDifficultyChange}
       />
+      <p className="mt-2 text-xs text-muted-foreground">
+        Makkelijk: → en ↓ · Gemiddeld: ook schuin · Moeilijk: alle kanten
+      </p>
 
       <fieldset className="mt-5 space-y-2">
         <legend className="mb-2 text-sm font-semibold">Welk thema?</legend>
