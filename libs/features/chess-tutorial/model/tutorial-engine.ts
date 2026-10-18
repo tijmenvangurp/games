@@ -1,11 +1,6 @@
-import { Chess, SQUARES, type Move, type Square } from "chess.js";
+import { Chess, type Move, type Square } from "chess.js";
+import { isChessSquare } from "@shared/lib";
 import type { TutorialLevel, TutorialMove, TutorialMoveResult } from "./types";
-
-const SQUARE_NAMES: ReadonlySet<string> = new Set(SQUARES);
-
-export function isSquare(value: string): value is Square {
-  return SQUARE_NAMES.has(value);
-}
 
 /**
  * De tutorial-FEN's hebben geen koningen. chess.js keurt zo'n stelling bij
@@ -35,7 +30,7 @@ export function legalMovesFor(
   fen: string,
   square: string,
 ): readonly Square[] {
-  if (!isSquare(square)) {
+  if (!isChessSquare(square)) {
     return [];
   }
 
@@ -56,7 +51,7 @@ export function playTutorialMove(
   to: string,
   moveCountBefore: number,
 ): TutorialMoveResult {
-  if (!isSquare(from) || !isSquare(to)) {
+  if (!isChessSquare(from) || !isChessSquare(to)) {
     return { ok: false, reason: "invalid-square" };
   }
 

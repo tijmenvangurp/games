@@ -10,7 +10,7 @@ export type GameCatalogEntry = GameCatalogBase &
   (
     | {
         status: "available";
-        to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" | "/schaken";
+        to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" | "/schaken" | "/puzzels";
       }
     | { status: "coming-soon" }
   );
@@ -69,5 +69,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/schaken",
     accentClassName: "from-violet-100 via-violet-50 to-white",
+  },
+  {
+    id: "chess-puzzles",
+    name: "Schaakpuzzels",
+    description: "Los korte puzzels op: zet schaakmat of win een stuk.",
+    emoji: "🧩",
+    status: "available",
+    to: "/puzzels",
+    accentClassName: "from-teal-100 via-emerald-50 to-white",
   },
 ];

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { resolveSquareClick, selectionForAction } from "@shared/lib";
 import { levelFor } from "./levels";
-import { isSquare, legalMovesFor, playTutorialMove } from "./tutorial-engine";
+import { legalMovesFor, playTutorialMove } from "./tutorial-engine";
 import {
   TUTORIAL_LEVEL_IDS,
   type TutorialLevel,
@@ -107,51 +108,47 @@ export function useChessTutorial({
 
   const onSquareClick = useCallback(
     (square: string) => {
-      if (state.status !== "playing" || !isSquare(square)) {
+      if (state.status !== "playing") {
         return;
       }
 
-      if (state.selectedSquare === square) {
+      const action = resolveSquareClick(
+        {
+          selectedSquare: state.selectedSquare,
+          legalTargets: state.legalTargets,
+        },
+        square,
+        (candidate) => legalMovesFor(state.level, state.fen, candidate),
+      );
+
+      if (action.kind !== "attempt") {
         setState({
           ...state,
-          selectedSquare: null,
-          legalTargets: [],
+          ...selectionForAction(action),
           feedback: "idle",
         });
         return;
       }
 
-      if (state.selectedSquare && state.legalTargets.includes(square)) {
-        const result = playTutorialMove(
-          state.level,
-          state.fen,
-          state.selectedSquare,
-          square,
-          state.moveCount,
-        );
+      const result = playTutorialMove(
+        state.level,
+        state.fen,
+        action.from,
+        action.to,
+        state.moveCount,
+      );
 
-        if (!result.ok) {
-          setState({
-            ...state,
-            selectedSquare: null,
-            legalTargets: [],
-            feedback: "illegal",
-          });
-          return;
-        }
-
-        setState(movedState(state, result));
+      if (!result.ok) {
+        setState({
+          ...state,
+          selectedSquare: null,
+          legalTargets: [],
+          feedback: "illegal",
+        });
         return;
       }
 
-      const legalTargets = legalMovesFor(state.level, state.fen, square);
-
-      setState({
-        ...state,
-        selectedSquare: legalTargets.length > 0 ? square : null,
-        legalTargets,
-        feedback: "idle",
-      });
+      setState(movedState(state, result));
     },
     [state],
   );

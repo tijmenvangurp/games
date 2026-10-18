@@ -9,6 +9,7 @@
 - `adr/0005-pokemon-assets.md` — lokale Pokémon-assets en de CSP-afweging.
 - `adr/0006-schaaktutorial.md` — de eerste schaaktutorial met chess.js en react-chessboard.
 - `adr/0007-schaaktutorial-uitbreiding.md` — waarom de schaaktutorial alle stukken en de eerste speciale regels dekt.
+- `adr/0008-schaakpuzzels.md` — de lokale Lichess-puzzelsselectie en de puzzelrunner.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 

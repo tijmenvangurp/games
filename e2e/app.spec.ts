@@ -225,6 +225,62 @@ test.describe("schaaktutorial op een tablet", () => {
   });
 });
 
+test.describe("schaakpuzzels op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("lost een schaakmatpuzzel op en gaat verder", async ({ page }) => {
+    await page.goto("/puzzels");
+
+    await expect(page.getByRole("heading", { name: "Schaakpuzzels" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Zet schaakmat!" })).toBeVisible();
+    await expect(page.getByText(/Puzzel 1 van 25/)).toBeVisible();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await expect(board.getByText("a", { exact: true })).toBeVisible();
+    await board.locator('[data-square="a1"]').click();
+    await board.locator('[data-square="a8"]').click();
+
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+    const next = page.getByRole("button", { name: "Volgende puzzel" });
+    await expect(next).toBeEnabled();
+    await next.click();
+
+    await expect(page.getByText(/Puzzel 2 van 25/)).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
+  test("geeft feedback op een verkeerde zet en laat opnieuw proberen", async ({ page }) => {
+    await page.goto("/puzzels");
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="a1"]').click();
+    await board.locator('[data-square="a2"]').click();
+
+    await expect(page.getByText(/Die zet is niet de beste/)).toBeVisible();
+
+    await board.locator('[data-square="a1"]').click();
+    await board.locator('[data-square="a8"]').click();
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+  });
+});
+
+test.describe("schaakpuzzels op een tablet", () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test("toont het bord, de hint en de navigatie", async ({ page }) => {
+    await page.goto("/puzzels");
+
+    await expect(page.getByRole("group", { name: /coördinaten/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Hint" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Opnieuw" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Volgende puzzel" })).toBeVisible();
+  });
+});
+
 test.describe("pokémon quiz op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 

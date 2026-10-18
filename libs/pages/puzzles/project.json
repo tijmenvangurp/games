@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-puzzles",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/puzzles",
+  "tags": ["layer:pages", "scope:chess", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/puzzles"
+      }
+    }
+  },
+  "implicitDependencies": ["widgets-game-shell", "features-chess-puzzles"]
+}
