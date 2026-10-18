@@ -33,7 +33,6 @@ function preloadSolvedGame() {
       hinted: puzzle.givens.map(() => false),
       selected: null,
       solved: true,
-      fallbackHints: 0,
     },
     settings: { size: 4, difficulty: "makkelijk", theme: "animals" },
   });
@@ -70,11 +69,19 @@ describe("games app", () => {
     fireEvent.click(cell);
     expect(cell.getAttribute("aria-pressed")).toBe("true");
 
-    fireEvent.click(screen.getByRole("button", { name: "Kies 🐱" }));
-    expect(cell.getAttribute("aria-label")).toMatch(/^🐱, rij/);
+    const numberButton = screen
+      .getAllByRole("button", { name: /^Kies/ })
+      .find((button) => !button.hasAttribute("disabled"));
+    if (!numberButton) {
+      throw new Error("No enabled number button");
+    }
+    const symbol = numberButton.textContent ?? "";
+
+    fireEvent.click(numberButton);
+    expect(cell.getAttribute("aria-label")?.startsWith(`${symbol}, rij`)).toBe(true);
     expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Kies 🐱" }));
+    fireEvent.click(numberButton);
     expect(cell.getAttribute("aria-label")).toMatch(/^leeg/);
 
     const keyboardCell = findEmptyCell(board);
@@ -129,10 +136,41 @@ describe("games app", () => {
 
     expect(await screen.findByRole("heading", { name: "Goed gedaan!" })).toBeTruthy();
     expect(screen.getByText("Je hebt de sudoku helemaal opgelost.")).toBeTruthy();
+    expect(
+      screen
+        .getAllByRole("button", { name: /^Kies/ })
+        .every((button) => button.hasAttribute("disabled")),
+    ).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
     expect(screen.queryByRole("heading", { name: "Goed gedaan!" })).toBeNull();
     expect(screen.getByText(/0 van 16 vakjes ingevuld/)).toBeTruthy();
+  });
+
+  it("disables a number button once that digit is complete", async () => {
+    const puzzle = generatePuzzle(4, "makkelijk", 99);
+    const entries = Array.from({ length: puzzle.givens.length }, () => 0);
+    puzzle.solution.forEach((value, index) => {
+      if (value === 1) {
+        entries[index] = 1;
+      }
+    });
+    useSudokuStore.setState({
+      play: {
+        puzzle,
+        entries,
+        hinted: puzzle.givens.map(() => false),
+        selected: null,
+        solved: false,
+      },
+      settings: { size: 4, difficulty: "makkelijk", theme: "animals" },
+    });
+
+    renderApp("/sudoku");
+
+    await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    expect(screen.getByRole("button", { name: "Kies 🐶" }).hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("button", { name: "Kies 🐱" }).hasAttribute("disabled")).toBe(false);
   });
 
   it("goes back to the setup screen from the win dialog", async () => {

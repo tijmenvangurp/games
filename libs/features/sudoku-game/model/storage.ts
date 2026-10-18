@@ -54,10 +54,6 @@ function isSelectedCell(value: unknown, cells: number): value is number | null {
   );
 }
 
-function readFallbackHints(value: unknown): number {
-  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0;
-}
-
 function readPlayState(value: unknown): PlayState | null {
   if (!isRecord(value)) {
     return null;
@@ -86,7 +82,6 @@ function readPlayState(value: unknown): PlayState | null {
     hinted,
     selected,
     solved,
-    fallbackHints: readFallbackHints(value.fallbackHints),
   };
 }
 

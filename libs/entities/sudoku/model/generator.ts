@@ -1,10 +1,12 @@
 import { getSudoku } from "sudoku-gen";
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 import { CLUE_TARGETS, geometryFor } from "./geometry";
+import { isSolvableWithSingles } from "./hints";
 import { countSolutions, generateSolution } from "./solver";
 import type { Difficulty, Geometry, SudokuPuzzle, SudokuSize } from "./types";
 
 const MAX_ATTEMPTS = 5;
+const MAX_PACKAGE_ATTEMPTS = 30;
 const PACKAGE_SIZE = 9;
 const PACKAGE_CELLS = PACKAGE_SIZE * PACKAGE_SIZE;
 
@@ -43,17 +45,33 @@ function parseSequence(sequence: string, allowEmpty: boolean): number[] {
  * Nine-by-nine puzzles come from sudoku-gen. That package picks a random seed
  * puzzle and random transformations, so the `seed` is only kept as metadata and
  * does not make the result deterministic.
+ *
+ * Puzzles that need more than naked/hidden singles are rejected so every
+ * generated board can always offer a logically certain hint.
  */
 function generatePackagePuzzle(difficulty: Difficulty, seed: number): SudokuPuzzle {
-  const generated = getSudoku(PACKAGE_DIFFICULTIES[difficulty]);
+  let lastPuzzle: SudokuPuzzle | null = null;
 
-  return {
-    size: PACKAGE_SIZE,
-    difficulty,
-    givens: parseSequence(generated.puzzle, true),
-    solution: parseSequence(generated.solution, false),
-    seed,
-  };
+  for (let attempt = 0; attempt < MAX_PACKAGE_ATTEMPTS; attempt += 1) {
+    const generated = getSudoku(PACKAGE_DIFFICULTIES[difficulty]);
+    const puzzle: SudokuPuzzle = {
+      size: PACKAGE_SIZE,
+      difficulty,
+      givens: parseSequence(generated.puzzle, true),
+      solution: parseSequence(generated.solution, false),
+      seed,
+    };
+
+    if (isSolvableWithSingles(puzzle)) {
+      return puzzle;
+    }
+    lastPuzzle = puzzle;
+  }
+
+  if (!lastPuzzle) {
+    throw new Error("sudoku-gen did not return a puzzle");
+  }
+  return lastPuzzle;
 }
 
 interface CarveState {
@@ -138,7 +156,8 @@ function carveGivens(
 
 /**
  * Generates a puzzle with exactly one solution. The same seed always yields
- * the same puzzle and solution for the 4x4 and 6x6 boards.
+ * the same puzzle and solution for the 4x4 and 6x6 boards. Boards that cannot
+ * be solved with naked/hidden singles are rejected so hints stay certain.
  */
 function generateSmallPuzzle(
   size: SmallSize,
@@ -160,6 +179,9 @@ function generateSmallPuzzle(
     const givens = carveGivens(solution, geometry, target, random);
     const puzzle: SudokuPuzzle = { size, difficulty, givens, solution, seed };
 
+    if (!isSolvableWithSingles(puzzle)) {
+      continue;
+    }
     if (!best || clueCount(givens) < clueCount(best.givens)) {
       best = puzzle;
     }

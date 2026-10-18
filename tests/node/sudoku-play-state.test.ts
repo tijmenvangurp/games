@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  completedValues,
   countMistakes,
   createPlayState,
   enterValue,
   eraseCell,
   filledCount,
   isComplete,
-  MAX_FALLBACK_HINTS,
   moveSelection,
   restartPuzzle,
   revealHint,
@@ -96,6 +96,23 @@ describe("sudoku play state", () => {
     expect(isComplete(puzzle, solved.entries)).toBe(true);
   });
 
+  it("reports only digits that are complete in every row, column and box", () => {
+    const empty = createPlayState(puzzle);
+    expect(completedValues(empty.puzzle, empty.entries).size).toBe(0);
+
+    const partial = enterValue(selectCell(empty, 6), 1);
+    expect(completedValues(partial.puzzle, partial.entries).has(1)).toBe(false);
+
+    const full = enterValue(selectCell(partial, 9), 1);
+    expect(completedValues(full.puzzle, full.entries).has(1)).toBe(true);
+    expect(completedValues(full.puzzle, full.entries).has(2)).toBe(false);
+  });
+
+  it("reports every digit as complete on a solved board", () => {
+    const solved = solveEverything(createPlayState(puzzle));
+    expect(completedValues(solved.puzzle, solved.entries)).toEqual(new Set([1, 2, 3, 4]));
+  });
+
   it("moves the selection with bounds", () => {
     const state = selectCell(createPlayState(puzzle), 0);
     expect(moveSelection(state, 0, 1).selected).toBe(1);
@@ -114,7 +131,6 @@ describe("sudoku play state", () => {
     expect(hinted.entries[3]).toBe(4);
     expect(hinted.hinted[3]).toBe(true);
     expect(hinted.selected).toBe(3);
-    expect(hinted.fallbackHints).toBe(0);
     expect(countMistakes(hinted.entries, puzzle.solution)).toEqual([]);
     expect(enterValue(hinted, 2)).toBe(hinted);
     expect(eraseCell(hinted)).toBe(hinted);
@@ -149,21 +165,9 @@ describe("sudoku play state", () => {
     expect(revealHint(wrong)).toBe(wrong);
   });
 
-  it("reveals a fallback hint in the selected cell when there is no logical move", () => {
-    const hinted = revealHint(selectCell(createPlayState(sparsePuzzle), 5));
-
-    expect(hinted.entries[5]).toBe(sparsePuzzle.solution[5]);
-    expect(hinted.hinted[5]).toBe(true);
-    expect(hinted.selected).toBe(5);
-    expect(hinted.fallbackHints).toBe(1);
-  });
-
-  it("stops after three fallback hints", () => {
-    const exhausted = {
-      ...createPlayState(sparsePuzzle),
-      fallbackHints: MAX_FALLBACK_HINTS,
-    };
-    expect(revealHint(exhausted)).toBe(exhausted);
+  it("does not guess when there is no logical move", () => {
+    const state = selectCell(createPlayState(sparsePuzzle), 5);
+    expect(revealHint(state)).toBe(state);
   });
 
   it("does nothing when there is nothing left to hint", () => {
@@ -177,8 +181,5 @@ describe("sudoku play state", () => {
     expect(filledCount(restarted.entries)).toBe(0);
     expect(restarted.hinted.every((value) => !value)).toBe(true);
     expect(restarted.solved).toBe(false);
-
-    const fallback = revealHint(createPlayState(sparsePuzzle));
-    expect(restartPuzzle(fallback).fallbackHints).toBe(0);
   });
 });

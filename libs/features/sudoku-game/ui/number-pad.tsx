@@ -5,6 +5,7 @@ interface NumberPadProps {
   size: SudokuSize;
   symbols: readonly string[];
   activeValue?: number | null;
+  completedValues?: ReadonlySet<number>;
   disabled?: boolean;
   onPick: (value: number) => void;
 }
@@ -15,7 +16,14 @@ const PAD_COLUMNS: Record<SudokuSize, number> = {
   9: 3,
 };
 
-export function NumberPad({ size, symbols, activeValue = null, disabled, onPick }: NumberPadProps) {
+export function NumberPad({
+  size,
+  symbols,
+  activeValue = null,
+  completedValues,
+  disabled,
+  onPick,
+}: NumberPadProps) {
   return (
     <div
       aria-label="Kies een getal of dier"
@@ -25,6 +33,7 @@ export function NumberPad({ size, symbols, activeValue = null, disabled, onPick 
     >
       {symbols.map((symbol, index) => {
         const value = index + 1;
+        const isCompleted = completedValues?.has(value) ?? false;
         return (
           <button
             key={value}
@@ -36,7 +45,7 @@ export function NumberPad({ size, symbols, activeValue = null, disabled, onPick 
               size === 4 ? "text-3xl" : "text-2xl",
               activeValue === value && "border-sky-300 bg-sky-100 text-sky-700",
             )}
-            disabled={disabled}
+            disabled={disabled || isCompleted}
             onClick={() => onPick(value)}
           >
             {symbol}
