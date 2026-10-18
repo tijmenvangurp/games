@@ -23,7 +23,9 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
           className={cn(
             "h-full w-full object-contain drop-shadow-xl transition duration-700 ease-out",
             revealed ? undefined : "brightness-0",
-            fragmentVisible ? "-translate-y-1/5 scale-200" : "translate-y-0 scale-100",
+            fragmentVisible
+              ? "quiz-fragment-pan -translate-y-1/5 scale-200"
+              : "translate-y-0 scale-100",
           )}
           data-fragment={fragmentVisible}
           data-revealed={revealed}
@@ -37,7 +39,7 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
           revealed ? "animate-pop text-emerald-700" : "text-slate-500",
         )}
       >
-        {revealed ? target.name : fragment ? "Je ziet maar een stukje…" : "Wie is deze Pokémon?"}
+        {revealed ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}
       </p>
     </div>
   );

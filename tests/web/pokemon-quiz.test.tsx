@@ -184,7 +184,7 @@ describe("wie is deze pokémon", () => {
     expect(artworkImage().getAttribute("data-revealed")).toBe("false");
     expect(artworkImage().getAttribute("data-fragment")).toBe("true");
     expect(artworkImage().getAttribute("alt")).toBe("");
-    expect(screen.getByText("Je ziet maar een stukje…")).toBeTruthy();
+    expect(screen.getByText("Je ziet steeds een stukje…")).toBeTruthy();
 
     const name = targetName();
     fireEvent.click(screen.getByRole("button", { name }));
