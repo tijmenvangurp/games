@@ -28,7 +28,7 @@ function statusText(complete: boolean, wrong: boolean, selectedCount: number): s
   if (selectedCount === 1) {
     return "Kies de laatste letter.";
   }
-  return "Tik de eerste en de laatste letter.";
+  return "Sleep over een woord of tik de eerste en de laatste letter.";
 }
 
 function WordSearchActions({

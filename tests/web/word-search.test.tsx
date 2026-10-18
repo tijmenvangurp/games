@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
@@ -14,6 +14,7 @@ beforeEach(() => {
     found: [],
     lastFound: null,
     selected: [],
+    dragStart: null,
     wrong: false,
     hint: null,
     settings: DEFAULT_WORD_SEARCH_SETTINGS,
@@ -118,6 +119,36 @@ describe("word search", () => {
     expect(screen.queryByRole("heading", { name: "Knap gedaan!" })).toBeNull();
     expect(useWordSearchStore.getState().found).toEqual([]);
     expect(useWordSearchStore.getState().puzzle).not.toBe(puzzle);
+  }, 30_000);
+
+  it("marks a word found when the selection is dragged", async () => {
+    renderApp();
+    fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
+    const board = await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i });
+
+    const puzzle = currentPuzzle();
+    const placement = puzzle.placements[0];
+    if (!placement) {
+      throw new Error("No placement");
+    }
+    const first = placement.cells[0];
+    if (!first) {
+      throw new Error("Placement without cells");
+    }
+
+    useWordSearchStore.getState().startDrag(first);
+    for (const cell of placement.cells.slice(1)) {
+      useWordSearchStore.getState().dragTo(cell);
+    }
+
+    expect(useWordSearchStore.getState().selected).toEqual(placement.cells);
+    useWordSearchStore.getState().commitDrag();
+
+    expect(useWordSearchStore.getState().found).toContain(placement.word);
+    expect(useWordSearchStore.getState().selected).toEqual([]);
+    await waitFor(() => {
+      expect(board.querySelector('[aria-label*="gevonden"]')).toBeTruthy();
+    });
   }, 30_000);
 
   it("opens the setup again and can go back to the active game", async () => {
