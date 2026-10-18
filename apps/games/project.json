@@ -64,6 +64,7 @@
   },
   "implicitDependencies": [
     "pages-home",
+    "pages-illustration-comparison",
     "pages-sudoku",
     "pages-chess",
     "pages-puzzles",

@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-illustration-comparison",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/illustration-comparison",
+  "tags": ["layer:pages", "scope:illustration-comparison", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/illustration-comparison"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-game", "shared-lib"]
+}

@@ -11,6 +11,7 @@ import { ChessPage } from "@pages/chess";
 import { CrosswordPage } from "@pages/crossword";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
 import { HomePage } from "@pages/home";
+import { IllustrationComparisonPage } from "@pages/illustration-comparison";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
@@ -45,6 +46,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/kruiswoord", CrosswordPage),
     gameRoute("/frans", FrenchPage),
+    gameRoute("/illustraties", IllustrationComparisonPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),
     frenchLessonRoute,
