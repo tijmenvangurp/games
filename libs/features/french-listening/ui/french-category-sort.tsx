@@ -1,4 +1,15 @@
 import { useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  TouchSensor,
+  pointerWithin,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import type { FrenchLesson } from "@entities/french";
 import { createSeed, playSound } from "@shared/lib";
 import { Button, Check, RotateCcw, Sparkles } from "@shared/ui";
@@ -15,6 +26,11 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [placements, setPlacements] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
+  const [activeWord, setActiveWord] = useState<SortWord | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }),
+  );
 
   const unplaced = round.words.filter((word) => !placements[word.item.id]);
   const selectedWord = round.words.find((word) => word.item.id === selectedId);
@@ -23,12 +39,32 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
     ? round.words.filter((word) => placements[word.item.id] === word.lessonId).length
     : 0;
 
-  const place = (categoryId: string) => {
-    if (!selectedWord || checked) {
+  const placeWord = (word: SortWord, categoryId: string) => {
+    if (checked) {
       return;
     }
-    setPlacements((current) => ({ ...current, [selectedWord.item.id]: categoryId }));
+    setPlacements((current) => ({ ...current, [word.item.id]: categoryId }));
     setSelectedId(null);
+  };
+
+  const placeSelected = (categoryId: string) => {
+    if (selectedWord) {
+      placeWord(selectedWord, categoryId);
+    }
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const word = round.words.find((candidate) => candidate.item.id === String(event.active.id));
+    setActiveWord(word ?? null);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const word = round.words.find((candidate) => candidate.item.id === String(event.active.id));
+    const categoryId = event.over ? String(event.over.id) : null;
+    if (word && categoryId) {
+      placeWord(word, categoryId);
+    }
+    setActiveWord(null);
   };
 
   const remove = (word: SortWord) => {
@@ -77,28 +113,44 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       </div>
 
       <p className="text-center text-sm text-muted-foreground">
-        Kies een woord en tik daarna op de juiste categorie.
+        Sleep een woord naar een categorie, of tik het woord en daarna de categorie.
       </p>
 
-      <SortWordBank
-        checked={checked}
-        selectedId={selectedId}
-        words={unplaced}
-        onSelect={(word) => setSelectedId(word.item.id)}
-      />
+      <DndContext
+        collisionDetection={pointerWithin}
+        sensors={sensors}
+        onDragCancel={() => setActiveWord(null)}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
+      >
+        <SortWordBank
+          checked={checked}
+          selectedId={selectedId}
+          words={unplaced}
+          onSelect={(word) => setSelectedId(word.item.id)}
+        />
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        {round.categories.map((category) => (
-          <SortCategoryBox
-            key={category.lessonId}
-            category={category}
-            checked={checked}
-            placed={round.words.filter((word) => placements[word.item.id] === category.lessonId)}
-            onPlace={place}
-            onRemove={remove}
-          />
-        ))}
-      </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {round.categories.map((category) => (
+            <SortCategoryBox
+              key={category.lessonId}
+              category={category}
+              checked={checked}
+              placed={round.words.filter((word) => placements[word.item.id] === category.lessonId)}
+              onPlace={placeSelected}
+              onRemove={remove}
+            />
+          ))}
+        </div>
+
+        <DragOverlay>
+          {activeWord ? (
+            <div className="rounded-xl border-2 border-primary bg-card px-3 py-2 font-bold shadow-lg">
+              {activeWord.item.fr}
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
       {checked ? (
         <div aria-live="polite" className="space-y-2 rounded-3xl border bg-card p-4 shadow-sm">

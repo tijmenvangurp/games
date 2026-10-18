@@ -36,6 +36,7 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@dnd-kit/core": "6.3.1",
     "@radix-ui/react-slot": "^1.5.0",
     "@tanstack/react-router": "^1.170.44",
     "chess.js": "^1.4.0",

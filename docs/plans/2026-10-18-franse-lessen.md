@@ -1,7 +1,7 @@
 # Plan: Franse lessen schaalbaar maken
 
 - **Datum:** 2026-10-18
-- **Status:** Fase 1–4 grotendeels afgerond; optionele uitbreidingen staan open
+- **Status:** Fase 1–4 afgerond; alleen optionele profielen staan nog open
 - **Doel:** van één hardcoded les naar een curriculum waarin nieuwe lessen data + audio zijn, zonder page-, generator- of testwerk per les.
 
 ## Uitgangspunt
@@ -61,14 +61,14 @@ Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen
 - [x] Zin bouwen met woordtegels.
 - [x] Categorie-sorteren over de hele curriculum.
 - [x] Snellere audio en een “meester”-modus met vijf opties.
-- [ ] Optioneel: drag-and-drop met `@dnd-kit/core` + `@dnd-kit/sortable`.
+- [x] Optioneel: drag-and-drop met `@dnd-kit/core`; tikken blijft als fallback.
 
 ## Ontwerpregels
 
 - **Geen backend of CMS.** De app blijft statisch; content staat in TypeScript-bestanden.
 - **Geen les-specifieke UI.** Eén leskeuze, één quiz, één flipcard- en sorteerfeature voor alle lessen.
 - **Geen audio in CI of runtime.** Audio wordt lokaal gegenereerd met de private TTS-skill en gecommit; CI controleert alleen de bestanden.
-- **Geen nieuwe dependency zonder noodzaak.** De validator is een pure TypeScript-functie; geen Zod of schema-library.
+- **Geen nieuwe dependency zonder noodzaak.** De validator is een pure TypeScript-functie; geen Zod of schema-library. Voor slepen is `@dnd-kit/core` de enige gerichte toevoeging; tikken blijft werken.
 - **Afleiders zijn beleid, geen content per vraag.** Woorden gebruiken `contrastWith`/tags; zinnen houden handmatige afleiders.
 - **Review is een status, geen aanname.** Alleen `reviewed` lessen komen in de app en in de audio-check.
 
