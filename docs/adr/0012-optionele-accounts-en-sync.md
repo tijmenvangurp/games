@@ -76,7 +76,7 @@ De server begrijpt alleen de envelop, niet de inhoud van `data_json`. Elk spel l
 ## Gevolgen
 
 - **De app blijft bruikbaar zonder account.** Dat is de belangrijkste eigenschap en moet in e2e-tests worden afgedwongen: alle spellen spelen zonder sessie, ook als de API onbereikbaar is.
-- **De deployment wordt zwaarder.** Naast static assets komen een Worker-entry, een D1-binding, migraties, secrets en een betaald Workers-plan (waarschijnlijk US$ 5/maand). De eenvoud van een pure statische site verdwijnt.
+- **De deployment wordt zwaarder.** Naast static assets komen een Worker-entry, een D1-binding, migraties, secrets en een Workers-plan. Het gratis plan kan waarschijnlijk volstaan; betaald (US$ 5/maand) is alleen nodig als de CPU-meting boven 10 ms uitkomt. De eenvoud van een pure statische site verdwijnt.
 - **De CSP wordt verzwakt.** `connect-src 'none'` wordt `'self'`. Dat is een bewuste wijziging en moet in de headers en in de ADR zichtbaar blijven.
 - **De publieke repo blijft schoon.** Geen secrets, `.dev.vars`, productie-exports of echte gezinsdata. Testdata gebruikt `example.invalid`.
 - **Account en lokaal kunnen uit elkaar lopen.** Omdat het account leeg begint, kan een gebruiker twee soorten voortgang hebben. Dat is geaccepteerd voor versie 1; de UI moet het uitleggen.

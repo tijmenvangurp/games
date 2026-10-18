@@ -15,7 +15,7 @@
 - Sync in fase 1 beperkt zich tot **instellingen, beste scores en grove voortgang**. Sync geen actieve sudoku-borden, zoekrondes of SRS-toestand: dat geeft conflictgedrag zonder duidelijke winst.
 - De technische minimale wijziging is: `wrangler.jsonc` krijgt een `main` en `run_worker_first: ["/api/*"]`, de CSP krijgt `connect-src 'self'`, en er komt een D1-binding. Dat is genoeg voor same-origin `/api/auth/*` en `/api/progress/*`.
 - **Dit mag niet zonder ADR.** ADR 0001 zegt expliciet dat accounts, gedeelde scores en multiplayer een nieuwe ADR met privacy- en beveiligingsontwerp vereisen. Reken op minimaal twee ADR's: één voor auth/backend en één voor privacy/gegevensverwerking.
-- **Reken op Workers Paid (minimaal US$ 5/maand).** Het gratis Workers-plan heeft 10 ms CPU per request. Better Auth gebruikt scrypt als je e-mail/wachtwoord aanzet; dat is CPU-intensief. Ook een passkey-only flow met D1 moet je meten, maar scrypt is de zwaarste variant. Ga uit van het betaalde plan of meet het eerst.
+- **Gratis kan waarschijnlijk, met één voorbehoud: de CPU-limiet.** Het gratis Workers-plan geeft 100.000 requests/dag en 10 ms CPU per request. D1, Workers Builds en de request-limiet zijn voor een familie-app ruim genoeg. De 10 ms is de bottleneck: met Google OAuth of passkeys is de kans groot dat het past; met e-mail/wachtwoord (scrypt) vrijwel zeker niet. Meet de CPU op een preview en stap pas naar Workers Paid (US$ 5/maand) als het echt nodig is.
 - **Multiplayer is een aparte fase met Durable Objects.** D1 is niet geschikt als realtime spelserver; D1 is single-threaded per database en heeft geen interactieve transacties.
 
 ## 1. Better Auth in het kort
@@ -79,7 +79,7 @@ Better Auth controleert bij initialisatie of het schema klopt. Ontbrekende tabel
 | Trusted origins    | Standaard alleen de base URL                                     | Zet de publieke origin expliciet; geen `localhost` in productie                                                                    | [Security](https://better-auth.com/docs/reference/security)                                                                           |
 | Rate limiting      | 100 requests per 10 seconden; `/sign-in/email` 3 per 10 seconden | In-memory opslag is ongeschikt voor serverless; gebruik D1 of secundaire opslag                                                    | [Rate limit](https://better-auth.com/docs/concepts/rate-limit)                                                                        |
 | IP-detectie        | Standaard `X-Forwarded-For`                                      | Op Cloudflare `cf-connecting-ip` gebruiken; die header kan de client niet zelf zetten                                              | [Rate limit](https://better-auth.com/docs/concepts/rate-limit)                                                                        |
-| Wachtwoord-hashing | `scrypt`, memory-hard en CPU-intensief                           | Dit is de belangrijkste reden om Workers Paid te overwegen                                                                         | [Security](https://better-auth.com/docs/reference/security)                                                                           |
+| Wachtwoord-hashing | `scrypt`, memory-hard en CPU-intensief                           | Vermijd dit op het gratis plan; het is de zwaarste CPU-variant                                                                     | [Security](https://better-auth.com/docs/reference/security)                                                                           |
 
 De CSRF-details zijn relevant omdat de huidige `_headers` `Referrer-Policy: no-referrer` zet. Better Auth documenteert expliciet dat een same-origin formulier dan `Origin: null` kan sturen en dat het met `Sec-Fetch-Site` alsnog valideert; requests zonder die bewijzen en zonder Origin/Referer blijven alleen voor niet-browserclients toegestaan ([Security](https://better-auth.com/docs/reference/security)). Dat is geen reden om de CSRF-checks uit te zetten; `disableCSRFCheck` en `disableOriginCheck` openen respectievelijk CSRF- en open-redirect-risico's ([Security](https://better-auth.com/docs/reference/security)).
 
@@ -165,7 +165,7 @@ De Node-compatibiliteitslaag is op deze repo al standaard: sinds compatibiliteit
 | Statische bestanden     | 20.000                   | 100.000              | Honderden audiofragmenten passen                         |
 | Bestandsgrootte         | 25 MiB                   | 25 MiB               | Idem                                                     |
 
-Bron: [Workers-limieten](https://developers.cloudflare.com/workers/platform/limits/). De CPU-limiet is de belangrijkste: de pagina zegt zelf dat zware workloads met authenticatie vaak 10–20 ms CPU gebruiken. Het gratis plan heeft 10 ms. Better Auth's scrypt is memory-hard en CPU-intensief ([Security](https://better-auth.com/docs/reference/security)); gebruik je alleen passkeys, dan valt de scrypt-kost weg, maar blijven auth, D1 en WebAuthn over. Meet beide varianten met een echte login op de preview. Reken voor de zekerheid op Workers Paid (US$ 5/maand minimum) ([Workers-pricing](https://developers.cloudflare.com/workers/platform/pricing/)).
+Bron: [Workers-limieten](https://developers.cloudflare.com/workers/platform/limits/). De CPU-limiet is de belangrijkste: de pagina zegt zelf dat zware workloads met authenticatie vaak 10–20 ms CPU gebruiken. Het gratis plan heeft 10 ms. Better Auth's scrypt is memory-hard en CPU-intensief ([Security](https://better-auth.com/docs/reference/security)); gebruik je alleen Google OAuth of passkeys, dan valt de scrypt-kost weg, maar blijven auth, D1 en WebAuthn over. Meet beide varianten met een echte login op de preview. Gratis is haalbaar als de meting onder 10 ms blijft; stap pas naar Workers Paid (US$ 5/maand) als de p95 structureel hoger is ([Workers-pricing](https://developers.cloudflare.com/workers/platform/pricing/)).
 
 | D1-limiet                  | Free    | Paid     | Relevantie                                |
 | -------------------------- | ------- | -------- | ----------------------------------------- |
@@ -398,17 +398,34 @@ De D1-upsert en de `progress_mutation`-insert horen in **dezelfde batch**, ander
 
 ### 4.6 Quota en kosten
 
-| Product         | Free                                                                            | Paid                                                                         | Voor deze app                         |
-| --------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------- |
-| Workers         | 100.000 requests/dag; 10 ms CPU                                                 | US$ 5/maand; 10M requests; 30M CPU-ms                                        | Paid waarschijnlijk, vanwege auth-CPU |
-| D1              | 5M rows read/dag; 100k rows written/dag; 5 GB per account (500 MB per database) | 25B reads/maand; 50M writes/maand; 5 GB inbegrepen, daarna US$ 0,75/GB-maand | Free-tier vaak al genoeg; paid ruim   |
-| Durable Objects | 100k requests/dag; 13k GB-s/dag                                                 | 1M requests/maand; 400k GB-s/maand; US$ 12,50/M GB-s                         | Alleen fase 3                         |
-| KV              | 100k reads/dag; 1.000 writes/dag; 1 GB                                          | 10M reads; 1M writes; 1 GB; US$ 0,50/GB-maand                                | Niet voor voortgang                   |
-| R2              | 10 GB; 1M Class A; 10M Class B                                                  | US$ 0,015/GB-maand; US$ 4,50/M Class A; US$ 0,36/M Class B                   | Export/backups, later                 |
+| Product         | Free                                                                            | Paid                                                                         | Voor deze app                       |
+| --------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------- |
+| Workers         | 100.000 requests/dag; 10 ms CPU                                                 | US$ 5/maand; 10M requests; 30M CPU-ms                                        | Gratis kan; betaald als CPU >10 ms  |
+| D1              | 5M rows read/dag; 100k rows written/dag; 5 GB per account (500 MB per database) | 25B reads/maand; 50M writes/maand; 5 GB inbegrepen, daarna US$ 0,75/GB-maand | Free-tier vaak al genoeg; paid ruim |
+| Durable Objects | 100k requests/dag; 13k GB-s/dag                                                 | 1M requests/maand; 400k GB-s/maand; US$ 12,50/M GB-s                         | Alleen fase 3                       |
+| KV              | 100k reads/dag; 1.000 writes/dag; 1 GB                                          | 10M reads; 1M writes; 1 GB; US$ 0,50/GB-maand                                | Niet voor voortgang                 |
+| R2              | 10 GB; 1M Class A; 10M Class B                                                  | US$ 0,015/GB-maand; US$ 4,50/M Class A; US$ 0,36/M Class B                   | Export/backups, later               |
 
 Bronnen: [Workers-pricing](https://developers.cloudflare.com/workers/platform/pricing/), [D1-pricing](https://developers.cloudflare.com/d1/platform/pricing/), [DO-pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/), [KV-pricing](https://developers.cloudflare.com/kv/platform/pricing/), [R2-pricing](https://developers.cloudflare.com/r2/pricing/).
 
-Dit zijn publieke prijzen en limieten op 2026-10-18; controleer ze vóór de beslissing. Voor een app met enkele tientallen gebruikers blijft het D1-gebruik klein; de gratis D1-limieten zijn ruim, de betaalde helemaal. De Workers-CPU-limiet is de reden om het betaalde plan serieus te nemen, maar meet eerst of de gekozen auth-methode echt boven 10 ms uitkomt. Reken voor de zekerheid op **US$ 5/maand**, niet op €0.
+Dit zijn publieke prijzen en limieten op 2026-10-18; controleer ze vóór de beslissing. Voor een app met enkele tientallen gebruikers blijft het D1-gebruik klein; de gratis D1-limieten zijn ruim, de betaalde helemaal. De Workers-CPU-limiet is het enige echte risico: meet of de gekozen auth-methode onder 10 ms blijft. Reken in eerste instantie op **€0** en houd US$ 5/maand als fallback.
+
+### 4.7 Kan het gratis?
+
+| Onderdeel        | Gratis limiet                              | Wat deze app ongeveer gebruikt                                             |
+| ---------------- | ------------------------------------------ | -------------------------------------------------------------------------- |
+| Workers-requests | 100.000/dag                                | 5 kinderen × 2 uur × 120 heartbeats/uur ≈ 1.200/dag, plus auth en progress |
+| Workers-CPU      | 10 ms/request                              | Onbekend; Google/passkey waarschijnlijk, scrypt niet                       |
+| Subrequests      | 50/request                                 | Auth plus een handvol D1-queries                                           |
+| D1-writes        | 100.000/dag                                | Enkele duizenden per dag                                                   |
+| D1-reads         | 5M/dag                                     | Honderden tot duizenden                                                    |
+| D1-opslag        | 5 GB (500 MB per database)                 | Enkele MB's                                                                |
+| Workers Builds   | 3.000 minuten/maand, 1 gelijktijdige build | Enkele minuten per deploy                                                  |
+| Static assets    | 20.000 bestanden, 25 MiB per bestand       | Ruim voldoende                                                             |
+
+Bronnen: [Workers-limieten](https://developers.cloudflare.com/workers/platform/limits/), [D1-limieten](https://developers.cloudflare.com/d1/platform/limits/), [Workers Builds-limieten](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/).
+
+**Conclusie:** gratis is realistisch voor een familie-app. De enige onzekerheid is de CPU-limiet. Test met een preview-login en de CPU-metrics van Cloudflare; pas bij een structurele overschrijding is US$ 5/maand nodig. Let op wat je op het gratis plan niet krijgt: 30 dagen D1 Time Travel (het is 7 dagen), read replication en een SLA. Die zijn voor deze app niet nodig.
 
 ## 5. Integratie in deze stack
 
@@ -671,7 +688,7 @@ De eigenaar moet dan expliciet het volgende beslissen:
 3. **Auth-methode kiezen:** passkey (aanbevolen) of e-mail/wachtwoord. Als het e-mail wordt: keur dan ook de e-mailprovider en de DPA goed.
 4. **Sync-scope kiezen:** alleen instellingen en scores, of ook actieve borden en SRS. Elke uitbreiding vraagt een aparte ADR of een expliciete wijziging van ADR 0014.
 5. **Bewaartermijn en verwijderprocedure vaststellen:** 12 maanden inactiviteit is een voorstel, geen wet. Leg uit hoe een ouder exporteert en verwijdert.
-6. **Workers Paid accepteren:** reken op minimaal US$ 5/maand en meet de CPU van de gekozen auth-methode.
+6. **CPU en plankeuze:** meet de CPU van de gekozen auth-methode; het gratis plan volstaat als die onder 10 ms blijft, anders is Workers Paid (US$ 5/maand) nodig.
 7. **D1 `database_id` en previews beleid kiezen:** wat komt in de publieke repo, en is auth op previews uit of apart?
 
 **Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0014 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0015 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
