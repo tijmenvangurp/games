@@ -1,7 +1,7 @@
 # Spelideeën
 
 - **Datum:** 2026-10-18
-- **Status:** Woordzoeker is geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Status:** Woordzoeker en Tafel Topper zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
 - **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
 - **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
 
@@ -13,19 +13,20 @@
 | Pijlen               | `/pijlen`      | Ruimtelijk inzicht, planning, doordacht bewegen                                 |
 | Waar is Wobbel?      | `/zoeken`      | Visuele aandacht, observeren, vergelijken                                       |
 | Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                     |
+| Tafel Topper         | `/rekenen`     | Plus, min, keer en delen; getallenlijn en groepjes als uitleg                   |
 | Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                 |
 | Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
 | Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
 
-De app dekt daarmee **logica, ruimte, geheugen, taal, lezen en schaken**. De grootste gaten zijn nu **rekenen, wereldoriëntatie en computationeel denken**.
+De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken**. De grootste gaten zijn nu **wereldoriëntatie en computationeel denken**.
 
 ## Overzicht
 
 | Prioriteit | Idee             | Domein                | Effort      | Kern                                                      |
 | ---------- | ---------------- | --------------------- | ----------- | --------------------------------------------------------- |
 | 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0009 en het bibliotheekonderzoek |
-| 2          | Tafel Topper     | Rekenen               | Laag        | Optellen, aftrekken, tafels en delen                      |
+| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                             |
 | 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                         |
 | 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen            |
 | 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen     |
@@ -48,13 +49,13 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, lezen en schaken**. De gro
 
 ## 2. Tafel Topper
 
-**Leerdoel:** optellen en aftrekken tot 10 en 20, tafels 1 tot 10, delen. Later breuken en geld.
+**Leerdoel:** optellen en aftrekken tot 10, 20 of 100, tafels 1–5, 1–10 en 6–10, en delen.
 
-**Vorm:** kies een tafel of "mix". Een ronde bestaat uit ongeveer tien korte sommen. Het kind typt het antwoord in of kiest uit drie opties. Bij een fout antwoord komt er geen "fout!" maar een korte uitleg met blokjes of een getallenlijn. Sterren en een streak geven voortgang. Een timer is optioneel en nooit standaard.
+**Vorm:** kies plus, min, keer of delen en daarna een niveau. Een ronde bestaat uit tien korte sommen met drie antwoordkeuzes. Een eerste fout kost geen ster en geeft één herkansing; daarna volgt het juiste antwoord met uitleg. Plus en min krijgen een getallenlijn, keer en delen een veld met groepjes stippen. Er is geen timer.
 
 **Waarom:** hoog leerrendement per regel code, onbeperkt herspeelbaar en volledig te testen met pure functies.
 
-**Techniek:** `entities/math` met een generator en regels, `features/math-trainer` met Zustand en UI, een eigen page en route. Geen nieuwe dependencies. Voortgang in `localStorage` onder een eigen key, bijvoorbeeld `games.math.v1`.
+**Techniek:** `entities/math` met een seedbare generator en regels, `features/math-trainer` met Zustand en UI, een eigen page en route. Geen nieuwe dependencies. De beste score per mode en niveau staat in `localStorage` onder `games.math.v1`. Zie [ADR 0010](../adr/0010-tafel-topper.md).
 
 **Aandachtspunten:** geen straf voor fouten, geen verdwijnende levens, geen verplichte timer. Verschillende niveaus moeten echt verschillende vaardigheden raken, niet alleen grotere getallen.
 
