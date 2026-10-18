@@ -22,6 +22,9 @@
     // allow the two prefix orders explicitly instead of prompting every time.
     { "action": "shell", "resource": "LD_LIBRARY_PATH=* corepack *", "effect": "allow" },
     { "action": "shell", "resource": "FONTCONFIG_PATH=* corepack *", "effect": "allow" },
+    // Last-resort workaround for a stuck Nx daemon; prefer
+    // `corepack pnpm exec nx ...` and see docs/tooling.md.
+    { "action": "shell", "resource": "NX_DAEMON=false corepack *", "effect": "allow" },
     { "action": "shell", "resource": "pnpm *", "effect": "allow" },
     { "action": "shell", "resource": "npx *", "effect": "allow" },
     { "action": "shell", "resource": "node *", "effect": "allow" },

@@ -8,7 +8,10 @@ interface GameCatalogBase {
 
 export type GameCatalogEntry = GameCatalogBase &
   (
-    | { status: "available"; to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" }
+    | {
+        status: "available";
+        to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" | "/schaken";
+      }
     | { status: "coming-soon" }
   );
 
@@ -57,5 +60,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/raad",
     accentClassName: "from-indigo-100 via-indigo-50 to-white",
+  },
+  {
+    id: "chess-tutorial",
+    name: "Schaaktutorial",
+    description: "Leer de toren, het paard en de pion stap voor stap kennen.",
+    emoji: "♞",
+    status: "available",
+    to: "/schaken",
+    accentClassName: "from-violet-100 via-violet-50 to-white",
   },
 ];
