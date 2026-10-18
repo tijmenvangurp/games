@@ -33,3 +33,7 @@ Na de schaaktutorial wil de eigenaar korte schaakpuzzels aanbieden. De app is st
 - De selectie is bewust niet representatief voor de hele Lichess-database en bevat geen dynamisch rating- of voortgangssysteem.
 - Meer puzzels toevoegen betekent een nieuwe offline selectie maken, de juiste `difficulty` kiezen en de data/test bijwerken.
 - De runner ondersteunt nu één spelerszet per puzzel. Latere tactics met meerdere zetten kunnen dezelfde engine gebruiken, maar vragen extra UI-feedback en tests.
+
+## Vervolg
+
+ADR 0015 breidt deze selectie uit met 90 gegenereerde Lichess-puzzels, waaronder mat-in-twee en tactieken met meer stukvariatie.

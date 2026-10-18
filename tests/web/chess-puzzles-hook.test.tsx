@@ -30,6 +30,45 @@ describe("useChessPuzzle", () => {
     expect(result.current.feedback).toBe("solved");
   });
 
+  it("plays a mate-in-two through both player moves", () => {
+    const puzzle = PUZZLES.find(
+      (candidate) => candidate.moves.length === 4 && candidate.kind === "mate",
+    );
+    if (!puzzle) {
+      throw new Error("Mate-in-two puzzle not found");
+    }
+
+    const { result } = renderHook(() => useChessPuzzle(puzzle));
+    const firstMove = puzzle.moves[1];
+    if (!firstMove) {
+      throw new Error("Mate-in-two puzzle has no first move");
+    }
+
+    act(() => {
+      result.current.onPieceDrop(firstMove.slice(0, 2), firstMove.slice(2, 4));
+    });
+
+    expect(result.current.status).toBe("playing");
+    expect(result.current.feedback).toBe("correct");
+
+    act(() => {
+      result.current.showHint();
+    });
+
+    const hint = result.current.hintMove;
+    expect(hint).not.toBeNull();
+    if (!hint) {
+      throw new Error("Mate-in-two puzzle has no second hint");
+    }
+
+    act(() => {
+      result.current.onPieceDrop(hint.from, hint.to);
+    });
+
+    expect(result.current.status).toBe("solved");
+    expect(result.current.feedback).toBe("solved");
+  });
+
   it("gives haptic feedback for a wrong move, a hint and a solve", () => {
     const vibrate = vi.fn(() => true);
     Object.defineProperty(navigator, "vibrate", {

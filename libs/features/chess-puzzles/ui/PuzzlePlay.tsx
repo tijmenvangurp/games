@@ -22,16 +22,28 @@ interface PuzzlePlayProps {
 }
 
 function titleFor(kind: PuzzleKind): string {
-  return kind === "mate" ? "Zet schaakmat!" : "Win een stuk!";
+  switch (kind) {
+    case "mate":
+      return "Zet schaakmat!";
+    case "capture":
+      return "Win een stuk!";
+    case "tactic":
+      return "Vind de beste zet!";
+  }
 }
 
 function promptFor(kind: PuzzleKind, playerColor: "w" | "b"): string {
   const player = playerColor === "w" ? "wit" : "zwart";
   const opponent = playerColor === "w" ? "zwarte" : "witte";
 
-  return kind === "mate"
-    ? `Je bent ${player}. Zet de ${opponent} koning schaakmat.`
-    : `Je bent ${player}. Welke zet wint een stuk?`;
+  switch (kind) {
+    case "mate":
+      return `Je bent ${player}. Zet de ${opponent} koning schaakmat.`;
+    case "capture":
+      return `Je bent ${player}. Welke zet wint een stuk?`;
+    case "tactic":
+      return `Je bent ${player}. Welke zet is de beste?`;
+  }
 }
 
 interface PuzzleHeaderProps {
@@ -118,7 +130,14 @@ interface PuzzleStatusProps {
 
 function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleStatus): string {
   if (status === "solved") {
-    return kind === "mate" ? "Schaakmat! Knap gedaan." : "Gelukt! Je hebt een stuk gewonnen.";
+    switch (kind) {
+      case "mate":
+        return "Schaakmat! Knap gedaan.";
+      case "capture":
+        return "Gelukt! Je hebt een stuk gewonnen.";
+      case "tactic":
+        return "Gelukt! Je hebt de beste zet gevonden.";
+    }
   }
 
   if (feedback === "wrong") {
@@ -126,7 +145,7 @@ function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleSt
   }
 
   if (feedback === "correct") {
-    return "Goed zo! De tegenstander heeft geantwoord.";
+    return "Goed zo! De tegenstander heeft geantwoord. Jij mag weer.";
   }
 
   return "Sleep een stuk of tik erop. Groene stippen zijn legale zetten.";

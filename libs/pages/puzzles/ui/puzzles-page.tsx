@@ -21,7 +21,7 @@ export function PuzzlesPage() {
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
-      subtitle="Schaakmat of een stuk winnen"
+      subtitle="Mat in één of twee, of win een stuk"
       title="Schaakpuzzels"
     >
       <PuzzlePlay

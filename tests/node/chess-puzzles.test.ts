@@ -1,6 +1,12 @@
-import { Chess } from "chess.js";
+import { Chess, type Move, type PieceSymbol, type Square } from "chess.js";
 import { describe, expect, it } from "vitest";
-import { PUZZLES, attemptPuzzleMove, createPuzzleState, hintFor } from "@features/chess-puzzles";
+import {
+  PUZZLES,
+  attemptPuzzleMove,
+  createPuzzleState,
+  hintFor,
+  type ChessPuzzle,
+} from "@features/chess-puzzles";
 
 const uci = (value: string) => ({
   from: value.slice(0, 2),
@@ -8,37 +14,84 @@ const uci = (value: string) => ({
   ...(value[4] ? { promotion: value[4] } : {}),
 });
 
+function playPuzzle(puzzle: ChessPuzzle): {
+  readonly chess: Chess;
+  readonly playerColor: "w" | "b";
+  readonly finalPiece: PieceSymbol | null;
+  readonly lastMove: Move | null;
+} {
+  const chess = new Chess(puzzle.fen);
+  const [setup, ...solution] = puzzle.moves;
+
+  if (!setup || solution.length === 0) {
+    throw new Error(`Puzzle ${puzzle.id} is incomplete`);
+  }
+
+  chess.move(uci(setup));
+  const playerColor = chess.turn();
+  let finalPiece: PieceSymbol | null = null;
+  let lastMove: Move | null = null;
+
+  for (const [index, move] of solution.entries()) {
+    const parsed = uci(move);
+    const piece = chess.get(parsed.from as Square);
+    const applied = chess.move(parsed);
+
+    if (index === solution.length - 1) {
+      finalPiece = piece?.type ?? null;
+      lastMove = applied;
+    }
+  }
+
+  return { chess, playerColor, finalPiece, lastMove };
+}
+
 describe("Lichess puzzle data", () => {
-  it("contains 34 unique puzzles in three balanced tiers", () => {
-    expect(PUZZLES).toHaveLength(34);
+  it("contains more than a hundred unique puzzles in three balanced tiers", () => {
+    expect(PUZZLES).toHaveLength(124);
     expect(new Set(PUZZLES.map((puzzle) => puzzle.id)).size).toBe(PUZZLES.length);
-    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "easy")).toHaveLength(12);
-    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "medium")).toHaveLength(12);
-    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "hard")).toHaveLength(10);
-    expect(PUZZLES.filter((puzzle) => puzzle.kind === "mate")).toHaveLength(29);
-    expect(PUZZLES.filter((puzzle) => puzzle.kind === "capture")).toHaveLength(5);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "easy")).toHaveLength(42);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "medium")).toHaveLength(42);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "hard")).toHaveLength(40);
+  });
+
+  it("contains mate-in-two puzzles and varied pieces", () => {
+    expect(
+      PUZZLES.filter((puzzle: ChessPuzzle) => puzzle.themes.includes("mateIn2")).length,
+    ).toBeGreaterThanOrEqual(25);
+    expect(PUZZLES.some((puzzle) => puzzle.kind === "tactic")).toBe(true);
+
+    const pieces = new Set<PieceSymbol>();
+    const colors = new Set<"w" | "b">();
+
+    for (const puzzle of PUZZLES) {
+      const { playerColor, finalPiece } = playPuzzle(puzzle);
+      colors.add(playerColor);
+      if (finalPiece) {
+        pieces.add(finalPiece);
+      }
+    }
+
+    expect(colors).toEqual(new Set(["w", "b"]));
+    for (const piece of ["p", "n", "b", "r", "q"] as const) {
+      expect(pieces.has(piece), piece).toBe(true);
+    }
   });
 
   it("loads every puzzle and verifies the recorded solution", () => {
     for (const puzzle of PUZZLES) {
-      const chess = new Chess(puzzle.fen);
-      const [setup, ...solution] = puzzle.moves;
+      const { chess, lastMove, finalPiece } = playPuzzle(puzzle);
 
-      expect(setup).toBeDefined();
-      expect(solution).toHaveLength(1);
-      if (!setup || !solution[0]) {
-        throw new Error(`Puzzle ${puzzle.id} is incomplete`);
-      }
-
-      chess.move(uci(setup));
-      expect(chess.turn()).toBe("w");
-
-      const move = chess.move(uci(solution[0]));
+      expect(finalPiece, puzzle.id).not.toBeNull();
+      expect(lastMove, puzzle.id).not.toBeNull();
 
       if (puzzle.kind === "mate") {
         expect(chess.isCheckmate(), puzzle.id).toBe(true);
+      } else if (puzzle.kind === "capture") {
+        expect(lastMove?.captured, puzzle.id).toBeDefined();
       } else {
-        expect(move.captured, puzzle.id).toBeDefined();
+        expect(chess.isCheckmate(), puzzle.id).toBe(false);
+        expect(lastMove?.captured, puzzle.id).toBeUndefined();
       }
     }
   });

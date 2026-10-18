@@ -28,4 +28,25 @@ describe("PuzzlePlay", () => {
     ).toBe(true);
     expect(onNext).not.toHaveBeenCalled();
   });
+
+  it("shows the tactic prompt for a best-move puzzle", () => {
+    const puzzle = PUZZLES.find((candidate) => candidate.kind === "tactic");
+    if (!puzzle) {
+      throw new Error("Tactic puzzle not found");
+    }
+
+    render(
+      <PuzzlePlay
+        difficulty={puzzle.difficulty}
+        index={0}
+        puzzle={puzzle}
+        total={1}
+        onDifficultyChange={vi.fn()}
+        onNext={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Vind de beste zet!" })).toBeTruthy();
+    expect(screen.getByText(/Welke zet is de beste\?/)).toBeTruthy();
+  });
 });

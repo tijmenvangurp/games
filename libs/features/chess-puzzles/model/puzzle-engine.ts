@@ -24,7 +24,7 @@ export type PuzzleAttempt =
       readonly reason: PuzzleAttemptError;
     };
 
-function parseUci(value: string): {
+export function parseUci(value: string): {
   readonly from: Square;
   readonly to: Square;
   readonly promotion?: string;
