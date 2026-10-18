@@ -2,7 +2,7 @@
 
 - **Status:** Proposed — ter goedkeuring door de eigenaar
 - **Datum:** 2026-10-18
-- **Gerelateerd:** [ADR 0012](0012-optionele-accounts-en-sync.md) (auth en sync), [ADR 0001](0001-publieke-statische-spellen-app.md), [onderzoek](../research/2026-10-18-auth-backend-betterauth.md)
+- **Gerelateerd:** [ADR 0012](0012-optionele-accounts-en-sync.md) (auth en sync), [ADR 0014](0014-schermtijd-per-profiel.md) (schermtijd), [ADR 0001](0001-publieke-statische-spellen-app.md), [onderzoek](../research/2026-10-18-auth-backend-betterauth.md)
 
 ## Context
 
@@ -33,18 +33,21 @@ Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die
 
 ## Gegevensinventaris
 
-| Gegeven                      | Doel                            | Grondslag              | Bewaartermijn                           | Waar       |
-| ---------------------------- | ------------------------------- | ---------------------- | --------------------------------------- | ---------- |
-| E-mailadres ouder            | Inloggen en herstel             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| Weergavenaam ouder           | UI en accountbeheer             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| OAuth-provider en subject-id | Inloggen via Google             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| Passkey (publieke sleutel)   | Inloggen zonder wachtwoord      | Toestemming            | Tot verwijdering van de passkey         | D1 (EU)    |
-| Sessie met IP en user-agent  | Beveiliging en misbruikdetectie | Gerechtvaardigd belang | 7 dagen, intrekbaar                     | D1 (EU)    |
-| Kindprofiel: slot en avatar  | Profielscheiding                | Toestemming ouder      | Tot profiel- of accountverwijdering     | D1 (EU)    |
-| Voortgang per profiel        | Synchroniseren van state        | Toestemming ouder      | 12 maanden inactief, daarna verwijderen | D1 (EU)    |
-| Toestemmingsbewijs           | Verantwoordingsplicht           | Wettelijke plicht      | Zolang account bestaat + 2 jaar         | D1 (EU)    |
-| Rate-limit-teller            | Misbruikpreventie               | Gerechtvaardigd belang | Kort, per venster                       | D1 (EU)    |
-| Operationele logs            | Storingen en beveiliging        | Gerechtvaardigd belang | 7–30 dagen, zonder PII                  | Cloudflare |
+| Gegeven                      | Doel                             | Grondslag              | Bewaartermijn                           | Waar       |
+| ---------------------------- | -------------------------------- | ---------------------- | --------------------------------------- | ---------- |
+| E-mailadres ouder            | Inloggen en herstel              | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| Weergavenaam ouder           | UI en accountbeheer              | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| OAuth-provider en subject-id | Inloggen via Google              | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| Passkey (publieke sleutel)   | Inloggen zonder wachtwoord       | Toestemming            | Tot verwijdering van de passkey         | D1 (EU)    |
+| Sessie met IP en user-agent  | Beveiliging en misbruikdetectie  | Gerechtvaardigd belang | 7 dagen, intrekbaar                     | D1 (EU)    |
+| Kindprofiel: slot en avatar  | Profielscheiding                 | Toestemming ouder      | Tot profiel- of accountverwijdering     | D1 (EU)    |
+| Voortgang per profiel        | Synchroniseren van state         | Toestemming ouder      | 12 maanden inactief, daarna verwijderen | D1 (EU)    |
+| Schermtijd per profiel       | Ouderlijke controle              | Toestemming ouder      | 12 maanden dagtotalen                   | D1 (EU)    |
+| Schermtijd-delta's           | Synchroniseren van de timer      | Toestemming ouder      | Kort, na verwerking opruimen            | D1 (EU)    |
+| Ouderpincode (alleen hash)   | Override en uitloggen beveiligen | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| Toestemmingsbewijs           | Verantwoordingsplicht            | Wettelijke plicht      | Zolang account bestaat + 2 jaar         | D1 (EU)    |
+| Rate-limit-teller            | Misbruikpreventie                | Gerechtvaardigd belang | Kort, per venster                       | D1 (EU)    |
+| Operationele logs            | Storingen en beveiliging         | Gerechtvaardigd belang | 7–30 dagen, zonder PII                  | Cloudflare |
 
 **Niet verzameld:** naam van het kind, e-mail van het kind, geboortedatum, geslacht, foto, locatie, school, IP-adres in applicatielogs, volledige request-bodies en inhoud van `progress.data_json` in logs.
 
@@ -65,26 +68,27 @@ Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die
 
 ## Bewaartermijnen en verwijdering
 
-| Actie               | Gedrag                                                                                                                            |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Profiel verwijderen | `player` zacht verwijderen en `progress` cascaderen; daarna definitief opschonen                                                  |
-| Account verwijderen | Better Auth-user, sessies, `player`, `progress`, `progress_mutation` en `consent` verwijderen; lokale state blijft op het toestel |
-| Inactief account    | Na 12 maanden zonder login: waarschuwen en daarna verwijderen of anonimiseren                                                     |
-| Sessies             | 7 dagen; direct intrekken bij logout                                                                                              |
-| Logs                | 7–30 dagen, zonder PII                                                                                                            |
-| D1 Time Travel      | 7 dagen (free) of 30 dagen (paid); verwijderen uit de live database betekent niet direct weg uit Time Travel                      |
-| Back-ups            | Vastgelegde termijn, niet langer dan nodig; herstelprocedure testen                                                               |
+| Actie               | Gedrag                                                                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Profiel verwijderen | `player` zacht verwijderen en `progress` en `screen_time_*` cascaderen; daarna definitief opschonen                                                                                     |
+| Account verwijderen | Better Auth-user, sessies, `player`, `progress`, `progress_mutation`, `consent`, `screen_time_day`, `screen_time_delta` en `parent_pin` verwijderen; lokale state blijft op het toestel |
+| Inactief account    | Na 12 maanden zonder login: waarschuwen en daarna verwijderen of anonimiseren                                                                                                           |
+| Schermtijd          | Dagtotalen 12 maanden; delta's direct na verwerking opruimen                                                                                                                            |
+| Sessies             | 7 dagen; direct intrekken bij logout                                                                                                                                                    |
+| Logs                | 7–30 dagen, zonder PII                                                                                                                                                                  |
+| D1 Time Travel      | 7 dagen (free) of 30 dagen (paid); verwijderen uit de live database betekent niet direct weg uit Time Travel                                                                            |
+| Back-ups            | Vastgelegde termijn, niet langer dan nodig; herstelprocedure testen                                                                                                                     |
 
 Het verwijderrecht moet in de UI zitten, niet alleen op aanvraag per e-mail. De ouder moet kunnen exporteren wat hij wil bewaren, daarna verwijderen, en het toestel terugzetten naar lokaal-only.
 
 ## Rechten van betrokkenen
 
-- **Inzage en export:** een JSON-bestand met accountgegevens, profielen en voortgang.
+- **Inzage en export:** een JSON-bestand met accountgegevens, profielen, voortgang en schermtijd.
 - **Correctie:** e-mail en weergavenaam van de ouder aanpassen.
 - **Verwijdering:** profiel of account verwijderen, met cascade.
 - **Beperking en bezwaar:** voor de verwerking op basis van gerechtvaardigd belang (beveiligingslogs).
 - **Dataportabiliteit:** dezelfde JSON-export.
-- **Toestemming intrekken:** account verwijderen of sync uitzetten; de app blijft lokaal werken.
+- **Toestemming intrekken:** account verwijderen, sync uitzetten of schermtijd uitzetten; de app blijft lokaal werken.
 - **Klacht:** verwijzen naar de Autoriteit Persoonsgegevens.
 - **Kindvriendelijke uitleg:** een korte pagina in gewone taal, naast de volledige privacyverklaring.
 
@@ -104,9 +108,13 @@ Het verwijderrecht moet in de UI zitten, niet alleen op aanvraag per e-mail. De 
 
 Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en de vingerafdruk of gezichtsherkenning blijven op het toestel van de ouder. De server ziet alleen de publieke sleutel.
 
+## Schermtijd
+
+Schermtijd ([ADR 0014](0014-schermtijd-per-profiel.md)) is een vorm van monitoring, maar beperkt tot het gebruik van deze app. We bewaren alleen dagtotalen en de limiet, geen reeks van elke minuut. Het kind ziet de timer, de ouder ziet de totalen per profiel. De grondslag is toestemming van de ouder; een kind van 12 jaar of ouder kan die toestemming intrekken. Neem de verwerking op in het register en in de privacyverklaring.
+
 ## DPIA en register
 
-- **DPIA:** een volledige DPIA is waarschijnlijk niet nodig: geen systematische monitoring, geen grootschalige verwerking, geen bijzondere categorieën, geen profiling en geen publieke profielen. Leg wel een korte risicoanalyse vast. Opnieuw beoordelen zodra analytics, een publieke ranglijst, chat of multiplayer met vreemden wordt toegevoegd.
+- **DPIA:** een volledige DPIA is waarschijnlijk niet nodig: geen grootschalige systematische monitoring, geen bijzondere categorieën, geen profiling en geen publieke profielen. Schermtijd is beperkte monitoring van appgebruik en is zichtbaar voor het kind; neem dat mee in de korte risicoanalyse. Opnieuw beoordelen zodra analytics, een publieke ranglijst, chat of multiplayer met vreemden wordt toegevoegd.
 - **Verwerkingsregister:** houd een register bij. De uitzondering voor organisaties met minder dan 250 medewerkers geldt niet als de verwerking niet incidenteel is of een risico vormt (artikel 30 lid 5 AVG).
 - **Verwerkersovereenkomsten:** Cloudflare DPA en, indien gebruikt, Google DPA en de e-mailprovider. Leg de subprocessors en doorgiftegronden vast.
 - **Doorgifte:** D1 staat in de EU-jurisdictie, maar Cloudflare is een Amerikaanse organisatie en het Workers-netwerk is wereldwijd. Gebruik de standaardcontractbepalingen en het Cloudflare Data Privacy Framework waar van toepassing. Bij Google OAuth gelden de Google-voorwaarden.
@@ -142,6 +150,7 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 5. **Is de site (ooit) op kinderen in de VS gericht?** Zo ja, dan is een COPPA-beoordeling nodig.
 6. **Wordt de app door een rechtspersoon gepubliceerd of door de eigenaar als particulier?**
 7. **Komt er een aparte functionaris of externe jurist voor de privacytoets?**
+8. **Schermtijd:** is 12 maanden dagtotalen nodig, of volstaan 90 dagen voor het ouderoverzicht?
 
 ## Status en vervolg
 
