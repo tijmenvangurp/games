@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { resolveSquareClick, selectionForAction } from "@shared/lib";
+import { playHaptic, resolveSquareClick, selectionForAction } from "@shared/lib";
 import { levelFor } from "./levels";
 import { legalMovesFor, playTutorialMove } from "./tutorial-engine";
 import {
@@ -55,10 +55,12 @@ export function useChessTutorial({
   const completedLevelRef = useRef<TutorialLevelId | null>(null);
 
   const loadLevel = useCallback((levelId: TutorialLevelId) => {
+    playHaptic("tap");
     setState(initialStateFor(levelFor(levelId)));
   }, []);
 
   const resetLevel = useCallback(() => {
+    playHaptic("tap");
     setState((current) => initialStateFor(current.level));
   }, []);
 
@@ -91,6 +93,7 @@ export function useChessTutorial({
       );
 
       if (!result.ok) {
+        playHaptic("wrong");
         setState({
           ...state,
           selectedSquare: null,
@@ -100,6 +103,7 @@ export function useChessTutorial({
         return false;
       }
 
+      playHaptic(result.completed ? "win" : "select");
       setState(movedState(state, result));
       return true;
     },
@@ -122,6 +126,7 @@ export function useChessTutorial({
       );
 
       if (action.kind !== "attempt") {
+        playHaptic("tap");
         setState({
           ...state,
           ...selectionForAction(action),
@@ -139,6 +144,7 @@ export function useChessTutorial({
       );
 
       if (!result.ok) {
+        playHaptic("wrong");
         setState({
           ...state,
           selectedSquare: null,
@@ -148,6 +154,7 @@ export function useChessTutorial({
         return;
       }
 
+      playHaptic(result.completed ? "win" : "select");
       setState(movedState(state, result));
     },
     [state],

@@ -2,7 +2,10 @@ import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useChessTutorial } from "@features/chess-tutorial";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
+});
 
 describe("useChessTutorial", () => {
   it("starts on the requested level and exposes its legal moves", () => {
@@ -73,6 +76,36 @@ describe("useChessTutorial", () => {
     expect(result.current.status).toBe("completed");
     expect(result.current.moveCount).toBe(1);
     expect(result.current.fen).toContain("3N4");
+  });
+
+  it("gives haptic feedback for selection, an illegal move and completion", () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    const { result } = renderHook(() => useChessTutorial({ initialLevelId: "rook-train" }));
+
+    act(() => {
+      result.current.onSquareClick("h1");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+
+    act(() => {
+      result.current.onPieceDrop("h1", "e5");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+
+    act(() => {
+      result.current.onPieceDrop("h1", "e1");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+
+    act(() => {
+      result.current.onPieceDrop("e1", "e5");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith([20, 40, 20]);
   });
 
   it("loads another level and resets it", () => {

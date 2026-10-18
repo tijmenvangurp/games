@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { getPokemon, usePokemonCry, type Pokemon } from "@entities/pokedex";
-import { playSound } from "@shared/lib";
+import { playHaptic, playSound } from "@shared/lib";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
@@ -38,12 +38,15 @@ export function PokemonQuizPlay() {
     usePokemonQuizStore.getState().answer(pokemonId);
     const next = usePokemonQuizStore.getState();
     if (!wasAnswered && next.answered && next.question) {
-      playSound(pokemonId === next.question.targetId ? "match" : "wrong");
+      const correctAnswer = pokemonId === next.question.targetId;
+      playSound(correctAnswer ? "match" : "wrong");
+      playHaptic(correctAnswer ? "match" : "wrong");
     }
   };
 
   const handleNext = () => {
     playSound("tap");
+    playHaptic("tap");
     usePokemonQuizStore.getState().newQuestion();
   };
 

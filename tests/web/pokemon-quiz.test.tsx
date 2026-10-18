@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { getPokemon } from "@entities/pokedex";
@@ -23,6 +23,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
 });
 
 function renderApp(path = "/raad") {
@@ -127,6 +128,32 @@ describe("wie is deze pokémon", () => {
       "wrong",
     );
     expect(screen.getByRole("button", { name }).getAttribute("data-answer-state")).toBe("correct");
+  });
+
+  it("gives haptic feedback on a correct and a wrong answer", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    await startGame();
+    fireEvent.click(screen.getByRole("button", { name: targetName() }));
+    expect(vibrate).toHaveBeenLastCalledWith([10, 30, 10]);
+
+    fireEvent.click(screen.getByRole("button", { name: /Volgende Pokémon/ }));
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+
+    const name = targetName();
+    const wrong = currentQuestion()
+      .optionIds.map((id) => getPokemon(id)?.name)
+      .find((optionName): optionName is string => Boolean(optionName) && optionName !== name);
+    if (!wrong) {
+      throw new Error("No wrong option found");
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: wrong }));
+    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
   });
 
   it("stores the chosen difficulty and shows five names", async () => {

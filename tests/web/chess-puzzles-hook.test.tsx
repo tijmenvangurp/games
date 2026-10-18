@@ -1,8 +1,11 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { PUZZLES, useChessPuzzle } from "@features/chess-puzzles";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
+});
 
 describe("useChessPuzzle", () => {
   it("rejects a wrong move and solves the puzzle with the right move", () => {
@@ -25,6 +28,31 @@ describe("useChessPuzzle", () => {
     expect(accepted).toBe(true);
     expect(result.current.status).toBe("solved");
     expect(result.current.feedback).toBe("solved");
+  });
+
+  it("gives haptic feedback for a wrong move, a hint and a solve", () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    const { result } = renderHook(() => useChessPuzzle(PUZZLES[0]));
+
+    act(() => {
+      result.current.onPieceDrop("a1", "a2");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+
+    act(() => {
+      result.current.showHint();
+    });
+    expect(vibrate).toHaveBeenLastCalledWith(20);
+
+    act(() => {
+      result.current.onPieceDrop("a1", "a8");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith([20, 40, 20]);
   });
 
   it("shows a hint, supports tapping and resets", () => {

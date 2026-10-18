@@ -1,6 +1,6 @@
 import type { MemoryDifficulty } from "@entities/memory";
 import { getPokemon, usePokemonCry } from "@entities/pokedex";
-import { cn, playSound } from "@shared/lib";
+import { cn, playHaptic, playSound } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryCard } from "./memory-card";
 
@@ -13,12 +13,17 @@ const COLUMN_CLASSES: Record<MemoryDifficulty, string> = {
 function playFlipFeedback(beforeMatched: number): void {
   const next = useMemoryStore.getState();
   if (next.found) {
+    playHaptic("win");
     return;
   }
   if (next.matched.filter(Boolean).length > beforeMatched) {
     playSound("match");
+    playHaptic("match");
   } else if (next.locked) {
     playSound("wrong");
+    playHaptic("wrong");
+  } else {
+    playHaptic("tap");
   }
 }
 

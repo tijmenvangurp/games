@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { resolveSquareClick, selectionForAction } from "@shared/lib";
+import { playHaptic, resolveSquareClick, selectionForAction } from "@shared/lib";
 import {
   attemptPuzzleMove,
   createPuzzleState,
@@ -40,6 +40,7 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
   const [state, setState] = useState<PuzzleState>(() => createPuzzleState(puzzle));
 
   const resetPuzzle = useCallback(() => {
+    playHaptic("tap");
     setState(createPuzzleState(puzzle));
   }, [puzzle]);
 
@@ -52,10 +53,12 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
       const attempt = attemptPuzzleMove(state, sourceSquare, targetSquare);
 
       if (!attempt.ok) {
+        playHaptic("wrong");
         setState(wrongState(state));
         return false;
       }
 
+      playHaptic(attempt.solved ? "win" : "select");
       setState(stateAfterAttempt(state, attempt));
       return true;
     },
@@ -78,6 +81,7 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
       );
 
       if (action.kind !== "attempt") {
+        playHaptic("tap");
         setState({
           ...state,
           ...selectionForAction(action),
@@ -89,10 +93,12 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
       const attempt = attemptPuzzleMove(state, action.from, action.to);
 
       if (!attempt.ok) {
+        playHaptic("wrong");
         setState(wrongState(state));
         return;
       }
 
+      playHaptic(attempt.solved ? "win" : "select");
       setState(stateAfterAttempt(state, attempt));
     },
     [state],
@@ -105,6 +111,7 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
       return;
     }
 
+    playHaptic("hint");
     setState({
       ...state,
       hintMove: hintFor(state),
