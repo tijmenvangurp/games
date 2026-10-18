@@ -20,7 +20,6 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/schaken"
           | "/puzzels"
           | "/woordzoeker"
-          | "/kruiswoord"
           | "/frans";
       }
     | { status: "coming-soon" }
@@ -89,15 +88,6 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/raad",
     accentClassName: "from-indigo-100 via-indigo-50 to-white",
-  },
-  {
-    id: "crossword",
-    name: "Kruiswoordpuzzel",
-    description: "Los het Pokémon-kruiswoord op met Nederlandse hints.",
-    emoji: "📝",
-    status: "available",
-    to: "/kruiswoord",
-    accentClassName: "from-rose-100 via-red-50 to-white",
   },
   {
     id: "chess-tutorial",
