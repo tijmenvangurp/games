@@ -1,10 +1,15 @@
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { LESSON_ANIMAUX } from "../libs/entities/french/model/lesson-animaux.ts";
+import {
+  FRENCH_CURRICULUM,
+  allFrenchItems,
+  validateCurriculum,
+} from "../libs/entities/french/index.ts";
+import type { FrenchItem } from "../libs/entities/french/index.ts";
 
 /**
- * Genereert de Franse audiofragmenten voor de les.
+ * Genereert de Franse audiofragmenten voor alle gepubliceerde lessen.
  *
  * Voorbeeld:
  *   TTS_BASE_URL=http://localhost:8000/v1 \
@@ -12,9 +17,9 @@ import { LESSON_ANIMAUX } from "../libs/entities/french/model/lesson-animaux.ts"
  *   TTS_VOICE=tom \
  *   pnpm exec tsx scripts/generate-french-audio.ts
  *
- * De URL en een eventuele sleutel horen in de omgeving, nooit in de repo.
- * De app zelf doet tijdens het spelen geen TTS-aanroep: zij leest de MP3's
- * uit `apps/games/public/audio/fr/`.
+ * `--check` controleert de content en de aanwezigheid van alle audio zonder
+ * de TTS-server nodig te hebben. De URL en sleutel horen in de omgeving,
+ * nooit in de repo.
  */
 interface Config {
   baseUrl: string;
@@ -26,11 +31,11 @@ interface Config {
 
 interface Options {
   only?: string;
+  lesson?: string;
   force: boolean;
   dryRun: boolean;
+  check: boolean;
 }
-
-type LessonItem = (typeof LESSON_ANIMAUX.items)[number];
 
 const outputDirectory = join("apps", "games", "public", "audio", "fr");
 
@@ -73,7 +78,16 @@ function readOptions(): Options {
   const only = [...args]
     .find((argument) => argument.startsWith("--only="))
     ?.slice("--only=".length);
-  return { only, force: args.has("--force"), dryRun: args.has("--dry-run") };
+  const lesson = [...args]
+    .find((argument) => argument.startsWith("--lesson="))
+    ?.slice("--lesson=".length);
+  return {
+    only,
+    lesson,
+    force: args.has("--force"),
+    dryRun: args.has("--dry-run"),
+    check: args.has("--check"),
+  };
 }
 
 function isId3Tag(bytes: Uint8Array): boolean {
@@ -123,11 +137,11 @@ interface Clip {
   input: string;
 }
 
-function wordClip(item: LessonItem): Clip {
+function wordClip(item: FrenchItem): Clip {
   return { id: item.id, input: item.audioText ?? item.fr };
 }
 
-function exampleClip(item: LessonItem): Clip | null {
+function exampleClip(item: FrenchItem): Clip | null {
   if (!item.example) {
     return null;
   }
@@ -137,7 +151,7 @@ function exampleClip(item: LessonItem): Clip | null {
   };
 }
 
-function clipsFor(items: readonly LessonItem[]): Clip[] {
+function clipsFor(items: readonly FrenchItem[]): Clip[] {
   const clips: Clip[] = [];
   for (const item of items) {
     clips.push(wordClip(item));
@@ -168,43 +182,70 @@ function actionLabel(options: Options): string {
   return options.dryRun ? "dry-run" : "genereer";
 }
 
-async function generateClip(clip: Clip, config: Config, options: Options): Promise<void> {
+async function generateClip(clip: Clip, config: Config | null, options: Options): Promise<void> {
   if (shouldSkip(clip, options)) {
     console.log(`skip ${clip.id} (bestaat al)`);
     return;
   }
 
   console.log(`${actionLabel(options)} ${clip.id}: ${clip.input}`);
-  if (!options.dryRun) {
+  if (!options.dryRun && config) {
     await writeAudio(clip, config);
   }
 }
 
-function selectItems(options: Options): LessonItem[] {
-  const items = LESSON_ANIMAUX.items.filter(
-    (item) => item.reviewed && (!options.only || item.id === options.only),
-  );
+function selectItems(options: Options): FrenchItem[] {
+  const lessons = options.lesson
+    ? FRENCH_CURRICULUM.filter((lesson) => lesson.id === options.lesson)
+    : FRENCH_CURRICULUM;
+  const items = lessons
+    .flatMap((lesson) => lesson.items)
+    .filter((item) => item.reviewed && (!options.only || item.id === options.only));
+
   if (items.length === 0) {
     console.error(
-      options.only ? `Geen gereviewd item met id "${options.only}".` : "Geen gereviewde items.",
+      options.only
+        ? `Geen gereviewd item met id "${options.only}".`
+        : "Geen gereviewde items gevonden.",
     );
     process.exit(1);
   }
   return items;
 }
 
-async function main(): Promise<void> {
-  const config = readConfig();
-  const options = readOptions();
-  const items = selectItems(options);
+function checkAudio(): void {
+  const issues = validateCurriculum(FRENCH_CURRICULUM, {
+    audioExists: (fileName) => existsSync(join(outputDirectory, fileName)),
+  });
+  if (issues.length > 0) {
+    for (const issue of issues) {
+      console.error(`${issue.path}: ${issue.message}`);
+    }
+    process.exit(1);
+  }
+  const reviewed = allFrenchItems().filter((item) => item.reviewed).length;
+  console.log(`Audio en content zijn in orde (${reviewed} items).`);
+}
 
+async function runGeneration(options: Options): Promise<void> {
+  const items = selectItems(options);
   if (!options.dryRun) {
     await mkdir(outputDirectory, { recursive: true });
   }
 
+  const config = options.dryRun ? null : readConfig();
   for (const clip of clipsFor(items)) {
     await generateClip(clip, config, options);
   }
+}
+
+async function main(): Promise<void> {
+  const options = readOptions();
+  if (options.check) {
+    checkAudio();
+    return;
+  }
+  await runGeneration(options);
 }
 
 await main();

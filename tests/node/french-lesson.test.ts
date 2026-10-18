@@ -2,12 +2,13 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  FRENCH_LESSONS,
+  FRENCH_CURRICULUM,
   LESSON_ANIMAUX,
   frenchAudioSrc,
   frenchExampleAudioSrc,
 } from "@entities/french";
 import {
+  FRENCH_MASTER_OPTION_COUNT,
   FRENCH_OPTION_COUNT,
   createFrenchQuestion,
   createFrenchQueue,
@@ -46,10 +47,10 @@ describe("Frans luisterspel", () => {
   });
 
   it("bevat alleen lessen met items", () => {
-    expect(FRENCH_LESSONS.length).toBeGreaterThan(0);
-    for (const lesson of FRENCH_LESSONS) {
+    expect(FRENCH_CURRICULUM.length).toBeGreaterThan(0);
+    for (const lesson of FRENCH_CURRICULUM) {
       expect(lesson.items.length).toBeGreaterThan(0);
-      expect(lesson.items.every((item) => item.theme === lesson.id)).toBe(true);
+      expect(lesson.status).toMatch(/^(draft|reviewed)$/u);
     }
   });
 
@@ -65,6 +66,19 @@ describe("Frans luisterspel", () => {
     });
   }
 
+  it("bouwt vijf opties in de meestermodus", () => {
+    const item = LESSON_ANIMAUX.items[0];
+    const question = createFrenchQuestion(
+      item,
+      LESSON_ANIMAUX.items,
+      3,
+      FRENCH_MASTER_OPTION_COUNT,
+    );
+    expect(question.options).toHaveLength(FRENCH_MASTER_OPTION_COUNT);
+    expect(new Set(question.options).size).toBe(FRENCH_MASTER_OPTION_COUNT);
+    expect(question.options[question.correctIndex]).toBe(item.nl);
+  });
+
   it("is deterministisch per seed en varieert tussen seeds", () => {
     const item = LESSON_ANIMAUX.items[0];
     expect(createFrenchQuestion(item, LESSON_ANIMAUX.items, 42)).toEqual(
@@ -73,6 +87,21 @@ describe("Frans luisterspel", () => {
     expect(createFrenchQuestion(item, LESSON_ANIMAUX.items, 1)).not.toEqual(
       createFrenchQuestion(item, LESSON_ANIMAUX.items, 2),
     );
+  });
+
+  it("gebruikt de handmatige contrastwoorden als afleiders", () => {
+    const item = LESSON_ANIMAUX.items.find((candidate) => candidate.contrastWith?.length);
+    if (!item?.contrastWith) {
+      throw new Error("Geen woord met contrastwoorden");
+    }
+    const question = createFrenchQuestion(item, LESSON_ANIMAUX.items, 5);
+    for (const id of item.contrastWith) {
+      const contrast = LESSON_ANIMAUX.items.find((candidate) => candidate.id === id);
+      if (!contrast) {
+        throw new Error(`Onbekend contrastwoord ${id}`);
+      }
+      expect(question.options).toContain(contrast.nl);
+    }
   });
 
   it("gebruikt de handmatige afleiders voor zinnen", () => {
@@ -87,7 +116,7 @@ describe("Frans luisterspel", () => {
   });
 
   it("schudt alle gereviewde items door elkaar", () => {
-    const queue = createFrenchQueue(LESSON_ANIMAUX, 7);
+    const queue = createFrenchQueue(LESSON_ANIMAUX, { seed: 7 });
     expect(queue).toHaveLength(LESSON_ANIMAUX.items.length);
     expect(new Set(queue.map((item) => item.id)).size).toBe(queue.length);
     expect(queue.every((item) => item.reviewed)).toBe(true);

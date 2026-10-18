@@ -1,4 +1,4 @@
-import type { FrenchLesson } from "./types";
+import { defineLesson } from "../define-lesson";
 
 /**
  * Prototype lesson for 9–12 jaar (A1.2).
@@ -8,26 +8,27 @@ import type { FrenchLesson } from "./types";
  * controleren; daarom staat `reviewed` hier nog bewust op `true` alleen
  * omdat dit de spike-les is. Zet nieuwe, ongereviewde items op `false`.
  */
-export const LESSON_ANIMAUX: FrenchLesson = {
+export const LESSON_ANIMAUX = defineLesson({
   id: "animaux",
   title: "Les animaux",
   subtitle: "Dieren: luister en kies de juiste vertaling.",
+  category: "Dieren",
   emoji: "🐱",
   level: "A1.2",
+  status: "reviewed",
   items: [
     {
       id: "animaux-chat",
       fr: "le chat",
       nl: "de kat",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐱",
       note: "‘le’ is mannelijk.",
       example: {
         fr: "Mon chat aime le lait.",
         nl: "Mijn kat houdt van melk.",
       },
+      contrastWith: ["animaux-chien", "animaux-lapin"],
       reviewed: true,
     },
     {
@@ -35,14 +36,13 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "le chien",
       nl: "de hond",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐶",
       note: "‘le’ is mannelijk.",
       example: {
         fr: "Le chien joue dans le jardin.",
         nl: "De hond speelt in de tuin.",
       },
+      contrastWith: ["animaux-chat", "animaux-lion"],
       reviewed: true,
     },
     {
@@ -51,8 +51,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       audioText: "l'oiseau",
       nl: "de vogel",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐦",
       note: "‘l’’ staat voor ‘le’ of ‘la’ vóór een klinker.",
       example: {
@@ -60,6 +58,7 @@ export const LESSON_ANIMAUX: FrenchLesson = {
         audioText: "L'oiseau chante le matin.",
         nl: "De vogel zingt in de ochtend.",
       },
+      contrastWith: ["animaux-poisson", "animaux-souris"],
       reviewed: true,
     },
     {
@@ -67,8 +66,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "le poisson",
       nl: "de vis",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐟",
       note: "‘le’ is mannelijk.",
       example: {
@@ -76,6 +73,7 @@ export const LESSON_ANIMAUX: FrenchLesson = {
         audioText: "Le poisson nage dans l'eau.",
         nl: "De vis zwemt in het water.",
       },
+      contrastWith: ["animaux-oiseau", "animaux-cheval"],
       reviewed: true,
     },
     {
@@ -83,14 +81,13 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "le cheval",
       nl: "het paard",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐴",
       note: "‘le’ is mannelijk.",
       example: {
         fr: "Le cheval mange une pomme.",
         nl: "Het paard eet een appel.",
       },
+      contrastWith: ["animaux-vache", "animaux-chien"],
       reviewed: true,
     },
     {
@@ -98,8 +95,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "la vache",
       nl: "de koe",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐄",
       note: "‘la’ is vrouwelijk.",
       example: {
@@ -107,6 +102,7 @@ export const LESSON_ANIMAUX: FrenchLesson = {
         audioText: "La vache mange de l'herbe.",
         nl: "De koe eet gras.",
       },
+      contrastWith: ["animaux-cheval", "animaux-lapin"],
       reviewed: true,
     },
     {
@@ -114,14 +110,13 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "le lapin",
       nl: "het konijn",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐰",
       note: "‘le’ is mannelijk.",
       example: {
         fr: "Le lapin saute dans le jardin.",
         nl: "Het konijn springt in de tuin.",
       },
+      contrastWith: ["animaux-souris", "animaux-chat"],
       reviewed: true,
     },
     {
@@ -129,14 +124,13 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "la souris",
       nl: "de muis",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐭",
       note: "‘la’ is vrouwelijk.",
       example: {
         fr: "La souris mange du fromage.",
         nl: "De muis eet kaas.",
       },
+      contrastWith: ["animaux-lapin", "animaux-oiseau"],
       reviewed: true,
     },
     {
@@ -144,8 +138,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "le lion",
       nl: "de leeuw",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🦁",
       note: "‘le’ is mannelijk.",
       example: {
@@ -153,6 +145,7 @@ export const LESSON_ANIMAUX: FrenchLesson = {
         audioText: "Le lion dort sous l'arbre.",
         nl: "De leeuw slaapt onder de boom.",
       },
+      contrastWith: ["animaux-chien", "animaux-elephant"],
       reviewed: true,
     },
     {
@@ -161,8 +154,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       audioText: "l'éléphant",
       nl: "de olifant",
       kind: "word",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🐘",
       note: "‘l’’ staat voor ‘le’ vóór een klinker.",
       example: {
@@ -170,6 +161,7 @@ export const LESSON_ANIMAUX: FrenchLesson = {
         audioText: "L'éléphant boit beaucoup d'eau.",
         nl: "De olifant drinkt veel water.",
       },
+      contrastWith: ["animaux-lion", "animaux-cheval"],
       reviewed: true,
     },
     {
@@ -177,8 +169,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "Le chat dort sur le canapé.",
       nl: "De kat slaapt op de bank.",
       kind: "phrase",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🛋️",
       note: "‘dort’ komt van ‘dormir’ (slapen).",
       distractors: [
@@ -194,8 +184,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       audioText: "J'ai un chien à la maison.",
       nl: "Ik heb een hond thuis.",
       kind: "phrase",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🏠",
       note: "‘à la maison’ betekent ‘thuis’.",
       distractors: [
@@ -211,8 +199,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       audioText: "L'oiseau chante dans le jardin.",
       nl: "De vogel zingt in de tuin.",
       kind: "phrase",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🎵",
       note: "‘chante’ komt van ‘chanter’ (zingen).",
       distractors: [
@@ -228,8 +214,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       audioText: "Le poisson nage dans l'eau.",
       nl: "De vis zwemt in het water.",
       kind: "phrase",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🌊",
       note: "‘nage’ komt van ‘nager’ (zwemmen).",
       distractors: [
@@ -244,8 +228,6 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       fr: "Le cheval court très vite.",
       nl: "Het paard rent heel snel.",
       kind: "phrase",
-      theme: "animaux",
-      level: "A1.2",
       emoji: "🏇",
       note: "‘très vite’ betekent ‘heel snel’.",
       distractors: [
@@ -256,6 +238,4 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       reviewed: true,
     },
   ],
-};
-
-export const FRENCH_LESSONS: readonly FrenchLesson[] = [LESSON_ANIMAUX];
+});

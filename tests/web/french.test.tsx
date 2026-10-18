@@ -4,12 +4,13 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { LESSON_ANIMAUX } from "@entities/french";
-import { useFrenchQuizStore } from "@features/french-listening";
+import { useFrenchProgressStore, useFrenchQuizStore } from "@features/french-listening";
 
 beforeEach(() => {
   cleanup();
   localStorage.clear();
   useFrenchQuizStore.getState().reset();
+  useFrenchProgressStore.getState().reset();
 });
 
 afterEach(() => {
@@ -30,10 +31,15 @@ function currentQuestion() {
   return question;
 }
 
-async function startQuiz(): Promise<void> {
+async function openLesson(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Bonjour !" })).toBeTruthy();
+  fireEvent.click(await screen.findByRole("link", { name: /Les animaux/ }));
   expect(await screen.findByRole("heading", { name: "Les animaux" })).toBeTruthy();
+}
+
+async function startQuiz(): Promise<void> {
+  await openLesson();
   fireEvent.click(screen.getByRole("button", { name: "Start luisteroefening" }));
   expect(await screen.findByRole("group", { name: "Kies de juiste vertaling" })).toBeTruthy();
 }
@@ -47,6 +53,16 @@ describe("Frans luisterspel", () => {
     expect(useFrenchQuizStore.getState().queue).toHaveLength(LESSON_ANIMAUX.items.length);
     expect(currentQuestion().item.kind).toBeTypeOf("string");
     expect(useFrenchQuizStore.getState().correctCount).toBe(0);
+  });
+
+  it("start de meestermodus met vijf opties", async () => {
+    await openLesson();
+    fireEvent.click(screen.getByRole("button", { name: "Meestermodus" }));
+
+    const group = await screen.findByRole("group", { name: "Kies de juiste vertaling" });
+    expect(within(group).getAllByRole("button")).toHaveLength(5);
+    expect(screen.getByText("Meester")).toBeTruthy();
+    expect(useFrenchQuizStore.getState().master).toBe(true);
   });
 
   it("accepteert het juiste antwoord en gaat verder", async () => {
@@ -68,6 +84,11 @@ describe("Frans luisterspel", () => {
       expect(screen.getByText(question.item.example.nl)).toBeTruthy();
       expect(screen.getByRole("button", { name: "Beluister de voorbeeldzin" })).toBeTruthy();
     }
+
+    const stored = JSON.parse(localStorage.getItem("games.french.v1") ?? "{}") as {
+      items?: Record<string, { seen?: number }>;
+    };
+    expect(stored.items?.[question.item.id]?.seen).toBe(1);
 
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(useFrenchQuizStore.getState().answered).toBe(false);
@@ -95,8 +116,7 @@ describe("Frans luisterspel", () => {
   });
 
   it("oefent met flipcards", async () => {
-    renderApp();
-    expect(await screen.findByRole("heading", { name: "Bonjour !" })).toBeTruthy();
+    await openLesson();
     fireEvent.click(screen.getByRole("button", { name: "Oefen met kaarten" }));
 
     const card = await screen.findByRole("button", { name: /^Frans:/ });
@@ -111,6 +131,62 @@ describe("Frans luisterspel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Ken ik" }));
     expect(await screen.findByText("Kaart 2 van 15")).toBeTruthy();
+  });
+
+  it("bouwt een Franse zin uit woordtegels", async () => {
+    await openLesson();
+    fireEvent.click(screen.getByRole("button", { name: "Bouw de zin" }));
+
+    const phrase = LESSON_ANIMAUX.items.find((item) => item.kind === "phrase");
+    if (!phrase) {
+      throw new Error("Geen zin in de les");
+    }
+
+    for (const token of phrase.fr.split(/\s+/u)) {
+      fireEvent.click(screen.getByRole("button", { name: `Kies ${token}` }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
+
+    expect(screen.getByText("Goed gedaan!")).toBeTruthy();
+    expect(screen.getByText(phrase.fr)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
+    expect(await screen.findByText("Zin 2 van 5")).toBeTruthy();
+  });
+
+  it("toont een melding voor een onbekende les", async () => {
+    renderApp("/frans/onbekend");
+    expect(await screen.findByRole("heading", { name: "Les niet gevonden" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Terug naar lessen" })).toBeTruthy();
+  });
+
+  it("reset de voortgang", () => {
+    useFrenchProgressStore.getState().record("temp", true);
+    expect(useFrenchProgressStore.getState().progress.items.temp).toBeDefined();
+    useFrenchProgressStore.getState().reset();
+    expect(useFrenchProgressStore.getState().progress.items).toEqual({});
+  });
+
+  it("sorteert een woord in een categorie", async () => {
+    renderApp("/frans/sorteren");
+    expect(await screen.findByText("Sorteer de woorden")).toBeTruthy();
+
+    const word = document.querySelector<HTMLButtonElement>("[data-sort-word]");
+    const category = document.querySelector<HTMLButtonElement>("[data-sort-category]");
+    if (!word || !category) {
+      throw new Error("Geen sorteerbare word of categorie");
+    }
+    const wordText = word.textContent ?? "";
+    fireEvent.click(word);
+    fireEvent.click(category);
+
+    expect(screen.getByRole("button", { name: `Verwijder ${wordText}` })).toBeTruthy();
+  });
+
+  it("toont een lege herhaalsessie zonder due-items", async () => {
+    expect(useFrenchProgressStore.getState().progress.items).toEqual({});
+    renderApp("/frans/herhalen");
+    expect(await screen.findByText("Er is nu niets te herhalen.")).toBeTruthy();
   });
 
   it("toont de eindscore na alle vragen", async () => {

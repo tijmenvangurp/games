@@ -1,6 +1,6 @@
 export type FrenchKind = "word" | "phrase";
 export type FrenchLevel = "A1.1" | "A1.2";
-export type FrenchThemeId = "animaux";
+export type FrenchLessonStatus = "draft" | "reviewed";
 
 export interface FrenchExample {
   /** A short sentence that uses the word in context. */
@@ -22,13 +22,13 @@ export interface FrenchItem {
   /** Alternative translations, only used on flashcards. */
   nlAlt?: readonly string[];
   kind: FrenchKind;
-  theme: FrenchThemeId;
-  level: FrenchLevel;
   emoji?: string;
   /** Short explanation shown after the answer. */
   note?: string;
   /** Example sentence for a word, with its own audio clip. */
   example?: FrenchExample;
+  /** Other words that make good near-miss distractors. */
+  contrastWith?: readonly string[];
   /** Curated Dutch distractors for phrase questions. */
   distractors?: readonly string[];
   /** Only reviewed items are included in the quiz and audio pipeline. */
@@ -39,7 +39,10 @@ export interface FrenchLesson {
   id: string;
   title: string;
   subtitle: string;
+  /** Dutch label used by cross-lesson exercises such as category sorting. */
+  category: string;
   emoji: string;
   level: FrenchLevel;
+  status: FrenchLessonStatus;
   items: readonly FrenchItem[];
 }
