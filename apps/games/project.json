@@ -65,6 +65,7 @@
   "implicitDependencies": [
     "pages-home",
     "pages-sudoku",
+    "pages-chess",
     "pages-arrow",
     "pages-memory",
     "pages-seek",
@@ -72,6 +73,7 @@
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
+    "features-chess-tutorial",
     "features-arrow-game",
     "features-memory-game",
     "features-seek-and-find",

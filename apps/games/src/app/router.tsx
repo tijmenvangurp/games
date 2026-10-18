@@ -6,6 +6,7 @@ import {
   type RouterHistory,
 } from "@tanstack/react-router";
 import { ArrowsPage } from "@pages/arrow";
+import { ChessPage } from "@pages/chess";
 import { HomePage } from "@pages/home";
 import { MemoryPage } from "@pages/memory";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
@@ -53,6 +54,12 @@ export function createAppRouter(history?: RouterHistory) {
     component: PokemonQuizPage,
   });
 
+  const chessRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/schaken",
+    component: ChessPage,
+  });
+
   const routeTree = rootRoute.addChildren([
     homeRoute,
     sudokuRoute,
@@ -60,6 +67,7 @@ export function createAppRouter(history?: RouterHistory) {
     seekRoute,
     memoryRoute,
     pokemonQuizRoute,
+    chessRoute,
   ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });
