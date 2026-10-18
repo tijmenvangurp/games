@@ -6,6 +6,7 @@ export { DIFFICULTIES, SUDOKU_SIZES } from "./model/types";
 export {
   countMistakes,
   createPlayState,
+  completedUnits,
   digitCounts,
   enterValue,
   eraseCell,
@@ -17,6 +18,6 @@ export {
   revealHint,
   selectCell,
 } from "./model/play-state";
-export type { PlayState } from "./model/play-state";
+export type { CompletedUnit, PlayState } from "./model/play-state";
 export type { SudokuHint } from "./model/hints";
 export type { Difficulty, SudokuPuzzle, SudokuSize } from "./model/types";

@@ -10,6 +10,7 @@ import {
 import { playSound, vibrate } from "@shared/lib";
 import { symbolsFor, type MistakeMode, type SymbolTheme } from "./settings";
 import { hintText, statusText } from "./sudoku-view";
+import { useSudokuCelebration } from "./use-sudoku-celebration";
 import { useSudokuKeyboard } from "./use-sudoku-keyboard";
 import { useSudokuStore } from "./use-sudoku-store";
 
@@ -218,6 +219,7 @@ export function useSudokuPlay() {
   const hintPreview = useSudokuStore((state) => state.hintPreview);
   const hintUnavailable = useSudokuStore((state) => state.hintUnavailable);
   const [check, setCheck] = useState<CheckResult | null>(null);
+  const celebration = useSudokuCelebration(play);
   useSudokuKeyboard(Boolean(play));
 
   const derived = useMemo(
@@ -243,6 +245,7 @@ export function useSudokuPlay() {
     hintPreview,
     ...derived,
     ...actions,
+    celebration,
     canUndo: history.length > 0,
     checkMode: settings.mistakeMode === "check",
   };

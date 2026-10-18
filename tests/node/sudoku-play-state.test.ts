@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   countMistakes,
+  completedUnits,
   createPlayState,
   digitCounts,
   enterValue,
@@ -122,6 +123,31 @@ describe("sudoku play state", () => {
 
     const conflict = enterValue(selectCell(empty, 1), 4);
     expect(findConflicts(conflict.puzzle, conflict.entries)).toEqual(new Set([1, 5]));
+  });
+
+  it("reports completed rows and boxes", () => {
+    const empty = createPlayState(puzzle);
+    expect(completedUnits(empty.puzzle, empty.entries)).toEqual([]);
+
+    let row = empty;
+    row = enterValue(selectCell(row, 1), 2);
+    row = enterValue(selectCell(row, 2), 3);
+    row = enterValue(selectCell(row, 3), 4);
+    expect(completedUnits(row.puzzle, row.entries)).toEqual([{ kind: "row", index: 0 }]);
+
+    let box = empty;
+    box = enterValue(selectCell(box, 1), 2);
+    box = enterValue(selectCell(box, 4), 3);
+    expect(completedUnits(box.puzzle, box.entries)).toEqual([{ kind: "box", index: 0 }]);
+  });
+
+  it("does not celebrate a full row with wrong digits", () => {
+    let state = createPlayState(puzzle);
+    state = enterValue(selectCell(state, 1), 3);
+    state = enterValue(selectCell(state, 2), 2);
+    state = enterValue(selectCell(state, 3), 4);
+
+    expect(completedUnits(state.puzzle, state.entries)).toEqual([]);
   });
 
   it("moves the selection with bounds", () => {
