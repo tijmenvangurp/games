@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import apiWorker from "../../apps/api/src/index";
 import { googleCallbackUrl, readAuthSettings } from "../../apps/api/src/auth-config";
 import { getAuth } from "../../apps/api/src/auth";
+import { withApiHeaders } from "../../apps/api/src/response";
 import type { Env } from "../../apps/api/src/env";
 
 const configuredEnv = {
@@ -91,6 +92,25 @@ describe("readAuthSettings", () => {
     expect(googleCallbackUrl(settings)).toBe(
       "https://games.example.invalid/api/auth/callback/google",
     );
+  });
+});
+
+describe("withApiHeaders", () => {
+  it("keeps cookies and redirects while adding API security headers", () => {
+    const original = new Response(null, {
+      status: 302,
+      headers: {
+        Location: "https://accounts.example.invalid/o/oauth2/auth",
+        "Set-Cookie": "spellen.session=test; HttpOnly; SameSite=Lax",
+      },
+    });
+
+    const response = withApiHeaders(original);
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get("Location")).toBe("https://accounts.example.invalid/o/oauth2/auth");
+    expect(response.headers.get("Set-Cookie")).toContain("spellen.session=test");
+    expectApiHeaders(response);
   });
 });
 
