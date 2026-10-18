@@ -3,12 +3,16 @@ import { getAuth } from "./auth";
 import { isGoogleConfigured, readAuthSettings } from "./auth-config";
 import { handleHealth } from "./health";
 import { createPasskeyContext } from "./passkey-context";
+import { handlePlayerDelete, handlePlayers } from "./players";
+import { handleProgress } from "./progress";
 import { jsonResponse, withApiHeaders } from "./response";
 
 const HEALTH_PATH = "/api/health";
 const AUTH_PATH = "/api/auth";
 const CAPABILITIES_PATH = "/api/auth/capabilities";
 const PASSKEY_CONTEXT_PATH = "/api/auth/passkey-first/context";
+const PLAYERS_PATH = "/api/players";
+const PROGRESS_PATH = "/api/progress";
 
 async function handleCapabilities(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET") {
@@ -69,6 +73,24 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 
   if (pathname === PASSKEY_CONTEXT_PATH) {
     return handlePasskeyContext(request, env);
+  }
+
+  if (pathname === PLAYERS_PATH) {
+    return handlePlayers(request, env);
+  }
+
+  if (pathname.startsWith(`${PLAYERS_PATH}/`)) {
+    let playerId: string;
+    try {
+      playerId = decodeURIComponent(pathname.slice(PLAYERS_PATH.length + 1));
+    } catch {
+      return jsonResponse({ error: "not_found" }, 404);
+    }
+    return handlePlayerDelete(request, env, playerId);
+  }
+
+  if (pathname === PROGRESS_PATH) {
+    return handleProgress(request, env);
   }
 
   if (pathname === AUTH_PATH || pathname.startsWith(`${AUTH_PATH}/`)) {

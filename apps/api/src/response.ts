@@ -25,6 +25,21 @@ export function jsonResponse(
   });
 }
 
+/** A body-less API response (used by `DELETE`), with the same security headers. */
+export function emptyResponse(status = 204): Response {
+  return new Response(null, { status, headers: API_HEADERS });
+}
+
+/** A `405` response that tells the client which methods the route accepts. */
+export function methodNotAllowed(allow: string): Response {
+  return jsonResponse({ error: "method_not_allowed" }, 405, { Allow: allow });
+}
+
+/** A `400` response that names the field that failed validation. */
+export function invalidField(field: string): Response {
+  return jsonResponse({ error: "invalid_request", field }, 400);
+}
+
 /**
  * Adds the API security headers to a response produced by Better Auth while
  * preserving its status, body and `Set-Cookie` headers.
