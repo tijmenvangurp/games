@@ -171,15 +171,13 @@ interface DotGrouping {
 
 /**
  * De verdeling in groepjes die bij een som hoort. Alleen zinvol voor keer en delen.
- * Bij delen is het aantal groepjes de deler, zodat "15 ÷ 3" als drie groepjes van vijf
- * wordt getekend en niet als vijf groepjes van drie.
+ * Bij delen is de uitkomst het aantal groepjes en de deler de grootte van elk groepje,
+ * zodat "15 ÷ 5" als drie groepjes van vijf wordt getekend.
  */
 export function groupingFor(question: MathQuestion): DotGrouping {
-  if (question.mode === "deel") {
-    return { groups: question.right, perGroup: question.answer };
-  }
+  const groups = question.mode === "deel" ? question.answer : question.left;
 
-  return { groups: question.left, perGroup: question.right };
+  return { groups, perGroup: question.right };
 }
 
 export function explanationFor(question: MathQuestion): string {
@@ -196,7 +194,7 @@ export function explanationFor(question: MathQuestion): string {
     }
     case "deel": {
       const { groups, perGroup } = groupingFor(question);
-      return `${left} ÷ ${right} = ${answer}. ${left} eerlijk verdelen over ${groups} groepjes geeft ${perGroup} per groep.`;
+      return `${left} ÷ ${right} = ${answer}. Dat zijn ${groups} groepjes van ${perGroup}.`;
     }
   }
 }

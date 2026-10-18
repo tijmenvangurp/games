@@ -131,7 +131,7 @@ describe("math trainer", () => {
     expect(screen.getByText(/Tel verder vanaf/)).toBeTruthy();
   });
 
-  it("shows a division as divisor groups of the quotient", async () => {
+  it("shows a division as quotient groups of the divisor", async () => {
     useMathStore.setState({
       round: {
         mode: "deel",
@@ -143,10 +143,10 @@ describe("math trainer", () => {
             mode: "deel",
             level: "makkelijk",
             left: 15,
-            right: 3,
-            answer: 5,
-            prompt: "15 ÷ 3",
-            choices: [5, 4, 6],
+            right: 5,
+            answer: 3,
+            prompt: "15 ÷ 5",
+            choices: [3, 4, 6],
           },
         ],
       },
@@ -155,11 +155,11 @@ describe("math trainer", () => {
     renderApp();
     await screen.findByText(/Som 1 van 1/);
 
-    clickAnswer(5);
+    clickAnswer(3);
 
     expect(screen.getByText("3 groepjes van 5")).toBeTruthy();
     expect(screen.queryByText("5 groepjes van 3")).toBeNull();
-    expect(screen.getByText(/15 eerlijk verdelen over 3 groepjes geeft 5 per groep/)).toBeTruthy();
+    expect(screen.getByText("15 ÷ 5 = 3. Dat zijn 3 groepjes van 5.")).toBeTruthy();
   });
 
   it("can open the setup again and return to the round", async () => {

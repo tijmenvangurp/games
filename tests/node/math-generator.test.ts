@@ -112,13 +112,13 @@ describe("createRound", () => {
 });
 
 describe("groupingFor", () => {
-  it("draws a division as divisor groups of quotient dots", () => {
+  it("draws a division as quotient groups of divisor dots", () => {
     for (const level of MATH_LEVELS) {
       for (const question of createRound("deel", level, 5).questions) {
         const { groups, perGroup } = groupingFor(question);
 
-        expect(groups).toBe(question.right);
-        expect(perGroup).toBe(question.answer);
+        expect(groups).toBe(question.answer);
+        expect(perGroup).toBe(question.right);
         expect(groups * perGroup).toBe(question.left);
       }
     }
