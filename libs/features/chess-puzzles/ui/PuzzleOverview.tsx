@@ -28,10 +28,10 @@ export function PuzzleOverview({
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <header className="space-y-1 text-center">
-        <h2 id={titleId} className="text-2xl font-black text-slate-900">
+        <h2 id={titleId} className="font-display text-2xl">
           Kies een puzzel
         </h2>
-        <p className="text-sm font-semibold text-slate-600">
+        <p className="text-sm font-semibold text-muted-foreground">
           {solvedCount} van {puzzles.length} opgelost
         </p>
       </header>
@@ -44,11 +44,11 @@ export function PuzzleOverview({
         aria-valuemin={0}
         aria-valuenow={solvedCount}
         aria-valuetext={`${solvedCount} van ${puzzles.length} opgelost`}
-        className="h-2 overflow-hidden rounded-full bg-slate-200"
+        className="h-2 overflow-hidden rounded-full bg-muted"
         role="progressbar"
       >
         <div
-          className="h-full rounded-full bg-emerald-500 transition-all"
+          className="h-full rounded-full bg-success transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -75,10 +75,10 @@ export function PuzzleOverview({
               type="button"
               aria-label={`Puzzel ${index + 1}${done ? ", opgelost" : ", nog niet opgelost"}`}
               className={cn(
-                "relative flex min-h-12 items-center justify-center rounded-xl border-2 text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
+                "relative flex min-h-12 items-center justify-center rounded-lg border text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                 done
-                  ? "border-emerald-300 bg-emerald-50 text-emerald-900"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50",
+                  ? "border-success/40 bg-success/10 text-success"
+                  : "border-border bg-card text-foreground hover:bg-muted/60",
               )}
               onClick={() => onSelect(puzzle.id)}
             >
@@ -86,7 +86,7 @@ export function PuzzleOverview({
               {done ? (
                 <Check
                   aria-hidden="true"
-                  className="absolute right-1 top-1 size-3.5 text-emerald-600"
+                  className="absolute right-1 top-1 size-3.5 text-success"
                 />
               ) : null}
             </button>

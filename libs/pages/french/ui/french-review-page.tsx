@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { allFrenchItems, dueItemIds, type FrenchItem, type FrenchLesson } from "@entities/french";
 import { FrenchQuiz, useFrenchProgressStore, useFrenchQuizStore } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, Play } from "@shared/ui";
+import { Button, Play, RotateCcw } from "@shared/ui";
 
 function createReviewLesson(items: readonly FrenchItem[]): FrenchLesson {
   return {
@@ -43,11 +43,11 @@ export function FrenchReviewPage() {
       {reviewItems ? (
         <FrenchQuiz />
       ) : (
-        <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-3xl border bg-card p-6 text-center shadow-sm">
-          <span aria-hidden="true" className="text-5xl">
-            🔁
+        <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
+          <span className="grid size-14 place-items-center rounded-lg bg-muted text-primary">
+            <RotateCcw aria-hidden="true" className="size-7" />
           </span>
-          <h2 className="text-2xl font-black">Herhalen</h2>
+          <h2 className="font-display text-2xl">Herhalen</h2>
           <p className="text-muted-foreground">
             {dueItems.length > 0
               ? `${dueItems.length} items zijn nu aan de beurt.`

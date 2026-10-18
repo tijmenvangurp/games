@@ -32,7 +32,7 @@ export function MemoryPlay() {
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
-        <div className="order-1 flex items-center justify-between gap-3 rounded-3xl border bg-card p-4 shadow-sm">
+        <div className="order-1 game-panel flex items-center justify-between gap-3 p-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Pokémon Memory

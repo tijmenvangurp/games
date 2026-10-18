@@ -2,8 +2,6 @@ interface GameCatalogBase {
   id: string;
   name: string;
   description: string;
-  emoji: string;
-  accentClassName: string;
 }
 
 export type GameCatalogEntry = GameCatalogBase &
@@ -21,6 +19,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/puzzels"
           | "/woordzoeker"
           | "/frans";
+        thumbnail: string;
       }
     | { status: "coming-soon" }
   );
@@ -30,90 +29,80 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "sudoku",
     name: "Sudoku",
     description: "Puzzel met cijfers of dieren. Kies 4 × 4, 6 × 6 of 9 × 9.",
-    emoji: "🧩",
     status: "available",
     to: "/sudoku",
-    accentClassName: "from-sky-100 via-sky-50 to-white",
+    thumbnail: "/thumbnails/sudoku.jpg",
   },
   {
     id: "math-trainer",
     name: "Tafel Topper",
     description: "Oefen plus, min, keer en deel. Verdien sterren.",
-    emoji: "🔢",
     status: "available",
     to: "/rekenen",
-    accentClassName: "from-orange-100 via-amber-50 to-white",
+    thumbnail: "/thumbnails/math-trainer.jpg",
   },
   {
     id: "arrows",
     name: "Pijlen",
     description: "Haal alle pijlen weg zonder dat ze tegen elkaar botsen.",
-    emoji: "🏹",
     status: "available",
     to: "/pijlen",
-    accentClassName: "from-rose-100 via-orange-50 to-white",
+    thumbnail: "/thumbnails/arrows.jpg",
   },
   {
     id: "seek",
     name: "Waar is Wobbel?",
     description: "Zoek het monstertje met de ster tussen alle andere Wobbels.",
-    emoji: "🔍",
     status: "available",
     to: "/zoeken",
-    accentClassName: "from-emerald-100 via-emerald-50 to-white",
+    thumbnail: "/thumbnails/seek.jpg",
   },
   {
     id: "word-search",
     name: "Woordzoeker",
     description: "Zoek woorden in de tuin, onder water of tussen de Pokémon.",
-    emoji: "🔤",
     status: "available",
     to: "/woordzoeker",
-    accentClassName: "from-teal-100 via-emerald-50 to-white",
+    thumbnail: "/thumbnails/word-search.jpg",
   },
   {
     id: "memory",
     name: "Pokémon Memory",
     description: "Zoek de paren tussen de 151 Pokémon uit Generatie 1.",
-    emoji: "⚡",
     status: "available",
     to: "/memory",
-    accentClassName: "from-amber-100 via-amber-50 to-white",
+    thumbnail: "/thumbnails/memory.jpg",
   },
   {
     id: "pokemon-quiz",
     name: "Wie is deze Pokémon?",
     description: "Kies de juiste naam bij het plaatje. 3, 4 of 5 namen.",
-    emoji: "❓",
     status: "available",
     to: "/raad",
-    accentClassName: "from-indigo-100 via-indigo-50 to-white",
+    thumbnail: "/thumbnails/pokemon-quiz.jpg",
   },
   {
     id: "chess-tutorial",
     name: "Schaakles",
     description: "Leer stap voor stap alle stukken en zet je eerste schaakmat.",
-    emoji: "♞",
     status: "available",
     to: "/schaken",
-    accentClassName: "from-violet-100 via-violet-50 to-white",
+    thumbnail: "/thumbnails/chess-tutorial.jpg",
   },
   {
     id: "chess-puzzles",
     name: "Schaakpuzzels",
     description: "Los korte puzzels op: zet schaakmat of win een stuk.",
-    emoji: "🧩",
     status: "available",
     to: "/puzzels",
-    accentClassName: "from-teal-100 via-emerald-50 to-white",
+    thumbnail: "/thumbnails/chess-puzzles.jpg",
   },
   {
     id: "french-listening",
     name: "Bonjour !",
     description: "Luister naar Frans en kies de juiste Nederlandse vertaling.",
-    emoji: "🇫🇷",
     status: "available",
     to: "/frans",
-    accentClassName: "from-blue-100 via-sky-50 to-white",
+    thumbnail: "/thumbnails/french-listening.jpg",
   },
 ];

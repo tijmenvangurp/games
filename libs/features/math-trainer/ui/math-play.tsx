@@ -1,6 +1,6 @@
 import { explanationFor, type MathQuestion } from "@entities/math";
 import { cn } from "@shared/lib";
-import { Button, Check, X } from "@shared/ui";
+import { Button, Check, Flame, Star, X } from "@shared/ui";
 import { useMathStore } from "../model/use-math-store";
 import { MathVisual } from "./math-visual";
 
@@ -15,13 +15,21 @@ interface MathHeaderProps {
 
 function MathHeader({ index, total, stars, streak }: MathHeaderProps) {
   return (
-    <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
+    <header className="game-panel flex items-center justify-between px-3 py-2">
       <p className="text-sm font-black text-muted-foreground">
         Som {index + 1} van {total}
       </p>
       <div className="flex items-center gap-3 text-sm font-bold">
-        <span aria-label={`${stars} sterren`}>⭐ {stars}</span>
-        {streak > 0 ? <span aria-label={`${streak} op een rij`}>🔥 {streak}</span> : null}
+        <span aria-label={`${stars} sterren`} className="inline-flex items-center gap-1">
+          <Star aria-hidden="true" className="size-4 fill-warning text-warning" />
+          {stars}
+        </span>
+        {streak > 0 ? (
+          <span aria-label={`${streak} op een rij`} className="inline-flex items-center gap-1">
+            <Flame aria-hidden="true" className="size-4 text-warning" />
+            {streak}
+          </span>
+        ) : null}
       </div>
     </header>
   );
@@ -40,10 +48,10 @@ function ChoiceButton({
     <button
       aria-label={`Antwoord ${value}`}
       className={cn(
-        "flex min-h-14 items-center justify-center gap-1 rounded-2xl border-2 text-2xl font-black transition active:scale-95",
+        "flex min-h-14 items-center justify-center gap-1 rounded-lg border text-2xl font-black transition active:scale-[0.99]",
         state === "default" && "border-border bg-card hover:bg-muted",
-        state === "wrong" && "border-rose-300 bg-rose-50 text-rose-600",
-        state === "correct" && "border-emerald-400 bg-emerald-50 text-emerald-700",
+        state === "wrong" && "border-danger/40 bg-danger/10 text-danger",
+        state === "correct" && "border-success/40 bg-success/10 text-success",
         state === "muted" && "border-border bg-muted text-muted-foreground opacity-50",
       )}
       disabled={state !== "default"}
@@ -117,10 +125,7 @@ function MathFeedback({
     <div className="space-y-2">
       <p
         aria-live="polite"
-        className={cn(
-          "text-center text-sm font-bold",
-          correct ? "text-emerald-700" : "text-rose-600",
-        )}
+        className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-danger")}
       >
         {correct ? "Goed gerekend!" : `Het juiste antwoord is ${question.answer}.`}
       </p>
@@ -146,7 +151,7 @@ function QuestionCard({
   isLast: boolean;
 }) {
   return (
-    <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel p-4 sm:p-6">
       <p className="text-center text-4xl font-black tracking-tight sm:text-5xl">
         {question.prompt} = ?
       </p>

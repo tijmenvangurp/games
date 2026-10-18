@@ -62,7 +62,7 @@ export function PokemonQuizPlay() {
       </div>
 
       <aside className="order-2 space-y-3 lg:col-span-2">
-        <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card p-4 shadow-sm">
+        <div className="game-panel flex items-center justify-between gap-3 p-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Raad de Pokémon

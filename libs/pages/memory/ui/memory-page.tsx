@@ -45,6 +45,7 @@ export function MemoryPage() {
 
       {found && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description={
             moves === scene?.pairs
               ? "Foutloos! Je vond elk Pokémon-paar meteen."

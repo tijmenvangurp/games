@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { allFrenchItems, dueItemIds, lessonStars, listPublishedLessons } from "@entities/french";
 import { useFrenchProgressStore } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, LayoutGrid, Play, Sparkles, Star } from "@shared/ui";
+import { Button, GameIcon, LayoutGrid, Star } from "@shared/ui";
 
 export function FrenchPage() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ export function FrenchPage() {
         </p>
 
         {lessons.length === 0 ? (
-          <p className="rounded-3xl border border-dashed bg-card/60 p-6 text-center text-muted-foreground">
+          <p className="rounded-lg border border-dashed bg-card/60 p-6 text-center text-muted-foreground">
             Er zijn nog geen lessen gepubliceerd.
           </p>
         ) : (
@@ -33,19 +33,16 @@ export function FrenchPage() {
               return (
                 <Link
                   key={lesson.id}
-                  className="group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+                  className="game-card group flex min-h-40 flex-col p-5 transition duration-200 hover:-translate-y-0.5 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 active:translate-y-0"
                   params={{ lessonId: lesson.id }}
                   to="/frans/$lessonId"
                 >
                   <div className="flex items-start justify-between">
-                    <span aria-hidden="true" className="text-4xl">
-                      {lesson.emoji}
-                    </span>
-                    <span className="grid size-9 place-items-center rounded-full bg-white/80 text-primary shadow-sm transition group-hover:bg-white">
-                      <Play aria-hidden="true" className="size-4" />
+                    <span className="grid size-11 place-items-center rounded-lg bg-muted text-primary">
+                      <GameIcon aria-hidden="true" name="french-lesson" size={24} />
                     </span>
                   </div>
-                  <h2 className="mt-3 text-lg font-black">{lesson.title}</h2>
+                  <h2 className="mt-4 font-display text-xl leading-snug">{lesson.title}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{lesson.subtitle}</p>
                   <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                     <span className="text-sm font-bold text-primary">
@@ -58,7 +55,7 @@ export function FrenchPage() {
                           aria-hidden="true"
                           className={
                             index < stars
-                              ? "size-4 fill-amber-400 text-amber-400"
+                              ? "size-4 fill-warning text-warning"
                               : "size-4 text-muted-foreground/30"
                           }
                         />
@@ -82,10 +79,7 @@ export function FrenchPage() {
           Sorteer de woorden
         </Button>
 
-        <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-          <Sparkles aria-hidden="true" className="size-3.5" />
-          Meer lessen komen eraan.
-        </p>
+        <p className="text-center text-xs text-muted-foreground">Meer lessen komen eraan.</p>
         <p className="text-center text-xs text-muted-foreground">
           Audio: Piper (MIT) · stem Tom (dataset AGPLv3).
         </p>

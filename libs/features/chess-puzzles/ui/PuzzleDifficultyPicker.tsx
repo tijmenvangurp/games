@@ -18,10 +18,10 @@ export function PuzzleDifficultyPicker({ current, onSelect }: PuzzleDifficultyPi
             type="button"
             aria-pressed={active}
             className={cn(
-              "min-h-11 rounded-xl border-2 px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
+              "min-h-11 rounded-lg border px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
               active
-                ? "border-teal-500 bg-teal-100 text-teal-950"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+                ? "border-primary bg-primary/5 text-primary"
+                : "border-border bg-card text-muted-foreground hover:bg-muted/60",
             )}
             onClick={() => onSelect(option.id)}
           >
@@ -29,7 +29,7 @@ export function PuzzleDifficultyPicker({ current, onSelect }: PuzzleDifficultyPi
             <span
               className={cn(
                 "mt-0.5 block text-xs font-medium",
-                active ? "text-teal-800" : "text-slate-500",
+                active ? "text-primary" : "text-muted-foreground",
               )}
             >
               {option.hint}

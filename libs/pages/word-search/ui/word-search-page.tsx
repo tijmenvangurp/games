@@ -56,6 +56,7 @@ export function WordSearchPage() {
 
       {complete && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description={`Je vond alle ${puzzle.placements.length} woorden.`}
           title="Knap gedaan!"
           onAgain={() => useWordSearchStore.getState().newPuzzle()}

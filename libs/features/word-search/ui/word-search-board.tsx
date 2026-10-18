@@ -94,13 +94,13 @@ function WordSearchCell({
       aria-label={cellLabel(letter, cell, found, hint, selected)}
       aria-pressed={selected}
       className={cn(
-        "relative z-0 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-slate-200/80 font-bold leading-none text-slate-700 transition-colors",
+        "relative z-0 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-border font-bold leading-none text-foreground transition-colors",
         letterSize(size),
-        !found && "bg-white hover:bg-slate-50",
-        found && "bg-emerald-100/25 text-emerald-700 ring-1 ring-inset ring-emerald-200",
-        hint && "bg-amber-100 text-amber-700 ring-2 ring-inset ring-amber-400",
-        selected && !wrong && "bg-sky-100 text-sky-700 ring-2 ring-inset ring-sky-500",
-        selected && wrong && "bg-rose-100 text-rose-700 ring-2 ring-inset ring-rose-400",
+        !found && "bg-card hover:bg-muted/60",
+        found && "bg-success/10 text-success ring-1 ring-inset ring-success/20",
+        hint && "bg-warning/15 text-warning ring-2 ring-inset ring-warning/50",
+        selected && !wrong && "bg-primary/10 text-primary ring-2 ring-inset ring-primary",
+        selected && wrong && "bg-danger/10 text-danger ring-2 ring-inset ring-danger/50",
       )}
       data-col={cell.col}
       data-row={cell.row}
@@ -183,7 +183,7 @@ export function WordSearchBoard({
     <div
       aria-label={`Woordzoeker van ${puzzle.size} bij ${puzzle.size}`}
       className={cn(
-        "select-none rounded-2xl border-2 border-slate-300 bg-white p-1 shadow-sm",
+        "select-none rounded-lg border border-border bg-card p-1",
         zoomed ? "overflow-x-auto" : "overflow-hidden",
         !zoomed && "cursor-crosshair",
       )}

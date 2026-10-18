@@ -2,7 +2,18 @@ import { useId, useMemo, useRef } from "react";
 import type { PieceSymbol } from "chess.js";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, Eye, LayoutGrid, Lightbulb, Play, RotateCcw } from "@shared/ui";
+import {
+  Button,
+  ArrowRight,
+  Check,
+  Eye,
+  LayoutGrid,
+  Lightbulb,
+  Play,
+  RotateCcw,
+  Star,
+  X,
+} from "@shared/ui";
 import { levelFor, nextLevelId } from "../model/levels";
 import {
   TUTORIAL_LEVEL_IDS,
@@ -39,15 +50,15 @@ function TutorialHeader({ currentIndex, level, titleId }: TutorialHeaderProps) {
     <header className="flex items-center gap-3">
       <span
         aria-hidden="true"
-        className="grid size-12 shrink-0 place-items-center rounded-2xl bg-sky-100 text-3xl leading-none text-sky-900 shadow-sm"
+        className="grid size-12 shrink-0 place-items-center rounded-lg border border-primary/30 bg-primary/5 text-3xl leading-none text-primary"
       >
         {PIECE_GLYPHS[level.playerPiece]}
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-black uppercase tracking-widest text-sky-700">
+        <p className="text-xs font-black uppercase tracking-widest text-primary">
           Les {currentIndex + 1} van {TUTORIAL_LEVEL_IDS.length}
         </p>
-        <h2 id={titleId} className="text-xl font-black leading-tight text-slate-900 sm:text-2xl">
+        <h2 id={titleId} className="text-xl font-black leading-tight text-foreground sm:text-2xl">
           {level.title}
         </h2>
       </div>
@@ -64,8 +75,8 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   return (
-    <details ref={detailsRef} className="rounded-2xl border border-slate-200 bg-white/80">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 [&::-webkit-details-marker]:hidden">
+    <details ref={detailsRef} className="rounded-lg border border-border bg-card">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-lg px-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 [&::-webkit-details-marker]:hidden">
         <LayoutGrid aria-hidden="true" className="size-4" />
         Kies een les
       </summary>
@@ -84,10 +95,10 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
               aria-label={`Les ${index + 1}: ${level.title}`}
               aria-pressed={active}
               className={cn(
-                "flex min-h-11 flex-col items-center justify-center rounded-xl border-2 px-1 py-1 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300",
+                "flex min-h-11 flex-col items-center justify-center rounded-lg border px-1 py-1 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                 active
-                  ? "border-sky-500 bg-sky-100 text-sky-950"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:bg-muted/60",
               )}
               title={level.title}
               onClick={() => {
@@ -197,70 +208,70 @@ function coachTone(
   preview: TutorialPreview | null,
 ): string {
   if (status === "completed") {
-    return "bg-emerald-100 text-emerald-950";
+    return "bg-success/10 text-success";
   }
 
   if (status === "stuck") {
-    return "bg-amber-100 text-amber-950";
+    return "bg-warning/15 text-warning";
   }
 
   if (feedback === "illegal") {
-    return "bg-rose-100 text-rose-950";
+    return "bg-danger/10 text-danger";
   }
 
   if (feedback === "blocked") {
-    return "bg-amber-100 text-amber-950";
+    return "bg-warning/15 text-warning";
   }
 
   if (feedback === "hint") {
-    return "bg-sky-100 text-sky-950";
+    return "bg-primary/10 text-primary";
   }
 
   if (feedback === "moved") {
-    return "bg-emerald-50 text-emerald-900";
+    return "bg-success/10 text-success";
   }
 
   if (preview) {
-    return "bg-sky-100 text-sky-950";
+    return "bg-primary/5 text-foreground";
   }
 
-  return "bg-sky-50 text-sky-950";
+  return "bg-muted text-foreground";
 }
 
 function coachIcon(
   status: TutorialStatus,
   feedback: TutorialFeedback,
   preview: TutorialPreview | null,
-): string {
+) {
   if (status === "completed") {
-    return "⭐";
+    return <Star className="size-6 fill-warning text-warning" />;
   }
 
   if (status === "stuck") {
-    return "🔁";
+    return <RotateCcw className="size-6" />;
   }
 
   if (feedback === "illegal") {
-    return "🤔";
+    return <X className="size-6" />;
   }
 
   if (feedback === "blocked") {
-    return "👉";
+    return <ArrowRight className="size-6" />;
   }
 
   if (feedback === "hint") {
-    return "💡";
+    return <Lightbulb className="size-6" />;
   }
 
   if (feedback === "moved") {
-    return "👍";
+    return <Check className="size-6" />;
   }
 
   if (preview) {
-    return "👀";
+    return <Eye className="size-6" />;
   }
 
-  return "👉";
+  return <ArrowRight className="size-6" />;
 }
 
 function CoachBubble({ feedback, level, preview, selectedSquare, status }: CoachBubbleProps) {
@@ -269,11 +280,11 @@ function CoachBubble({ feedback, level, preview, selectedSquare, status }: Coach
       aria-atomic="true"
       aria-live="polite"
       className={cn(
-        "flex min-h-14 items-center gap-3 rounded-2xl px-4 py-3 text-base font-bold leading-snug sm:text-lg",
+        "flex min-h-14 items-center gap-3 rounded-lg px-4 py-3 text-base font-bold leading-snug sm:text-lg",
         coachTone(status, feedback, preview),
       )}
     >
-      <span aria-hidden="true" className="text-2xl leading-none">
+      <span aria-hidden="true" className="shrink-0">
         {coachIcon(status, feedback, preview)}
       </span>
       <span>{coachText({ feedback, level, preview, selectedSquare, status })}</span>
@@ -307,7 +318,7 @@ function TutorialActions({
           aria-pressed={previewActive}
           className={cn(
             "min-h-12 px-2 text-xs sm:text-sm",
-            previewActive && "border-sky-400 bg-sky-100 text-sky-950",
+            previewActive && "border-primary bg-primary/5 text-primary",
           )}
           disabled={playDisabled}
           variant="outline"
@@ -322,7 +333,7 @@ function TutorialActions({
           variant="outline"
           onClick={onHint}
         >
-          <Lightbulb aria-hidden="true" className="size-5 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-5 text-warning" />
           Toon zet
         </Button>
         <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>
@@ -357,14 +368,14 @@ function objectiveLabel(level: TutorialLevel): string {
 
 function WhyCard({ level }: { readonly level: TutorialLevel }) {
   return (
-    <details className="rounded-2xl border border-slate-200 bg-white/80">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 [&::-webkit-details-marker]:hidden">
-        <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+    <details className="rounded-lg border border-border bg-card">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 [&::-webkit-details-marker]:hidden">
+        <Lightbulb aria-hidden="true" className="size-4 text-warning" />
         Waarom?
       </summary>
-      <div className="space-y-2 px-4 pb-4 text-sm font-medium text-slate-600">
+      <div className="space-y-2 px-4 pb-4 text-sm font-medium text-muted-foreground">
         <p>{level.explanation}</p>
-        <p className="font-bold text-sky-800">Tip: {level.hint}</p>
+        <p className="font-bold text-primary">Tip: {level.hint}</p>
       </div>
     </details>
   );
@@ -422,9 +433,10 @@ export function TutorialBoard({
         {square === targetSquare ? (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 grid animate-pulse place-items-center text-3xl motion-reduce:animate-none sm:text-4xl"
+            className="pointer-events-none absolute inset-0 grid animate-pulse place-items-center motion-reduce:animate-none"
+            data-target-square="true"
           >
-            ⭐
+            <Star className="size-8 fill-warning text-warning" />
           </span>
         ) : null}
       </div>
