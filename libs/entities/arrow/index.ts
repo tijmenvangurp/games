@@ -11,6 +11,7 @@ export {
   nearestArrow,
   removableArrows,
   solveMaze,
+  visibleArrowPoints,
 } from "./model/geometry";
 export { LEVEL_COUNT, MAZE_LEVELS, levelAt } from "./model/levels";
 export { MAX_HEARTS } from "./model/types";
