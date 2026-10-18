@@ -1,4 +1,4 @@
-import type { MathQuestion } from "@entities/math";
+import { groupingFor, type MathQuestion } from "@entities/math";
 
 interface NumberLineSvgProps {
   question: MathQuestion;
@@ -92,8 +92,7 @@ function NumberLine({ question }: { question: MathQuestion }) {
 }
 
 function DotGroups({ question }: { question: MathQuestion }) {
-  const groups = question.mode === "keer" ? question.left : question.answer;
-  const perGroup = question.right;
+  const { groups, perGroup } = groupingFor(question);
   const columns = perGroup <= 5 ? perGroup : Math.ceil(perGroup / 2);
 
   return (

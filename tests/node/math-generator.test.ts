@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createRound,
   explanationFor,
+  groupingFor,
   levelHint,
   MATH_LEVELS,
   MATH_MODES,
@@ -107,6 +108,31 @@ describe("createRound", () => {
     expect(second.questions.map((question) => question.choices)).toEqual(
       first.questions.map((question) => question.choices),
     );
+  });
+});
+
+describe("groupingFor", () => {
+  it("draws a division as divisor groups of quotient dots", () => {
+    for (const level of MATH_LEVELS) {
+      for (const question of createRound("deel", level, 5).questions) {
+        const { groups, perGroup } = groupingFor(question);
+
+        expect(groups).toBe(question.right);
+        expect(perGroup).toBe(question.answer);
+        expect(groups * perGroup).toBe(question.left);
+      }
+    }
+  });
+
+  it("keeps a multiplication as left groups of right dots", () => {
+    for (const level of MATH_LEVELS) {
+      for (const question of createRound("keer", level, 5).questions) {
+        const { groups, perGroup } = groupingFor(question);
+
+        expect(groups).toBe(question.left);
+        expect(perGroup).toBe(question.right);
+      }
+    }
   });
 });
 
