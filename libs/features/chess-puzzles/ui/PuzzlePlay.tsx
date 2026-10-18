@@ -3,25 +3,22 @@ import { Chessboard, type ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
 import { Button, Check, Lightbulb, Play, RotateCcw } from "@shared/ui";
 import { useChessPuzzle } from "../model/useChessPuzzle";
-import type { ChessPuzzle, PuzzleFeedback, PuzzleKind, PuzzleStatus } from "../model/types";
+import {
+  PUZZLE_DIFFICULTIES,
+  type ChessPuzzle,
+  type PuzzleDifficulty,
+  type PuzzleFeedback,
+  type PuzzleKind,
+  type PuzzleStatus,
+} from "../model/types";
 
 interface PuzzlePlayProps {
+  readonly difficulty: PuzzleDifficulty;
   readonly puzzle: ChessPuzzle;
   readonly index: number;
   readonly total: number;
+  readonly onDifficultyChange: (difficulty: PuzzleDifficulty) => void;
   readonly onNext: () => void;
-}
-
-function difficultyFor(rating: number): string {
-  if (rating <= 500) {
-    return "Makkelijk";
-  }
-
-  if (rating <= 800) {
-    return "Lastig";
-  }
-
-  return "Uitdagend";
 }
 
 function titleFor(kind: PuzzleKind): string {
@@ -49,13 +46,53 @@ function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHead
   return (
     <header className="space-y-1 text-center">
       <p className="text-xs font-black uppercase tracking-widest text-teal-700">
-        Puzzel {index + 1} van {total} · {difficultyFor(puzzle.rating)}
+        Puzzel {index + 1} van {total}
       </p>
       <h2 id={titleId} className="text-2xl font-black text-slate-900 sm:text-3xl">
         {titleFor(puzzle.kind)}
       </h2>
       <p className="text-sm font-semibold text-slate-600">{promptFor(puzzle.kind, playerColor)}</p>
     </header>
+  );
+}
+
+interface DifficultyPickerProps {
+  readonly current: PuzzleDifficulty;
+  readonly onSelect: (difficulty: PuzzleDifficulty) => void;
+}
+
+function DifficultyPicker({ current, onSelect }: DifficultyPickerProps) {
+  return (
+    <nav aria-label="Kies een moeilijkheidsgraad" className="grid grid-cols-3 gap-2">
+      {PUZZLE_DIFFICULTIES.map((option) => {
+        const active = option.id === current;
+
+        return (
+          <button
+            key={option.id}
+            type="button"
+            aria-pressed={active}
+            className={cn(
+              "min-h-11 rounded-xl border-2 px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
+              active
+                ? "border-teal-500 bg-teal-100 text-teal-950"
+                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+            )}
+            onClick={() => onSelect(option.id)}
+          >
+            <span className="block">{option.label}</span>
+            <span
+              className={cn(
+                "mt-0.5 block text-xs font-medium",
+                active ? "text-teal-800" : "text-slate-500",
+              )}
+            >
+              {option.hint}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -144,7 +181,14 @@ function PuzzleActions({ solved, onHint, onNext, onReset }: PuzzleActionsProps) 
   );
 }
 
-export function PuzzlePlay({ index, puzzle, total, onNext }: PuzzlePlayProps) {
+export function PuzzlePlay({
+  difficulty,
+  index,
+  puzzle,
+  total,
+  onDifficultyChange,
+  onNext,
+}: PuzzlePlayProps) {
   const puzzleState = useChessPuzzle(puzzle);
   const titleId = useId();
 
@@ -182,6 +226,7 @@ export function PuzzlePlay({ index, puzzle, total, onNext }: PuzzlePlayProps) {
         titleId={titleId}
         total={total}
       />
+      <DifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
       <BoardPanel options={boardOptions} />
       <PuzzleStatusBanner
         feedback={puzzleState.feedback}

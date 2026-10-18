@@ -1,10 +1,24 @@
 import type { Color, PieceSymbol, Square } from "chess.js";
 
 export type PuzzleKind = "mate" | "capture";
+export type PuzzleDifficulty = "easy" | "medium" | "hard";
+
+export interface PuzzleDifficultyOption {
+  readonly id: PuzzleDifficulty;
+  readonly label: string;
+  readonly hint: string;
+}
+
+export const PUZZLE_DIFFICULTIES = [
+  { id: "easy", label: "Makkelijk", hint: "Mat in één" },
+  { id: "medium", label: "Lastig", hint: "Denk goed na" },
+  { id: "hard", label: "Uitdagend", hint: "Voor durfals" },
+] as const satisfies readonly PuzzleDifficultyOption[];
 
 export interface ChessPuzzle {
   readonly id: string;
   readonly kind: PuzzleKind;
+  readonly difficulty: PuzzleDifficulty;
   /** Lichess-FEN: de stelling vóór de eerste tegenzet. */
   readonly fen: string;
   /** UCI: eerst de tegenzet, daarna de oplossing. */

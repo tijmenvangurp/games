@@ -233,7 +233,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
 
     await expect(page.getByRole("heading", { name: "Schaakpuzzels" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Zet schaakmat!" })).toBeVisible();
-    await expect(page.getByText(/Puzzel 1 van 25/)).toBeVisible();
+    await expect(page.getByText(/Puzzel 1 van 12/)).toBeVisible();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await expect(board.getByText("a", { exact: true })).toBeVisible();
@@ -245,12 +245,31 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await expect(next).toBeEnabled();
     await next.click();
 
-    await expect(page.getByText(/Puzzel 2 van 25/)).toBeVisible();
+    await expect(page.getByText(/Puzzel 2 van 12/)).toBeVisible();
 
     const overflows = (await page.evaluate(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("wisselt van moeilijkheidsgraad en lost een lastige puzzel op", async ({ page }) => {
+    await page.goto("/puzzels");
+
+    const medium = page.getByRole("button", { name: /Lastig/ });
+    await medium.click();
+    await expect(medium).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByText(/Puzzel 1 van 12/)).toBeVisible();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="h7"]').click();
+    await board.locator('[data-square="h8"]').click();
+
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+
+    const hard = page.getByRole("button", { name: /Uitdagend/ });
+    await hard.click();
+    await expect(hard).toHaveAttribute("aria-pressed", "true");
   });
 
   test("geeft feedback op een verkeerde zet en laat opnieuw proberen", async ({ page }) => {

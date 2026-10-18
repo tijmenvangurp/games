@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { PUZZLES, PuzzlePlay } from "@features/chess-puzzles";
+import { PUZZLES, PuzzlePlay, type PuzzleDifficulty } from "@features/chess-puzzles";
 import { GameShell } from "@widgets/game-shell";
 
 export function PuzzlesPage() {
   const navigate = useNavigate();
+  const [difficulty, setDifficulty] = useState<PuzzleDifficulty>("easy");
   const [index, setIndex] = useState(0);
-  const puzzle = PUZZLES[index];
+  const puzzles = useMemo(
+    () => PUZZLES.filter((puzzle) => puzzle.difficulty === difficulty),
+    [difficulty],
+  );
+  const puzzle = puzzles[index];
+
+  const chooseDifficulty = (next: PuzzleDifficulty) => {
+    setDifficulty(next);
+    setIndex(0);
+  };
 
   return (
     <GameShell
@@ -16,10 +26,12 @@ export function PuzzlesPage() {
     >
       <PuzzlePlay
         key={puzzle.id}
+        difficulty={difficulty}
         index={index}
         puzzle={puzzle}
-        total={PUZZLES.length}
-        onNext={() => setIndex((current) => (current + 1) % PUZZLES.length)}
+        total={puzzles.length}
+        onDifficultyChange={chooseDifficulty}
+        onNext={() => setIndex((current) => (current + 1) % puzzles.length)}
       />
     </GameShell>
   );
