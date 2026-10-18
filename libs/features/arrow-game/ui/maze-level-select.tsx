@@ -42,11 +42,11 @@ export function MazeLevelSelect({
               }
               aria-disabled={locked}
               className={cn(
-                "relative flex min-h-24 flex-col items-start justify-between rounded-2xl border-2 p-3 text-left transition active:scale-95",
+                "relative flex min-h-24 flex-col items-start justify-between rounded-lg border p-3 text-left transition active:scale-[0.99]",
                 locked
                   ? "border-border bg-muted/40 text-muted-foreground"
-                  : "border-border bg-card hover:bg-muted",
-                index === current && !locked && "border-primary ring-2 ring-primary/20",
+                  : "border-border bg-card hover:bg-muted/60",
+                index === current && !locked && "border-primary ring-1 ring-primary/20",
               )}
               disabled={locked}
               type="button"
@@ -60,7 +60,7 @@ export function MazeLevelSelect({
                 {locked ? (
                   <Lock aria-hidden="true" className="size-4" />
                 ) : completed ? (
-                  <span className="grid size-5 place-items-center rounded-full bg-emerald-500 text-white">
+                  <span className="grid size-5 place-items-center rounded-full bg-success text-white">
                     <Check aria-hidden="true" className="size-3" />
                   </span>
                 ) : null}

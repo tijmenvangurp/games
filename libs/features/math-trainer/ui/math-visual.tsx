@@ -101,11 +101,11 @@ function DotGroups({ question }: { question: MathQuestion }) {
         {Array.from({ length: groups }, (_, groupIndex) => (
           <div
             key={groupIndex}
-            className="grid gap-0.5 rounded-lg border border-amber-200 bg-amber-50 p-1"
+            className="grid gap-0.5 rounded-lg border border-border bg-muted p-1"
             style={{ gridTemplateColumns: `repeat(${columns}, 6px)` }}
           >
             {Array.from({ length: perGroup }, (_, dotIndex) => (
-              <span key={dotIndex} className="size-1.5 rounded-full bg-amber-500" />
+              <span key={dotIndex} className="size-1.5 rounded-full bg-foreground/70" />
             ))}
           </div>
         ))}

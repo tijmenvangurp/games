@@ -11,7 +11,7 @@ export function MazeLost({ onRestart, onLevels, onHome }: MazeLostProps) {
     <div
       aria-labelledby="maze-lost-title"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4 backdrop-blur-sm"
       role="dialog"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -20,13 +20,13 @@ export function MazeLost({ onRestart, onLevels, onHome }: MazeLostProps) {
         }
       }}
     >
-      <div className="animate-pop w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl">
-        <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-rose-300">
+      <div className="game-panel animate-pop w-full max-w-sm p-6 text-center">
+        <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-danger">
           <Heart className="size-10" fill="currentColor" />
           <Heart className="size-10" fill="currentColor" />
           <Heart className="size-10" fill="currentColor" />
         </div>
-        <h2 className="text-2xl font-black" id="maze-lost-title">
+        <h2 className="font-display text-2xl" id="maze-lost-title">
           Harten op
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">

@@ -33,29 +33,26 @@ export function symbolsFor(size: SudokuSize, theme: SymbolTheme): readonly strin
 export const DIFFICULTY_OPTIONS: readonly {
   value: Difficulty;
   label: string;
-  emoji: string;
 }[] = [
-  { value: "makkelijk", label: "Makkelijk", emoji: "🌱" },
-  { value: "gemiddeld", label: "Gemiddeld", emoji: "🌤️" },
-  { value: "moeilijk", label: "Moeilijk", emoji: "🔥" },
+  { value: "makkelijk", label: "Makkelijk" },
+  { value: "gemiddeld", label: "Gemiddeld" },
+  { value: "moeilijk", label: "Moeilijk" },
 ];
 
 export const MISTAKE_MODE_OPTIONS: readonly {
   value: MistakeMode;
   label: string;
-  emoji: string;
 }[] = [
-  { value: "direct", label: "Direct", emoji: "👀" },
-  { value: "check", label: "Controleren", emoji: "🔍" },
+  { value: "direct", label: "Direct" },
+  { value: "check", label: "Controleren" },
 ];
 
 export const SIZE_OPTIONS: readonly {
   value: SudokuSize;
   label: string;
   hint: string;
-  emoji: string;
 }[] = [
-  { value: 4, label: "4 × 4", hint: "Voor de jongste", emoji: "🐣" },
-  { value: 6, label: "6 × 6", hint: "Iets meer uitdaging", emoji: "🦊" },
-  { value: 9, label: "9 × 9", hint: "De klassieker", emoji: "🧠" },
+  { value: 4, label: "4 × 4", hint: "Voor de jongste" },
+  { value: 6, label: "6 × 6", hint: "Iets meer uitdaging" },
+  { value: 9, label: "9 × 9", hint: "De klassieker" },
 ];

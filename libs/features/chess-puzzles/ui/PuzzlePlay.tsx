@@ -59,18 +59,20 @@ interface PuzzleHeaderProps {
 function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHeaderProps) {
   return (
     <header className="space-y-1 text-center">
-      <p className="text-xs font-black uppercase tracking-widest text-teal-700">
+      <p className="text-xs font-black uppercase tracking-widest text-primary">
         Puzzel {index + 1} van {total}
       </p>
-      <h2 id={titleId} className="text-2xl font-black text-slate-900 sm:text-3xl">
+      <h2 id={titleId} className="text-2xl font-black text-foreground sm:text-3xl">
         {titleFor(puzzle.kind)}
       </h2>
-      <p className="text-sm font-semibold text-slate-600">{promptFor(puzzle.kind, playerColor)}</p>
+      <p className="text-sm font-semibold text-muted-foreground">
+        {promptFor(puzzle.kind, playerColor)}
+      </p>
     </header>
   );
 }
 
-function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
+({ options }: { readonly options: ChessboardOptions }) {
   return (
     <div
       aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Sleep een stuk of tik erop."
@@ -118,14 +120,14 @@ function PuzzleStatusBanner({ feedback, kind, status }: PuzzleStatusProps) {
     <div
       aria-live="polite"
       className={cn(
-        "flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 py-2 text-center text-sm font-bold",
+        "flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-bold",
         status === "solved"
-          ? "bg-emerald-100 text-emerald-900"
+          ? "bg-success/10 text-success"
           : feedback === "wrong"
-            ? "bg-rose-100 text-rose-900"
+            ? "bg-danger/10 text-danger"
             : feedback === "correct"
-              ? "bg-sky-100 text-sky-900"
-              : "bg-slate-100 text-slate-700",
+              ? "bg-primary/10 text-primary"
+              : "bg-muted text-muted-foreground",
       )}
     >
       {status === "solved" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
@@ -152,7 +154,7 @@ function PuzzleActions({ solved, onHint, onNext, onOverview, onReset }: PuzzleAc
           variant="outline"
           onClick={onHint}
         >
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
         <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>

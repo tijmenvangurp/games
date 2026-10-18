@@ -49,8 +49,8 @@ export function CelebrationDialog({
       <div className="game-panel animate-pop w-full max-w-sm p-6 text-center">
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
           <Sparkles className="animate-rise size-10 text-primary" />
-          <Star className="size-10 text-amber-500" />
-          <Sparkles className="animate-rise size-10 text-amber-500" />
+          <Star className="size-10 text-warning" />
+          <Sparkles className="animate-rise size-10 text-warning" />
         </div>
         <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-primary" />
         <h2 className="font-display text-2xl" id="celebration-title">

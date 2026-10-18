@@ -54,7 +54,7 @@ function WordSearchActions({
             }
           }}
         >
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
         <Button variant="outline" onClick={onNew}>

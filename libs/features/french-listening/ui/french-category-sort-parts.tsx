@@ -27,7 +27,7 @@ export function SortCategoryBox({
     <section
       ref={setNodeRef}
       className={cn(
-        "flex min-h-36 flex-col rounded-3xl border bg-card p-3 shadow-sm transition",
+        "flex min-h-36 flex-col rounded-lg border bg-card p-3 transition",
         isOver && "border-primary bg-primary/5 ring-2 ring-primary/20",
       )}
     >
@@ -52,10 +52,10 @@ export function SortCategoryBox({
                 key={word.item.id}
                 aria-label={`Verwijder ${word.item.fr}`}
                 className={cn(
-                  "min-h-11 rounded-xl border-2 px-2.5 py-1.5 text-sm font-bold transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none",
-                  state === "correct" && "border-emerald-400 bg-emerald-50 text-emerald-900",
-                  state === "wrong" && "border-rose-400 bg-rose-50 text-rose-900",
-                  state === "idle" && "border-border bg-white hover:bg-muted",
+                  "min-h-11 rounded-lg border px-2.5 py-1.5 text-sm font-bold transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:pointer-events-none",
+                  state === "correct" && "border-success/45 bg-success/10 text-success",
+                  state === "wrong" && "border-danger/45 bg-danger/10 text-danger",
+                  state === "idle" && "border-border bg-card hover:bg-muted/60",
                 )}
                 data-answer-state={state}
                 disabled={checked}

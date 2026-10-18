@@ -19,15 +19,15 @@ function ModePicker({ selected, onSelect }: ModePickerProps) {
             type="button"
             aria-pressed={selected === option.value}
             className={cn(
-              "flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border-2 px-2 text-sm font-bold transition active:scale-95",
+              "flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-lg border p-3 text-sm font-bold transition active:scale-[0.99]",
               selected === option.value
-                ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                : "border-border bg-card hover:bg-muted",
+                ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                : "border-border bg-card hover:bg-muted/60",
             )}
             onClick={() => onSelect(option.value)}
           >
-            <span aria-hidden="true" className="text-2xl">
-              {option.emoji}
+            <span aria-hidden="true" className="font-display text-2xl leading-none">
+              {option.symbol}
             </span>
             {option.label}
             <span className="text-xs font-normal text-muted-foreground">{option.hint}</span>

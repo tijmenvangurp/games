@@ -29,10 +29,12 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 }
 
 :root {
-  /* Prentenboek: ivoor papier, terracotta inkt en zachte salie. */
+  /* Eén rustige basis: ivoor papier, inkt en terracotta als enige accent. */
   --background: oklch(0.965 0.02 88);
   --foreground: oklch(0.3 0.025 145);
   --card: oklch(0.992 0.008 88);
@@ -41,7 +43,9 @@
   --muted: oklch(0.935 0.02 88);
   --muted-foreground: oklch(0.48 0.027 120);
   --border: oklch(0.84 0.023 88);
-  --success: oklch(0.52 0.09 150);
+  --success: oklch(0.5 0.1 150);
+  --warning: oklch(0.56 0.13 72);
+  --danger: oklch(0.53 0.17 25);
 }
 
 @layer base {
@@ -55,14 +59,11 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at 10% 4%, oklch(0.93 0.045 75 / 0.55), transparent 30rem),
-      radial-gradient(circle at 92% 0%, oklch(0.94 0.035 145 / 0.4), transparent 28rem),
-      radial-gradient(oklch(0.3 0.025 145 / 0.035) 1px, transparent 1.2px);
-    background-size:
-      auto,
-      auto,
-      26px 26px;
+    background-image: radial-gradient(
+      circle at 50% -18%,
+      oklch(0.93 0.04 78 / 0.45),
+      transparent 38rem
+    );
     background-attachment: fixed;
     overscroll-behavior-y: none;
   }
@@ -82,8 +83,8 @@
 
 @layer games {
   /*
-   * Prentenboek-surface: een rustige pagina met een hairline-rand en een
-   * zachte schaduw. Spelpanelen en HUD's voelen als platen in een boek.
+   * Eén surface voor panelen, kaarten en HUD's. Hairline-rand, vaste radius
+   * en nauwelijks schaduw, zodat kleur alleen voor betekenis wordt gebruikt.
    */
   .game-panel {
     border: 1px solid var(--border);

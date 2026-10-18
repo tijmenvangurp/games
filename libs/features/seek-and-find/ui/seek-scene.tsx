@@ -16,7 +16,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
   const garden = scene.theme === "tuin";
 
   return (
-    <div className="overflow-hidden rounded-3xl border-2 border-white/80 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
       <svg
         aria-label="Zoek de Wobbel met de ster tussen alle andere Wobbels"
         className="block h-auto w-full touch-manipulation"
@@ -55,11 +55,11 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
             cx={target.x}
             cy={target.y}
             data-testid="hint-region"
-            fill="#fbbf24"
-            fillOpacity="0.25"
+            fill="var(--warning)"
+            fillOpacity="0.22"
             pointerEvents="none"
             r={scene.hintRadius}
-            stroke="#f59e0b"
+            stroke="var(--warning)"
             strokeDasharray="12 9"
             strokeWidth="5"
           />
@@ -90,7 +90,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
             >
               <circle fill="transparent" pointerEvents="all" r={creature.size * 0.62} />
               {creature.id === wrongId ? (
-                <circle fill="none" r={ringSize} stroke="#f43f5e" strokeWidth="6" />
+                <circle fill="none" r={ringSize} stroke="var(--danger)" strokeWidth="6" />
               ) : null}
               <g transform={`rotate(${creature.rotation}) scale(${creature.size / 100})`}>
                 <CreatureGlyph creature={creature} />
@@ -111,9 +111,15 @@ function FoundRing({ scene }: { scene: SeekSceneData }) {
 
   return (
     <g pointerEvents="none" transform={`translate(${target.x} ${target.y})`}>
-      <circle fill="#22c55e" fillOpacity="0.15" r={radius} />
-      <circle className="animate-ping" fill="none" r={radius} stroke="#22c55e" strokeWidth="5" />
-      <circle fill="none" r={radius} stroke="#16a34a" strokeWidth="6" />
+      <circle fill="var(--success)" fillOpacity="0.15" r={radius} />
+      <circle
+        className="animate-ping"
+        fill="none"
+        r={radius}
+        stroke="var(--success)"
+        strokeWidth="5"
+      />
+      <circle fill="none" r={radius} stroke="var(--success)" strokeWidth="6" />
     </g>
   );
 }

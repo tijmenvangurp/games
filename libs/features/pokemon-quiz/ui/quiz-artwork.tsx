@@ -15,9 +15,9 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
   const fragmentVisible = fragment && !answered;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-sky-100 via-amber-50 to-rose-100 p-3 shadow-sm sm:p-5">
+    <div className="game-panel relative overflow-hidden p-3 sm:p-5">
       <PokeballMark className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-10 sm:size-56" />
-      <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center overflow-hidden rounded-2xl">
+      <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center overflow-hidden rounded-lg">
         <img
           alt={revealed ? target.name : ""}
           className={cn(
@@ -36,7 +36,7 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
       <p
         className={cn(
           "relative text-center text-lg font-black",
-          revealed ? "animate-pop text-emerald-700" : "text-slate-500",
+          revealed ? "animate-pop text-success" : "text-muted-foreground",
         )}
       >
         {revealed ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}

@@ -42,9 +42,9 @@ export function NumberPad({
             aria-label={`Kies ${symbol}`}
             aria-pressed={activeValue === value}
             className={cn(
-              "relative flex aspect-square w-full max-w-20 select-none items-center justify-center justify-self-center rounded-2xl border-2 border-white bg-white font-bold text-slate-700 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:opacity-50",
+              "relative flex aspect-square w-full max-w-20 select-none items-center justify-center justify-self-center rounded-lg border border-border bg-card font-bold text-foreground transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:opacity-50",
               size === 4 ? "text-3xl" : "text-2xl",
-              activeValue === value && "border-sky-300 bg-sky-100 text-sky-700",
+              activeValue === value && "border-primary bg-primary/10 text-primary",
             )}
             disabled={disabled || isCompleted}
             onClick={() => onPick(value)}
@@ -53,7 +53,7 @@ export function NumberPad({
             {left !== undefined ? (
               <span
                 aria-hidden="true"
-                className="absolute right-1.5 top-1 text-xs font-semibold leading-none text-slate-400"
+                className="absolute right-1.5 top-1 text-xs font-semibold leading-none text-muted-foreground"
               >
                 {Math.max(0, left)}
               </span>

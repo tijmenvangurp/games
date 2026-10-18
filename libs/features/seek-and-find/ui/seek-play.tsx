@@ -87,7 +87,7 @@ export function SeekPlay() {
                 useSeekStore.getState().showHint();
               }}
             >
-              <Search aria-hidden="true" className="size-4 text-amber-500" />
+              <Search aria-hidden="true" className="size-4 text-warning" />
               Hint
             </Button>
             <Button

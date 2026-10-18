@@ -97,7 +97,7 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card px-4 py-3 shadow-sm">
+      <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
             Sorteer de woorden
@@ -145,7 +145,7 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
 
         <DragOverlay>
           {activeWord ? (
-            <div className="rounded-xl border-2 border-primary bg-card px-3 py-2 font-bold shadow-lg">
+            <div className="rounded-xl border border-primary bg-card px-3 py-2 font-bold shadow-lg">
               {activeWord.item.fr}
             </div>
           ) : null}
@@ -153,12 +153,12 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       </DndContext>
 
       {checked ? (
-        <div aria-live="polite" className="space-y-2 rounded-3xl border bg-card p-4 shadow-sm">
+        <div aria-live="polite" className="game-panel space-y-2 p-4">
           <p
             className={
               score === round.words.length
-                ? "flex items-center justify-center gap-1.5 font-black text-emerald-700"
-                : "flex items-center justify-center gap-1.5 font-black text-rose-700"
+                ? "flex items-center justify-center gap-1.5 font-black text-success"
+                : "flex items-center justify-center gap-1.5 font-black text-danger"
             }
           >
             <Sparkles aria-hidden="true" className="size-5" />

@@ -71,14 +71,13 @@ export function SetupPanel({
               type="button"
               aria-pressed={settings.difficulty === option.value}
               className={cn(
-                "flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 px-2 text-sm font-bold transition active:scale-95",
+                "flex min-h-14 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-bold transition active:scale-[0.99]",
                 settings.difficulty === option.value
-                  ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
+                  ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                  : "border-border bg-card hover:bg-muted/60",
               )}
               onClick={() => onDifficultyChange(option.value)}
             >
-              <span aria-hidden="true">{option.emoji}</span>
               {option.label}
             </button>
           ))}
@@ -94,14 +93,13 @@ export function SetupPanel({
               type="button"
               aria-pressed={settings.mistakeMode === option.value}
               className={cn(
-                "flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 text-sm font-bold transition active:scale-95",
+                "flex min-h-12 items-center justify-center gap-2 rounded-lg border text-sm font-bold transition active:scale-[0.99]",
                 settings.mistakeMode === option.value
-                  ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
+                  ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                  : "border-border bg-card hover:bg-muted/60",
               )}
               onClick={() => onMistakeModeChange(option.value)}
             >
-              <span aria-hidden="true">{option.emoji}</span>
               {option.label}
             </button>
           ))}
@@ -114,8 +112,8 @@ export function SetupPanel({
           <div className="grid grid-cols-2 gap-2">
             {(
               [
-                { value: "numbers", label: "Cijfers", symbol: "123" },
-                { value: "animals", label: "Dieren", symbol: "🐶" },
+                { value: "numbers", label: "Cijfers" },
+                { value: "animals", label: "Dieren" },
               ] as const
             ).map((option) => (
               <button
@@ -123,14 +121,13 @@ export function SetupPanel({
                 type="button"
                 aria-pressed={settings.theme === option.value}
                 className={cn(
-                  "flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 text-sm font-bold transition active:scale-95",
+                  "flex min-h-12 items-center justify-center gap-2 rounded-lg border text-sm font-bold transition active:scale-[0.99]",
                   settings.theme === option.value
-                    ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                    : "border-border bg-card hover:bg-muted",
+                    ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                    : "border-border bg-card hover:bg-muted/60",
                 )}
                 onClick={() => onThemeChange(option.value)}
               >
-                <span aria-hidden="true">{option.symbol}</span>
                 {option.label}
               </button>
             ))}

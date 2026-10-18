@@ -51,6 +51,7 @@ export function SeekPage() {
 
       {found && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description={
             tries === 0
               ? "In één keer gevonden, knap gedaan!"

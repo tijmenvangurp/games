@@ -1,17 +1,19 @@
 export { Button } from "./button";
 export { CelebrationDialog } from "./celebration-dialog";
 export { Confetti } from "./confetti";
+export { GameIcon } from "./game-icon";
 export { OptionPicker } from "./option-picker";
 export { PageHeader } from "./page-header";
 export { SetupActions } from "./setup-actions";
 export { SoundToggle } from "./sound-toggle";
 export {
   ArrowLeft,
+  ArrowRight,
   ArrowUp,
   Check,
   Eraser,
   Eye,
-  Gamepad2,
+  Flame,
   Heart,
   Home,
   LayoutGrid,

@@ -5,7 +5,7 @@ interface PickerOption<T extends string | number> {
   value: T;
   label: string;
   hint?: string;
-  emoji: string;
+  symbol?: string;
 }
 
 const COLUMN_CLASSES = {
@@ -37,9 +37,13 @@ export function OptionPicker<T extends string | number>({
         {options.map((option) => (
           <ChoiceCard
             key={option.value}
-            emoji={option.emoji}
             hint={option.hint}
             label={option.label}
+            leading={
+              option.symbol ? (
+                <span className="font-display text-2xl leading-none">{option.symbol}</span>
+              ) : undefined
+            }
             selected={selected === option.value}
             onClick={() => onSelect(option.value)}
           />

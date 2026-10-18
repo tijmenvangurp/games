@@ -1,10 +1,11 @@
 export {
   ArrowLeft,
+  ArrowRight,
   ArrowUp,
   Check,
   Eraser,
   Eye,
-  Gamepad2,
+  Flame,
   Heart,
   Home,
   LayoutGrid,

@@ -29,16 +29,16 @@ export function MazeIntro({
 
       <div className="flex flex-1 flex-col items-center justify-center text-center">
         <div className="flex items-center gap-2">
-          <span className="grid size-12 place-items-center rounded-2xl bg-slate-900 text-white shadow-sm">
+          <span className="grid size-12 place-items-center rounded-lg bg-foreground text-background">
             <ArrowUp aria-hidden="true" className="size-7 stroke-2" />
           </span>
-          <span className="text-4xl font-black tracking-tight">Pijlen</span>
+          <span className="font-display text-4xl tracking-tight">Pijlen</span>
         </div>
 
         <p className="mt-8 text-sm font-bold uppercase tracking-widest text-muted-foreground">
           Level {levelIndex + 1} van {levelCount}
         </p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">{level.name}</h1>
+        <h1 className="mt-1 font-display text-3xl tracking-tight">{level.name}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {MAZE_DIFFICULTY_LABELS[level.difficulty]} · {level.arrows.length} pijlen
         </p>

@@ -8,7 +8,7 @@ import {
   useFrenchQuizStore,
 } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, LayoutGrid, Play, Puzzle, Sparkles, Trophy } from "@shared/ui";
+import { Button, GameIcon, LayoutGrid, Play, Puzzle, Trophy } from "@shared/ui";
 
 type FrenchMode = "intro" | "quiz" | "cards" | "build";
 
@@ -26,8 +26,8 @@ export function FrenchLessonPage() {
         title="Bonjour !"
         titleClassName="text-xl sm:text-2xl"
       >
-        <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-3xl border bg-card p-6 text-center shadow-sm">
-          <h2 className="text-2xl font-black">Les niet gevonden</h2>
+        <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
+          <h2 className="font-display text-2xl">Les niet gevonden</h2>
           <p className="text-muted-foreground">
             Deze les bestaat niet of is nog niet gepubliceerd.
           </p>
@@ -69,11 +69,11 @@ export function FrenchLessonPage() {
     >
       {mode === "intro" ? (
         <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
-          <section className="game-panel bg-gradient-to-br from-[#eaf0f7] via-[#f4f8fc] to-[#fcfdff] p-6 text-center">
-            <span aria-hidden="true" className="text-5xl">
-              {lesson.emoji}
+          <section className="game-panel p-6 text-center">
+            <span className="mx-auto grid size-14 place-items-center rounded-lg bg-muted text-primary">
+              <GameIcon aria-hidden="true" name="french-lesson" size={30} />
             </span>
-            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
               Thema
             </p>
             <h2 className="mt-1 font-display text-3xl leading-snug">{lesson.title}</h2>
@@ -102,8 +102,7 @@ export function FrenchLessonPage() {
             </Button>
           ) : null}
 
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-            <Sparkles aria-hidden="true" className="size-3.5" />
+          <p className="text-center text-xs text-muted-foreground">
             Prototype · inhoud nog niet taalkundig gereviewd.
           </p>
           <p className="text-center text-xs text-muted-foreground">

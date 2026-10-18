@@ -17,17 +17,17 @@ export function SudokuStatus({
     <div aria-live="polite" className="space-y-1 text-center text-xs text-muted-foreground">
       {celebration ? <Confetti key={celebration} /> : null}
       {celebration ? (
-        <p className="animate-rise rounded-xl bg-amber-100 px-3 py-2 text-sm font-bold text-amber-900">
-          🎉 {celebration}
+        <p className="animate-rise rounded-lg bg-success/10 px-3 py-2 text-sm font-bold text-success">
+          {celebration}
         </p>
       ) : null}
       {hintMessage ? (
-        <p className="rounded-xl bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-800">
+        <p className="rounded-lg bg-warning/15 px-3 py-2 text-sm font-semibold text-warning">
           {hintMessage}
         </p>
       ) : null}
       <p>{status}</p>
-      {almostSolved ? <p className="font-semibold text-sky-600">Nog één vakje!</p> : null}
+      {almostSolved ? <p className="font-semibold text-primary">Nog één vakje!</p> : null}
     </div>
   );
 }
