@@ -564,6 +564,35 @@ Waarom:
 - Zonder backend voegt Query alleen bundle-grootte en een extra provider toe. De spellen laden nu synchroon uit `localStorage`; dat moet zo blijven.
 - TanStack Router en Query werken goed samen, maar de huidige routes gebruiken geen loaders. Voeg `ensureQueryData` pas toe als een route echt serverdata nodig heeft; de games mogen nooit op een query wachten om te starten.
 
+### 5.9 Branchpreviews en testen
+
+Cloudflare **Workers Previews** geven elke branch een geïsoleerde, productie-achtige omgeving met eigen variabelen, secrets en bindings. Een preview-build draait standaard `npx wrangler preview` en gebruikt de configuratie uit de `previews`-sectie van `wrangler.jsonc` ([Previews](https://developers.cloudflare.com/workers/previews/), [configuratie](https://developers.cloudflare.com/workers/previews/configuration/)).
+
+Wat je op een branch kunt voorbereiden:
+
+- De Worker-entry, `/api/auth/*` en `/api/progress/*`, achter een feature-flag.
+- Het D1-schema en de migraties op een **aparte preview-database** in de EU.
+- Preview-secrets (`BETTER_AUTH_SECRET`) en variabelen (`BETTER_AUTH_URL`, `ACCOUNTS_ENABLED`).
+- CSP, cookies en e2e-tests tegen de preview-URL.
+- Een Google OAuth-testclient met de preview-callback erin, als Google de gekozen methode is.
+
+Wat je niet op een branch kunt testen:
+
+- **Passkeys:** die zijn domeingebonden. Een passkey die op de preview-URL is geregistreerd, werkt niet op het productiedomein. Test de flow op de preview en registreer op productie opnieuw.
+- **Productie-secrets en echte gezinsdata.** Gebruik synthetische accounts.
+- **Het definitieve domein, DNS en productieverkeer.** Een preview lijkt op productie, maar is het niet.
+- **De exacte `main`-deploy.** Die volgt pas na de merge; de preview dekt wel dezelfde code en configuratie.
+
+Aandachtspunten:
+
+- Previews erven **geen** productie-instellingen. Zonder `previews`-blok ontbreken variabelen, secrets en de D1-binding.
+- Wijs een aparte preview-D1 aan. Anders test je in de productiedatabase.
+- Draai de migraties op de preview-database vóór de preview-deploy.
+- Preview-URL's zijn openbaar. Gebruik alleen testdata en ruim de preview-database en testaccounts daarna op.
+- Preview-builds tellen mee voor de 3.000 gratis bouwminuten per maand.
+
+Aanbevolen volgorde: **lokaal** (`wrangler dev` met lokale D1) → **preview-branch** met aparte D1 en preview-secrets → **productie** met de flag uit → flag aan voor de eigenaar → brede uitrol.
+
 ## 6. Privacy en compliance
 
 Dit is geen juridisch advies. De conclusies hieronder zijn ontwerpkeuzes; de eigenaar moet ze met de Autoriteit Persoonsgegevens, een jurist of in ieder geval met het eigen verwerkingsregister laten toetsen.
