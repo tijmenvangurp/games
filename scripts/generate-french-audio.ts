@@ -76,14 +76,16 @@ function readOptions(): Options {
   return { only, force: args.has("--force"), dryRun: args.has("--dry-run") };
 }
 
-// fallow-ignore-next-line complexity
+function isId3Tag(bytes: Uint8Array): boolean {
+  return bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33;
+}
+
+function isMp3Frame(bytes: Uint8Array): boolean {
+  return bytes.length >= 2 && bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0;
+}
+
 function looksLikeMp3(bytes: Uint8Array): boolean {
-  if (bytes.length < 3) {
-    return false;
-  }
-  const isId3 = bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33;
-  const isFrame = bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0;
-  return isId3 || isFrame;
+  return isId3Tag(bytes) || isMp3Frame(bytes);
 }
 
 async function requestSpeech(config: Config, input: string): Promise<Uint8Array> {
