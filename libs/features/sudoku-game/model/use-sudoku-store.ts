@@ -31,6 +31,7 @@ interface SudokuStore {
   history: PlayState[];
   hintPreview: SudokuHint | null;
   hintUnavailable: boolean;
+  hintDetailed: boolean;
   start: (puzzle: SudokuPuzzle) => void;
   newPuzzle: () => void;
   select: (index: number) => void;
@@ -38,6 +39,7 @@ interface SudokuStore {
   enter: (value: number) => void;
   erase: () => void;
   previewHint: () => void;
+  detailHint: () => void;
   applyHint: () => void;
   undo: () => void;
   restart: () => void;
@@ -51,7 +53,7 @@ function withHistory(history: PlayState[], play: PlayState): PlayState[] {
   return [...history, play].slice(-MAX_HISTORY);
 }
 
-const clearedHint = { hintPreview: null, hintUnavailable: false };
+const clearedHint = { hintPreview: null, hintUnavailable: false, hintDetailed: false };
 
 const restored = loadSudokuState();
 
@@ -61,6 +63,7 @@ export const useSudokuStore = create<SudokuStore>((set) => ({
   history: [],
   hintPreview: null,
   hintUnavailable: false,
+  hintDetailed: false,
 
   start: (puzzle) =>
     set((state) => ({
@@ -132,8 +135,10 @@ export const useSudokuStore = create<SudokuStore>((set) => ({
         return {};
       }
       const hint = findHint(state.play.puzzle, state.play.entries, state.play.selected);
-      return { hintPreview: hint, hintUnavailable: hint === null };
+      return { hintPreview: hint, hintUnavailable: hint === null, hintDetailed: false };
     }),
+
+  detailHint: () => set((state) => (state.hintPreview ? { hintDetailed: true } : {})),
 
   applyHint: () =>
     set((state) => {
