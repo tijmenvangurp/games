@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-crossword",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/crossword",
+  "tags": ["layer:entities", "scope:crossword", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/crossword"
+      }
+    }
+  },
+  "implicitDependencies": []
+}

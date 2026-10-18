@@ -74,6 +74,7 @@
     "pages-pokemon-quiz",
     "pages-french",
     "pages-word-search",
+    "pages-crossword",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -86,7 +87,11 @@
     "features-pokemon-quiz",
     "features-french-listening",
     "features-word-search",
+<<<<<<< HEAD
     "features-profile-switcher",
+=======
+    "features-crossword",
+>>>>>>> origin/main
     "entities-game",
     "entities-profile",
     "entities-french",
@@ -97,6 +102,7 @@
     "entities-hidden-object",
     "entities-pokedex",
     "entities-word-search",
+    "entities-crossword",
     "shared-lib",
     "shared-ui"
   ]
