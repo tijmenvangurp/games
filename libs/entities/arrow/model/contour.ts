@@ -413,10 +413,7 @@ function clearCandidates(
     }
 
     if (!flipped) {
-      // No arrow is free and no flip helps. Drop one candidate so the rest of
-      // the figure can still be cleared; the dropped arrow never reaches the
-      // level, and the emitted set stays solvable by construction.
-      remaining.splice(0, 1);
+      break;
     }
   }
 

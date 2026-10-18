@@ -142,10 +142,10 @@ function mergedSegments(points: readonly Point[]): { a: Point; b: Point }[] {
 }
 
 /**
- * Does the escape lane cross a perpendicular segment? The segment is merged at
- * collinear joints, so a crossing at a lattice vertex inside a straight run is
- * interior. Endpoints count too: a corner or arrowhead is visible, and the
- * moving arrow must not pass through it.
+ * Does the escape lane cross a perpendicular segment away from its endpoints?
+ * The segment is merged at collinear joints, so a crossing at a lattice vertex
+ * inside a straight run is interior. A neighbour that only touches the lane at
+ * one endpoint is passed by, not crossed.
  */
 function crossesHorizontalLane(
   segment: { a: Point; b: Point },
@@ -155,14 +155,14 @@ function crossesHorizontalLane(
   const low = Math.min(segment.a.y, segment.b.y);
   const high = Math.max(segment.a.y, segment.b.y);
   const ahead = stepX > 0 ? segment.a.x > head.x : segment.a.x < head.x;
-  return ahead && low <= head.y && head.y <= high;
+  return ahead && low < head.y && head.y < high;
 }
 
 function crossesVerticalLane(segment: { a: Point; b: Point }, head: Point, stepY: number): boolean {
   const low = Math.min(segment.a.x, segment.b.x);
   const high = Math.max(segment.a.x, segment.b.x);
   const ahead = stepY > 0 ? segment.a.y > head.y : segment.a.y < head.y;
-  return ahead && low <= head.x && head.x <= high;
+  return ahead && low < head.x && head.x < high;
 }
 
 /** Does this segment lie collinear with the lane and reach past the head? */

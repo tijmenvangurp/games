@@ -77,7 +77,7 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
   });
 
-  it("blocks a lane that only touches a corner", () => {
+  it("does not treat a corner touch as a blocker", () => {
     const mover = arrow(1, [
       [1, 1],
       [2, 1],
@@ -88,7 +88,7 @@ describe("maze geometry", () => {
     ]);
     const testLevel = level([mover, corner]);
 
-    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(true);
   });
 
   it("treats a collinear arrow directly ahead as a blocker", () => {
@@ -121,7 +121,7 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set())).toBe(true);
   });
 
-  it("blocks a lane that ends on a neighbour's head, while the neighbour can leave", () => {
+  it("lets two arrows with adjacent perpendicular heads leave", () => {
     const right = arrow(1, [
       [1, 0],
       [1, 2],
@@ -135,7 +135,7 @@ describe("maze geometry", () => {
     ]);
     const testLevel = level([right, up], 8, 8);
 
-    expect(isArrowRemovable(right, testLevel, new Set())).toBe(false);
+    expect(isArrowRemovable(right, testLevel, new Set())).toBe(true);
     expect(isArrowRemovable(up, testLevel, new Set())).toBe(true);
   });
 
