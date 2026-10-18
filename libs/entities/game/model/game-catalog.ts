@@ -19,6 +19,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/puzzels"
           | "/woordzoeker"
           | "/frans";
+        thumbnail: string;
       }
     | { status: "coming-soon" }
   );
@@ -30,6 +31,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Puzzel met cijfers of dieren. Kies 4 × 4, 6 × 6 of 9 × 9.",
     status: "available",
     to: "/sudoku",
+    thumbnail: "/thumbnails/sudoku.jpg",
   },
   {
     id: "math-trainer",
@@ -37,6 +39,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Oefen plus, min, keer en deel. Verdien sterren.",
     status: "available",
     to: "/rekenen",
+    thumbnail: "/thumbnails/math-trainer.jpg",
   },
   {
     id: "arrows",
@@ -44,6 +47,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Haal alle pijlen weg zonder dat ze tegen elkaar botsen.",
     status: "available",
     to: "/pijlen",
+    thumbnail: "/thumbnails/arrows.jpg",
   },
   {
     id: "seek",
@@ -51,6 +55,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Zoek het monstertje met de ster tussen alle andere Wobbels.",
     status: "available",
     to: "/zoeken",
+    thumbnail: "/thumbnails/seek.jpg",
   },
   {
     id: "word-search",
@@ -58,6 +63,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Zoek woorden in de tuin, onder water of tussen de Pokémon.",
     status: "available",
     to: "/woordzoeker",
+    thumbnail: "/thumbnails/word-search.jpg",
   },
   {
     id: "memory",
@@ -65,6 +71,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Zoek de paren tussen de 151 Pokémon uit Generatie 1.",
     status: "available",
     to: "/memory",
+    thumbnail: "/thumbnails/memory.jpg",
   },
   {
     id: "pokemon-quiz",
@@ -72,6 +79,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Kies de juiste naam bij het plaatje. 3, 4 of 5 namen.",
     status: "available",
     to: "/raad",
+    thumbnail: "/thumbnails/pokemon-quiz.jpg",
   },
   {
     id: "chess-tutorial",
@@ -79,6 +87,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Leer stap voor stap alle stukken en zet je eerste schaakmat.",
     status: "available",
     to: "/schaken",
+    thumbnail: "/thumbnails/chess-tutorial.jpg",
   },
   {
     id: "chess-puzzles",
@@ -86,6 +95,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Los korte puzzels op: zet schaakmat of win een stuk.",
     status: "available",
     to: "/puzzels",
+    thumbnail: "/thumbnails/chess-puzzles.jpg",
   },
   {
     id: "french-listening",
@@ -93,5 +103,6 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Luister naar Frans en kies de juiste Nederlandse vertaling.",
     status: "available",
     to: "/frans",
+    thumbnail: "/thumbnails/french-listening.jpg",
   },
 ];

@@ -39,7 +39,8 @@ spelnamen. Geen externe fonts.
 
 - `GameShell` — vaste paginakop met terug, geluid en eventueel nieuw spel.
 - `PageHeader` — serif titel met rustige subtitel.
-- `GameMenu` — neutrale spelkaarten met één `GameIcon` per spel.
+- `GameMenu` — neutrale spelkaarten met een lokale thumbnail, spelnaam en korte uitleg.
+  De hele kaart is de link; er staat geen extra "Openen"-regel.
 - `game-panel` — gedeelde surface voor setup, HUD en informatieblokken.
 - `Button` — primair, outline, ghost en success; vaste focusring.
 - `ChoiceCard` / `OptionPicker` — keuze met label, hint en optioneel symbool.
@@ -54,6 +55,8 @@ spelnamen. Geen externe fonts.
 - Gebruik `success`, `warning` en `danger` alleen voor hun betekenis.
 - Voeg geen nieuwe emoji toe aan UI-chrome. Emoji's mogen wel in leerinhoud staan.
 - Nieuwe spellen krijgen een item in `GameIcon` en een regel in `gameCatalog`.
+- Spelthumbnails staan lokaal in `apps/games/public/thumbnails` (800 × 500, JPEG) en worden
+  lazy geladen. Geen externe afbeeldingen of screenshotdiensten.
 - Houd touch-targets op minimaal 44 px en respecteer `pt-safe`/`pb-safe`.
 
 ## Iconen
