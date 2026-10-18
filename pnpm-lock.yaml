@@ -187,6 +187,9 @@ importers:
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      sudoku-gen:
+        specifier: 1.0.3
+        version: 1.0.3
       tailwind-merge:
         specifier: ^3.7.0
         version: 3.7.0
@@ -2712,6 +2715,9 @@ packages:
     resolution: {integrity: sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA==}
     engines: {node: '>=4'}
 
+  sudoku-gen@1.0.3:
+    resolution: {integrity: sha512-eYRVf4MPEk9DSyA6H0/F1Jc3xH+EY5SiSL6LYom2JcTDTEIJ9Nt8KShbClHlnJgqrUC4vH9syGCFp3R+7xG/mg==}
+
   supports-color@10.2.2:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
@@ -5136,6 +5142,8 @@ snapshots:
       ansi-regex: 6.4.0
 
   strip-bom@3.0.0: {}
+
+  sudoku-gen@1.0.3: {}
 
   supports-color@10.2.2: {}
 
