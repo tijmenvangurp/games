@@ -76,6 +76,10 @@
     { "action": "shell", "resource": "true", "effect": "allow" },
     { "action": "shell", "resource": "exit *", "effect": "allow" },
 
+    // Private integration secrets stay out of the shell. The audio skill loads
+    // the TTS endpoint in its own process; never read .env files directly.
+    { "action": "shell", "resource": "*/.config/*/.env*", "effect": "deny" },
+
     // Delivery commands: branch, push, PR, checks and merge.
     { "action": "shell", "resource": "gh *", "effect": "allow" },
     { "action": "shell", "resource": "git fetch *", "effect": "allow" },
