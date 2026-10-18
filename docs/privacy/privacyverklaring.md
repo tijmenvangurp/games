@@ -40,18 +40,18 @@ In Nederland kunnen kinderen onder de 16 jaar zelf geen geldige toestemming geve
 
 ## Welke gegevens bewaren we?
 
-| Gegeven                                              | Waarvoor                                                                  | Waar en hoe lang           |
-| ---------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------- |
-| E-mailadres van de ouder                             | Inloggen met Google; bij een passkey alleen als je zelf een adres opgeeft | Database in de EU          |
-| Weergavenaam van de ouder                            | Het account herkenbaar maken                                              | Database in de EU          |
-| Inlogmethode en technische account-id                | De login aan het account koppelen                                         | Database in de EU          |
-| Publieke sleutel van een passkey                     | Inloggen zonder wachtwoord                                                | Database in de EU          |
-| Profielslot en avatar                                | Kindprofielen van elkaar scheiden                                         | Database in de EU          |
-| Voortgang per profiel                                | Instellingen, beste scores en grove voortgang synchroniseren              | Database in de EU          |
-| Sessiegegevens, waaronder IP-adres en user-agent     | De sessie beveiligen en misbruik herkennen                                | Database in de EU          |
-| Toestemmingsbewijs: versie, datum, methode en status | Kunnen aantonen dat de ouder toestemming gaf                              | Database in de EU          |
-| Rate-limit-teller                                    | Te veel loginpogingen of verzoeken tegenhouden                            | Database in de EU          |
-| Applicatielogs                                       | Storingen opsporen en de beveiliging bewaken                              | Cloudflare, 7 tot 30 dagen |
+| Gegeven                                              | Waarvoor                                                                                      | Waar en hoe lang           |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------- |
+| E-mailadres van de ouder                             | Inloggen met Google; bij een passkey een synthetisch `@invalid`-adres zonder persoonsgegevens | Database in de EU          |
+| Weergavenaam van de ouder                            | Het account herkenbaar maken                                                                  | Database in de EU          |
+| Inlogmethode en technische account-id                | De login aan het account koppelen                                                             | Database in de EU          |
+| Publieke sleutel van een passkey                     | Inloggen zonder wachtwoord                                                                    | Database in de EU          |
+| Profielslot en avatar                                | Kindprofielen van elkaar scheiden                                                             | Database in de EU          |
+| Voortgang per profiel                                | Instellingen, beste scores en grove voortgang synchroniseren                                  | Database in de EU          |
+| Sessiegegevens, waaronder IP-adres en user-agent     | De sessie beveiligen en misbruik herkennen                                                    | Database in de EU          |
+| Toestemmingsbewijs: versie, datum, methode en status | Kunnen aantonen dat de ouder toestemming gaf                                                  | Database in de EU          |
+| Rate-limit-teller                                    | Te veel loginpogingen of verzoeken tegenhouden                                                | Database in de EU          |
+| Applicatielogs                                       | Storingen opsporen en de beveiliging bewaken                                                  | Cloudflare, 7 tot 30 dagen |
 
 Een profielnaam is optioneel en blijft lokaal op het toestel. De server bewaart alleen het slotnummer en de avatar. De inhoud van een spel, zoals een lopend sudokubord of een woordzoeker-raster, wordt niet gesynchroniseerd.
 
@@ -90,9 +90,9 @@ De ouder kan op twee manieren inloggen. Beide manieren kunnen aan hetzelfde acco
 
 **Met Google.** Je gaat naar de inlogpagina van Google en komt daarna terug in de app. Google ziet dat je inlogt en geeft je e-mailadres, je naam en een technische account-id aan de app. De app vraagt alleen de standaardgegevens `openid`, `email` en `profile` op. We krijgen geen toegang tot je Gmail, Drive, contacten of andere Google-diensten. We tonen ook geen Google-avatar: het profiel gebruikt een avatar uit de vaste set van de app. Google kan tijdens het inloggen cookies op zijn eigen domein plaatsen; daarvoor geldt het privacybeleid van Google.
 
-**Met een passkey.** Een passkey is een sleutel die op je eigen toestel blijft. Je ontgrendelt hem met je vingerafdruk, gezicht of toestelcode. De app bewaart alleen de publieke sleutel. Je vingerafdruk of gezichtsscan gaat nooit naar de server. Een passkey is gekoppeld aan het domein van de app. Raak je je toestel kwijt, dan heb je een tweede passkey of herstelcodes nodig. Zorg daarom voor een tweede inlogmethode.
+**Met een passkey.** Een passkey is een sleutel die op je eigen toestel blijft. Je ontgrendelt hem met je vingerafdruk, gezicht of toestelcode. De app bewaart alleen de publieke sleutel. Je vingerafdruk of gezichtsscan gaat nooit naar de server. Een passkey is gekoppeld aan het domein van de app. Raak je je toestel kwijt, dan heb je een tweede passkey of een gekoppeld Google-account nodig. Zorg daarom voor een tweede inlogmethode.
 
-Bij een passkey bewaren we geen wachtwoord. Het systeem heeft technisch een inlognaam nodig. Daarvoor gebruiken we een niet-bestaand adres op `example.invalid`, tenzij je zelf een e-mailadres als inlognaam opgeeft. Dat adres gebruiken we niet om je e-mails te sturen: er is bewust **geen** e-mailmagic-link en er is geen e-mailprovider.
+Bij een passkey bewaren we geen wachtwoord. Het systeem heeft technisch een inlognaam nodig. Daarvoor gebruiken we een niet-bestaand adres op `example.invalid`. Dat adres gebruiken we niet om je e-mails te sturen: er is bewust **geen** e-mailmagic-link en er is geen e-mailprovider.
 
 ## Cookies en lokale opslag
 
@@ -166,4 +166,4 @@ Deze verklaring heeft een versienummer en een datum. Bij een belangrijke wijzigi
 
 ## Noot voor de eigenaar (niet publiceren)
 
-Vul minimaal in: `[naam verwerkingsverantwoordelijke]`, `[contactadres]`, `[versie]` en `[datum]`. Kies of een passkey-account een echt ouder-e-mailadres krijgt of een synthetische waarde op `example.invalid`, en pas de alinea over passkeys daarop aan. Er is geen e-mailherstel; herstel verloopt via een tweede passkey of herstelcodes. Bevestig de bewaartermijn van 12 maanden voor inactieve accounts en voortgang. Bevestig dat het toestemmingsbewijs bij accountverwijdering wordt verwijderd. Laat de hele tekst toetsen aan de AVG, de Nederlandse leeftijdsgrens van 16 jaar en, als de site ooit op kinderen in de VS is gericht, aan COPPA.
+Vul minimaal in: `[naam verwerkingsverantwoordelijke]`, `[contactadres]`, `[versie]` en `[datum]`. Passkey-accounts gebruiken een synthetisch `@invalid`-adres; er is geen e-mailherstel. Herstel verloopt via een tweede passkey of, na koppeling, via "Inloggen met Google". Bevestig de bewaartermijn van 12 maanden voor inactieve accounts en voortgang. Bevestig dat het toestemmingsbewijs bij accountverwijdering wordt verwijderd. Laat de hele tekst toetsen aan de AVG, de Nederlandse leeftijdsgrens van 16 jaar en, als de site ooit op kinderen in de VS is gericht, aan COPPA.
