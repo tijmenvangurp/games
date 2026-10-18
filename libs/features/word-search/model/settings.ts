@@ -13,6 +13,7 @@ export const DEFAULT_WORD_SEARCH_SETTINGS: WordSearchSettings = {
 export const WORD_SEARCH_THEME_OPTIONS = [
   { value: "tuin", label: "Tuin", hint: "Bloemen en beestjes", emoji: "🌷" },
   { value: "onderwater", label: "Onder water", hint: "Vissen en schelpen", emoji: "🐠" },
+  { value: "pokemon", label: "Pokémon", hint: "Generatie 1", emoji: "⚡" },
 ] as const;
 
 export const WORD_SEARCH_DIFFICULTY_OPTIONS = [

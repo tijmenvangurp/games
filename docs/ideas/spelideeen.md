@@ -41,7 +41,7 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken*
 
 **Leerdoel:** woorden herkennen, spelling oefenen, visueel scannen en de woordenschat van een thema versterken.
 
-**Vorm:** een klassieke woordzoeker met de thema's **Tuin** en **Onder water** uit _Waar is Wobbel?_. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden krijgen een handgetekende streep. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Makkelijk zoekt alleen links-naar-rechts en boven-naar-beneden, gemiddeld voegt de diagonale richtingen toe en moeilijk opent alle acht richtingen. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
+**Vorm:** een klassieke woordzoeker met de thema's **Tuin**, **Onder water** en **Pokémon**. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden krijgen een handgetekende streep. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Makkelijk zoekt alleen links-naar-rechts en boven-naar-beneden, gemiddeld voegt de diagonale richtingen toe en moeilijk opent alle acht richtingen. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
 
 **Waarom:** taal is het grootste gat in het huidige aanbod. Een woordzoeker is laagdrempelig, goed te herspelen en vraagt geen nieuwe backend of externe assets.
 
