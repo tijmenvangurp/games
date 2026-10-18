@@ -280,6 +280,28 @@ describe("games app", () => {
     expect(screen.getByText("Er staan dubbele cijfers.")).toBeTruthy();
   });
 
+  it("celebrates a completed row", async () => {
+    preloadFixture("direct", { 1: 2, 2: 3 });
+    renderApp("/sudoku");
+
+    const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    fireEvent.click(within(board).getAllByRole("button")[3]);
+    fireEvent.click(screen.getByRole("button", { name: "Kies 🦊" }));
+
+    expect(await screen.findByText(/Rij 1 klaar!/)).toBeTruthy();
+  });
+
+  it("celebrates a completed box", async () => {
+    preloadFixture("direct", { 1: 2 });
+    renderApp("/sudoku");
+
+    const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    fireEvent.click(within(board).getAllByRole("button")[4]);
+    fireEvent.click(screen.getByRole("button", { name: "Kies 🐰" }));
+
+    expect(await screen.findByText(/Blok 1 klaar!/)).toBeTruthy();
+  });
+
   it("shows a near-solved message with one cell left", async () => {
     const entries = fixturePuzzle.solution.map((value, index) => (index === 1 ? 0 : value));
     useSudokuStore.setState({

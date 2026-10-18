@@ -87,6 +87,33 @@ export function findConflicts(puzzle: SudokuPuzzle, entries: readonly number[]):
   return conflicts;
 }
 
+type CompletedUnitKind = "row" | "box";
+
+export interface CompletedUnit {
+  kind: CompletedUnitKind;
+  index: number;
+}
+
+/**
+ * Rows and boxes that are completely filled in and match the solution. These
+ * are the small milestones worth celebrating during play.
+ */
+export function completedUnits(puzzle: SudokuPuzzle, entries: readonly number[]): CompletedUnit[] {
+  const values = puzzle.givens.map((given, index) => given || entries[index] || 0);
+  const completed: CompletedUnit[] = [];
+
+  for (const unit of unitsFor(geometryFor(puzzle.size))) {
+    if (unit.kind === "column") {
+      continue;
+    }
+    if (unit.indexes.every((index) => values[index] === puzzle.solution[index])) {
+      completed.push({ kind: unit.kind, index: unit.index });
+    }
+  }
+
+  return completed;
+}
+
 export function createPlayState(puzzle: SudokuPuzzle): PlayState {
   return {
     puzzle,

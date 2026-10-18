@@ -4,6 +4,7 @@ export type UnitKind = "row" | "column" | "box";
 
 export interface Unit {
   kind: UnitKind;
+  index: number;
   indexes: number[];
 }
 
@@ -15,12 +16,14 @@ export function unitsFor(geometry: Geometry): Unit[] {
   for (let row = 0; row < size; row += 1) {
     units.push({
       kind: "row",
+      index: row,
       indexes: Array.from({ length: size }, (_, col) => row * size + col),
     });
   }
   for (let col = 0; col < size; col += 1) {
     units.push({
       kind: "column",
+      index: col,
       indexes: Array.from({ length: size }, (_, row) => row * size + col),
     });
   }
@@ -36,7 +39,7 @@ export function unitsFor(geometry: Geometry): Unit[] {
         indexes.push((band * boxRows + row) * size + stack * boxCols + col);
       }
     }
-    units.push({ kind: "box", indexes });
+    units.push({ kind: "box", index: box, indexes });
   }
 
   return units;

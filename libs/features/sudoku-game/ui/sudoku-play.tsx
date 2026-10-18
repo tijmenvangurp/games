@@ -50,6 +50,7 @@ export function SudokuPlay() {
 
         <SudokuStatus
           almostSolved={model.almostSolved}
+          celebration={model.celebration}
           hintMessage={model.hintMessage}
           status={model.status}
         />
