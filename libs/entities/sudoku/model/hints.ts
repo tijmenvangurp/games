@@ -1,13 +1,19 @@
 import { geometryFor } from "./geometry";
 import { candidateMask, createMasks } from "./masks";
 import type { SudokuPuzzle } from "./types";
+import { unitsFor, type Unit, type UnitKind } from "./units";
 
 type HintTechnique = "naked-single" | "hidden-single";
 
-interface SudokuHint {
+type HintUnit = UnitKind;
+
+export interface SudokuHint {
   index: number;
   value: number;
   technique: HintTechnique;
+  unit: HintUnit | null;
+  /** Cells of the unit the hint is based on, for highlighting. */
+  related: number[];
 }
 
 interface CandidateBoard {
@@ -26,34 +32,6 @@ function popcount(mask: number): number {
 
 function valueOfBit(bit: number): number {
   return 32 - Math.clz32(bit);
-}
-
-function unitIndexes(size: number, geometry: ReturnType<typeof geometryFor>): number[][] {
-  const units: number[][] = [];
-
-  for (let row = 0; row < size; row += 1) {
-    units.push(Array.from({ length: size }, (_, col) => row * size + col));
-  }
-  for (let col = 0; col < size; col += 1) {
-    units.push(Array.from({ length: size }, (_, row) => row * size + col));
-  }
-
-  const { boxRows, boxCols } = geometry;
-  const boxesPerBand = size / boxCols;
-  const boxCount = (size / boxRows) * boxesPerBand;
-  for (let box = 0; box < boxCount; box += 1) {
-    const band = Math.floor(box / boxesPerBand);
-    const stack = box % boxesPerBand;
-    const indexes: number[] = [];
-    for (let row = 0; row < boxRows; row += 1) {
-      for (let col = 0; col < boxCols; col += 1) {
-        indexes.push((band * boxRows + row) * size + stack * boxCols + col);
-      }
-    }
-    units.push(indexes);
-  }
-
-  return units;
 }
 
 function readBoard(puzzle: SudokuPuzzle, entries: readonly number[]): CandidateBoard | null {
@@ -92,22 +70,24 @@ function findNakedSingles(board: CandidateBoard): SudokuHint[] {
     }
     const mask = board.candidates[index];
     if (popcount(mask) === 1) {
-      singles.push({ index, value: valueOfBit(mask), technique: "naked-single" });
+      singles.push({
+        index,
+        value: valueOfBit(mask),
+        technique: "naked-single",
+        unit: null,
+        related: [],
+      });
     }
   }
   return singles;
 }
 
-function hiddenSingleInUnit(
-  unit: readonly number[],
-  value: number,
-  board: CandidateBoard,
-): SudokuHint | null {
+function hiddenSingleInUnit(unit: Unit, value: number, board: CandidateBoard): SudokuHint | null {
   const bit = 1 << (value - 1);
   let spot = -1;
   let count = 0;
 
-  for (const index of unit) {
+  for (const index of unit.indexes) {
     const current = board.values[index];
     if (current !== 0) {
       if (current === value) {
@@ -122,14 +102,22 @@ function hiddenSingleInUnit(
     count += 1;
   }
 
-  return count === 1 ? { index: spot, value, technique: "hidden-single" } : null;
+  return count === 1
+    ? {
+        index: spot,
+        value,
+        technique: "hidden-single",
+        unit: unit.kind,
+        related: unit.indexes,
+      }
+    : null;
 }
 
 function findHiddenSingles(board: CandidateBoard, size: number): SudokuHint[] {
   const singles: SudokuHint[] = [];
   const seen = new Set<number>();
 
-  for (const unit of unitIndexes(size, board.geometry)) {
+  for (const unit of unitsFor(board.geometry)) {
     for (let value = 1; value <= size; value += 1) {
       const single = hiddenSingleInUnit(unit, value, board);
       if (!single) {

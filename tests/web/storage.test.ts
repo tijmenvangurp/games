@@ -22,7 +22,12 @@ describe("sudoku storage", () => {
     state.entries[0] = state.puzzle.solution[0];
     const payload = {
       play: state,
-      settings: { size: 4 as const, difficulty: "makkelijk" as const, theme: "animals" as const },
+      settings: {
+        size: 4 as const,
+        difficulty: "makkelijk" as const,
+        theme: "animals" as const,
+        mistakeMode: "check" as const,
+      },
     };
 
     saveSudokuState(payload);
@@ -66,6 +71,7 @@ describe("sudoku storage", () => {
       size: 6,
       difficulty: "gemiddeld",
       theme: "numbers",
+      mistakeMode: "direct",
     });
   });
 

@@ -1,4 +1,4 @@
-import { isSudokuSize, type PlayState, type SudokuPuzzle } from "@entities/sudoku";
+import { isSudokuSize, type Difficulty, type PlayState, type SudokuPuzzle } from "@entities/sudoku";
 import { DEFAULT_SETTINGS, type SudokuSettings } from "./settings";
 
 const STORAGE_KEY = "games.sudoku.v1";
@@ -12,7 +12,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isDifficulty(value: unknown): boolean {
+function isDifficulty(value: unknown): value is Difficulty {
   return value === "makkelijk" || value === "gemiddeld" || value === "moeilijk";
 }
 
@@ -85,16 +85,25 @@ function readPlayState(value: unknown): PlayState | null {
   };
 }
 
-function isSettings(value: unknown): value is SudokuSettings {
+function readSettings(value: unknown): SudokuSettings | null {
   if (!isRecord(value)) {
-    return false;
+    return null;
   }
-  return (
-    typeof value.size === "number" &&
-    isSudokuSize(value.size) &&
-    isDifficulty(value.difficulty) &&
-    (value.theme === "numbers" || value.theme === "animals")
-  );
+  const { size, difficulty, theme, mistakeMode } = value;
+  if (
+    typeof size !== "number" ||
+    !isSudokuSize(size) ||
+    !isDifficulty(difficulty) ||
+    (theme !== "numbers" && theme !== "animals")
+  ) {
+    return null;
+  }
+  return {
+    size,
+    difficulty,
+    theme,
+    mistakeMode: mistakeMode === "check" ? "check" : "direct",
+  };
 }
 
 export function loadSudokuState(): PersistedSudokuState | null {
@@ -109,7 +118,7 @@ export function loadSudokuState(): PersistedSudokuState | null {
     }
     return {
       play: readPlayState(parsed.play),
-      settings: isSettings(parsed.settings) ? parsed.settings : DEFAULT_SETTINGS,
+      settings: readSettings(parsed.settings) ?? DEFAULT_SETTINGS,
     };
   } catch {
     return null;

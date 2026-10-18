@@ -3,8 +3,10 @@ import { OptionPicker, SetupActions } from "@shared/ui";
 import { cn } from "@shared/lib";
 import {
   DIFFICULTY_OPTIONS,
+  MISTAKE_MODE_OPTIONS,
   SIZE_OPTIONS,
   symbolsFor,
+  type MistakeMode,
   type SudokuSettings,
   type SymbolTheme,
 } from "../model/settings";
@@ -16,6 +18,7 @@ interface SetupPanelProps {
   onSizeChange: (size: SudokuSize) => void;
   onDifficultyChange: (difficulty: Difficulty) => void;
   onThemeChange: (theme: SymbolTheme) => void;
+  onMistakeModeChange: (mode: MistakeMode) => void;
   onStart: () => void;
   onBack: () => void;
 }
@@ -27,6 +30,7 @@ export function SetupPanel({
   onSizeChange,
   onDifficultyChange,
   onThemeChange,
+  onMistakeModeChange,
   onStart,
   onBack,
 }: SetupPanelProps) {
@@ -73,6 +77,29 @@ export function SetupPanel({
                   : "border-border bg-card hover:bg-muted",
               )}
               onClick={() => onDifficultyChange(option.value)}
+            >
+              <span aria-hidden="true">{option.emoji}</span>
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="mt-5 space-y-2">
+        <legend className="mb-2 text-sm font-semibold">Fouten tonen</legend>
+        <div className="grid grid-cols-2 gap-2">
+          {MISTAKE_MODE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={settings.mistakeMode === option.value}
+              className={cn(
+                "flex min-h-12 items-center justify-center gap-2 rounded-2xl border-2 text-sm font-bold transition active:scale-95",
+                settings.mistakeMode === option.value
+                  ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
+                  : "border-border bg-card hover:bg-muted",
+              )}
+              onClick={() => onMistakeModeChange(option.value)}
             >
               <span aria-hidden="true">{option.emoji}</span>
               {option.label}

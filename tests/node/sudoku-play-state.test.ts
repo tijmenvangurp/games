@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  completedValues,
   countMistakes,
   createPlayState,
+  digitCounts,
   enterValue,
   eraseCell,
   filledCount,
+  findConflicts,
   isComplete,
   moveSelection,
   restartPuzzle,
@@ -96,21 +97,31 @@ describe("sudoku play state", () => {
     expect(isComplete(puzzle, solved.entries)).toBe(true);
   });
 
-  it("reports only digits that are complete in every row, column and box", () => {
+  it("counts visible digits for the number pad", () => {
     const empty = createPlayState(puzzle);
-    expect(completedValues(empty.puzzle, empty.entries).size).toBe(0);
+    expect(digitCounts(empty.puzzle, empty.entries)).toEqual([0, 2, 0, 0, 2]);
 
     const partial = enterValue(selectCell(empty, 6), 1);
-    expect(completedValues(partial.puzzle, partial.entries).has(1)).toBe(false);
+    expect(digitCounts(partial.puzzle, partial.entries)[1]).toBe(3);
 
     const full = enterValue(selectCell(partial, 9), 1);
-    expect(completedValues(full.puzzle, full.entries).has(1)).toBe(true);
-    expect(completedValues(full.puzzle, full.entries).has(2)).toBe(false);
+    expect(digitCounts(full.puzzle, full.entries)[1]).toBe(4);
   });
 
-  it("reports every digit as complete on a solved board", () => {
+  it("counts every digit on a solved board", () => {
     const solved = solveEverything(createPlayState(puzzle));
-    expect(completedValues(solved.puzzle, solved.entries)).toEqual(new Set([1, 2, 3, 4]));
+    expect(digitCounts(solved.puzzle, solved.entries)).toEqual([0, 4, 4, 4, 4]);
+  });
+
+  it("marks duplicate digits in a row, column or box as conflicts", () => {
+    const empty = createPlayState(puzzle);
+    expect(findConflicts(empty.puzzle, empty.entries).size).toBe(0);
+
+    const wrongButFree = enterValue(selectCell(empty, 1), 3);
+    expect(findConflicts(wrongButFree.puzzle, wrongButFree.entries).size).toBe(0);
+
+    const conflict = enterValue(selectCell(empty, 1), 4);
+    expect(findConflicts(conflict.puzzle, conflict.entries)).toEqual(new Set([1, 5]));
   });
 
   it("moves the selection with bounds", () => {

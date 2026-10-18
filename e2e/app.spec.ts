@@ -18,7 +18,7 @@ test.describe("op een telefoon", () => {
 
     await board.getByRole("button", { name: /^leeg/ }).first().click();
     const numberButton = page.locator('button[aria-label^="Kies"]:not([disabled])').first();
-    const symbol = (await numberButton.textContent()) ?? "";
+    const symbol = ((await numberButton.getAttribute("aria-label")) ?? "").replace("Kies ", "");
     await numberButton.click();
     await expect(
       board.getByRole("button", { name: new RegExp(`^${symbol}, rij`) }).first(),

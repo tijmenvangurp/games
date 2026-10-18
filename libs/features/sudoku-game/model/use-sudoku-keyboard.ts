@@ -25,7 +25,30 @@ function resolveKeyAction(key: string, size: number): KeyAction | null {
   return move ? { type: "move", rowDelta: move[0], colDelta: move[1] } : null;
 }
 
-/** Arrow keys, digits, Backspace and Delete control the active puzzle. */
+function isUndoShortcut(event: KeyboardEvent): boolean {
+  return (
+    (event.metaKey || event.ctrlKey) &&
+    !event.altKey &&
+    !event.shiftKey &&
+    event.key.toLowerCase() === "z"
+  );
+}
+
+function applyAction(store: ReturnType<typeof useSudokuStore.getState>, action: KeyAction): void {
+  switch (action.type) {
+    case "enter":
+      store.enter(action.value);
+      break;
+    case "erase":
+      store.erase();
+      break;
+    case "move":
+      store.move(action.rowDelta, action.colDelta);
+      break;
+  }
+}
+
+/** Arrow keys, digits, Backspace, Delete and Ctrl/Cmd+Z control the puzzle. */
 export function useSudokuKeyboard(enabled: boolean): void {
   useEffect(() => {
     if (!enabled) {
@@ -33,10 +56,16 @@ export function useSudokuKeyboard(enabled: boolean): void {
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      const store = useSudokuStore.getState();
+      if (isUndoShortcut(event)) {
+        event.preventDefault();
+        store.undo();
+        return;
+      }
       if (event.metaKey || event.ctrlKey || event.altKey) {
         return;
       }
-      const play = useSudokuStore.getState().play;
+      const play = store.play;
       if (!play) {
         return;
       }
@@ -46,18 +75,7 @@ export function useSudokuKeyboard(enabled: boolean): void {
       }
 
       event.preventDefault();
-      const store = useSudokuStore.getState();
-      switch (action.type) {
-        case "enter":
-          store.enter(action.value);
-          break;
-        case "erase":
-          store.erase();
-          break;
-        case "move":
-          store.move(action.rowDelta, action.colDelta);
-          break;
-      }
+      applyAction(store, action);
     };
 
     window.addEventListener("keydown", handleKeyDown);
