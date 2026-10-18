@@ -8,8 +8,8 @@ export function ChessPage() {
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
-      subtitle="Leer de looproutes van de stukken"
-      title="Schaaktutorial"
+      subtitle="Leer de stukken kennen"
+      title="Schaakles"
     >
       <TutorialBoard />
     </GameShell>

@@ -695,8 +695,8 @@ Toelichting:
 | 0    | Nu: statisch                                          | Geen                 | Geen                      | Lokaal                            | Geen                            | Ongewijzigd                                | Geen                 | Bestaand                       | n.v.t.                              |
 | 0.5  | Lokale profielen + export/import                      | Geen                 | Geen                      | Lokaal, per profiel               | Geen (wel docs)                 | Ongewijzigd                                | Geen                 | Storage/migratie/export        | Oude key blijft leesbaar            |
 | 1    | Optioneel ouderaccount + sync van instellingen/scores | Worker + D1          | Ouder-passkey (of e-mail) | `player`, `progress`              | 0012 auth/backend, 0013 privacy | `connect-src 'self'`                       | `BETTER_AUTH_SECRET` | Auth, sync, offline, CSRF      | Flag uit, `main` weg, CSP terug     |
-| 2    | Volledige voortgang + ouder-dashboard                 | Zelfde               | Zelfde                    | Uitgebreide `progress`, `consent` | 0014 sync/datamodel             | Ongewijzigd                                | Zelfde               | Merge, retentie, export/delete | Sync-endpoints uit, data exporteren |
-| 3    | Multiplayer                                           | D1 + Durable Objects | Zelfde                    | DO per room, D1 voor profielen    | 0015 multiplayer                | `connect-src 'self'` (+ same-origin `wss`) | Zelfde               | Realtime, reconnect, misbruik  | Rooms uit, DO-binding weg           |
+| 2    | Volledige voortgang + ouder-dashboard                 | Zelfde               | Zelfde                    | Uitgebreide `progress`, `consent` | 0015 sync/datamodel             | Ongewijzigd                                | Zelfde               | Merge, retentie, export/delete | Sync-endpoints uit, data exporteren |
+| 3    | Multiplayer                                           | D1 + Durable Objects | Zelfde                    | DO per room, D1 voor profielen    | 0016 multiplayer                | `connect-src 'self'` (+ same-origin `wss`) | Zelfde               | Realtime, reconnect, misbruik  | Rooms uit, DO-binding weg           |
 
 ### Fase 0 — nu (statisch)
 
@@ -726,7 +726,7 @@ Toelichting:
 
 ### Fase 2 — volledige voortgang en ouder-dashboard
 
-- **ADR 0014:** datamodel, merge-regels, retentie en dashboardtoegang.
+- **ADR 0015:** datamodel, merge-regels, retentie en dashboardtoegang.
 - **Data:** SRS/franse voortgang per item, achievements, grove statistieken. Gebruik per-item merge of een event-log als LWW aantoonbaar verkeerd gaat.
 - **Dashboard:** alleen voor de ouder/verzorger; geen publieke profielen, geen ranglijst, geen chat. Toon voortgang per slot, niet per kindnaam.
 - **Privacy:** consent-record, export, delete, retention-job (Cron Trigger of handmatige beheerstaak). D1 Time Travel blijft een aandachtspunt.
@@ -735,7 +735,7 @@ Toelichting:
 
 ### Fase 3 — multiplayer
 
-- **ADR 0015:** realtime-architectuur, rooms, autoritatieve state, misbruikpreventie, kosten.
+- **ADR 0016:** realtime-architectuur, rooms, autoritatieve state, misbruikpreventie, kosten.
 - **Techniek:** Durable Objects per room/sessie; D1 voor profielen en persistente voortgang; WebSockets met hibernation. D1 is niet geschikt als realtime spelserver ([D1-limieten](https://developers.cloudflare.com/d1/platform/limits/), [DO-pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)).
 - **Veiligheid:** alleen spelen met bekenden (code/link), geen publieke matchmaking, geen chat, geen user-generated content, geen namen van kinderen. Dit is een product- en veiligheidsbeslissing, niet alleen een technische.
 - **CSP:** `connect-src 'self'` blijft; voeg alleen same-origin `wss` toe als de browser dat expliciet eist.
@@ -766,12 +766,12 @@ De eigenaar moet dan expliciet het volgende beslissen:
 1. **ADR 0012 goedkeuren:** auth- en backendontwerp, zelfde origin, D1, `run_worker_first`, CSP-wijziging, secrets en rollback.
 2. **ADR 0013 goedkeuren:** privacy en gegevensverwerking, inclusief verwerkingsverantwoordelijke, grondslag, bewaartermijn, verwerkers (Cloudflare, eventueel e-mail), ouderlijke toestemming en verwijdering.
 3. **Auth-methode kiezen:** passkey (aanbevolen) of e-mail/wachtwoord. Als het e-mail wordt: keur dan ook de e-mailprovider en de DPA goed.
-4. **Sync-scope kiezen:** alleen instellingen en scores, of ook actieve borden en SRS. Elke uitbreiding vraagt een aparte ADR of een expliciete wijziging van ADR 0014.
+4. **Sync-scope kiezen:** alleen instellingen en scores, of ook actieve borden en SRS. Elke uitbreiding vraagt een aparte ADR of een expliciete wijziging van ADR 0015.
 5. **Bewaartermijn en verwijderprocedure vaststellen:** 12 maanden inactiviteit is een voorstel, geen wet. Leg uit hoe een ouder exporteert en verwijdert.
 6. **CPU en plankeuze:** meet de CPU van de gekozen auth-methode; het gratis plan volstaat als die onder 10 ms blijft, anders is Workers Paid (US$ 5/maand) nodig.
 7. **D1 `database_id` en previews beleid kiezen:** wat komt in de publieke repo, en is auth op previews uit of apart?
 
-**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0014 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0015 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
+**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0015 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0016 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
 
 ## Bronnen
 

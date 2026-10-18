@@ -4,12 +4,13 @@ import {
   digitCounts,
   filledCount,
   findConflicts,
+  hintDetailCells,
   type PlayState,
   type SudokuHint,
 } from "@entities/sudoku";
 import { playHaptic, playSound } from "@shared/lib";
 import { symbolsFor, type MistakeMode, type SymbolTheme } from "./settings";
-import { hintText, statusText } from "./sudoku-view";
+import { hintDetailText, hintText, statusText } from "./sudoku-view";
 import { useSudokuCelebration } from "./use-sudoku-celebration";
 import { useSudokuKeyboard } from "./use-sudoku-keyboard";
 import { useSudokuStore } from "./use-sudoku-store";
@@ -28,6 +29,7 @@ interface DerivedPlay {
   visibleMistakes: Set<number>;
   status: string;
   hintMessage: string | null;
+  hintCells: number[];
   almostSolved: boolean;
 }
 
@@ -41,6 +43,7 @@ const EMPTY_DERIVED: DerivedPlay = {
   visibleMistakes: EMPTY_SET,
   status: "",
   hintMessage: null,
+  hintCells: [],
   almostSolved: false,
 };
 
@@ -58,11 +61,11 @@ function selectedValueFor(play: PlayState): number | null {
 function hintMessageFor(
   hintPreview: SudokuHint | null,
   hintUnavailable: boolean,
+  hintDetailed: boolean,
   solutionMistakes: readonly number[],
-  symbols: readonly string[],
 ): string | null {
   if (hintPreview) {
-    return hintText(hintPreview, symbols);
+    return hintDetailed ? hintDetailText(hintPreview) : hintText(hintPreview);
   }
   if (!hintUnavailable) {
     return null;
@@ -70,14 +73,18 @@ function hintMessageFor(
   return solutionMistakes.length > 0 ? "Los eerst het foutje op." : "Er is nu geen logische hint.";
 }
 
-function derivePlay(
-  play: PlayState,
-  mistakeMode: MistakeMode,
-  theme: SymbolTheme,
-  check: CheckResult | null,
-  hintPreview: SudokuHint | null,
-  hintUnavailable: boolean,
-): DerivedPlay {
+interface DeriveInput {
+  play: PlayState;
+  mistakeMode: MistakeMode;
+  theme: SymbolTheme;
+  check: CheckResult | null;
+  hintPreview: SudokuHint | null;
+  hintUnavailable: boolean;
+  hintDetailed: boolean;
+}
+
+function derivePlay(input: DeriveInput): DerivedPlay {
+  const { play, mistakeMode, theme, check, hintPreview, hintUnavailable, hintDetailed } = input;
   const symbols = symbolsFor(play.puzzle.size, theme);
   const solutionMistakes = countMistakes(play.entries, play.puzzle.solution);
   const conflicts = findConflicts(play.puzzle, play.entries);
@@ -104,7 +111,13 @@ function derivePlay(
       filled,
       total: play.entries.length,
     }),
-    hintMessage: hintMessageFor(hintPreview, hintUnavailable, solutionMistakes, symbols),
+    hintMessage: hintMessageFor(hintPreview, hintUnavailable, hintDetailed, solutionMistakes),
+    hintCells:
+      hintPreview === null
+        ? []
+        : hintDetailed
+          ? hintDetailCells(play.puzzle, hintPreview)
+          : hintPreview.related,
     almostSolved: play.entries.length - filled === 1 && !play.solved,
   };
 }
@@ -179,6 +192,12 @@ function useSudokuActions(
     }
   };
 
+  const handleHintDetail = () => {
+    playSound("tap");
+    playHaptic("tap");
+    useSudokuStore.getState().detailHint();
+  };
+
   const handleUndo = () => {
     playSound("tap");
     playHaptic("tap");
@@ -206,6 +225,7 @@ function useSudokuActions(
     handlePick,
     handleErase,
     handleHint,
+    handleHintDetail,
     handleUndo,
     handleRestart,
     handleCheck,
@@ -219,6 +239,7 @@ export function useSudokuPlay() {
   const history = useSudokuStore((state) => state.history);
   const hintPreview = useSudokuStore((state) => state.hintPreview);
   const hintUnavailable = useSudokuStore((state) => state.hintUnavailable);
+  const hintDetailed = useSudokuStore((state) => state.hintDetailed);
   const [check, setCheck] = useState<CheckResult | null>(null);
   const celebration = useSudokuCelebration(play);
   useSudokuKeyboard(Boolean(play));
@@ -226,16 +247,17 @@ export function useSudokuPlay() {
   const derived = useMemo(
     () =>
       play
-        ? derivePlay(
+        ? derivePlay({
             play,
-            settings.mistakeMode,
-            settings.theme,
+            mistakeMode: settings.mistakeMode,
+            theme: settings.theme,
             check,
             hintPreview,
             hintUnavailable,
-          )
+            hintDetailed,
+          })
         : EMPTY_DERIVED,
-    [play, settings.mistakeMode, settings.theme, check, hintPreview, hintUnavailable],
+    [play, settings.mistakeMode, settings.theme, check, hintPreview, hintUnavailable, hintDetailed],
   );
   const actions = useSudokuActions(play, hintPreview, setCheck);
 
@@ -244,6 +266,7 @@ export function useSudokuPlay() {
     settings,
     history,
     hintPreview,
+    hintDetailed,
     ...derived,
     ...actions,
     celebration,

@@ -10,6 +10,7 @@ interface SudokuBoardProps {
   mistakes: ReadonlySet<number>;
   conflicts: ReadonlySet<number>;
   hint?: SudokuHint | null;
+  hintCells?: readonly number[];
   onSelect: (index: number) => void;
 }
 
@@ -22,12 +23,13 @@ export function SudokuBoard({
   mistakes,
   conflicts,
   hint = null,
+  hintCells,
   onSelect,
 }: SudokuBoardProps) {
   const geometry = geometryFor(puzzle.size);
   const { size } = geometry;
   const selectedValue = selected === null ? 0 : puzzle.givens[selected] || entries[selected];
-  const hintUnit = new Set(hint?.related ?? []);
+  const hintUnit = new Set(hintCells ?? hint?.related ?? []);
   const cells = Array.from({ length: size * size }, (_, index) => {
     const row = Math.floor(index / size);
     const col = index % size;

@@ -18,6 +18,7 @@ export function SudokuPlay() {
           conflicts={model.conflicts}
           entries={model.play.entries}
           hint={model.hintPreview}
+          hintCells={model.hintCells}
           hinted={model.play.hinted}
           mistakes={model.visibleMistakes}
           puzzle={model.play.puzzle}
@@ -40,10 +41,12 @@ export function SudokuPlay() {
           canUndo={model.canUndo}
           checkMode={model.checkMode}
           hintActive={model.hintActive}
+          hintDetailed={model.hintDetailed}
           solved={model.play.solved}
           onCheck={model.handleCheck}
           onErase={model.handleErase}
           onHint={model.handleHint}
+          onHintDetail={model.handleHintDetail}
           onRestart={model.handleRestart}
           onUndo={model.handleUndo}
         />

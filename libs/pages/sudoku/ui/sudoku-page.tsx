@@ -55,6 +55,7 @@ export function SudokuPage() {
 
       {play?.solved && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description="Je hebt de sudoku helemaal opgelost."
           title="Goed gedaan!"
           onAgain={() => useSudokuStore.getState().newPuzzle()}
