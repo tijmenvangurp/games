@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import type { MemoryScene } from "@entities/memory";
@@ -24,6 +24,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
 });
 
 function renderApp(path = "/memory") {
@@ -121,6 +122,36 @@ describe("pokémon memory", () => {
     expect(
       (await screen.findAllByRole("button", { name: "Omgedraaide kaart" })).length,
     ).toBeGreaterThan(0);
+  });
+
+  it("gives haptic feedback on a flip, a match and a mismatch", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    await startGame();
+    const scene = useMemoryStore.getState().scene;
+    if (!scene) {
+      throw new Error("No memory scene");
+    }
+    const entries = [...indexesByPokemon(scene).entries()];
+
+    fireEvent.click(cardNode(entries[0]?.[1][0] ?? 0));
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+
+    fireEvent.click(cardNode(entries[0]?.[1][1] ?? 1));
+    expect(vibrate).toHaveBeenLastCalledWith([10, 30, 10]);
+
+    const second = entries[1]?.[1][0];
+    const third = entries[2]?.[1][0];
+    if (second === undefined || third === undefined) {
+      throw new Error("Not enough cards for a mismatch");
+    }
+    fireEvent.click(cardNode(second));
+    fireEvent.click(cardNode(third));
+    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
   });
 
   it("stores the chosen difficulty and uses it for the deck", async () => {

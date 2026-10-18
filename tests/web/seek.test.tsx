@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import type { SeekScene } from "@entities/hidden-object";
@@ -23,6 +23,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
 });
 
 function renderApp(path = "/zoeken") {
@@ -94,6 +95,33 @@ describe("seek and find", () => {
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Terug naar je zoekveld/ }));
     expect(await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
+  });
+
+  it("gives haptic feedback on a wrong tap, a hint and a find", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    renderApp();
+    fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
+    await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i });
+
+    const scene = currentScene();
+    const decoy = scene.creatures.find((creature) => creature.id !== scene.targetId);
+    if (!decoy) {
+      throw new Error("No decoy found");
+    }
+
+    fireEvent.click(creatureNode(decoy.id));
+    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+
+    fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+    expect(vibrate).toHaveBeenLastCalledWith(20);
+
+    fireEvent.click(creatureNode(scene.targetId));
+    expect(vibrate).toHaveBeenLastCalledWith([20, 40, 20]);
   });
 
   it("is playable with the keyboard", async () => {

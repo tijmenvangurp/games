@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { findTarget } from "@entities/hidden-object";
-import { playSound } from "@shared/lib";
+import { playHaptic, playSound } from "@shared/lib";
 import { Button, RotateCcw, Search } from "@shared/ui";
 import { useSeekStore } from "../model/use-seek-store";
 import { CreatureGlyph } from "./creature-glyph";
@@ -43,8 +43,14 @@ export function SeekPlay() {
     const wasFound = useSeekStore.getState().found;
     useSeekStore.getState().tap(id);
     const next = useSeekStore.getState();
-    if (!wasFound && !next.found && next.wrongId === id) {
+    if (wasFound) {
+      return;
+    }
+    if (next.found) {
+      playHaptic("win");
+    } else if (next.wrongId === id) {
       playSound("wrong");
+      playHaptic("wrong");
     }
   };
 
@@ -77,6 +83,7 @@ export function SeekPlay() {
               variant="outline"
               onClick={() => {
                 playSound("hint");
+                playHaptic("hint");
                 useSeekStore.getState().showHint();
               }}
             >
@@ -87,6 +94,7 @@ export function SeekPlay() {
               variant="outline"
               onClick={() => {
                 playSound("tap");
+                playHaptic("tap");
                 useSeekStore.getState().newScene();
               }}
             >
