@@ -1,7 +1,7 @@
 # Woordzoeker: bibliotheken voor een Nederlandse woordzoeker
 
 - **Datum:** 2026-10-18
-- **Status:** Onderzoek. Inmiddels is `@aydee-app/word-search` gekozen en geïmplementeerd; zie [ADR 0009](../adr/0009-woordzoeker.md). De vergelijking en de alternatieven hieronder blijven geldig.
+- **Status:** Onderzoek. De eerste implementatie gebruikte `@aydee-app/word-search`, maar die is vervangen door een eigen generator toen richtingniveaus nodig waren; zie [ADR 0011](../adr/0011-woordzoeker-richtingen.md). De vergelijking en alternatieven hieronder blijven geldig.
 - **Aanleiding:** een nieuw spel “Woordzoeker” met de bestaande thema’s **Tuin** en **Onder water**, dezelfde thema’s als het zoekspel `Waar is Wobbel?`.
 - **Vraag:** welke npm-bibliotheek genereert een Nederlandse woordzoeker met zo weinig mogelijk eigen code, en past die binnen een publieke, statische Nx/React-app zonder backend of externe requests?
 - **Kader:** [AGENTS.md](../../AGENTS.md), [ADR 0001](../adr/0001-publieke-statische-spellen-app.md) en de [CSP in `_headers`](../../apps/games/public/_headers).
@@ -16,7 +16,7 @@ Geen van de onderzochte pakketten combineert **Nederlandse woorden, oplossingsco
 2. **Terugval: `@blex41/word-search`** als de voorkeur “geen plaatsingscode onderhouden” zwaarder weegt dan seed-determinisme. Het is het enige volwassen pakket met alle acht richtingen, uitschakelbare richtingen en `path`-coördinaten per woord. Nadelen: geen TypeScript-types, CJS in plaats van ESM, geen seed, 12 KB gzip en de laatste release is van 2021.
 3. **Alleen als vooruit-only acceptabel is: `@aydee-app/word-search`.** Klein (1,8 KB gzip), ESM, TypeScript en nul runtime-dependencies, maar het plaatst alleen horizontaal, verticaal en diagonaal naar beneden-rechts, heeft geen seed en gooit een fout als een woord niet past.
 
-**In de uiteindelijke implementatie is voor `@aydee-app/word-search` gekozen**, omdat de wens “zo weinig mogelijk eigen code” zwaarder woog dan seed-determinisme. Zie [5.4](#54-als-zo-weinig-mogelijk-eigen-code-een-harde-eis-is) en [ADR 0009](../adr/0009-woordzoeker.md).
+**Uiteindelijk is een eigen generator gekozen**, omdat de richtingniveaus (makkelijk alleen vooruit, moeilijk alle acht richtingen) met `@aydee` niet te maken zijn. Zie [ADR 0011](../adr/0011-woordzoeker-richtingen.md).
 
 Een eigen generator is hier geen “not invented here”-reflex: de plaatsingslogica is klein, de eisen zijn smal (10×10, 12×12 of 14×14, 8–12 woorden, twee thema’s) en de repo heeft al een deterministische PRNG en generator-tests. De bibliotheek kost ons vooral een extra abstractie, een licentie-audit en een bundel van 2–12 KB (geschat), zonder de UI te leveren.
 

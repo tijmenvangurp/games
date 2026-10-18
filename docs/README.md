@@ -12,6 +12,7 @@
 - `adr/0008-schaakpuzzels.md` — de lokale Lichess-puzzelsselectie en de puzzelrunner.
 - `adr/0009-woordzoeker.md` — de woordzoeker, de generator-bibliotheek, de formaten en de zoomstand.
 - `adr/0010-tafel-topper.md` — de reken trainer, de niveaus, sterren en lokale beste scores.
+- `adr/0011-woordzoeker-richtingen.md` — de eigen generator en de richtingniveaus van de woordzoeker.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

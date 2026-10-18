@@ -89,6 +89,10 @@ test.describe("woordzoeker op een telefoon", () => {
     )) as boolean;
     expect(overflowsZoomed).toBe(false);
   });
+});
+
+test.describe("woordzoeker slepen op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
 
   test("sleept een woord door", async ({ page }) => {
     await page.goto("/woordzoeker");
@@ -121,5 +125,6 @@ test.describe("woordzoeker op een telefoon", () => {
       "aria-pressed",
       "true",
     );
+    await expect(board.locator(`[data-word="${firstWord}"]`)).toHaveCount(1);
   });
 });
