@@ -1,5 +1,5 @@
 import { MEMORY_DIFFICULTIES, type MemoryDifficulty } from "@entities/memory";
-import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
+import { GAME_STORAGE_KEYS, profileStorageKey, writeGameProgress } from "@shared/lib";
 import { DEFAULT_MEMORY_SETTINGS, type MemorySettings } from "./settings";
 
 const STORAGE_KEY = GAME_STORAGE_KEYS.memory;
@@ -8,18 +8,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isDifficulty(value: unknown): value is MemoryDifficulty {
+export function isMemoryDifficulty(value: unknown): value is MemoryDifficulty {
   return typeof value === "string" && (MEMORY_DIFFICULTIES as readonly string[]).includes(value);
 }
 
-export function loadMemorySettings(): MemorySettings {
+export function loadMemorySettings(profileId?: string): MemorySettings {
   try {
-    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY, profileId));
     if (!raw) {
       return DEFAULT_MEMORY_SETTINGS;
     }
     const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed) || !isDifficulty(parsed.difficulty)) {
+    if (!isRecord(parsed) || !isMemoryDifficulty(parsed.difficulty)) {
       return DEFAULT_MEMORY_SETTINGS;
     }
     return { difficulty: parsed.difficulty };
@@ -28,10 +28,6 @@ export function loadMemorySettings(): MemorySettings {
   }
 }
 
-export function saveMemorySettings(settings: MemorySettings): void {
-  try {
-    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(settings));
-  } catch {
-    // Storage may be unavailable (private mode); playing still works.
-  }
+export function saveMemorySettings(settings: MemorySettings, profileId?: string): void {
+  writeGameProgress(STORAGE_KEY, "memory", settings, profileId);
 }

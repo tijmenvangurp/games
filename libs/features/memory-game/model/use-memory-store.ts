@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { createMemoryScene, type MemoryDifficulty, type MemoryScene } from "@entities/memory";
-import { loadMemorySettings, saveMemorySettings } from "./storage";
+import { parseSyncableProgress } from "@entities/progress";
+import {
+  readActiveProfileId,
+  registerProgressAdapter,
+  withSuppressedProgressEvents,
+} from "@shared/lib";
+import { isMemoryDifficulty, loadMemorySettings, saveMemorySettings } from "./storage";
 import { flipCard } from "./flip-card";
 import type { MemorySettings } from "./settings";
 
@@ -71,3 +77,23 @@ export const useMemoryStore = create<MemoryStore>((set, get) => ({
     saveMemorySettings(settings);
   },
 }));
+
+registerProgressAdapter("memory", {
+  read: (profileId) => {
+    const settings = loadMemorySettings(profileId);
+    return { settings: { difficulty: settings.difficulty } };
+  },
+  apply: (profileId, value) => {
+    const parsed = parseSyncableProgress(value);
+    const difficulty = parsed?.settings?.difficulty;
+    if (!isMemoryDifficulty(difficulty)) {
+      return;
+    }
+    withSuppressedProgressEvents(() => {
+      if (profileId === readActiveProfileId()) {
+        useMemoryStore.setState({ settings: { difficulty } });
+      }
+      saveMemorySettings({ difficulty }, profileId);
+    });
+  },
+});

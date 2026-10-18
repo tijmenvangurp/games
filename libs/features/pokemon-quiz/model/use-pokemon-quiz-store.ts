@@ -1,6 +1,16 @@
 import { create } from "zustand";
+import { parseSyncableProgress } from "@entities/progress";
+import {
+  readActiveProfileId,
+  registerProgressAdapter,
+  withSuppressedProgressEvents,
+} from "@shared/lib";
 import { createQuizQuestion, type QuizDifficulty, type QuizQuestion } from "./quiz";
-import { loadPokemonQuizSettings, savePokemonQuizSettings } from "./storage";
+import {
+  isPokemonQuizDifficulty,
+  loadPokemonQuizSettings,
+  savePokemonQuizSettings,
+} from "./storage";
 import type { PokemonQuizSettings } from "./settings";
 
 interface PokemonQuizStore {
@@ -62,3 +72,23 @@ export const usePokemonQuizStore = create<PokemonQuizStore>((set, get) => ({
     savePokemonQuizSettings(settings);
   },
 }));
+
+registerProgressAdapter("pokemon-quiz", {
+  read: (profileId) => {
+    const settings = loadPokemonQuizSettings(profileId);
+    return { settings: { difficulty: settings.difficulty } };
+  },
+  apply: (profileId, value) => {
+    const parsed = parseSyncableProgress(value);
+    const difficulty = parsed?.settings?.difficulty;
+    if (!isPokemonQuizDifficulty(difficulty)) {
+      return;
+    }
+    withSuppressedProgressEvents(() => {
+      if (profileId === readActiveProfileId()) {
+        usePokemonQuizStore.setState({ settings: { difficulty } });
+      }
+      savePokemonQuizSettings({ difficulty }, profileId);
+    });
+  },
+});

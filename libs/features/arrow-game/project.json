@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-arrow", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-arrow", "entities-progress", "shared-lib", "shared-ui"]
 }

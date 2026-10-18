@@ -1,4 +1,4 @@
-import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
+import { GAME_STORAGE_KEYS, profileStorageKey, writeGameProgress } from "@shared/lib";
 import { QUIZ_DIFFICULTIES, type QuizDifficulty } from "./quiz";
 import { DEFAULT_POKEMON_QUIZ_SETTINGS, type PokemonQuizSettings } from "./settings";
 
@@ -8,18 +8,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
 
-function isDifficulty(value: unknown): value is QuizDifficulty {
+export function isPokemonQuizDifficulty(value: unknown): value is QuizDifficulty {
   return typeof value === "string" && (QUIZ_DIFFICULTIES as readonly string[]).includes(value);
 }
 
-export function loadPokemonQuizSettings(): PokemonQuizSettings {
+export function loadPokemonQuizSettings(profileId?: string): PokemonQuizSettings {
   try {
-    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY, profileId));
     if (!raw) {
       return DEFAULT_POKEMON_QUIZ_SETTINGS;
     }
     const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed) || !isDifficulty(parsed.difficulty)) {
+    if (!isRecord(parsed) || !isPokemonQuizDifficulty(parsed.difficulty)) {
       return DEFAULT_POKEMON_QUIZ_SETTINGS;
     }
     return { difficulty: parsed.difficulty };
@@ -28,10 +28,6 @@ export function loadPokemonQuizSettings(): PokemonQuizSettings {
   }
 }
 
-export function savePokemonQuizSettings(settings: PokemonQuizSettings): void {
-  try {
-    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(settings));
-  } catch {
-    // Storage may be unavailable (private mode); playing still works.
-  }
+export function savePokemonQuizSettings(settings: PokemonQuizSettings, profileId?: string): void {
+  writeGameProgress(STORAGE_KEY, "pokemon-quiz", settings, profileId);
 }

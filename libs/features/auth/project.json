@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-profile", "shared-ui"]
+  "implicitDependencies": ["entities-profile", "shared-lib", "shared-ui"]
 }

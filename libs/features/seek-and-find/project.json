@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-hidden-object", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-hidden-object", "entities-progress", "shared-lib", "shared-ui"]
 }

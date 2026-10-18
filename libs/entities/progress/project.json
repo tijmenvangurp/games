@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-progress",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/progress",
+  "tags": ["layer:entities", "scope:progress", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/progress"
+      }
+    }
+  },
+  "implicitDependencies": []
+}
