@@ -1,10 +1,35 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { PUZZLES, useChessPuzzle } from "@features/chess-puzzles";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  PUZZLES,
+  PUZZLE_PROGRESS_STORAGE_KEY,
+  useChessPuzzle,
+  usePuzzleProgress,
+} from "@features/chess-puzzles";
+
+beforeEach(() => {
+  localStorage.clear();
+});
 
 afterEach(() => {
   cleanup();
   Reflect.deleteProperty(navigator, "vibrate");
+});
+
+describe("usePuzzleProgress", () => {
+  it("marks a puzzle solved and stores it locally", () => {
+    const { result } = renderHook(() => usePuzzleProgress());
+    const puzzleId = PUZZLES[0].id;
+
+    act(() => {
+      result.current.markSolved(puzzleId);
+    });
+
+    expect(result.current.solved.has(puzzleId)).toBe(true);
+    expect(JSON.parse(localStorage.getItem(PUZZLE_PROGRESS_STORAGE_KEY) ?? "{}")).toEqual({
+      solved: [puzzleId],
+    });
+  });
 });
 
 describe("useChessPuzzle", () => {
@@ -26,6 +51,45 @@ describe("useChessPuzzle", () => {
     });
 
     expect(accepted).toBe(true);
+    expect(result.current.status).toBe("solved");
+    expect(result.current.feedback).toBe("solved");
+  });
+
+  it("plays a mate-in-two through both player moves", () => {
+    const puzzle = PUZZLES.find(
+      (candidate) => candidate.moves.length === 4 && candidate.kind === "mate",
+    );
+    if (!puzzle) {
+      throw new Error("Mate-in-two puzzle not found");
+    }
+
+    const { result } = renderHook(() => useChessPuzzle(puzzle));
+    const firstMove = puzzle.moves[1];
+    if (!firstMove) {
+      throw new Error("Mate-in-two puzzle has no first move");
+    }
+
+    act(() => {
+      result.current.onPieceDrop(firstMove.slice(0, 2), firstMove.slice(2, 4));
+    });
+
+    expect(result.current.status).toBe("playing");
+    expect(result.current.feedback).toBe("correct");
+
+    act(() => {
+      result.current.showHint();
+    });
+
+    const hint = result.current.hintMove;
+    expect(hint).not.toBeNull();
+    if (!hint) {
+      throw new Error("Mate-in-two puzzle has no second hint");
+    }
+
+    act(() => {
+      result.current.onPieceDrop(hint.from, hint.to);
+    });
+
     expect(result.current.status).toBe("solved");
     expect(result.current.feedback).toBe("solved");
   });

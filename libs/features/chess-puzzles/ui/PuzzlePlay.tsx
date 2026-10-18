@@ -1,16 +1,16 @@
-import { useId, useMemo } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, Check, Lightbulb, Play, RotateCcw } from "@shared/ui";
+import { Button, Check, LayoutGrid, Lightbulb, Play, RotateCcw } from "@shared/ui";
 import { useChessPuzzle } from "../model/useChessPuzzle";
-import {
-  PUZZLE_DIFFICULTIES,
-  type ChessPuzzle,
-  type PuzzleDifficulty,
-  type PuzzleFeedback,
-  type PuzzleKind,
-  type PuzzleStatus,
+import type {
+  ChessPuzzle,
+  PuzzleDifficulty,
+  PuzzleFeedback,
+  PuzzleKind,
+  PuzzleStatus,
 } from "../model/types";
+import { PuzzleDifficultyPicker } from "./PuzzleDifficultyPicker";
 
 interface PuzzlePlayProps {
   readonly difficulty: PuzzleDifficulty;
@@ -19,19 +19,33 @@ interface PuzzlePlayProps {
   readonly total: number;
   readonly onDifficultyChange: (difficulty: PuzzleDifficulty) => void;
   readonly onNext: () => void;
+  readonly onOverview: () => void;
+  readonly onSolved?: (puzzle: ChessPuzzle) => void;
 }
 
 function titleFor(kind: PuzzleKind): string {
-  return kind === "mate" ? "Zet schaakmat!" : "Win een stuk!";
+  switch (kind) {
+    case "mate":
+      return "Zet schaakmat!";
+    case "capture":
+      return "Win een stuk!";
+    case "tactic":
+      return "Vind de beste zet!";
+  }
 }
 
 function promptFor(kind: PuzzleKind, playerColor: "w" | "b"): string {
   const player = playerColor === "w" ? "wit" : "zwart";
   const opponent = playerColor === "w" ? "zwarte" : "witte";
 
-  return kind === "mate"
-    ? `Je bent ${player}. Zet de ${opponent} koning schaakmat.`
-    : `Je bent ${player}. Welke zet wint een stuk?`;
+  switch (kind) {
+    case "mate":
+      return `Je bent ${player}. Zet de ${opponent} koning schaakmat.`;
+    case "capture":
+      return `Je bent ${player}. Welke zet wint een stuk?`;
+    case "tactic":
+      return `Je bent ${player}. Welke zet is de beste?`;
+  }
 }
 
 interface PuzzleHeaderProps {
@@ -53,46 +67,6 @@ function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHead
       </h2>
       <p className="text-sm font-semibold text-slate-600">{promptFor(puzzle.kind, playerColor)}</p>
     </header>
-  );
-}
-
-interface DifficultyPickerProps {
-  readonly current: PuzzleDifficulty;
-  readonly onSelect: (difficulty: PuzzleDifficulty) => void;
-}
-
-function DifficultyPicker({ current, onSelect }: DifficultyPickerProps) {
-  return (
-    <nav aria-label="Kies een moeilijkheidsgraad" className="grid grid-cols-3 gap-2">
-      {PUZZLE_DIFFICULTIES.map((option) => {
-        const active = option.id === current;
-
-        return (
-          <button
-            key={option.id}
-            type="button"
-            aria-pressed={active}
-            className={cn(
-              "min-h-11 rounded-xl border-2 px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
-              active
-                ? "border-teal-500 bg-teal-100 text-teal-950"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-            )}
-            onClick={() => onSelect(option.id)}
-          >
-            <span className="block">{option.label}</span>
-            <span
-              className={cn(
-                "mt-0.5 block text-xs font-medium",
-                active ? "text-teal-800" : "text-slate-500",
-              )}
-            >
-              {option.hint}
-            </span>
-          </button>
-        );
-      })}
-    </nav>
   );
 }
 
@@ -118,7 +92,14 @@ interface PuzzleStatusProps {
 
 function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleStatus): string {
   if (status === "solved") {
-    return kind === "mate" ? "Schaakmat! Knap gedaan." : "Gelukt! Je hebt een stuk gewonnen.";
+    switch (kind) {
+      case "mate":
+        return "Schaakmat! Knap gedaan.";
+      case "capture":
+        return "Gelukt! Je hebt een stuk gewonnen.";
+      case "tactic":
+        return "Gelukt! Je hebt de beste zet gevonden.";
+    }
   }
 
   if (feedback === "wrong") {
@@ -126,7 +107,7 @@ function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleSt
   }
 
   if (feedback === "correct") {
-    return "Goed zo! De tegenstander heeft geantwoord.";
+    return "Goed zo! De tegenstander heeft geantwoord. Jij mag weer.";
   }
 
   return "Sleep een stuk of tik erop. Groene stippen zijn legale zetten.";
@@ -157,20 +138,30 @@ interface PuzzleActionsProps {
   readonly solved: boolean;
   readonly onHint: () => void;
   readonly onNext: () => void;
+  readonly onOverview: () => void;
   readonly onReset: () => void;
 }
 
-function PuzzleActions({ solved, onHint, onNext, onReset }: PuzzleActionsProps) {
+function PuzzleActions({ solved, onHint, onNext, onOverview, onReset }: PuzzleActionsProps) {
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-11" disabled={solved} variant="outline" onClick={onHint}>
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          className="min-h-12 px-2 text-xs sm:text-sm"
+          disabled={solved}
+          variant="outline"
+          onClick={onHint}
+        >
           <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
           Hint
         </Button>
-        <Button className="min-h-11" variant="outline" onClick={onReset}>
+        <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>
           <RotateCcw aria-hidden="true" className="size-4" />
           Opnieuw
+        </Button>
+        <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onOverview}>
+          <LayoutGrid aria-hidden="true" className="size-4" />
+          Overzicht
         </Button>
       </div>
       <Button className="w-full" disabled={!solved} size="lg" variant="success" onClick={onNext}>
@@ -188,9 +179,21 @@ export function PuzzlePlay({
   total,
   onDifficultyChange,
   onNext,
+  onOverview,
+  onSolved,
 }: PuzzlePlayProps) {
   const puzzleState = useChessPuzzle(puzzle);
   const titleId = useId();
+  const solvedRef = useRef(false);
+
+  useEffect(() => {
+    if (puzzleState.status !== "solved" || solvedRef.current) {
+      return;
+    }
+
+    solvedRef.current = true;
+    onSolved?.(puzzle);
+  }, [onSolved, puzzle, puzzleState.status]);
 
   const squareStyles = useMemo(
     () =>
@@ -226,7 +229,7 @@ export function PuzzlePlay({
         titleId={titleId}
         total={total}
       />
-      <DifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
+      <PuzzleDifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
       <BoardPanel options={boardOptions} />
       <PuzzleStatusBanner
         feedback={puzzleState.feedback}
@@ -237,6 +240,7 @@ export function PuzzlePlay({
         solved={puzzleState.status === "solved"}
         onHint={puzzleState.showHint}
         onNext={onNext}
+        onOverview={onOverview}
         onReset={puzzleState.resetPuzzle}
       />
     </section>

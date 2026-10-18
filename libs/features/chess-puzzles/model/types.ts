@@ -1,6 +1,6 @@
 import type { Color, PieceSymbol, Square } from "chess.js";
 
-export type PuzzleKind = "mate" | "capture";
+export type PuzzleKind = "mate" | "capture" | "tactic";
 export type PuzzleDifficulty = "easy" | "medium" | "hard";
 
 export interface PuzzleDifficultyOption {
@@ -10,9 +10,9 @@ export interface PuzzleDifficultyOption {
 }
 
 export const PUZZLE_DIFFICULTIES = [
-  { id: "easy", label: "Makkelijk", hint: "Mat in één" },
-  { id: "medium", label: "Lastig", hint: "Denk goed na" },
-  { id: "hard", label: "Uitdagend", hint: "Voor durfals" },
+  { id: "easy", label: "Makkelijk", hint: "Eén zet" },
+  { id: "medium", label: "Lastig", hint: "Twee zetten" },
+  { id: "hard", label: "Uitdagend", hint: "Tactiek" },
 ] as const satisfies readonly PuzzleDifficultyOption[];
 
 export interface ChessPuzzle {
