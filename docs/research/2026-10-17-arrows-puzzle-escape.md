@@ -145,7 +145,7 @@ Regels:
 
 **Runtime (sinds 2026-10-17).** Een pijl glijdt als een slang langs zijn eigen polyline naar buiten: de kop schuift recht vooruit en het lijf volgt hetzelfde spoor. Daardoor bezet de pijl alleen nieuwe cellen in de **baan vóór de pijlpunt**, en een pijl kan weg zodra die baan vrij is. Een buur die de baan slechts in een hoekpunt raakt blokkeert niet; een buur die de baan echt kruist of er collineair vóór ligt wel. Zie `isArrowRemovable` in `libs/entities/arrow/model/geometry.ts`. Dit vervangt de eerdere regel “het volledige lichaam moet vrij baan hebben”, die te streng was: twee pijlen met naast elkaar liggende, loodrechte punten konden daardoor onnodig geblokkeerd raken.
 
-**Levelgenerator.** De generator gebruikt bewust nog de strengere regel: een **star lichaam** dat recht in de richting van de punt schuift, zodat ook de staart zijwaarts kan vegen (`isArrowRemovableRigid`). Een star-vrije volgorde is altijd ook baan-vrij, dus zo blijven de levels gegarandeerd oplosbaar én verandert hun uiterlijk niet.
+**Levelgenerator (bijgewerkt).** De generator gebruikt dezelfde baan-regel als de runtime (`isArrowRemovable`). Eerder gebruikte hij een strengere starre sweep (`isArrowRemovableRigid`); die verwijderde onnodig veel pijlen en was een tweede regel die uit de pas kon lopen met het spel. Na het genereren controleert `buildLevel` met `solveMaze` dat het level oplosbaar is. Zo is er één bron van waarheid en is elk level gegarandeerd oplosbaar: de generator bewaart alleen pijlen in de volgorde waarin hij ze kon verwijderen.
 
 Voor elk segment `S` van pijl `A` en elk segment `T` van een andere, nog aanwezige pijl:
 

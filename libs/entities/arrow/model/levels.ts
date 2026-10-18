@@ -1,4 +1,5 @@
 import { buildContourArrows } from "./contour";
+import { solveMaze } from "./geometry";
 import { createShapeMask, type ShapeMask, type ShapeName } from "./shapes";
 import type { MazeDifficulty, MazeLevel } from "./types";
 
@@ -140,7 +141,7 @@ function buildLevel(spec: LevelSpec): MazeLevel {
     seed: spec.seed,
   });
 
-  return {
+  const level: MazeLevel = {
     id: spec.id,
     name: spec.name,
     difficulty: spec.difficulty,
@@ -148,6 +149,15 @@ function buildLevel(spec: LevelSpec): MazeLevel {
     height: spec.size,
     arrows,
   };
+
+  // The generator only keeps arrows it could clear, so this must always pass.
+  // Guarding it here makes the solvability contract explicit: a level that
+  // cannot be solved never reaches the game.
+  if (arrows.length === 0 || solveMaze(level) === null) {
+    throw new Error(`Arrow level ${spec.id} is not solvable`);
+  }
+
+  return level;
 }
 
 export const MAZE_LEVELS: readonly MazeLevel[] = LEVEL_SPECS.map(buildLevel);

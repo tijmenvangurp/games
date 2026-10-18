@@ -88,7 +88,7 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
   });
 
-  it("lets a bent arrow leave when only a rigid tail sweep would cross a neighbour", () => {
+  it("lets a bent arrow leave when only its tail would cross a neighbour", () => {
     const mover = arrow(1, [
       [2, 4],
       [2, 2],
