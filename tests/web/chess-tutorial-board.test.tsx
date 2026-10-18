@@ -15,7 +15,7 @@ describe("TutorialBoard", () => {
     expect(screen.getByRole("button", { name: "Opnieuw" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: "Volgende les" })).toBeNull();
     expect(screen.getByRole("group", { name: /coördinaten/i })).toBeTruthy();
-    expect(container.querySelector('[data-square="e1"]')?.textContent).toContain("⭐");
+    expect(container.querySelector('[data-square="e5"]')?.textContent).toContain("⭐");
     expect(screen.getByText("Waarom?")).toBeTruthy();
   });
 

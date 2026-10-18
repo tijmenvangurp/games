@@ -52,6 +52,20 @@ describe("tutorial levels", () => {
     }
   });
 
+  it("keeps every star at least two moves away", () => {
+    for (const levelId of TUTORIAL_LEVEL_IDS) {
+      const level = levelFor(levelId);
+      if (!level.targetSquare || level.goal) {
+        continue;
+      }
+
+      expect(level.minimumMoves ?? 1, levelId).toBeGreaterThanOrEqual(2);
+      expect(previewFor(level, level.initialFen)?.targets, levelId).not.toContain(
+        level.targetSquare,
+      );
+    }
+  });
+
   it("blocks the pawn's forward move so the child cannot get stuck", () => {
     const level = levelFor("pawn-crossing");
     expect(legalMovesFor(level, level.initialFen, "e2")).toEqual(["d3"]);
@@ -75,9 +89,21 @@ describe("tutorial levels", () => {
     }
   });
 
-  it("hints the first step of a two-move route", () => {
+  it("hints the first step of every two-move route", () => {
+    const rook = levelFor("rook-train");
+    expect(hintFor(rook, rook.initialFen)).toEqual({ from: "h1", to: "h5" });
+
+    const bishop = levelFor("bishop-line");
+    expect(hintFor(bishop, bishop.initialFen)).toEqual({ from: "c1", to: "f4" });
+
     const queen = levelFor("queen-dance");
     expect(hintFor(queen, queen.initialFen)).toEqual({ from: "d1", to: "d4" });
+
+    const knight = levelFor("knight-jump");
+    expect(hintFor(knight, knight.initialFen)).toEqual({ from: "b1", to: "a3" });
+
+    const king = levelFor("king-step");
+    expect(hintFor(king, king.initialFen)).toEqual({ from: "e1", to: "d2" });
   });
 
   it("hints the special goal moves", () => {
@@ -142,25 +168,38 @@ describe("tutorial engine", () => {
     expect(legalMovesFor(level, level.initialFen, "z9")).toEqual([]);
   });
 
-  it("plays the rook to the star in one move", () => {
+  it("plays the rook to the star in two moves", () => {
     const level = levelFor("rook-train");
-    const result = playTutorialMove(level, level.initialFen, "h1", "e1", 0);
-    expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error("expected legal move");
+    const first = playTutorialMove(level, level.initialFen, "h1", "e1", 0);
+    expect(first.ok).toBe(true);
+    if (!first.ok) throw new Error("expected legal move");
 
-    expect(result.completed).toBe(true);
-    expect(result.move.san).toBe("Re1");
-    expect(result.nextFen.endsWith(" w - - 0 1")).toBe(true);
+    expect(first.completed).toBe(false);
+    expect(first.move.san).toBe("Re1");
+
+    const second = playTutorialMove(level, first.nextFen, "e1", "e5", 1);
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error("expected legal move");
+
+    expect(second.completed).toBe(true);
+    expect(second.move.san).toBe("Re5");
+    expect(second.nextFen.endsWith(" w - - 0 1")).toBe(true);
   });
 
-  it("plays the bishop diagonal to the star", () => {
+  it("plays the bishop diagonal to the star in two moves", () => {
     const level = levelFor("bishop-line");
-    const result = playTutorialMove(level, level.initialFen, "c1", "h6", 0);
-    expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error("expected legal move");
+    const first = playTutorialMove(level, level.initialFen, "c1", "f4", 0);
+    expect(first.ok).toBe(true);
+    if (!first.ok) throw new Error("expected legal move");
 
-    expect(result.move.san).toBe("Bh6");
-    expect(result.completed).toBe(true);
+    expect(first.completed).toBe(false);
+
+    const second = playTutorialMove(level, first.nextFen, "f4", "e5", 1);
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error("expected legal move");
+
+    expect(second.move.san).toBe("Be5");
+    expect(second.completed).toBe(true);
   });
 
   it("plays the queen route to the star", () => {
@@ -180,24 +219,38 @@ describe("tutorial engine", () => {
     expect(second.completed).toBe(true);
   });
 
-  it("plays the knight L-jump to the star", () => {
+  it("plays the knight L-jump to the star in two moves", () => {
     const level = levelFor("knight-jump");
-    const result = playTutorialMove(level, level.initialFen, "b1", "d2", 0);
-    expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error("expected legal move");
+    const first = playTutorialMove(level, level.initialFen, "b1", "a3", 0);
+    expect(first.ok).toBe(true);
+    if (!first.ok) throw new Error("expected legal move");
 
-    expect(result.completed).toBe(true);
-    expect(result.move.san).toBe("Nd2");
+    expect(first.completed).toBe(false);
+    expect(first.move.san).toBe("Na3");
+
+    const second = playTutorialMove(level, first.nextFen, "a3", "c4", 1);
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error("expected legal move");
+
+    expect(second.completed).toBe(true);
+    expect(second.move.san).toBe("Nc4");
   });
 
-  it("plays the king step to the star", () => {
+  it("plays the king step to the star in two moves", () => {
     const level = levelFor("king-step");
-    const result = playTutorialMove(level, level.initialFen, "e1", "d2", 0);
-    expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error("expected legal move");
+    const first = playTutorialMove(level, level.initialFen, "e1", "d2", 0);
+    expect(first.ok).toBe(true);
+    if (!first.ok) throw new Error("expected legal move");
 
-    expect(result.completed).toBe(true);
-    expect(result.move.san).toBe("Kd2");
+    expect(first.completed).toBe(false);
+    expect(first.move.san).toBe("Kd2");
+
+    const second = playTutorialMove(level, first.nextFen, "d2", "c3", 1);
+    expect(second.ok).toBe(true);
+    if (!second.ok) throw new Error("expected legal move");
+
+    expect(second.completed).toBe(true);
+    expect(second.move.san).toBe("Kc3");
   });
 
   it("captures diagonally and then moves forward to the star", () => {

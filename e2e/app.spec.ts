@@ -142,7 +142,19 @@ test.describe("schaaktutorial op een telefoon", () => {
     };
 
     await dragPiece("h1", "e1");
+    await expect(page.getByText("Goed! Nog één zet naar de ster.")).toBeVisible();
+
+    await dragPiece("e1", "e5");
     await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
+  });
+
+  test("waarschuwt als de ster nog niet bereikbaar is", async ({ page }) => {
+    await page.goto("/schaken");
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="e5"]').click();
+
+    await expect(page.getByText("Nog niet! Kies eerst een blauwe stip.")).toBeVisible();
   });
 
   test("speelt de torenles met tikken", async ({ page }) => {
@@ -165,7 +177,9 @@ test.describe("schaaktutorial op een telefoon", () => {
 
     await board.locator('[data-square="h1"]').click();
     await board.locator('[data-square="e1"]').click();
+    await expect(page.getByText("Goed! Nog één zet naar de ster.")).toBeVisible();
 
+    await board.locator('[data-square="e5"]').click();
     await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Volgende les" })).toBeEnabled();
 

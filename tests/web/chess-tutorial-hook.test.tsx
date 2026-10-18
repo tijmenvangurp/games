@@ -47,15 +47,23 @@ describe("useChessTutorial", () => {
       result.current.onSquareClick("e1");
     });
 
-    expect(result.current.status).toBe("completed");
+    expect(result.current.status).toBe("playing");
+    expect(result.current.moveCount).toBe(1);
     expect(result.current.lastMove?.san).toBe("Re1");
+
+    act(() => {
+      result.current.onSquareClick("e5");
+    });
+
+    expect(result.current.status).toBe("completed");
+    expect(result.current.lastMove?.san).toBe("Re5");
   });
 
   it("keeps the preview when the child taps an unrelated square", () => {
     const { result } = renderHook(() => useChessTutorial({ initialLevelId: "rook-train" }));
 
     act(() => {
-      result.current.onSquareClick("e5");
+      result.current.onSquareClick("d4");
     });
 
     expect(result.current.preview?.square).toBe("h1");
@@ -98,6 +106,15 @@ describe("useChessTutorial", () => {
     expect(accepted).toBe(true);
     expect(result.current.moveCount).toBe(1);
     expect(result.current.lastMove?.san).toBe("Re1");
+    expect(result.current.status).toBe("playing");
+
+    act(() => {
+      accepted = result.current.onPieceDrop("e1", "e5");
+    });
+
+    expect(accepted).toBe(true);
+    expect(result.current.moveCount).toBe(2);
+    expect(result.current.lastMove?.san).toBe("Re5");
     expect(result.current.status).toBe("completed");
     expect(onComplete).toHaveBeenCalledTimes(1);
     expect(onComplete).toHaveBeenCalledWith(result.current.level);
@@ -162,12 +179,19 @@ describe("useChessTutorial", () => {
     expect(result.current.legalTargets).toEqual(expect.arrayContaining(["a3", "c3", "d2"]));
 
     act(() => {
-      result.current.onSquareClick("d2");
+      result.current.onSquareClick("a3");
+    });
+
+    expect(result.current.status).toBe("playing");
+    expect(result.current.moveCount).toBe(1);
+
+    act(() => {
+      result.current.onSquareClick("c4");
     });
 
     expect(result.current.status).toBe("completed");
-    expect(result.current.moveCount).toBe(1);
-    expect(result.current.fen).toContain("3N4");
+    expect(result.current.moveCount).toBe(2);
+    expect(result.current.fen).toContain("2N5");
   });
 
   it("gives haptic feedback for selection, an illegal move and completion", () => {
@@ -191,6 +215,11 @@ describe("useChessTutorial", () => {
 
     act(() => {
       result.current.onPieceDrop("h1", "e1");
+    });
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+
+    act(() => {
+      result.current.onPieceDrop("e1", "e5");
     });
     expect(vibrate).toHaveBeenLastCalledWith([20, 40, 20]);
   });
