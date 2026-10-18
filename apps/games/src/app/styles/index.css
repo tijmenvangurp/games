@@ -254,6 +254,31 @@
     animation: maze-trail-dot 160ms ease-out var(--maze-dot-delay, 0ms) forwards;
   }
 
+  /*
+   * The hardest quiz level only shows a fragment of the silhouette. The slow
+   * pan makes every part pass by, while the viewport never shows the whole
+   * Pokémon at once.
+   */
+  .quiz-fragment-pan {
+    animation: quiz-fragment-pan 24s ease-in-out infinite;
+  }
+
+  @keyframes quiz-fragment-pan {
+    0%,
+    100% {
+      translate: -22% -20%;
+    }
+    25% {
+      translate: 22% -20%;
+    }
+    50% {
+      translate: 22% 20%;
+    }
+    75% {
+      translate: -22% 20%;
+    }
+  }
+
   [data-creature-id]:focus-visible {
     outline: 3px solid #0ea5e9;
     outline-offset: 4px;

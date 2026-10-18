@@ -24,7 +24,7 @@ export function PokemonQuizSetup({
         <h2 className="text-xl font-black">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
           Hoe moeilijker, hoe meer namen en hoe minder je van de Pokémon ziet. Op de moeilijkste
-          stand zie je maar een stukje van het silhouet.
+          stand beweegt het silhouet langzaam voorbij.
         </p>
       </div>
 
