@@ -25,7 +25,7 @@ De gewenste opbouw is:
 ## Gevolgen
 
 - De app heeft geen jonge upstream-dependency meer voor de woordzoeker.
-- Richtingen, formaten en woorden zijn volledig lokaal aan te passen. Een nieuw niveau of thema vraagt alleen een configuratiewijziging.
+- Richtingen, formaten en woorden zijn volledig lokaal aan te passen. Een nieuw niveau of thema vraagt alleen een configuratiewijziging. Naast Tuin en Onder water is een Pokémon-thema met 25 namen toegevoegd.
 - De generator is deterministisch en daardoor goed te testen: richtingen, plaatsingen, letters en het aantal woorden worden over veel seeds gecontroleerd.
 - Oude opgeslagen puzzels blijven geldig; het opgeslagen formaat (`grid`, `placements`, `found`) is niet veranderd.
 - De plaatsingscode is iets meer eigen code dan de bibliotheek, maar de UI en tests waren toch al eigen werk en de richtingniveaus waren met de bibliotheek niet mogelijk.

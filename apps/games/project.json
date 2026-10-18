@@ -74,7 +74,6 @@
     "pages-pokemon-quiz",
     "pages-french",
     "pages-word-search",
-    "pages-crossword",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -88,7 +87,6 @@
     "features-french-listening",
     "features-word-search",
     "features-profile-switcher",
-    "features-crossword",
     "features-auth",
     "pages-account",
     "entities-game",
@@ -101,7 +99,6 @@
     "entities-hidden-object",
     "entities-pokedex",
     "entities-word-search",
-    "entities-crossword",
     "shared-lib",
     "shared-ui"
   ]

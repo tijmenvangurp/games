@@ -7,6 +7,7 @@ import { GameShell } from "@widgets/game-shell";
 const THEME_LABELS = {
   tuin: "in de tuin",
   onderwater: "onder water",
+  pokemon: "Pokémon",
 } as const;
 
 export function WordSearchPage() {

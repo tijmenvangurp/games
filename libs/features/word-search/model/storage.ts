@@ -75,7 +75,7 @@ function isSize(value: unknown): value is number {
 }
 
 function isWord(value: unknown): value is string {
-  return typeof value === "string" && /^[a-z]+$/.test(value);
+  return typeof value === "string" && /^[A-Za-z]+$/.test(value);
 }
 
 function cellsAreStraight(cells: readonly Cell[]): boolean {
