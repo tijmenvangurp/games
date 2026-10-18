@@ -1,5 +1,5 @@
 import { mulberry32 } from "@shared/lib";
-import { isArrowRemovableRigid } from "./geometry";
+import { isArrowRemovable } from "./geometry";
 import type { MazeArrow, MazeLevel, Point } from "./types";
 import type { ShapeMask } from "./shapes";
 
@@ -376,9 +376,10 @@ function levelWith(arrows: readonly MazeArrow[], width: number, height: number):
  * is clear. The recorded order is a valid solution and every arrow that can be
  * cleared is kept.
  *
- * Deliberately uses the stricter rigid sweep instead of the runtime lane rule:
- * a rigid-clearing order is always a lane-clearing order, so the generated
- * layouts stay solvable without changing how they look.
+ * The generator uses the same lane rule as the game. That keeps one source of
+ * truth for removability: an order that is valid here is valid in play. Arrows
+ * that never become free are dropped, so the emitted set is solvable by
+ * construction.
  */
 function clearCandidates(
   candidates: readonly MazeArrow[],
@@ -391,7 +392,7 @@ function clearCandidates(
 
   while (remaining.length > 0) {
     const freeIndex = remaining.findIndex((arrow) =>
-      isArrowRemovableRigid(arrow, levelWith(remaining, width, height), EMPTY_REMOVED),
+      isArrowRemovable(arrow, levelWith(remaining, width, height), EMPTY_REMOVED),
     );
     if (freeIndex >= 0) {
       order.push(remaining[freeIndex] as MazeArrow);
@@ -403,7 +404,7 @@ function clearCandidates(
     for (let index = 0; index < remaining.length && !flipped; index += 1) {
       const candidate = reverse(remaining[index] as MazeArrow);
       const others = remaining.filter((_, otherIndex) => otherIndex !== index);
-      if (isArrowRemovableRigid(candidate, levelWith(others, width, height), EMPTY_REMOVED)) {
+      if (isArrowRemovable(candidate, levelWith(others, width, height), EMPTY_REMOVED)) {
         remaining[index] = candidate;
         order.push(candidate);
         remaining.splice(index, 1);
@@ -499,9 +500,6 @@ export function buildContourArrows(mask: ShapeMask, options: ContourOptions): Ma
     const cleared = removeBodyContacts(clearCandidates(candidates, width, height, random));
     if (cleared.length > best.length) {
       best = cleared;
-    }
-    if (best.length === candidates.length) {
-      break;
     }
   }
 

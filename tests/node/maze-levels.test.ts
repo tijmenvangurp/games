@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { LEVEL_COUNT, MAZE_LEVELS, levelAt, removableArrows, solveMaze } from "@entities/arrow";
+import {
+  isArrowRemovable,
+  isSolved,
+  LEVEL_COUNT,
+  MAZE_LEVELS,
+  levelAt,
+  removableArrows,
+  solveMaze,
+} from "@entities/arrow";
 import type { MazeLevel, Point } from "@entities/arrow";
 
 interface Segment {
@@ -68,6 +76,33 @@ describe("maze levels", () => {
       const order = solveMaze(level);
       expect(order).not.toBeNull();
       expect(order).toHaveLength(level.arrows.length);
+
+      // Replay the solution with the exact rule the game uses. A non-null
+      // greedy result alone would not catch a generator/runtime rule drift.
+      const removed = new Set<number>();
+      for (const id of order ?? []) {
+        const arrow = level.arrows.find((candidate) => candidate.id === id);
+        if (!arrow) {
+          throw new Error(`Solution refers to unknown arrow ${id} in ${level.id}`);
+        }
+        expect(isArrowRemovable(arrow, level, removed)).toBe(true);
+        removed.add(id);
+      }
+      expect(isSolved(level, removed)).toBe(true);
+    }
+  });
+
+  it("stays solvable after any free first move", () => {
+    for (const level of MAZE_LEVELS) {
+      // Three free moves per level keep this fast enough for CI while still
+      // covering every generated level; the monotonicity property is general.
+      for (const arrow of removableArrows(level, new Set()).slice(0, 3)) {
+        const rest = {
+          ...level,
+          arrows: level.arrows.filter((candidate) => candidate.id !== arrow.id),
+        };
+        expect(solveMaze(rest), `${level.id} deadlocks after removing ${arrow.id}`).not.toBeNull();
+      }
     }
   });
 
