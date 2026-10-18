@@ -1,5 +1,6 @@
 export { Button } from "./button";
 export { CelebrationDialog } from "./celebration-dialog";
+export { Confetti } from "./confetti";
 export { OptionPicker } from "./option-picker";
 export { PageHeader } from "./page-header";
 export { SetupActions } from "./setup-actions";

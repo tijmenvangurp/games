@@ -1,3 +1,5 @@
+import { Confetti } from "@shared/ui";
+
 interface SudokuStatusProps {
   hintMessage: string | null;
   status: string;
@@ -13,6 +15,7 @@ export function SudokuStatus({
 }: SudokuStatusProps) {
   return (
     <div aria-live="polite" className="space-y-1 text-center text-xs text-muted-foreground">
+      {celebration ? <Confetti key={celebration} /> : null}
       {celebration ? (
         <p className="animate-rise rounded-xl bg-amber-100 px-3 py-2 text-sm font-bold text-amber-900">
           🎉 {celebration}
