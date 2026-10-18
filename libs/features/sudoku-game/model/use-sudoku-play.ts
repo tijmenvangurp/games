@@ -7,7 +7,7 @@ import {
   type PlayState,
   type SudokuHint,
 } from "@entities/sudoku";
-import { playSound, vibrate } from "@shared/lib";
+import { playHaptic, playSound } from "@shared/lib";
 import { symbolsFor, type MistakeMode, type SymbolTheme } from "./settings";
 import { hintText, statusText } from "./sudoku-view";
 import { useSudokuKeyboard } from "./use-sudoku-keyboard";
@@ -121,16 +121,16 @@ function useSudokuActions(
     const empty = next.entries.length - filledCount(next.entries);
     if (next.solved) {
       playSound("win");
-      vibrate([20, 40, 20]);
+      playHaptic("win");
     } else if (empty === 1) {
       playSound("almost");
-      vibrate(20);
+      playHaptic("almost");
     }
   };
 
   const handleSelect = (index: number) => {
     playSound("tap");
-    vibrate(10);
+    playHaptic("tap");
     useSudokuStore.getState().select(index);
   };
 
@@ -149,18 +149,18 @@ function useSudokuActions(
     const after = countMistakes(next.entries, next.puzzle.solution).length;
     if (after > before) {
       playSound("wrong");
-      vibrate([30, 40, 30]);
+      playHaptic("wrong");
     } else if (next.solved || next.entries.length - filledCount(next.entries) === 1) {
       feedbackAfterMove();
     } else {
       playSound("select");
-      vibrate(10);
+      playHaptic("select");
     }
   };
 
   const handleErase = () => {
     playSound("tap");
-    vibrate(10);
+    playHaptic("tap");
     useSudokuStore.getState().erase();
   };
 
@@ -169,23 +169,24 @@ function useSudokuActions(
     if (store.hintPreview) {
       store.applyHint();
       playSound("hint");
-      vibrate(20);
+      playHaptic("hint");
       feedbackAfterMove();
     } else {
       playSound("tap");
-      vibrate(10);
+      playHaptic("tap");
       store.previewHint();
     }
   };
 
   const handleUndo = () => {
     playSound("tap");
-    vibrate(10);
+    playHaptic("tap");
     useSudokuStore.getState().undo();
   };
 
   const handleRestart = () => {
     playSound("tap");
+    playHaptic("tap");
     useSudokuStore.getState().restart();
   };
 
@@ -196,7 +197,7 @@ function useSudokuActions(
     const mistakes = countMistakes(play.entries, play.puzzle.solution);
     setCheck({ entries: play.entries, mistakes });
     playSound(mistakes.length > 0 ? "wrong" : "match");
-    vibrate(mistakes.length > 0 ? [30, 40, 30] : 10);
+    playHaptic(mistakes.length > 0 ? "wrong" : "match");
   };
 
   return {

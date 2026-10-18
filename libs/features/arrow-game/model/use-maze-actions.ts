@@ -5,7 +5,7 @@ import {
   type MazeDirection,
   type MazeLevel,
 } from "@entities/arrow";
-import { playSound } from "@shared/lib";
+import { playHaptic, playSound } from "@shared/lib";
 import { useArrowsStore, type ArrowsTapResult } from "./use-arrow-store";
 
 export interface FlyingArrow {
@@ -23,12 +23,16 @@ function feedbackForTap(
   if (result === "blocked" || result === "lost") {
     setBlockedId(arrow?.id ?? null);
     playSound("wrong");
+    playHaptic("wrong");
     return;
   }
   if ((result === "removed" || result === "won") && arrow) {
     setFlying({ arrow, direction: arrowDirection(arrow), key: Date.now() });
-    if (result === "removed") {
+    if (result === "won") {
+      playHaptic("win");
+    } else {
       playSound("select");
+      playHaptic("select");
     }
   }
 }
@@ -76,11 +80,13 @@ export function useMazeActions(
   const handleHint = () => {
     if (useArrowsStore.getState().hint() !== null) {
       playSound("hint");
+      playHaptic("hint");
     }
   };
 
   const handleUndo = () => {
     playSound("tap");
+    playHaptic("tap");
     useArrowsStore.getState().undo();
     setFlying(null);
     setBlockedId(null);
@@ -88,6 +94,7 @@ export function useMazeActions(
 
   const handleRestart = () => {
     playSound("tap");
+    playHaptic("tap");
     useArrowsStore.getState().restart();
     setFlying(null);
     setBlockedId(null);
