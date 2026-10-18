@@ -15,7 +15,7 @@ interface MathHeaderProps {
 
 function MathHeader({ index, total, stars, streak }: MathHeaderProps) {
   return (
-    <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
+    <header className="game-panel flex items-center justify-between px-3 py-2">
       <p className="text-sm font-black text-muted-foreground">
         Som {index + 1} van {total}
       </p>
@@ -146,7 +146,7 @@ function QuestionCard({
   isLast: boolean;
 }) {
   return (
-    <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel p-4 sm:p-6">
       <p className="text-center text-4xl font-black tracking-tight sm:text-5xl">
         {question.prompt} = ?
       </p>

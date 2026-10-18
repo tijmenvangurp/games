@@ -14,6 +14,9 @@
   --font-sans:
     ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
     sans-serif;
+  --font-display:
+    ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.25s ease-out;
 }
@@ -31,15 +34,16 @@
 }
 
 :root {
-  --background: oklch(0.985 0.012 85);
-  --foreground: oklch(0.27 0.03 265);
-  --card: oklch(1 0 0);
-  --primary: oklch(0.58 0.16 255);
-  --primary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.95 0.012 85);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --border: oklch(0.9 0.012 85);
-  --success: oklch(0.66 0.15 155);
+  /* Speeltuin: warm papier, inkt en vrolijke stickers. */
+  --background: oklch(0.975 0.03 88);
+  --foreground: oklch(0.27 0.035 55);
+  --card: oklch(0.995 0.012 90);
+  --primary: oklch(0.63 0.2 25);
+  --primary-foreground: oklch(0.99 0.01 85);
+  --muted: oklch(0.93 0.03 85);
+  --muted-foreground: oklch(0.46 0.045 55);
+  --border: oklch(0.27 0.035 55);
+  --success: oklch(0.58 0.14 155);
 }
 
 @layer base {
@@ -53,6 +57,15 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at 8% -4%, oklch(0.88 0.08 25 / 0.5), transparent 22rem),
+      radial-gradient(circle at 96% 4%, oklch(0.9 0.07 200 / 0.45), transparent 20rem),
+      radial-gradient(oklch(0.27 0.035 55 / 0.075) 1px, transparent 1.4px);
+    background-size:
+      auto,
+      auto,
+      22px 22px;
+    background-attachment: fixed;
     overscroll-behavior-y: none;
   }
 
@@ -70,6 +83,28 @@
 }
 
 @layer games {
+  /*
+   * Speeltuin-surface: een stevige kaart met een inktomtrek en een harde
+   * schaduw, alsof hij op het papier is geplakt. Alle spelpanelen delen hem,
+   * zodat de richting ook binnen de spellen zichtbaar blijft.
+   */
+  .game-panel {
+    border: 2px solid var(--border);
+    border-radius: 1.75rem;
+    background-color: var(--card);
+    box-shadow: 0 5px 0 oklch(0.27 0.035 55 / 0.22);
+  }
+
+  .game-card {
+    border: 2px solid var(--border);
+    border-radius: 1.75rem;
+    box-shadow: 0 5px 0 oklch(0.27 0.035 55 / 0.22);
+  }
+
+  .game-card:hover {
+    box-shadow: 0 7px 0 oklch(0.27 0.035 55 / 0.22);
+  }
+
   .memory-card {
     perspective: 900px;
   }

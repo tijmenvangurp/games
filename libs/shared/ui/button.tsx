@@ -4,14 +4,17 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@shared/lib";
 
 const buttonVariants = cva(
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-2xl border-2 font-bold transition-all active:translate-y-0.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/35 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
-        outline: "border-2 border-border bg-card text-foreground hover:bg-muted",
-        ghost: "text-foreground hover:bg-muted",
-        success: "bg-success text-white shadow-sm hover:bg-success/90",
+        default:
+          "border-foreground bg-primary text-primary-foreground shadow-[0_4px_0_var(--border)] hover:brightness-105 active:shadow-[0_2px_0_var(--border)]",
+        outline:
+          "border-foreground bg-card text-foreground shadow-[0_4px_0_var(--border)] hover:bg-muted active:shadow-[0_2px_0_var(--border)]",
+        ghost: "border-transparent bg-transparent text-foreground hover:bg-muted",
+        success:
+          "border-foreground bg-success text-white shadow-[0_4px_0_var(--border)] hover:brightness-105 active:shadow-[0_2px_0_var(--border)]",
       },
       size: {
         default: "h-10 px-4 text-sm",

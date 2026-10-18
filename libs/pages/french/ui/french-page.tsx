@@ -33,7 +33,7 @@ export function FrenchPage() {
               return (
                 <Link
                   key={lesson.id}
-                  className="group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+                  className="game-card group flex min-h-40 flex-col bg-gradient-to-br from-[#cfe1ff] via-[#e8f0ff] to-[#f8fbff] p-5 transition duration-150 hover:-translate-y-1 active:translate-y-0 active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/35"
                   params={{ lessonId: lesson.id }}
                   to="/frans/$lessonId"
                 >
