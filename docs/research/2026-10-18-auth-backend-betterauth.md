@@ -11,7 +11,7 @@
 
 - De app is vandaag 100% statisch en dat is een feature, geen tekortkoming. Alle voortgang staat in `localStorage`; meerdere kinderen op één apparaat kunnen met lokale profielen zonder account, zonder server en zonder gegevens die de app naar buiten stuurt.
 - Als er toch een backend komt: **Better Auth 1.7.10 in dezelfde Cloudflare Worker, met D1 in de EU en een ouderaccount op basis van een passkey**. Geen kindlogin, geen kind-e-mailadressen en geen profielnamen op de server. Het kind blijft lokaal spelen; sync is optioneel.
-- **Geen magic link of OAuth in fase 1.** Magic link vereist e-mailverzending via een externe dienst en OAuth vereist een redirect naar een derde partij. Beide botsen met de regel "geen externe requests", ook al grijpt de browser-CSP er niet altijd op in.
+- **Geen magic link.** Magic link vereist e-mailverzending via een externe dienst. **Google OAuth is de expliciete uitzondering**: de ouder krijgt een gewone "Inloggen met Google"-knop naast passkey. Latere OAuth-providers, bijvoorbeeld GitHub, zijn extra knoppen. De browser-CSP blokkeert top-level navigatie niet, maar de Worker doet voor de tokenuitwisseling wel een externe request; dat is bewust geaccepteerd en in ADR 0013 vastgelegd.
 - Sync in fase 1 beperkt zich tot **instellingen, beste scores en grove voortgang**. Sync geen actieve sudoku-borden, zoekrondes of SRS-toestand: dat geeft conflictgedrag zonder duidelijke winst.
 - De technische minimale wijziging is: `wrangler.jsonc` krijgt een `main` en `run_worker_first: ["/api/*"]`, de CSP krijgt `connect-src 'self'`, en er komt een D1-binding. Dat is genoeg voor same-origin `/api/auth/*` en `/api/progress/*`.
 - **Dit mag niet zonder ADR.** ADR 0001 zegt expliciet dat accounts, gedeelde scores en multiplayer een nieuwe ADR met privacy- en beveiligingsontwerp vereisen. Reken op minimaal twee ADR's: één voor auth/backend en één voor privacy/gegevensverwerking.
@@ -261,10 +261,12 @@ De doelgroep is 6–12 jaar. Dat verandert de vraag: niet "welke login is handig
 
 ### 3.4 OAuth/social
 
-- **Hoe:** `socialProviders` met client-ID en secret; redirect naar de provider en terug ([OAuth](https://better-auth.com/docs/concepts/oauth)).
-- **Waarom niet:** de browser verlaat de site, de provider ziet het bezoek, sommige providers hebben leeftijdsgrenzen, en je krijgt een derde partij in de keten. De CSP blokkeert top-level navigatie niet per se, maar het is wel een externe request en een privacyrelatie die je moet uitleggen.
-- **Voor kinderen:** ongeschikt. Een Google- of Apple-account is geen kindvriendelijke identiteit en de ouder moet hem beheren.
-- **Conclusie:** niet doen in fase 1. Als de ouder later per se "Inloggen met Google" wil, is dat een aparte ADR met een goede reden.
+- **Hoe:** `socialProviders` met client-ID en secret; de client opent `/api/auth/sign-in/social`, de Worker stuurt een redirect naar Google en wisselt de code server-side in. Daarna gaat de browser terug naar de app ([OAuth](https://better-auth.com/docs/concepts/oauth)).
+- **Waarom:** de ouder kent Google en hoeft geen wachtwoord of passkey te beheren. Het is één knop naast de passkey-login.
+- **Nadelen:** de browser verlaat de site, Google ziet het bezoek, Google is een verwerker en de Worker doet een externe tokenuitwisseling. Voor kinderen is dit ongeschikt; alleen de ouder logt in.
+- **Afspraken:** geen remote avatar renderen; alleen de standaardscopes `openid`, `email` en `profile`; de callback-URL staat exact in de Google-console; `trustedOrigins` is per origin ingesteld; DPA, register en privacyverklaring staan in [ADR 0013](../adr/0013-privacy-optionele-accounts.md).
+- **Later:** GitHub of een andere provider is een extra knop en een extra verwerker. Per provider zijn een DPA, callback en privacyregel nodig.
+- **Conclusie:** Google OAuth is gekozen als expliciete uitzondering, naast passkey. Geen OAuth voor kinderen.
 
 ### 3.5 Anonymous/guest
 
@@ -574,7 +576,7 @@ Wat je op een branch kunt voorbereiden:
 - Het D1-schema en de migraties op een **aparte preview-database** in de EU.
 - Preview-secrets (`BETTER_AUTH_SECRET`) en variabelen (`BETTER_AUTH_URL`, `ACCOUNTS_ENABLED`).
 - CSP, cookies en e2e-tests tegen de preview-URL.
-- Een Google OAuth-testclient met de preview-callback erin, als Google de gekozen methode is.
+- Een Google OAuth-testclient met de preview-callback erin. Google is de gekozen methode; de preview-callback moet exact zijn toegestaan.
 
 Wat je niet op een branch kunt testen:
 
@@ -759,7 +761,7 @@ Toelichting:
 
 **Beste optie nu:** fase 0.5. Bouw lokale profielen en export/import, zonder backend, zonder accounts en zonder CSP-wijziging. Daarmee lost de app de meest voorkomende situatie op en blijft de huidige belofte intact.
 
-**Beste optie als cross-device sync echt nodig is:** fase 1 met Better Auth 1.7.10 in dezelfde Worker, D1 in de EU, en een ouderaccount met passkey. Sync alleen instellingen, beste scores en grove voortgang. Geen kindlogin, geen kind-e-mail, geen magic link of OAuth in fase 1.
+**Beste optie als cross-device sync echt nodig is:** fase 1 met Better Auth 1.7.10 in dezelfde Worker, D1 in de EU, en een ouderaccount met passkey plus een "Inloggen met Google"-knop. Sync alleen instellingen, beste scores en grove voortgang. Geen kindlogin, geen kind-e-mail en geen magic link. Google OAuth is de expliciete uitzondering op "geen externe requests".
 
 De eigenaar moet dan expliciet het volgende beslissen:
 

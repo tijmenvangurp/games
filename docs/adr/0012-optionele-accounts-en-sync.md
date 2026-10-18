@@ -32,7 +32,7 @@ Het technische onderzoek staat in [research/2026-10-18-auth-backend-betterauth.m
 9. **Better Auth en D1.** We gebruiken Better Auth 1.7.x (exact gepind) met de ingebouwde D1-ondersteuning en een D1-database in de `eu`-jurisdictie. De tabellen `user`, `session`, `account` en `verification` zijn van Better Auth; `player`, `progress`, `progress_mutation` en `consent` zijn van ons.
 10. **State-model.** Eén `progress`-rij per `player_id` + `game_id` met een JSON-envelop (`schema_version`, `revision`, `data_json`, `client_updated_at`, `server_updated_at`). Schrijven gebeurt met een idempotente upsert plus een `progress_mutation`-insert in dezelfde D1-batch. De client houdt een outbox bij en probeert opnieuw met backoff.
 11. **Conflictregels.** Instellingen: last-write-wins op `client_updated_at`. Beste scores en `unlocked`: `max(existing, incoming)`. Er is geen server-authoritative anti-cheat; de client berekent de score en dat is voor een familie-app acceptabel.
-12. **Loginmethode is nog open.** De voorkeur is een **passkey** voor de ouder: geen wachtwoord, phishing-resistent en geen externe request. **Google OAuth** is alleen toegestaan als de eigenaar de uitzondering op "geen externe requests" expliciet accepteert; dan gelden de voorwaarden uit [ADR 0013](0013-privacy-optionele-accounts.md). E-mail met wachtwoord is een derde optie, maar vraagt een e-mailprovider voor herstel en verificatie. Deze ADR legt het accountmodel vast, niet de methode.
+12. **Loginmethoden: passkey en social OAuth.** De ouder kan met een **passkey** inloggen en/of met **Google** via een gewone "Inloggen met Google"-knop. Beide methoden kunnen aan hetzelfde ouderaccount worden gekoppeld. Google OAuth is een **expliciete uitzondering** op de regel "geen externe requests": de browser navigeert naar Google en de Worker wisselt de code server-side in. Google is daarmee een verwerker; de voorwaarden staan in [ADR 0013](0013-privacy-optionele-accounts.md). Later kunnen meer OAuth-providers, bijvoorbeeld GitHub, als extra knop worden toegevoegd. E-mail met wachtwoord is geen fase-1-methode.
 13. **Geen remote avatars.** Ook bij Google OAuth renderen we geen Google-avatar-URL. Het profiel gebruikt een avatar uit de lokale set. Dat voorkomt een `img-src`-uitzondering en een externe request.
 14. **Feature-flag en uitrol.** `ACCOUNTS_ENABLED` (Worker-variabele) en `VITE_ACCOUNTS_ENABLED` (build-time, publiek) staan standaard uit. Previews krijgen geen auth. Uitrol: Worker deployen met de flag uit, testen met het ouderaccount van de eigenaar, daarna de flag aan en pas dan de accountroute zichtbaar maken.
 15. **Verwijderen.** De ouder kan een kindprofiel verwijderen (cascade naar `progress`) en het hele account verwijderen (cascade naar `player`, `progress`, `progress_mutation`, `consent`, sessies en Better Auth-user). Lokale state blijft daarna staan. De verwijderactie vraagt een verse sessie of extra bevestiging.
@@ -76,7 +76,7 @@ De server begrijpt alleen de envelop, niet de inhoud van `data_json`. Elk spel l
 - **De CSP wordt verzwakt.** `connect-src 'none'` wordt `'self'`. Dat is een bewuste wijziging en moet in de headers en in de ADR zichtbaar blijven.
 - **De publieke repo blijft schoon.** Geen secrets, `.dev.vars`, productie-exports of echte gezinsdata. Testdata gebruikt `example.invalid`.
 - **Account en lokaal kunnen uit elkaar lopen.** Omdat het account leeg begint, kan een gebruiker twee soorten voortgang hebben. Dat is geaccepteerd voor versie 1; de UI moet het uitleggen.
-- **Google OAuth is geen detail.** Het voegt een externe redirect, een derde partij en een verwerker toe. Als de eigenaar Google wil, moet dat expliciet in [ADR 0013](0013-privacy-optionele-accounts.md) worden vastgelegd; anders blijft passkey de route.
+- **Google OAuth is een bewuste uitzondering.** De Google-knop voegt een externe redirect, een derde partij en een verwerker toe. Dat is expliciet geaccepteerd; [ADR 0013](0013-privacy-optionele-accounts.md) legt de DPA, het register en de privacyverklaring vast. Er komen geen remote avatars of extra third-party requests bij.
 - **Geen schermtijdbeleid.** Dagbudgetten, blokkades en ouderpincodes vallen buiten deze ADR. OS-ouderscontrole (Digital Wellbeing, Family Link) is daar de juiste plek. Een ouderoverzicht met bestede tijd zonder limiet kan later als dashboardfeature worden toegevoegd.
 - **Latere fases.** Een ouder-dashboard, volledige SRS-sync en multiplayer vragen eigen ADR's. Deze ADR reserveert daar geen architectuur voor.
 
@@ -93,7 +93,7 @@ De server begrijpt alleen de envelop, niet de inhoud van `data_json`. Elk spel l
 
 ## Open vragen
 
-1. **Loginmethode:** passkey, Google OAuth of e-mail met wachtwoord? Google vraagt een expliciete uitzondering op de "geen externe requests"-regel.
+1. **Latere OAuth-providers:** welke providers komen na Google, bijvoorbeeld GitHub, en in welke volgorde?
 2. **Maximum aantal profielen:** vier is een voorstel; wat is praktisch voor de doelgroep?
 3. **Naam van een profiel:** volledig lokaal houden, of als optioneel veld toch syncen? Deze ADR kiest lokaal.
 4. **Import van lokale voortgang:** komt er later een expliciete "neem mijn lokale voortgang mee"-actie? Zo ja, welke merge-regels?

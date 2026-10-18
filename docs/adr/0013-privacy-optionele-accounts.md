@@ -21,13 +21,12 @@ Deze ADR legt het privacy- en beveiligingsontwerp vast dat [ADR 0001](0001-publi
 
 ## Verwerkingsverantwoordelijke en verwerkers
 
-| Rol                                 | Partij                                   | Toelichting                                                           |
-| ----------------------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
-| Verwerkingsverantwoordelijke        | De eigenaar van de app                   | Publiek contactadres in de privacyverklaring, niet in deze repo       |
-| Verwerker                           | Cloudflare                               | Workers, static assets en D1; verwerkersovereenkomst en subprocessors |
-| Verwerker (alleen bij Google OAuth) | Google                                   | OAuth-login; aparte verwerkersovereenkomst en doorgiftegronden        |
-| Verwerker (alleen bij e-maillogin)  | E-mailprovider                           | Verzenden van verificatie- en herstelmail                             |
-| Geen verwerker                      | Analytics-, advertentie- of CDN-partijen | Worden niet toegevoegd                                                |
+| Rol                          | Partij                                   | Toelichting                                                           |
+| ---------------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
+| Verwerkingsverantwoordelijke | De eigenaar van de app                   | Publiek contactadres in de privacyverklaring, niet in deze repo       |
+| Verwerker                    | Cloudflare                               | Workers, static assets en D1; verwerkersovereenkomst en subprocessors |
+| Verwerker                    | Google                                   | OAuth-login; verwerkersovereenkomst en doorgiftegronden               |
+| Geen verwerker               | Analytics-, advertentie- of CDN-partijen | Worden niet toegevoegd                                                |
 
 Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die rechtspersoon de verwerkingsverantwoordelijke. De eigenaar moet dit vóór de eerste productie-login vastleggen.
 
@@ -108,8 +107,8 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 
 - **DPIA:** een volledige DPIA is waarschijnlijk niet nodig: geen systematische monitoring, geen grootschalige verwerking, geen bijzondere categorieën, geen profiling en geen publieke profielen. Leg een korte risicoanalyse vast. Opnieuw beoordelen zodra analytics, een publieke ranglijst, chat of multiplayer met vreemden wordt toegevoegd.
 - **Verwerkingsregister:** houd een register bij. De uitzondering voor organisaties met minder dan 250 medewerkers geldt niet als de verwerking niet incidenteel is of een risico vormt (artikel 30 lid 5 AVG).
-- **Verwerkersovereenkomsten:** Cloudflare DPA en, indien gebruikt, Google DPA en de e-mailprovider. Leg de subprocessors en doorgiftegronden vast.
-- **Doorgifte:** D1 staat in de EU-jurisdictie, maar Cloudflare is een Amerikaanse organisatie en het Workers-netwerk is wereldwijd. Gebruik de standaardcontractbepalingen en het Cloudflare Data Privacy Framework waar van toepassing. Bij Google OAuth gelden de Google-voorwaarden.
+- **Verwerkersovereenkomsten:** Cloudflare DPA en Google DPA. Leg de subprocessors en doorgiftegronden vast.
+- **Doorgifte:** D1 staat in de EU-jurisdictie, maar Cloudflare is een Amerikaanse organisatie en het Workers-netwerk is wereldwijd. Gebruik de standaardcontractbepalingen en het Cloudflare Data Privacy Framework waar van toepassing. Voor Google OAuth gelden de Google-voorwaarden en doorgiftegronden.
 
 ## COPPA en ICO Age Appropriate Design Code
 
@@ -127,7 +126,7 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 ## Gevolgen
 
 - **Het ouder-e-mailadres is persoonsgegeven.** Daarmee zijn een privacyverklaring, een verwerkingsregister en een DPA met Cloudflare nodig, ook bij een kleine app.
-- **Google OAuth voegt een verwerker en een externe request toe.** Dat is alleen acceptabel als de eigenaar die uitzondering expliciet vastlegt. Zonder Google blijft de app dichter bij de oorspronkelijke "geen externe requests"-regel.
+- **Google OAuth is gekozen.** De Google-knop voegt een verwerker en een externe request toe. Dat is een expliciete uitzondering; leg de DPA, het register en de privacyverklaring vast. Zonder Google blijft de app dichter bij de oorspronkelijke "geen externe requests"-regel.
 - **Verwijderen en exporteren moeten vanaf dag één werken.** Achteraf inbouwen is duurder en foutgevoeliger.
 - **Geen analytics betekent minder productinzicht.** De eigenaar moet genoegen nemen met kwalitatieve feedback en geanonimiseerde operationele metrieken.
 - **Multiplayer, chat en ranglijsten vallen buiten deze ADR.** Die vragen een nieuwe DPIA en een apart veiligheidsontwerp.
@@ -136,12 +135,11 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 ## Open vragen
 
 1. **Wie is de verwerkingsverantwoordelijke en welk contactadres komt in de privacyverklaring?**
-2. **Wordt Google OAuth gebruikt, of blijft het bij passkey/e-mail?** Dit bepaalt of Google als verwerker in het register komt.
-3. **Is 12 maanden inactiviteit de juiste bewaartermijn voor voortgang?**
-4. **Mag de ouder een dashboard met voortgang per profiel zien, en vanaf welke leeftijd?**
-5. **Is de site (ooit) op kinderen in de VS gericht?** Zo ja, dan is een COPPA-beoordeling nodig.
-6. **Wordt de app door een rechtspersoon gepubliceerd of door de eigenaar als particulier?**
-7. **Komt er een aparte functionaris of externe jurist voor de privacytoets?**
+2. **Is 12 maanden inactiviteit de juiste bewaartermijn voor voortgang?**
+3. **Mag de ouder een dashboard met voortgang per profiel zien, en vanaf welke leeftijd?**
+4. **Is de site (ooit) op kinderen in de VS gericht?** Zo ja, dan is een COPPA-beoordeling nodig.
+5. **Wordt de app door een rechtspersoon gepubliceerd of door de eigenaar als particulier?**
+6. **Komt er een aparte functionaris of externe jurist voor de privacytoets?**
 
 ## Status en vervolg
 
