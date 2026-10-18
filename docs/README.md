@@ -18,6 +18,7 @@
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
 - `research/2026-10-18-frans-luisterspel.md` — bestaande content, TTS-stemmen en spelconcept voor een Frans luisterspel met flipcards en sorteren.
 - `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
+- `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/spelideeen.md` — verzamelde educatieve spelideeën, prioriteiten en aandachtspunten.
 
