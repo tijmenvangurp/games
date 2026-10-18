@@ -427,6 +427,24 @@ Bronnen: [Workers-limieten](https://developers.cloudflare.com/workers/platform/l
 
 **Conclusie:** gratis is realistisch voor een familie-app. De enige onzekerheid is de CPU-limiet. Test met een preview-login en de CPU-metrics van Cloudflare; pas bij een structurele overschrijding is US$ 5/maand nodig. Let op wat je op het gratis plan niet krijgt: 30 dagen D1 Time Travel (het is 7 dagen), read replication en een SLA. Die zijn voor deze app niet nodig.
 
+### 4.8 Waar hosten we de backend?
+
+De backend is geen aparte server maar een serverless API. De goedkoopste en eenvoudigste plek is de **zelfde Cloudflare Worker** die de site al host. Daarmee blijven auth en API same-origin, zijn er geen CORS-headers of third-party cookies, en is er geen tweede deploypad.
+
+| Optie                                      | Gratis?                                   | Voordeel                                    | Nadeel voor deze app                                           |
+| ------------------------------------------ | ----------------------------------------- | ------------------------------------------- | -------------------------------------------------------------- |
+| **Cloudflare Workers + D1**                | Ja: 100k requests/dag, 10 ms CPU, D1 5 GB | Zelfde host, same-origin, geen extra vendor | 10 ms CPU is de enige risicofactor                             |
+| Cloudflare Workers Paid                    | Nee, US$ 5/maand                          | Zelfde architectuur, 30 s CPU               | Kleine vaste kosten                                            |
+| Vercel/Netlify Functions + Neon/Turso      | Ja                                        | Bekende tooling, gratis database            | Frontend verhuizen of CORS/cookies; extra vendor; cold starts  |
+| Deno Deploy + Turso                        | Ja: 1M requests/maand, 1 GiB KV           | Eenvoudige runtime                          | Andere runtime; same-origin vraagt een proxy of frontendmove   |
+| Neon Managed Better Auth                   | Ja, tot 60.000 MAU op Free                | Auth en Postgres in één                     | Hosted auth, externe origin, minder controle over configuratie |
+| Supabase/Firebase/Appwrite                 | Ja                                        | Auth, database en dashboard                 | Vervangt Better Auth, vendor lock-in, externe requests         |
+| Eigen VM (bijvoorbeeld Oracle Always Free) | Ja, meestal met creditcard                | Volledige controle, geen CPU-limiet         | TLS, backups, updates en monitoring zelf doen                  |
+
+**Advies:** begin op Cloudflare Workers + D1. Het is de enige optie die de bestaande deployment houdt en same-origin blijft. De gratis limieten zijn voor een familie-app ruim; alleen de 10 ms CPU moet je meten. Kom je daar structureel boven, dan is US$ 5/maand goedkoper dan een migratie naar een ander gratis platform.
+
+Bronnen: [Workers-pricing](https://developers.cloudflare.com/workers/platform/pricing/), [D1-pricing](https://developers.cloudflare.com/d1/platform/pricing/), [Vercel-pricing](https://vercel.com/pricing), [Deno Deploy-pricing](https://deno.com/deploy/pricing), [Neon-pricing](https://neon.com/pricing), [Neon Managed Better Auth](https://neon.com/docs/auth/overview), [Turso-pricing](https://turso.tech/pricing), [Supabase-pricing](https://supabase.com/pricing).
+
 ## 5. Integratie in deze stack
 
 ### 5.1 Worker-routing naast static assets
