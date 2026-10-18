@@ -17,17 +17,17 @@ function createTutorialChess(fen: string): Chess {
 }
 
 /**
- * De tutorial is een drill: na elke zet is wit weer aan zet. Alleen de
- * stukopstelling blijft over; castling en en passant zijn hier niet nodig.
+ * De tutorial is een drill: na elke zet is wit weer aan zet. De stukopstelling
+ * en castlingrechten blijven behouden; en passant is hier niet nodig.
  */
 export function rearmWhite(fen: string): string {
-  const [placement] = fen.split(" ");
+  const [placement, , castling = "-"] = fen.split(" ");
 
   if (!placement) {
     throw new Error(`Ongeldige FEN: ${fen}`);
   }
 
-  return `${placement} w - - 0 1`;
+  return `${placement} w ${castling} - 0 1`;
 }
 
 export function legalMovesFor(
@@ -93,16 +93,27 @@ export function playTutorialMove(
     ok: true,
     move,
     nextFen: rearmWhite(chess.fen()),
-    completed: isGoalReached(level, applied.to, nextMoveCount),
+    completed: isGoalReached(level, applied, chess, nextMoveCount),
   };
 }
 
-export function isGoalReached(level: TutorialLevel, square: Square, moveCount: number): boolean {
-  if (!level.targetSquare || square !== level.targetSquare) {
-    return false;
+function isGoalReached(level: TutorialLevel, move: Move, chess: Chess, moveCount: number): boolean {
+  switch (level.goal) {
+    case "check":
+      return chess.isCheck();
+    case "checkmate":
+      return chess.isCheckmate();
+    case "castle-kingside":
+      return move.isKingsideCastle();
+    case "castle-queenside":
+      return move.isQueensideCastle();
+    default:
+      return Boolean(
+        level.targetSquare &&
+        move.to === level.targetSquare &&
+        moveCount >= (level.minimumMoves ?? 1),
+      );
   }
-
-  return moveCount >= (level.minimumMoves ?? 1);
 }
 
 function tryMove(chess: Chess, from: Square, to: Square): Move | null {

@@ -1,8 +1,21 @@
 import type { PieceSymbol, Square } from "chess.js";
 
-export const TUTORIAL_LEVEL_IDS = ["rook-train", "knight-jump", "pawn-crossing"] as const;
+export const TUTORIAL_LEVEL_IDS = [
+  "rook-train",
+  "bishop-line",
+  "queen-dance",
+  "knight-jump",
+  "king-step",
+  "pawn-crossing",
+  "castling",
+  "check",
+  "checkmate",
+] as const;
 
 export type TutorialLevelId = (typeof TUTORIAL_LEVEL_IDS)[number];
+
+/** Speciale opdrachten naast het bereiken van een doelveld. */
+export type TutorialGoal = "check" | "checkmate" | "castle-kingside" | "castle-queenside";
 
 /** Eén geïsoleerde schaakles. De FEN bevat alleen de stukken van deze les. */
 export interface TutorialLevel {
@@ -10,13 +23,15 @@ export interface TutorialLevel {
   readonly title: string;
   readonly description: string;
   readonly initialFen: string;
-  /** Het veld met de ster. Ontbreekt bij een vrije oefening. */
+  /** Het veld met de ster. Ontbreekt bij een vrije oefening of schaakopdracht. */
   readonly targetSquare?: Square;
   /** Het witte stuk dat het kind in deze les bestuurt. */
   readonly playerPiece: PieceSymbol;
   readonly hint: string;
   /** Minimum aantal zetten voordat de ster telt. */
   readonly minimumMoves?: number;
+  /** Speciale opdracht. Zonder goal telt het doelveld. */
+  readonly goal?: TutorialGoal;
 }
 
 export interface TutorialMove {

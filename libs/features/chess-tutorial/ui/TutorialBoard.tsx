@@ -175,17 +175,50 @@ function HintCard({ hint }: { readonly hint: string }) {
   );
 }
 
-function TargetBadge({ targetSquare }: { readonly targetSquare: Square | undefined }) {
-  if (!targetSquare) {
+function objectiveText(level: TutorialLevel): string {
+  switch (level.goal) {
+    case "check":
+      return "Zet de zwarte koning schaak.";
+    case "checkmate":
+      return "Zet de zwarte koning schaakmat.";
+    case "castle-kingside":
+      return "Rokade: zet de koning op g1.";
+    case "castle-queenside":
+      return "Rokade: zet de koning op c1.";
+    default:
+      return level.targetSquare ? `Zet de ster op ${level.targetSquare}.` : "Voltooi de opdracht.";
+  }
+}
+
+function completionText(level: TutorialLevel): string {
+  switch (level.goal) {
+    case "check":
+      return "Gelukt! Je hebt schaak gezet.";
+    case "checkmate":
+      return "Schaakmat! Knap gedaan.";
+    case "castle-kingside":
+    case "castle-queenside":
+      return "Gelukt! De koning is gerokeerd.";
+    default:
+      return level.targetSquare
+        ? `Gelukt! Je hebt de ster op ${level.targetSquare} gehaald.`
+        : "Gelukt!";
+  }
+}
+
+function ObjectiveBadge({ level }: { readonly level: TutorialLevel }) {
+  if (!level.targetSquare && !level.goal) {
     return null;
   }
 
   return (
-    <p className="text-center text-sm font-bold text-slate-700">
-      <span aria-hidden="true">⭐</span> Zet de ster op{" "}
-      <span className="rounded-lg bg-amber-200 px-2 py-0.5 font-black text-amber-950">
-        {targetSquare}
-      </span>
+    <p className="flex items-center justify-center gap-1.5 text-center text-sm font-bold text-slate-700">
+      {level.targetSquare ? (
+        <span aria-hidden="true">⭐</span>
+      ) : (
+        <Sparkles aria-hidden="true" className="size-4 text-amber-500" />
+      )}
+      <span>{objectiveText(level)}</span>
     </p>
   );
 }
@@ -206,9 +239,9 @@ function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
 
 interface StatusBannerProps {
   readonly feedback: TutorialFeedback;
+  readonly level: TutorialLevel;
   readonly moveCount: number;
   readonly status: TutorialStatus;
-  readonly targetSquare: Square | undefined;
 }
 
 function statusTone(status: TutorialStatus, feedback: TutorialFeedback): string {
@@ -223,15 +256,12 @@ function statusTone(status: TutorialStatus, feedback: TutorialFeedback): string 
   return "bg-slate-100 text-slate-700";
 }
 
-function StatusMessage({ feedback, moveCount, status, targetSquare }: StatusBannerProps) {
+function StatusMessage({ feedback, level, moveCount, status }: StatusBannerProps) {
   if (status === "completed") {
     return (
       <>
         <Check aria-hidden="true" className="size-5 shrink-0" />
-        <span>
-          Gelukt! Je hebt de ster
-          {targetSquare ? ` op ${targetSquare}` : ""} gehaald.
-        </span>
+        <span>{completionText(level)}</span>
       </>
     );
   }
@@ -242,13 +272,13 @@ function StatusMessage({ feedback, moveCount, status, targetSquare }: StatusBann
 
   return (
     <span>
-      Sleep het stuk naar een groene stip, of tik eerst op het stuk. Het gouden vak is de ster.
+      Sleep het stuk naar een groene stip, of tik eerst op het stuk. {objectiveText(level)}
       {moveCount > 0 ? ` Je deed al ${moveCount} ${moveCount === 1 ? "zet" : "zetten"}.` : ""}
     </span>
   );
 }
 
-function StatusBanner({ feedback, moveCount, status, targetSquare }: StatusBannerProps) {
+function StatusBanner({ feedback, level, moveCount, status }: StatusBannerProps) {
   return (
     <div
       aria-live="polite"
@@ -257,12 +287,7 @@ function StatusBanner({ feedback, moveCount, status, targetSquare }: StatusBanne
         statusTone(status, feedback),
       )}
     >
-      <StatusMessage
-        feedback={feedback}
-        moveCount={moveCount}
-        status={status}
-        targetSquare={targetSquare}
-      />
+      <StatusMessage feedback={feedback} level={level} moveCount={moveCount} status={status} />
     </div>
   );
 }
@@ -319,13 +344,13 @@ export function TutorialBoard({
       <TutorialHeader currentIndex={currentIndex} level={tutorial.level} titleId={titleId} />
       <LevelPicker currentLevelId={tutorial.level.id} onSelect={tutorial.loadLevel} />
       <HintCard hint={tutorial.level.hint} />
-      <TargetBadge targetSquare={tutorial.level.targetSquare} />
+      <ObjectiveBadge level={tutorial.level} />
       <BoardPanel options={boardOptionsFor(tutorial, squareStyles)} />
       <StatusBanner
         feedback={tutorial.feedback}
+        level={tutorial.level}
         moveCount={tutorial.moveCount}
         status={tutorial.status}
-        targetSquare={tutorial.level.targetSquare}
       />
       <TutorialNavigation
         canContinue={nextId !== null && tutorial.status === "completed"}

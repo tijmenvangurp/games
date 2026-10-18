@@ -124,6 +124,7 @@ test.describe("schaaktutorial op een telefoon", () => {
     await page.goto("/schaken");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.scrollIntoViewIfNeeded();
     const dragPiece = async (from: string, to: string) => {
       const fromBox = await board.locator(`[data-square="${from}"]`).boundingBox();
       const toBox = await board.locator(`[data-square="${to}"]`).boundingBox();
@@ -173,6 +174,39 @@ test.describe("schaaktutorial op een telefoon", () => {
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("speelt de rokade", async ({ page }) => {
+    await page.goto("/schaken");
+    await page.getByRole("button", { name: "Rokade", exact: true }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="e1"]').click();
+    await board.locator('[data-square="g1"]').click();
+
+    await expect(page.getByText(/Gelukt! De koning is gerokeerd/)).toBeVisible();
+  });
+
+  test("zet de koning schaak", async ({ page }) => {
+    await page.goto("/schaken");
+    await page.getByRole("button", { name: "Schaak zetten", exact: true }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="a1"]').click();
+    await board.locator('[data-square="a8"]').click();
+
+    await expect(page.getByText(/Gelukt! Je hebt schaak gezet/)).toBeVisible();
+  });
+
+  test("zet schaakmat met de dame", async ({ page }) => {
+    await page.goto("/schaken");
+    await page.getByRole("button", { name: "Schaakmat", exact: true }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="g6"]').click();
+    await board.locator('[data-square="g7"]').click();
+
+    await expect(page.getByText(/Schaakmat! Knap gedaan/)).toBeVisible();
   });
 });
 
