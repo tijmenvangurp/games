@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { playSound } from "@shared/lib";
 import { Button } from "./button";
+import { Confetti } from "./confetti";
 import { LayoutGrid, Sparkles, Star, Trophy } from "./icons";
 
 interface CelebrationDialogProps {
@@ -12,6 +13,7 @@ interface CelebrationDialogProps {
   againLabel?: string;
   chooseLabel?: string;
   homeLabel?: string;
+  confetti?: boolean;
 }
 
 export function CelebrationDialog({
@@ -23,6 +25,7 @@ export function CelebrationDialog({
   againLabel = "Nog een keer",
   chooseLabel = "Ander spel kiezen",
   homeLabel = "Naar het menu",
+  confetti = false,
 }: CelebrationDialogProps) {
   useEffect(() => {
     playSound("win");
@@ -42,6 +45,7 @@ export function CelebrationDialog({
         }
       }}
     >
+      {confetti ? <Confetti pieces={28} /> : null}
       <div className="animate-pop w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl">
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
           <Sparkles className="animate-rise size-10 text-rose-400" />

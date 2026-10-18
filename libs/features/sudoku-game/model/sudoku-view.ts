@@ -1,20 +1,19 @@
 import type { SudokuHint } from "@entities/sudoku";
 import type { MistakeMode } from "./settings";
 
-export function hintText(hint: SudokuHint, symbols: readonly string[]): string {
-  const symbol = symbols[hint.value - 1] ?? String(hint.value);
+export function hintText(hint: SudokuHint): string {
   if (hint.technique === "naked-single") {
-    return `In dit vakje past alleen nog ${symbol}.`;
+    return "In dit vakje past nog maar één cijfer.";
   }
   switch (hint.unit) {
     case "row":
-      return `In deze rij kan ${symbol} maar op één plek.`;
+      return "In deze rij is nog maar één plek voor één cijfer.";
     case "column":
-      return `In deze kolom kan ${symbol} maar op één plek.`;
+      return "In deze kolom is nog maar één plek voor één cijfer.";
     case "box":
-      return `In dit blok kan ${symbol} maar op één plek.`;
+      return "In dit blok is nog maar één plek voor één cijfer.";
     default:
-      return `${symbol} kan maar op één plek.`;
+      return "Er is nog maar één plek voor één cijfer.";
   }
 }
 

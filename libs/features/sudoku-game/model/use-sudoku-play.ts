@@ -59,10 +59,9 @@ function hintMessageFor(
   hintPreview: SudokuHint | null,
   hintUnavailable: boolean,
   solutionMistakes: readonly number[],
-  symbols: readonly string[],
 ): string | null {
   if (hintPreview) {
-    return hintText(hintPreview, symbols);
+    return hintText(hintPreview);
   }
   if (!hintUnavailable) {
     return null;
@@ -104,7 +103,7 @@ function derivePlay(
       filled,
       total: play.entries.length,
     }),
-    hintMessage: hintMessageFor(hintPreview, hintUnavailable, solutionMistakes, symbols),
+    hintMessage: hintMessageFor(hintPreview, hintUnavailable, solutionMistakes),
     almostSolved: play.entries.length - filled === 1 && !play.solved,
   };
 }
