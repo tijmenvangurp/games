@@ -13,6 +13,7 @@ import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
+import { WordSearchPage } from "@pages/word-search";
 
 export function createAppRouter(history?: RouterHistory) {
   const rootRoute = createRootRoute({
@@ -67,6 +68,12 @@ export function createAppRouter(history?: RouterHistory) {
     component: PuzzlesPage,
   });
 
+  const wordSearchRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/woordzoeker",
+    component: WordSearchPage,
+  });
+
   const routeTree = rootRoute.addChildren([
     homeRoute,
     sudokuRoute,
@@ -76,6 +83,7 @@ export function createAppRouter(history?: RouterHistory) {
     pokemonQuizRoute,
     chessRoute,
     puzzlesRoute,
+    wordSearchRoute,
   ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });

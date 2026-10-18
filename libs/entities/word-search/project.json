@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-word-search",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/word-search",
+  "tags": ["layer:entities", "scope:word-search", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/word-search"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}

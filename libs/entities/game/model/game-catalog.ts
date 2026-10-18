@@ -10,7 +10,15 @@ export type GameCatalogEntry = GameCatalogBase &
   (
     | {
         status: "available";
-        to: "/sudoku" | "/pijlen" | "/zoeken" | "/memory" | "/raad" | "/schaken" | "/puzzels";
+        to:
+          | "/sudoku"
+          | "/pijlen"
+          | "/zoeken"
+          | "/memory"
+          | "/raad"
+          | "/schaken"
+          | "/puzzels"
+          | "/woordzoeker";
       }
     | { status: "coming-soon" }
   );
@@ -42,6 +50,15 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/zoeken",
     accentClassName: "from-emerald-100 via-emerald-50 to-white",
+  },
+  {
+    id: "word-search",
+    name: "Woordzoeker",
+    description: "Zoek woorden in de tuin of onder water. Kies 10 × 10, 12 × 12 of 14 × 14.",
+    emoji: "🔤",
+    status: "available",
+    to: "/woordzoeker",
+    accentClassName: "from-teal-100 via-emerald-50 to-white",
   },
   {
     id: "memory",
