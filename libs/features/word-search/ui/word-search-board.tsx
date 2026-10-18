@@ -94,7 +94,7 @@ function WordSearchCell({
       aria-label={cellLabel(letter, cell, found, hint, selected)}
       aria-pressed={selected}
       className={cn(
-        "relative z-10 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-slate-200/80 font-bold leading-none text-slate-700 transition-colors",
+        "relative z-0 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-slate-200/80 font-bold leading-none text-slate-700 transition-colors",
         letterSize(size),
         !found && "bg-white hover:bg-slate-50",
         found && "bg-emerald-100/25 text-emerald-700 ring-1 ring-inset ring-emerald-200",

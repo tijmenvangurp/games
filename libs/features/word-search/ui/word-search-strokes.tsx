@@ -55,7 +55,7 @@ export function WordSearchStrokes({ placements, size }: WordSearchStrokesProps) 
   return (
     <svg
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
+      className="pointer-events-none absolute inset-0 z-10 h-full w-full"
       preserveAspectRatio="none"
       viewBox={`0 0 ${size} ${size}`}
     >
@@ -68,23 +68,23 @@ export function WordSearchStrokes({ placements, size }: WordSearchStrokesProps) 
               className="word-search-stroke"
               d={path}
               fill="none"
-              opacity={0.25}
+              opacity={0.18}
               pathLength={1}
-              stroke="#f59e0b"
+              stroke="#93c5fd"
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={0.2}
+              strokeWidth={0.16}
             />
             <path
               className="word-search-stroke"
               d={path}
               fill="none"
               pathLength={1}
-              stroke="#9a3412"
+              stroke="#1d4ed8"
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={0.07}
-              style={{ animationDelay: "70ms", opacity: 0.8 }}
+              strokeWidth={0.08}
+              style={{ animationDelay: "70ms", opacity: 0.65 }}
             />
           </g>
         );
