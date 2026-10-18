@@ -31,6 +31,9 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 
 - Gebruik `corepack pnpm` voor alle commando's. Nx-taken staan in `project.json`; gebruik `pnpm run graph` voor de projectgraaf en `pnpm run affected` voor gerichte checks.
 - `pnpm run build`, `pnpm run typecheck`, `pnpm run test:coverage` en `pnpm run lint` draaien via Nx en profiteren van de lokale cache. Geen Nx Cloud: de app en CI sturen niets naar externe diensten.
+- Gebruik geen `NX_DAEMON=false`-prefix. Die valt buiten de permissieregel `corepack *` en levert onnodige permission checks op. Gebruik `corepack pnpm exec nx ...` met Nx-flags; zie `docs/tooling.md`.
+- Forceer een verse build met `corepack pnpm exec nx run games:build --skipNxCache`, niet met `pnpm run build -- --skip-nx-cache` (die flag gaat naar Vite).
+- Draai `fallow` en Nx-taken niet parallel: Fallow schrijft `.fallow/` en kan de Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch, open een pull request en merge pas als alle CI-checks groen zijn.
