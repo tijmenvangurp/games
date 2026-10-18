@@ -68,23 +68,23 @@ export function WordSearchStrokes({ placements, size }: WordSearchStrokesProps) 
               className="word-search-stroke"
               d={path}
               fill="none"
-              opacity={0.18}
+              opacity={0.12}
               pathLength={1}
               stroke="#93c5fd"
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={0.16}
+              strokeWidth={0.13}
             />
             <path
               className="word-search-stroke"
               d={path}
               fill="none"
               pathLength={1}
-              stroke="#1d4ed8"
+              stroke="#3b82f6"
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={0.08}
-              style={{ animationDelay: "70ms", opacity: 0.65 }}
+              strokeWidth={0.06}
+              style={{ animationDelay: "70ms", opacity: 0.42 }}
             />
           </g>
         );
