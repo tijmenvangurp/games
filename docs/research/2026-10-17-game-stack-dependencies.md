@@ -18,6 +18,7 @@ Als een volgend spel het wél nodig heeft:
 | Complexe animatie           | `motion`                              | 14.3.0         | MIT      | 35,6 KB (LazyMotion) / 50,2 KB (volledig) | Alleen bij layout-, exit- of gesture-choreografie.                     |
 | Lijst/kaarten laten bewegen | `@formkit/auto-animate`               | 0.10.0         | MIT      | 3,3 KB                                    | Goedkope optie voor toevoegen/verwijderen/verplaatsen.                 |
 | Geluid                      | geen package                          | —              | —        | 0 KB                                      | Native `HTMLAudioElement` of Web Audio; geen Howler.                   |
+| Haptische feedback          | geen package                          | —              | —        | 0 KB                                      | Native `navigator.vibrate`; iOS Safari heeft geen webhaptics.          |
 | Geluid met sprites/pooling  | `howler`                              | 2.2.4          | MIT      | 10,2 KB                                   | Alleen met `html5: true`; standaard Web Audio is geblokkeerd door CSP. |
 | Feesteffect                 | `canvas-confetti`                     | 1.9.4          | ISC      | 4,4 KB                                    | Optioneel; CSS/emoji is al genoeg.                                     |
 
@@ -224,6 +225,21 @@ Voor lokale audiobestanden met Web Audio-effecten kun je een `<audio>`-element v
 
 **Advies:** geen audiolibrary. Houd de cries op `HTMLAudioElement` en voeg eventueel een kleine Web Audio-helper toe voor effecten. Geen `data:`-URI's voor audio: `media-src` valt terug op `default-src 'self'`, en daar zit `data:` niet in. Lokale bestanden zijn het eenvoudigst.
 
+### Haptics
+
+De app heeft al een kleine wrapper in `libs/shared/lib/haptics.ts`: `vibrate(pattern)` voor ruwe patronen en `playHaptic(name)` voor dezelfde semantische namen als `playSound` (`tap`, `select`, `match`, `wrong`, `hint`, `almost`, `win`). Sudoku en Pijlen gebruiken die helper; er is **geen package** nodig.
+
+Wat werkt in oktober 2026:
+
+- **Android/Chromium:** `navigator.vibrate(number | number[])` werkt na een gebruikersactie. Er is geen intensiteit, golfvorm of betrouwbare hardwaredetectie; desktop-Chrome heeft de API maar meestal geen motor.
+- **Firefox:** `Navigator.vibrate` is in Firefox 129 verwijderd. Niet op ondersteuning rekenen.
+- **iOS/iPadOS Safari:** de Vibration API is nooit geïmplementeerd. De enige native tik is de systeemhaptiek van een `<input type="checkbox" switch>` (Safari 17.4+). Sinds iOS 26.5 speelt die alleen nog bij een echte tik op de switch of het bijbehorende label; een click uit JavaScript is niet genoeg.
+- **Toekomst:** de Web Haptics API (`navigator.playHaptics(effect, intensity)` en CSS `@haptic`) is in 2026 voorgesteld, maar nog door geen stabiele browser uitgerold.
+
+Voor iOS bestaan libraries zoals [`@mxerf/tappt`](https://github.com/mxerf/tappt), [`browser-haptic`](https://github.com/KemalEmirhan/browser-haptic) en [`ios-haptics`](https://github.com/tijnjh/ios-haptics). Ze leggen een transparant label met een verborgen switch over een knop. Dat geeft op iOS één vaste tik per echte tap, geen patroon en geen feedback na een `await`. Voor het SVG-bord van Pijlen is zo'n overlay ongeschikt: hij onderschept de pointer-events en de uitkomst (vrij of geblokkeerd) is op dat moment nog niet bekend. Voor losse HUD-knoppen zou het kunnen, maar dat is een aparte proef en geen algemene game-stack-oplossing.
+
+**Advies:** geen haptics-library toevoegen. Houd `playHaptic` als enige ingang, zodat een toekomstige Web Haptics API in één bestand kan worden ingehangen. Als echte iPhone-haptics een producteis worden, prototyp dan `tappt` op losse knoppen en leg de beperkingen in een ADR vast.
+
 ## 4. Optionele extra's
 
 | Package                        | Versie          | Licentie     | Min + gzip | Waarvoor               | Advies                                                                  |
@@ -373,6 +389,13 @@ Gebruik geen `pnpm add` voor de optionele extra's zonder eerst een spel te hebbe
 - Howler.js: <https://howlerjs.com/> en <https://github.com/goldfire/howler.js>
 - Howler XHR-loadpad: <https://github.com/goldfire/howler.js/blob/master/src/howler.core.js#L2408>
 - npm: <https://www.npmjs.com/package/howler>, <https://www.npmjs.com/package/tone>, <https://www.npmjs.com/package/use-sound>
+
+### Haptics
+
+- MDN `Navigator.vibrate()`: <https://developer.mozilla.org/en-US/docs/Web/API/Navigator/vibrate>
+- Wingo UI, webhaptics in oktober 2026: <https://wingo-ui.com/blog/web-vibration-api-haptic-feedback>
+- Safari `switch`-haptiek en de beperking sinds iOS 26.5: <https://github.com/mxerf/tappt>, <https://github.com/tijnjh/ios-haptics>, <https://github.com/KemalEmirhan/browser-haptic>
+- Pulsar Web SDK (vibratiepatronen plus audiosimulatie): <https://docs.swmansion.com/pulsar/sdk/web/>
 
 ### Overig
 

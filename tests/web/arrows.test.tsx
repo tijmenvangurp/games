@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import {
@@ -32,6 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  Reflect.deleteProperty(navigator, "vibrate");
 });
 
 function renderApp(path = "/pijlen") {
@@ -102,6 +103,33 @@ describe("arrows maze", () => {
     fireEvent.click(screen.getByRole("button", { name: "Terug" }));
     expect(await screen.findByRole("heading", { name: level.name })).toBeTruthy();
     expect(level.arrows.length).toBeGreaterThan(0);
+  });
+
+  it("gives haptic feedback for a free and a blocked arrow", async () => {
+    const vibrate = vi.fn(() => true);
+    Object.defineProperty(navigator, "vibrate", {
+      configurable: true,
+      value: vibrate,
+    });
+
+    await startGame();
+    const free = firstRemovable();
+    fireEvent.click(arrowNode(free.id));
+    expect(vibrate).toHaveBeenCalledWith(10);
+
+    const state = useArrowsStore.getState();
+    const freeAfterMove = new Set(
+      removableArrows(state.level, new Set(state.removedIds)).map((arrow) => arrow.id),
+    );
+    const blocked = state.level.arrows.find(
+      (arrow) => !state.removedIds.includes(arrow.id) && !freeAfterMove.has(arrow.id),
+    );
+    if (!blocked) {
+      throw new Error("No blocked arrow left in the first level");
+    }
+
+    fireEvent.click(arrowNode(blocked.id));
+    expect(vibrate).toHaveBeenCalledWith([30, 40, 30]);
   });
 
   it("wins a level, unlocks the next one and starts it", async () => {
