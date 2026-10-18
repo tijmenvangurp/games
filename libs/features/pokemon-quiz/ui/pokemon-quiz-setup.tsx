@@ -23,7 +23,8 @@ export function PokemonQuizSetup({
       <div className="mb-5">
         <h2 className="text-xl font-black">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
-          Hoeveel namen krijg je bij elk plaatje? Hoe moeilijker, hoe meer namen.
+          Hoeveel namen krijg je bij elk plaatje? Hoe moeilijker, hoe meer namen. Op de moeilijkste
+          stand zie je eerst alleen een silhouet.
         </p>
       </div>
 

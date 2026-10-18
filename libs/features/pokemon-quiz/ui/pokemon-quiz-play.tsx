@@ -49,7 +49,11 @@ export function PokemonQuizPlay() {
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-5 lg:items-start lg:gap-4">
       <div className="order-1 lg:col-span-3">
-        <QuizArtwork answered={answered} target={target} />
+        <QuizArtwork
+          answered={answered}
+          silhouette={question.difficulty === "moeilijk"}
+          target={target}
+        />
       </div>
 
       <aside className="order-2 space-y-3 lg:col-span-2">

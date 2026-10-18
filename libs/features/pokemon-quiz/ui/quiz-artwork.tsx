@@ -4,16 +4,24 @@ import { cn } from "@shared/lib";
 interface QuizArtworkProps {
   target: Pokemon;
   answered: boolean;
+  /** Hard mode hides the colours until the player has answered. */
+  silhouette: boolean;
 }
 
-export function QuizArtwork({ target, answered }: QuizArtworkProps) {
+export function QuizArtwork({ target, answered, silhouette }: QuizArtworkProps) {
+  const revealed = !silhouette || answered;
+
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-sky-100 via-amber-50 to-rose-100 p-3 shadow-sm sm:p-5">
       <PokeballMark className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-10 sm:size-56" />
       <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center">
         <img
-          alt={answered ? target.name : ""}
-          className="h-full w-full object-contain drop-shadow-xl"
+          alt={revealed ? target.name : ""}
+          className={cn(
+            "h-full w-full object-contain drop-shadow-xl transition duration-500 ease-out",
+            revealed ? undefined : "brightness-0",
+          )}
+          data-revealed={revealed}
           draggable={false}
           src={pokemonArtworkSrc(target)}
         />
@@ -21,10 +29,10 @@ export function QuizArtwork({ target, answered }: QuizArtworkProps) {
       <p
         className={cn(
           "relative text-center text-lg font-black",
-          answered ? "animate-pop text-emerald-700" : "text-slate-500",
+          revealed ? "animate-pop text-emerald-700" : "text-slate-500",
         )}
       >
-        {answered ? target.name : "Wie is deze Pokémon?"}
+        {revealed ? target.name : "Wie is deze Pokémon?"}
       </p>
     </div>
   );
