@@ -1,7 +1,8 @@
 import { MATH_LEVELS, MATH_MODES, type MathLevel, type MathMode } from "@entities/math";
+import { GAME_STORAGE_KEYS, profileStorageKey, readStoredJson } from "@shared/lib";
 import { DEFAULT_MATH_SETTINGS, type MathSettings } from "./settings";
 
-const STORAGE_KEY = "games.math.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.math;
 const MAX_STARS = 10;
 
 export interface MathState {
@@ -49,28 +50,15 @@ function isBest(value: unknown): value is Record<string, number> {
 }
 
 export function loadMathState(): MathState {
-  try {
-    if (typeof localStorage === "undefined") {
-      return FALLBACK;
-    }
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return FALLBACK;
-    }
-
-    const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed)) {
-      return FALLBACK;
-    }
-
-    return {
-      settings: isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings,
-      best: isBest(parsed.best) ? parsed.best : {},
-    };
-  } catch {
+  const parsed = readStoredJson(profileStorageKey(STORAGE_KEY));
+  if (!isRecord(parsed)) {
     return FALLBACK;
   }
+
+  return {
+    settings: isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings,
+    best: isBest(parsed.best) ? parsed.best : {},
+  };
 }
 
 export function saveMathState(state: MathState): void {
@@ -78,7 +66,7 @@ export function saveMathState(state: MathState): void {
     if (typeof localStorage === "undefined") {
       return;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(state));
   } catch {
     // Storage may be unavailable; the in-memory game still works.
   }
