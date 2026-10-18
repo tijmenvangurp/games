@@ -55,8 +55,10 @@ spelnamen. Geen externe fonts.
 - Gebruik `success`, `warning` en `danger` alleen voor hun betekenis.
 - Voeg geen nieuwe emoji toe aan UI-chrome. Emoji's mogen wel in leerinhoud staan.
 - Nieuwe spellen krijgen een item in `GameIcon` en een regel in `gameCatalog`.
-- Spelthumbnails staan lokaal in `apps/games/public/thumbnails` (800 × 500, JPEG) en worden
-  lazy geladen. Geen externe afbeeldingen of screenshotdiensten.
+- Spelthumbnails staan lokaal in `apps/games/public/thumbnails` (800 × 500, JPEG) met een
+  contenthash in de bestandsnaam. Daardoor kunnen ze lang en immutable gecachet worden; bij
+  een nieuwe afbeelding verandert de URL. Ze worden lazy geladen en komen niet van een
+  externe dienst.
 - Houd touch-targets op minimaal 44 px en respecteer `pt-safe`/`pb-safe`.
 
 ## Iconen
