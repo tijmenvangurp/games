@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { QUIZ_DIFFICULTIES, QUIZ_OPTION_COUNT, createQuizQuestion } from "@features/pokemon-quiz";
+import {
+  POKEMON_LOOKALIKE_GROUPS,
+  QUIZ_DIFFICULTIES,
+  QUIZ_OPTION_COUNT,
+  createQuizQuestion,
+  isFragmentDifficulty,
+  isSilhouetteDifficulty,
+  lookalikeIdsFor,
+} from "@features/pokemon-quiz";
 import { POKEDEX, getPokemon } from "@entities/pokedex";
 
 describe("pokémon quiz generator", () => {
@@ -33,5 +41,45 @@ describe("pokémon quiz generator", () => {
     const easy = createQuizQuestion("makkelijk", 5);
     const hard = createQuizQuestion("moeilijk", 5);
     expect(hard.optionIds.length).toBeGreaterThan(easy.optionIds.length);
+  });
+
+  it("keeps the hardest level to five names", () => {
+    expect(createQuizQuestion("meester", 11).optionIds).toHaveLength(5);
+  });
+
+  it("puts every Pokémon in exactly one lookalike group with enough names", () => {
+    const seen = new Map<number, number>();
+
+    for (const group of POKEMON_LOOKALIKE_GROUPS) {
+      expect(group.length).toBeGreaterThanOrEqual(5);
+      for (const id of group) {
+        seen.set(id, (seen.get(id) ?? 0) + 1);
+      }
+    }
+
+    expect(seen.size).toBe(POKEDEX.length);
+    for (const pokemon of POKEDEX) {
+      expect(seen.get(pokemon.id)).toBe(1);
+      expect(lookalikeIdsFor(pokemon.id)).toContain(pokemon.id);
+    }
+  });
+
+  for (const difficulty of ["moeilijk", "meester"] as const) {
+    it(`uses only lookalike names on ${difficulty}`, () => {
+      for (let seed = 0; seed < 25; seed += 1) {
+        const question = createQuizQuestion(difficulty, seed);
+        const group = lookalikeIdsFor(question.targetId);
+
+        expect(group.length).toBeGreaterThanOrEqual(question.optionIds.length);
+        for (const id of question.optionIds) {
+          expect(group).toContain(id);
+        }
+      }
+    });
+  }
+
+  it("marks only meester as a fragment level", () => {
+    expect(QUIZ_DIFFICULTIES.filter(isFragmentDifficulty)).toEqual(["meester"]);
+    expect(QUIZ_DIFFICULTIES.filter(isSilhouetteDifficulty)).toEqual(["moeilijk", "meester"]);
   });
 });

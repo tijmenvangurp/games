@@ -23,12 +23,13 @@ export function PokemonQuizSetup({
       <div className="mb-5">
         <h2 className="text-xl font-black">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
-          Hoeveel namen krijg je bij elk plaatje? Hoe moeilijker, hoe meer namen. Op de moeilijkste
-          stand zie je eerst alleen een silhouet.
+          Hoe moeilijker, hoe meer namen en hoe minder je van de Pokémon ziet. Op de moeilijkste
+          stand zie je maar een stukje van het silhouet.
         </p>
       </div>
 
       <OptionPicker
+        columns={2}
         legend="Moeilijkheid"
         options={POKEMON_QUIZ_DIFFICULTY_OPTIONS}
         selected={settings.difficulty}

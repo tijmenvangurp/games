@@ -63,6 +63,14 @@ async function startHardGame(): Promise<void> {
   expect(await screen.findByRole("group", { name: "Kies de juiste naam" })).toBeTruthy();
 }
 
+async function startMeesterGame(): Promise<void> {
+  renderApp();
+  expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Meester/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+  expect(await screen.findByRole("group", { name: "Kies de juiste naam" })).toBeTruthy();
+}
+
 async function startGame(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -166,6 +174,25 @@ describe("wie is deze pokémon", () => {
     expect(artworkImage().getAttribute("data-revealed")).toBe("true");
     expect(artworkImage().getAttribute("alt")).toBe(name);
     expect(screen.getByText(`Het juiste antwoord is ${name}.`)).toBeTruthy();
+  });
+
+  it("shows only a fragment of the silhouette on meester until an answer is picked", async () => {
+    await startMeesterGame();
+
+    const group = screen.getByRole("group", { name: "Kies de juiste naam" });
+    expect(within(group).getAllByRole("button")).toHaveLength(5);
+    expect(artworkImage().getAttribute("data-revealed")).toBe("false");
+    expect(artworkImage().getAttribute("data-fragment")).toBe("true");
+    expect(artworkImage().getAttribute("alt")).toBe("");
+    expect(screen.getByText("Je ziet maar een stukje…")).toBeTruthy();
+
+    const name = targetName();
+    fireEvent.click(screen.getByRole("button", { name }));
+
+    expect(artworkImage().getAttribute("data-revealed")).toBe("true");
+    expect(artworkImage().getAttribute("data-fragment")).toBe("false");
+    expect(artworkImage().getAttribute("alt")).toBe(name);
+    expect(usePokemonQuizStore.getState().correctCount).toBe(1);
   });
 
   it("returns to the setup without losing the score", async () => {
