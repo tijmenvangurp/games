@@ -61,8 +61,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
-  // @ts-expect-error remove the test double again
-  delete window.AudioContext;
+  Reflect.deleteProperty(window, "AudioContext");
 });
 
 describe("sound", () => {
