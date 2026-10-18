@@ -30,8 +30,8 @@ export const LESSON_METEO = defineLesson({
       emoji: "🌧️",
       note: "‘la’ is vrouwelijk.",
       example: {
-        fr: "Il pleut beaucoup.",
-        nl: "Het regent veel.",
+        fr: "La pluie tombe fort.",
+        nl: "De regen valt hard.",
       },
       contrastWith: ["meteo-soleil", "meteo-neige"],
     }),
