@@ -10,6 +10,7 @@ import { ChessPage } from "@pages/chess";
 import { HomePage } from "@pages/home";
 import { MemoryPage } from "@pages/memory";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
+import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 
@@ -60,6 +61,12 @@ export function createAppRouter(history?: RouterHistory) {
     component: ChessPage,
   });
 
+  const puzzlesRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/puzzels",
+    component: PuzzlesPage,
+  });
+
   const routeTree = rootRoute.addChildren([
     homeRoute,
     sudokuRoute,
@@ -68,6 +75,7 @@ export function createAppRouter(history?: RouterHistory) {
     memoryRoute,
     pokemonQuizRoute,
     chessRoute,
+    puzzlesRoute,
   ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });

@@ -1,7 +1,6 @@
-import { useId, useMemo, type CSSProperties } from "react";
-import type { Square } from "chess.js";
+import { useId, useMemo } from "react";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
-import { cn } from "@shared/lib";
+import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
 import { Button, Check, Play, RotateCcw, Sparkles } from "@shared/ui";
 import { levelFor, nextLevelId } from "../model/levels";
 import {
@@ -9,106 +8,13 @@ import {
   type TutorialFeedback,
   type TutorialLevel,
   type TutorialLevelId,
-  type TutorialMove,
   type TutorialStatus,
-  type UseChessTutorialResult,
 } from "../model/types";
 import { useChessTutorial } from "../model/useChessTutorial";
 
 interface TutorialBoardProps {
   readonly initialLevelId?: TutorialLevelId;
   readonly onComplete?: (level: TutorialLevel) => void;
-}
-
-interface SquareStyleInput {
-  readonly targetSquare: Square | undefined;
-  readonly selectedSquare: Square | null;
-  readonly legalTargets: readonly Square[];
-  readonly lastMove: TutorialMove | null;
-}
-
-function squareStylesFor({
-  targetSquare,
-  selectedSquare,
-  legalTargets,
-  lastMove,
-}: SquareStyleInput): Record<string, CSSProperties> {
-  const styles: Record<string, CSSProperties> = {};
-
-  const merge = (square: Square, style: CSSProperties) => {
-    styles[square] = { ...styles[square], ...style };
-  };
-
-  if (lastMove) {
-    const lastMoveStyle: CSSProperties = {
-      backgroundColor: "rgba(251, 191, 36, 0.22)",
-    };
-    merge(lastMove.from, lastMoveStyle);
-    merge(lastMove.to, lastMoveStyle);
-  }
-
-  for (const square of legalTargets) {
-    merge(square, {
-      backgroundImage: "radial-gradient(circle, rgba(15, 118, 110, 0.7) 0 15%, transparent 16%)",
-      boxShadow: "inset 0 0 0 4px rgba(13, 148, 136, 0.4)",
-    });
-  }
-
-  if (targetSquare) {
-    merge(targetSquare, {
-      backgroundColor: "rgba(253, 230, 138, 0.42)",
-      boxShadow: "inset 0 0 0 5px #f59e0b",
-    });
-  }
-
-  if (selectedSquare) {
-    merge(selectedSquare, {
-      boxShadow: "inset 0 0 0 6px #0284c7",
-    });
-  }
-
-  return styles;
-}
-
-function boardOptionsFor(
-  tutorial: UseChessTutorialResult,
-  squareStyles: Record<string, CSSProperties>,
-): ChessboardOptions {
-  return {
-    position: tutorial.fen,
-    boardOrientation: "white",
-    showNotation: true,
-    allowDragging: tutorial.status === "playing",
-    allowDragOffBoard: false,
-    allowDrawingArrows: false,
-    animationDurationInMs: 160,
-    boardStyle: {
-      borderRadius: "1.25rem",
-      overflow: "hidden",
-      boxShadow: "0 24px 60px -32px rgba(15, 23, 42, 0.55)",
-    },
-    lightSquareStyle: { backgroundColor: "#fef3c7" },
-    darkSquareStyle: { backgroundColor: "#7dd3fc" },
-    lightSquareNotationStyle: { color: "#92400e", opacity: 1 },
-    darkSquareNotationStyle: { color: "#075985", opacity: 1 },
-    alphaNotationStyle: {
-      fontSize: "clamp(12px, 3.2vw, 18px)",
-      fontWeight: 800,
-      right: 5,
-      bottom: 3,
-    },
-    numericNotationStyle: {
-      fontSize: "clamp(12px, 3.2vw, 18px)",
-      fontWeight: 800,
-      left: 5,
-      top: 3,
-    },
-    squareStyles,
-    canDragPiece: ({ isSparePiece, piece }) => !isSparePiece && piece.pieceType.startsWith("w"),
-    onPieceDrop: ({ sourceSquare, targetSquare }) =>
-      tutorial.onPieceDrop(sourceSquare, targetSquare),
-    onSquareClick: ({ square }) => tutorial.onSquareClick(square),
-  };
 }
 
 interface TutorialHeaderProps {
@@ -322,7 +228,7 @@ export function TutorialBoard({
 
   const squareStyles = useMemo(
     () =>
-      squareStylesFor({
+      chessSquareStyles({
         targetSquare: tutorial.level.targetSquare,
         selectedSquare: tutorial.selectedSquare,
         legalTargets: tutorial.legalTargets,
@@ -336,6 +242,15 @@ export function TutorialBoard({
     ],
   );
 
+  const boardOptions = chessBoardOptions({
+    position: tutorial.fen,
+    playerColor: "w",
+    allowDragging: tutorial.status === "playing",
+    squareStyles,
+    onPieceDrop: tutorial.onPieceDrop,
+    onSquareClick: tutorial.onSquareClick,
+  });
+
   const currentIndex = TUTORIAL_LEVEL_IDS.indexOf(tutorial.level.id);
   const nextId = nextLevelId(tutorial.level.id);
 
@@ -345,7 +260,7 @@ export function TutorialBoard({
       <LevelPicker currentLevelId={tutorial.level.id} onSelect={tutorial.loadLevel} />
       <HintCard hint={tutorial.level.hint} />
       <ObjectiveBadge level={tutorial.level} />
-      <BoardPanel options={boardOptionsFor(tutorial, squareStyles)} />
+      <BoardPanel options={boardOptions} />
       <StatusBanner
         feedback={tutorial.feedback}
         level={tutorial.level}
