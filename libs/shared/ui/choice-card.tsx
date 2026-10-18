@@ -14,10 +14,10 @@ export function ChoiceCard({ selected, emoji, label, hint, onClick }: ChoiceCard
       type="button"
       aria-pressed={selected}
       className={cn(
-        "flex min-h-24 flex-col items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
+        "flex min-h-24 flex-col items-center justify-center gap-1 rounded-lg border p-3 transition active:scale-[0.99]",
         selected
-          ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-          : "border-border bg-card hover:bg-muted",
+          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+          : "border-border bg-card hover:bg-muted/60",
       )}
       onClick={onClick}
     >

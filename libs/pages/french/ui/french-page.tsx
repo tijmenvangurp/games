@@ -33,7 +33,7 @@ export function FrenchPage() {
               return (
                 <Link
                   key={lesson.id}
-                  className="group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+                  className="game-card group flex min-h-40 flex-col bg-gradient-to-br from-[#eaf0f7] via-[#f4f8fc] to-[#fcfdff] p-5 transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 active:translate-y-0"
                   params={{ lessonId: lesson.id }}
                   to="/frans/$lessonId"
                 >
@@ -45,7 +45,7 @@ export function FrenchPage() {
                       <Play aria-hidden="true" className="size-4" />
                     </span>
                   </div>
-                  <h2 className="mt-3 text-lg font-black">{lesson.title}</h2>
+                  <h2 className="mt-3 font-display text-xl leading-snug">{lesson.title}</h2>
                   <p className="mt-1 text-sm text-muted-foreground">{lesson.subtitle}</p>
                   <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                     <span className="text-sm font-bold text-primary">

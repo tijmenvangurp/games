@@ -21,9 +21,9 @@ export function SeekSetup({
   onBack,
 }: SeekSetupProps) {
   return (
-    <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel animate-rise p-4 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-xl font-black">Nieuw spel</h2>
+        <h2 className="font-display text-2xl">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
           Kies hoe druk het zoekveld is en waar je zoekt.
         </p>

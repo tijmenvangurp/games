@@ -19,23 +19,25 @@ export function GameShell({
   children,
 }: GameShellProps) {
   return (
-    <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-3 pb-safe pt-safe sm:px-4">
-      <PageHeader
-        actions={
-          <div className="flex items-center gap-0.5">
-            <SoundToggle />
-            {onNewGame ? (
-              <Button aria-label="Nieuw spel" size="icon" variant="outline" onClick={onNewGame}>
-                <Plus aria-hidden="true" className="size-5" />
-              </Button>
-            ) : null}
-          </div>
-        }
-        onBack={onBack}
-        subtitle={subtitle}
-        title={title}
-        titleClassName={titleClassName}
-      />
+    <div className="mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-5 pb-safe pt-safe sm:px-6">
+      <div className="flex items-center gap-2 border-b border-border pb-3">
+        <PageHeader
+          actions={
+            <div className="flex items-center gap-0.5">
+              <SoundToggle />
+              {onNewGame ? (
+                <Button aria-label="Nieuw spel" size="icon" variant="outline" onClick={onNewGame}>
+                  <Plus aria-hidden="true" className="size-5" />
+                </Button>
+              ) : null}
+            </div>
+          }
+          onBack={onBack}
+          subtitle={subtitle}
+          title={title}
+          titleClassName={titleClassName}
+        />
+      </div>
       {children}
     </div>
   );

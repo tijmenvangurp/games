@@ -33,7 +33,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🧩",
     status: "available",
     to: "/sudoku",
-    accentClassName: "from-sky-100 via-sky-50 to-white",
+    accentClassName: "from-[#eef3f7] via-[#f7fafc] to-[#fdfefe]",
   },
   {
     id: "math-trainer",
@@ -42,7 +42,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🔢",
     status: "available",
     to: "/rekenen",
-    accentClassName: "from-orange-100 via-amber-50 to-white",
+    accentClassName: "from-[#fbf0e3] via-[#fdf7ee] to-[#fffdf9]",
   },
   {
     id: "arrows",
@@ -51,7 +51,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🏹",
     status: "available",
     to: "/pijlen",
-    accentClassName: "from-rose-100 via-orange-50 to-white",
+    accentClassName: "from-[#f8ece7] via-[#fcf5f1] to-[#fffdfb]",
   },
   {
     id: "seek",
@@ -60,7 +60,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🔍",
     status: "available",
     to: "/zoeken",
-    accentClassName: "from-emerald-100 via-emerald-50 to-white",
+    accentClassName: "from-[#eef4e9] via-[#f6faf2] to-[#fdfefb]",
   },
   {
     id: "word-search",
@@ -69,7 +69,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🔤",
     status: "available",
     to: "/woordzoeker",
-    accentClassName: "from-teal-100 via-emerald-50 to-white",
+    accentClassName: "from-[#e9f3ef] via-[#f3faf7] to-[#fcfffe]",
   },
   {
     id: "memory",
@@ -78,7 +78,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "⚡",
     status: "available",
     to: "/memory",
-    accentClassName: "from-amber-100 via-amber-50 to-white",
+    accentClassName: "from-[#fbf2dd] via-[#fdf8eb] to-[#fffdf7]",
   },
   {
     id: "pokemon-quiz",
@@ -87,7 +87,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "❓",
     status: "available",
     to: "/raad",
-    accentClassName: "from-indigo-100 via-indigo-50 to-white",
+    accentClassName: "from-[#efedf6] via-[#f7f5fb] to-[#fdfcff]",
   },
   {
     id: "chess-tutorial",
@@ -96,7 +96,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "♞",
     status: "available",
     to: "/schaken",
-    accentClassName: "from-violet-100 via-violet-50 to-white",
+    accentClassName: "from-[#f2edf6] via-[#f9f6fb] to-[#fdfcff]",
   },
   {
     id: "chess-puzzles",
@@ -105,7 +105,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🧩",
     status: "available",
     to: "/puzzels",
-    accentClassName: "from-teal-100 via-emerald-50 to-white",
+    accentClassName: "from-[#eaf3ef] via-[#f4faf7] to-[#fcfffe]",
   },
   {
     id: "french-listening",
@@ -114,6 +114,6 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     emoji: "🇫🇷",
     status: "available",
     to: "/frans",
-    accentClassName: "from-blue-100 via-sky-50 to-white",
+    accentClassName: "from-[#eaf0f7] via-[#f4f8fc] to-[#fcfdff]",
   },
 ];
