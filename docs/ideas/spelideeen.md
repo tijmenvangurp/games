@@ -1,7 +1,7 @@
 # Spelideeën
 
 - **Datum:** 2026-10-18
-- **Status:** Woordzoeker en Tafel Topper zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Status:** Woordzoeker, Tafel Topper en de Kruiswoordpuzzel zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
 - **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
 - **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
 
@@ -14,6 +14,7 @@
 | Waar is Wobbel?      | `/zoeken`      | Visuele aandacht, observeren, vergelijken                                       |
 | Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                     |
 | Tafel Topper         | `/rekenen`     | Plus, min, keer en delen; getallenlijn en groepjes als uitleg                   |
+| Kruiswoordpuzzel     | `/kruiswoord`  | Pokémon-kennis, spelling en kruiswoordlogica                                    |
 | Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                 |
 | Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
@@ -34,6 +35,7 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken*
 | 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                    |
 | 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                             |
 | 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden     |
+| 10         | Kruiswoordpuzzel | Taal                  | Laag        | Geïmplementeerd; zie ADR 0012                            |
 
 ## 1. Woordzoeker
 
@@ -139,6 +141,18 @@ Deze ideeën zijn klein genoeg om als variant op een bestaand spel te beginnen.
 - **Woordbouw:** sleep letters naar de juiste plek bij een emoji of tekening. Geschikt voor spelling zoals ei/ij en au/ou. Gebruik een eigen, korte woordenlijst.
 - **Dierenquiz:** "Welk dier is dit?" met originele tekeningen of emoji, plus één weetje per dier. Past bij de natuur en wereldoriëntatie.
 - **Verkeersborden:** herken borden en weet wat ze betekenen. Leerzaam en veilig, maar vraagt originele SVG-borden.
+
+## 10. Kruiswoordpuzzel
+
+**Status:** geïmplementeerd op `/kruiswoord`.
+
+**Leerdoel:** Pokémon-namen spellen, Nederlandse hints lezen en met kruisende letters redeneren.
+
+**Vorm:** een handgemaakte 8 × 9-puzzel met zes Generatie 1-Pokémon en Nederlandse clues. De speler kiest een vakje of clue, typt met het schermtoetsenbord of het fysieke toetsenbord, en kan controleren of een hint vragen.
+
+**Techniek:** `libs/entities/crossword` bevat de puzzeldata en de gevalideerde `buildCrossword`; `libs/features/crossword` de Zustand-store, het grid, de clues en het toetsenbord. Alleen de letters worden lokaal bewaard. Zie [ADR 0012](../adr/0012-kruiswoordpuzzel.md).
+
+**Aandachtspunten:** de eerste versie heeft één puzzel. Meer categorieën of puzzels vragen nieuwe data en een keuze in de setup; een generator is pas nodig bij veel puzzels.
 
 ## Gemeenschappelijke aanpak
 
