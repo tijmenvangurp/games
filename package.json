@@ -31,6 +31,7 @@
     "ts-only": "pnpm exec tsx scripts/check-ts-only.ts",
     "prepare": "husky",
     "icons": "pnpm exec tsx scripts/generate-app-icons.ts",
+    "audio:french": "pnpm exec tsx scripts/generate-french-audio.ts",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

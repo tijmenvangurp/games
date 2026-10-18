@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-french",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/french",
+  "tags": ["layer:pages", "scope:french", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/french"
+      }
+    }
+  },
+  "implicitDependencies": [
+    "entities-french",
+    "features-french-listening",
+    "widgets-game-shell",
+    "shared-ui"
+  ]
+}

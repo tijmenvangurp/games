@@ -19,7 +19,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/raad"
           | "/schaken"
           | "/puzzels"
-          | "/woordzoeker";
+          | "/woordzoeker"
+          | "/frans";
       }
     | { status: "coming-soon" }
   );
@@ -105,5 +106,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/puzzels",
     accentClassName: "from-teal-100 via-emerald-50 to-white",
+  },
+  {
+    id: "french-listening",
+    name: "Bonjour !",
+    description: "Luister naar Frans en kies de juiste Nederlandse vertaling.",
+    emoji: "🇫🇷",
+    status: "available",
+    to: "/frans",
+    accentClassName: "from-blue-100 via-sky-50 to-white",
   },
 ];

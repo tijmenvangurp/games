@@ -21,6 +21,7 @@ export {
   Search,
   Sparkles,
   Undo2,
+  Volume2,
   X,
   ZoomIn,
   ZoomOut,
