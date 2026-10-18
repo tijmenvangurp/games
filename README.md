@@ -57,4 +57,6 @@ Eenmalig in Cloudflare instellen via **Workers & Pages → `games` → Settings 
 
 De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.workers.dev/>.
 
+Sinds #42 heeft de Worker ook een `/api/*`-route en een D1-binding. Workers Builds voert geen `wrangler d1 migrations apply` uit; migreer de database vóór de deploy. Zie [docs/api-worker.md](docs/api-worker.md) voor de health-route, de preview-database en de placeholders die de eigenaar moet invullen.
+
 GitHub Actions draait de Quality-gate; de deploy-workflow is verwijderd zodat er één deploypad is. `pnpm deploy` blijft beschikbaar voor een handmatige deploy vanaf een machine met Cloudflare-toegang.
