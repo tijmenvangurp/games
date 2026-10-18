@@ -66,7 +66,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   {
     id: "word-search",
     name: "Woordzoeker",
-    description: "Zoek woorden in de tuin of onder water. Kies 10 × 10, 12 × 12 of 14 × 14.",
+    description: "Zoek woorden in de tuin, onder water of tussen de Pokémon.",
     emoji: "🔤",
     status: "available",
     to: "/woordzoeker",

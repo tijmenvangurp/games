@@ -43,7 +43,7 @@ export function WordSearchSetup({
 
       <fieldset className="mt-5 space-y-2">
         <legend className="mb-2 text-sm font-semibold">Welk thema?</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {WORD_SEARCH_THEME_OPTIONS.map((option) => (
             <button
               key={option.value}
