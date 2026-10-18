@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { countMistakes, filledCount } from "@entities/sudoku";
+import { countMistakes, filledCount, MAX_FALLBACK_HINTS } from "@entities/sudoku";
 import { playSound } from "@shared/lib";
 import { Button, Eraser, Lightbulb, RotateCcw } from "@shared/ui";
 import { symbolsFor } from "../model/settings";
@@ -23,6 +23,7 @@ export function SudokuPlay() {
   }
 
   const symbols = symbolsFor(play.puzzle.size, settings.theme);
+  const fallbackLeft = MAX_FALLBACK_HINTS - play.fallbackHints;
   const selectedValue =
     play.selected === null
       ? null
@@ -101,13 +102,20 @@ export function SudokuPlay() {
           </Button>
         </div>
 
-        <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-          {play.solved
-            ? "Opgelost!"
-            : mistakes.length > 0
-              ? "Er staat nog een foutje in."
-              : `${filledCount(play.entries)} van ${play.entries.length} vakjes ingevuld`}
-        </p>
+        <div aria-live="polite" className="space-y-1 text-center text-xs text-muted-foreground">
+          <p>
+            {play.solved
+              ? "Opgelost!"
+              : mistakes.length > 0
+                ? "Er staat nog een foutje in."
+                : `${filledCount(play.entries)} van ${play.entries.length} vakjes ingevuld`}
+          </p>
+          {play.fallbackHints > 0 && !play.solved ? (
+            <p>
+              Nog {fallbackLeft} extra {fallbackLeft === 1 ? "hint" : "hints"} over
+            </p>
+          ) : null}
+        </div>
       </section>
     </div>
   );

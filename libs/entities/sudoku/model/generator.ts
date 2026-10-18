@@ -1,12 +1,59 @@
+import { getSudoku } from "sudoku-gen";
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 import { CLUE_TARGETS, geometryFor } from "./geometry";
 import { countSolutions, generateSolution } from "./solver";
 import type { Difficulty, Geometry, SudokuPuzzle, SudokuSize } from "./types";
 
 const MAX_ATTEMPTS = 5;
+const PACKAGE_SIZE = 9;
+const PACKAGE_CELLS = PACKAGE_SIZE * PACKAGE_SIZE;
+
+type PackageDifficulty = NonNullable<Parameters<typeof getSudoku>[0]>;
+type SmallSize = Exclude<SudokuSize, typeof PACKAGE_SIZE>;
+
+const PACKAGE_DIFFICULTIES: Record<Difficulty, PackageDifficulty> = {
+  makkelijk: "easy",
+  gemiddeld: "medium",
+  moeilijk: "hard",
+};
 
 export function clueCount(givens: readonly number[]): number {
   return givens.reduce((total, value) => (value === 0 ? total : total + 1), 0);
+}
+
+/** Maps a sudoku-gen sequence (`-` for an empty cell) to our number grid. */
+function parseSequence(sequence: string, allowEmpty: boolean): number[] {
+  if (sequence.length !== PACKAGE_CELLS) {
+    throw new Error(`sudoku-gen returned ${sequence.length} cells instead of ${PACKAGE_CELLS}`);
+  }
+
+  return Array.from(sequence, (symbol) => {
+    if (allowEmpty && symbol === "-") {
+      return 0;
+    }
+    const value = Number(symbol);
+    if (!Number.isInteger(value) || value < 1 || value > PACKAGE_SIZE) {
+      throw new Error(`sudoku-gen returned an invalid cell: ${symbol}`);
+    }
+    return value;
+  });
+}
+
+/**
+ * Nine-by-nine puzzles come from sudoku-gen. That package picks a random seed
+ * puzzle and random transformations, so the `seed` is only kept as metadata and
+ * does not make the result deterministic.
+ */
+function generatePackagePuzzle(difficulty: Difficulty, seed: number): SudokuPuzzle {
+  const generated = getSudoku(PACKAGE_DIFFICULTIES[difficulty]);
+
+  return {
+    size: PACKAGE_SIZE,
+    difficulty,
+    givens: parseSequence(generated.puzzle, true),
+    solution: parseSequence(generated.solution, false),
+    seed,
+  };
 }
 
 interface CarveState {
@@ -91,10 +138,10 @@ function carveGivens(
 
 /**
  * Generates a puzzle with exactly one solution. The same seed always yields
- * the same puzzle and solution.
+ * the same puzzle and solution for the 4x4 and 6x6 boards.
  */
-export function generatePuzzle(
-  size: SudokuSize,
+function generateSmallPuzzle(
+  size: SmallSize,
   difficulty: Difficulty,
   seed: number = createSeed(),
 ): SudokuPuzzle {
@@ -125,4 +172,19 @@ export function generatePuzzle(
     throw new Error(`Could not generate a ${size}x${size} sudoku`);
   }
   return best;
+}
+
+/**
+ * Generates a puzzle with exactly one solution. 9x9 puzzles come from
+ * sudoku-gen; the smaller boards use the built-in generator because sudoku-gen
+ * only supports 9x9.
+ */
+export function generatePuzzle(
+  size: SudokuSize,
+  difficulty: Difficulty,
+  seed: number = createSeed(),
+): SudokuPuzzle {
+  return size === PACKAGE_SIZE
+    ? generatePackagePuzzle(difficulty, seed)
+    : generateSmallPuzzle(size, difficulty, seed);
 }

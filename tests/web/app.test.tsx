@@ -33,6 +33,7 @@ function preloadSolvedGame() {
       hinted: puzzle.givens.map(() => false),
       selected: null,
       solved: true,
+      fallbackHints: 0,
     },
     settings: { size: 4, difficulty: "makkelijk", theme: "animals" },
   });

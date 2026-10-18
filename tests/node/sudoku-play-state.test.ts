@@ -6,6 +6,7 @@ import {
   eraseCell,
   filledCount,
   isComplete,
+  MAX_FALLBACK_HINTS,
   moveSelection,
   restartPuzzle,
   revealHint,
@@ -19,6 +20,11 @@ const puzzle: SudokuPuzzle = {
   seed: 1,
   givens: [1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1],
   solution: [1, 2, 3, 4, 3, 4, 1, 2, 2, 1, 4, 3, 4, 3, 2, 1],
+};
+
+const sparsePuzzle: SudokuPuzzle = {
+  ...puzzle,
+  givens: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 };
 
 function solveEverything(state: ReturnType<typeof createPlayState>) {
@@ -99,23 +105,65 @@ describe("sudoku play state", () => {
     expect(noSelection.selected).toBe(5);
   });
 
-  it("reveals a hint in the selected cell", () => {
-    const wrong = enterValue(selectCell(createPlayState(puzzle), 1), 3);
-    const hinted = revealHint(wrong);
+  it("reveals only a hint that follows from the board", () => {
+    const state = createPlayState(puzzle);
+    const hinted = revealHint(selectCell(state, 1));
 
-    expect(hinted.entries[1]).toBe(2);
-    expect(hinted.hinted[1]).toBe(true);
+    expect(hinted.entries[1]).toBe(0);
+    expect(hinted.hinted[1]).toBe(false);
+    expect(hinted.entries[3]).toBe(4);
+    expect(hinted.hinted[3]).toBe(true);
+    expect(hinted.selected).toBe(3);
+    expect(hinted.fallbackHints).toBe(0);
     expect(countMistakes(hinted.entries, puzzle.solution)).toEqual([]);
-    expect(enterValue(hinted, 4)).toBe(hinted);
+    expect(enterValue(hinted, 2)).toBe(hinted);
     expect(eraseCell(hinted)).toBe(hinted);
   });
 
-  it("reveals a hint elsewhere when the selection is a given", () => {
-    const state = createPlayState(puzzle);
-    const hinted = revealHint(selectCell(state, 0));
-    expect(hinted.entries[1]).toBe(2);
-    expect(hinted.hinted[1]).toBe(true);
-    expect(hinted.selected).toBe(1);
+  it("prefers a forced digit in the selected cell", () => {
+    const twoSingles: SudokuPuzzle = {
+      ...puzzle,
+      givens: [1, 2, 3, 0, 3, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    };
+    const hinted = revealHint(selectCell(createPlayState(twoSingles), 7));
+
+    expect(hinted.entries[7]).toBe(2);
+    expect(hinted.hinted[7]).toBe(true);
+    expect(hinted.entries[3]).toBe(0);
+    expect(hinted.selected).toBe(7);
+  });
+
+  it("reveals a naked single", () => {
+    const nakedPuzzle: SudokuPuzzle = {
+      ...puzzle,
+      givens: [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    };
+    const hinted = revealHint(createPlayState(nakedPuzzle));
+
+    expect(hinted.entries[3]).toBe(4);
+    expect(hinted.hinted[3]).toBe(true);
+  });
+
+  it("does not hint while the board contains a mistake", () => {
+    const wrong = enterValue(selectCell(createPlayState(puzzle), 1), 3);
+    expect(revealHint(wrong)).toBe(wrong);
+  });
+
+  it("reveals a fallback hint in the selected cell when there is no logical move", () => {
+    const hinted = revealHint(selectCell(createPlayState(sparsePuzzle), 5));
+
+    expect(hinted.entries[5]).toBe(sparsePuzzle.solution[5]);
+    expect(hinted.hinted[5]).toBe(true);
+    expect(hinted.selected).toBe(5);
+    expect(hinted.fallbackHints).toBe(1);
+  });
+
+  it("stops after three fallback hints", () => {
+    const exhausted = {
+      ...createPlayState(sparsePuzzle),
+      fallbackHints: MAX_FALLBACK_HINTS,
+    };
+    expect(revealHint(exhausted)).toBe(exhausted);
   });
 
   it("does nothing when there is nothing left to hint", () => {
@@ -129,5 +177,8 @@ describe("sudoku play state", () => {
     expect(filledCount(restarted.entries)).toBe(0);
     expect(restarted.hinted.every((value) => !value)).toBe(true);
     expect(restarted.solved).toBe(false);
+
+    const fallback = revealHint(createPlayState(sparsePuzzle));
+    expect(restartPuzzle(fallback).fallbackHints).toBe(0);
   });
 });
