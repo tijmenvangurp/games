@@ -1,3 +1,4 @@
+import { ProfileSwitcher } from "@features/profile-switcher";
 import { GameMenu } from "@widgets/game-menu";
 import { Gamepad2, Sparkles } from "@shared/ui";
 
@@ -15,6 +16,8 @@ export function HomePage() {
           <h1 className="text-2xl font-black tracking-tight">Spellen</h1>
         </div>
       </header>
+
+      <ProfileSwitcher />
 
       <p className="text-muted-foreground">
         Kies een spelletje. Alles werkt op telefoon en tablet.

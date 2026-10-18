@@ -8,9 +8,10 @@ import {
   type WordSearchPuzzle,
   type WordSearchTheme,
 } from "@entities/word-search";
+import { GAME_STORAGE_KEYS, profileStorageKey, readStoredJson } from "@shared/lib";
 import { DEFAULT_WORD_SEARCH_SETTINGS, type WordSearchSettings } from "./settings";
 
-const STORAGE_KEY = "games.word-search.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.wordSearch;
 
 export interface StoredWordSearchState {
   settings: WordSearchSettings;
@@ -151,40 +152,27 @@ function isPuzzle(value: unknown): value is WordSearchPuzzle {
 }
 
 export function loadWordSearchState(): StoredWordSearchState {
-  try {
-    if (typeof localStorage === "undefined") {
-      return FALLBACK;
-    }
-
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-      return FALLBACK;
-    }
-
-    const parsed: unknown = JSON.parse(raw);
-    if (!isRecord(parsed)) {
-      return FALLBACK;
-    }
-
-    const settings = isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings;
-    const puzzle = isPuzzle(parsed.puzzle) ? parsed.puzzle : null;
-    const found =
-      puzzle && Array.isArray(parsed.found)
-        ? [
-            ...new Set(
-              parsed.found.filter(
-                (word): word is string =>
-                  typeof word === "string" &&
-                  puzzle.placements.some((placement) => placement.word === word),
-              ),
-            ),
-          ]
-        : [];
-
-    return { settings, puzzle, found };
-  } catch {
+  const parsed = readStoredJson(profileStorageKey(STORAGE_KEY));
+  if (!isRecord(parsed)) {
     return FALLBACK;
   }
+
+  const settings = isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings;
+  const puzzle = isPuzzle(parsed.puzzle) ? parsed.puzzle : null;
+  const found =
+    puzzle && Array.isArray(parsed.found)
+      ? [
+          ...new Set(
+            parsed.found.filter(
+              (word): word is string =>
+                typeof word === "string" &&
+                puzzle.placements.some((placement) => placement.word === word),
+            ),
+          ),
+        ]
+      : [];
+
+  return { settings, puzzle, found };
 }
 
 export function saveWordSearchState(state: StoredWordSearchState): void {
@@ -192,7 +180,7 @@ export function saveWordSearchState(state: StoredWordSearchState): void {
     if (typeof localStorage === "undefined") {
       return;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(state));
   } catch {
     // Storage may be unavailable; the in-memory game still works.
   }

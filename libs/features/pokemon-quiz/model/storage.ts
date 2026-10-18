@@ -1,7 +1,8 @@
+import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
 import { QUIZ_DIFFICULTIES, type QuizDifficulty } from "./quiz";
 import { DEFAULT_POKEMON_QUIZ_SETTINGS, type PokemonQuizSettings } from "./settings";
 
-const STORAGE_KEY = "games.pokemon-quiz.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.pokemonQuiz;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -13,7 +14,7 @@ function isDifficulty(value: unknown): value is QuizDifficulty {
 
 export function loadPokemonQuizSettings(): PokemonQuizSettings {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
     if (!raw) {
       return DEFAULT_POKEMON_QUIZ_SETTINGS;
     }
@@ -29,7 +30,7 @@ export function loadPokemonQuizSettings(): PokemonQuizSettings {
 
 export function savePokemonQuizSettings(settings: PokemonQuizSettings): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(settings));
   } catch {
     // Storage may be unavailable (private mode); playing still works.
   }

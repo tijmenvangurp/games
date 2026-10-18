@@ -4,8 +4,9 @@ import {
   type FrenchItemProgress,
   type FrenchProgressState,
 } from "@entities/french";
+import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
 
-const STORAGE_KEY = "games.french.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.french;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -37,7 +38,7 @@ function isEntry(value: unknown): value is FrenchItemProgress {
 
 export function loadFrenchProgress(): FrenchProgressState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
     if (!raw) {
       return emptyFrenchProgress();
     }
@@ -64,7 +65,7 @@ export function loadFrenchProgress(): FrenchProgressState {
 
 export function saveFrenchProgress(progress: FrenchProgressState): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(progress));
   } catch {
     // Storage may be unavailable (private mode); playing still works.
   }

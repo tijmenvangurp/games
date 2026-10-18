@@ -1,6 +1,7 @@
 import { LEVEL_COUNT } from "@entities/arrow";
+import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
 
-const STORAGE_KEY = "games.arrows.v2";
+const STORAGE_KEY = GAME_STORAGE_KEYS.arrows;
 
 interface ArrowsProgress {
   /** Number of unlocked levels, 1 through LEVEL_COUNT. */
@@ -24,7 +25,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function loadArrowsProgress(): ArrowsProgress {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
     if (!raw) {
       return DEFAULT_ARROWS_PROGRESS;
     }
@@ -46,7 +47,7 @@ export function loadArrowsProgress(): ArrowsProgress {
 
 export function saveArrowsProgress(progress: ArrowsProgress): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(progress));
   } catch {
     // Storage may be unavailable (private mode); playing still works.
   }

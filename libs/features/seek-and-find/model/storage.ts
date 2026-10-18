@@ -4,9 +4,10 @@ import {
   type SeekDifficulty,
   type SeekTheme,
 } from "@entities/hidden-object";
+import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
 import { DEFAULT_SEEK_SETTINGS, type SeekSettings } from "./settings";
 
-const STORAGE_KEY = "games.seek.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.seek;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -22,7 +23,7 @@ function isTheme(value: unknown): value is SeekTheme {
 
 export function loadSeekSettings(): SeekSettings {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
     if (!raw) {
       return DEFAULT_SEEK_SETTINGS;
     }
@@ -38,7 +39,7 @@ export function loadSeekSettings(): SeekSettings {
 
 export function saveSeekSettings(settings: SeekSettings): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(settings));
   } catch {
     // Storage may be unavailable (private mode); playing still works.
   }
