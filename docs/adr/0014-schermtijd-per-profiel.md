@@ -76,6 +76,19 @@ De delta-insert en de update van `screen_time_day` horen in dezelfde D1-batch, n
 - Een delta is nooit negatief en nooit groter dan de verstreken zichtbare tijd plus een marge. De client kapt een tick op 60 seconden af.
 - Meerdere tabs: de Web Locks API (`navigator.locks`) of een `BroadcastChannel` zorgt dat één tab telt. Zonder die API telt alleen de zichtbare tab en wordt een tweede tab bij openen gepauzeerd.
 
+### Wat de server wel en niet ziet
+
+| Situatie                            | Wat er op de server gebeurt                                                         |
+| ----------------------------------- | ----------------------------------------------------------------------------------- |
+| Online spelen                       | Elke 30 seconden een delta; het dagtotaal staat in D1                               |
+| Offline spelen                      | Alleen lokaal; de delta's gaan later mee                                            |
+| Weer online                         | Server retourneert het dagtotaal; is de limiet bereikt, dan blokkeert de app alsnog |
+| Site-data wissen                    | Het server-totaal blijft; alleen niet-gesynchroniseerde minuten gaan verloren       |
+| Privévenster of andere browser      | Geen account, dus geen serverrecord en geen timer                                   |
+| Ander toestel met hetzelfde profiel | Telt mee in hetzelfde dagtotaal                                                     |
+
+De server is de boekhouding, de client is de lokale kassabon. Zolang er internet is, kan het kind het dagtotaal niet verlagen. De enige gaten zijn tijd die nooit gesynchroniseerd is en spelen zonder account.
+
 ## Privacy
 
 Schermtijd is persoonsgegeven, ook al is het maar een dagtotaal. De verwerking valt onder [ADR 0013](0013-privacy-optionele-accounts.md); daar worden de grondslag, bewaartermijn, het register en de verwerkers geregeld. Aanvullend:
@@ -91,7 +104,7 @@ Schermtijd is persoonsgegeven, ook al is het maar een dagtotaal. De verwerking v
 
 - **De limiet is alleen zinvol op een accounttoestel.** Zonder account is er geen timer. Als de ouder de functie wil gebruiken, moet het kindertoestel aan het account gekoppeld zijn.
 - **Uitloggen wordt een ouderlijke handeling.** Dat is nodig voor een harde blokkade, maar vraagt een pincode, een herstelroute en duidelijke UI.
-- **De blokkade is omzeilbaar.** Site-data wissen, devtools gebruiken, een andere browser of een privévenster reset de lokale timer. De server houdt het totaal, maar kan een nieuwe lokale state niet tegenhouden. Accepteer dit als productgrens of kies een native/MDM-oplossing buiten deze repo.
+- **De blokkade is omzeilbaar.** Site-data wissen, devtools gebruiken, een andere browser of een privévenster reset de lokale timer. Het server-totaal blijft staan; alleen niet-gesynchroniseerde tijd gaat verloren. De server kan een nieuwe lokale state niet tegenhouden. Accepteer dit als productgrens of kies een native/MDM-oplossing buiten deze repo.
 - **Er komen meer D1-writes.** Een hartbeat per 30 seconden per actief profiel is klein, maar niet nul. Bij een familie-app is dat verwaarloosbaar.
 - **De UI wordt complexer.** Timer, waarschuwingen, blokkadescherm, pincode, override en een ouderoverzicht moeten samen werken zonder het spel zelf te verstoren.
 - **Privacy-impact stijgt.** Er komt een ouderlijk controlespoor bij. Dat is transparant en minimaal, maar vraagt uitleg en een plek in het verwerkingsregister.
