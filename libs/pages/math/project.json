@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-math",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/math",
+  "tags": ["layer:pages", "scope:math", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/math"
+      }
+    }
+  },
+  "implicitDependencies": ["widgets-game-shell", "features-math-trainer", "shared-ui"]
+}

@@ -3,11 +3,13 @@ import {
   createRoute,
   createRouter,
   Outlet,
+  type RouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
 import { HomePage } from "@pages/home";
+import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { PuzzlesPage } from "@pages/puzzles";
@@ -19,71 +21,20 @@ export function createAppRouter(history?: RouterHistory) {
   const rootRoute = createRootRoute({
     component: Outlet,
   });
-
-  const homeRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/",
-    component: HomePage,
-  });
-
-  const sudokuRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/sudoku",
-    component: SudokuPage,
-  });
-
-  const arrowsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/pijlen",
-    component: ArrowsPage,
-  });
-
-  const seekRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/zoeken",
-    component: SeekPage,
-  });
-
-  const memoryRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/memory",
-    component: MemoryPage,
-  });
-
-  const pokemonQuizRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/raad",
-    component: PokemonQuizPage,
-  });
-
-  const chessRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/schaken",
-    component: ChessPage,
-  });
-
-  const puzzlesRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/puzzels",
-    component: PuzzlesPage,
-  });
-
-  const wordSearchRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/woordzoeker",
-    component: WordSearchPage,
-  });
+  const gameRoute = <TPath extends string>(path: TPath, component: RouteComponent) =>
+    createRoute({ getParentRoute: () => rootRoute, path, component });
 
   const routeTree = rootRoute.addChildren([
-    homeRoute,
-    sudokuRoute,
-    arrowsRoute,
-    seekRoute,
-    memoryRoute,
-    pokemonQuizRoute,
-    chessRoute,
-    puzzlesRoute,
-    wordSearchRoute,
+    gameRoute("/", HomePage),
+    gameRoute("/sudoku", SudokuPage),
+    gameRoute("/pijlen", ArrowsPage),
+    gameRoute("/rekenen", MathPage),
+    gameRoute("/zoeken", SeekPage),
+    gameRoute("/memory", MemoryPage),
+    gameRoute("/raad", PokemonQuizPage),
+    gameRoute("/schaken", ChessPage),
+    gameRoute("/puzzels", PuzzlesPage),
+    gameRoute("/woordzoeker", WordSearchPage),
   ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });

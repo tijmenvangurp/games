@@ -12,6 +12,7 @@ export type GameCatalogEntry = GameCatalogBase &
         status: "available";
         to:
           | "/sudoku"
+          | "/rekenen"
           | "/pijlen"
           | "/zoeken"
           | "/memory"
@@ -32,6 +33,15 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/sudoku",
     accentClassName: "from-sky-100 via-sky-50 to-white",
+  },
+  {
+    id: "math-trainer",
+    name: "Tafel Topper",
+    description: "Oefen plus, min, keer en deel. Verdien sterren.",
+    emoji: "🔢",
+    status: "available",
+    to: "/rekenen",
+    accentClassName: "from-orange-100 via-amber-50 to-white",
   },
   {
     id: "arrows",

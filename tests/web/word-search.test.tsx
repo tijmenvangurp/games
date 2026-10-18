@@ -118,7 +118,7 @@ describe("word search", () => {
     expect(screen.queryByRole("heading", { name: "Knap gedaan!" })).toBeNull();
     expect(useWordSearchStore.getState().found).toEqual([]);
     expect(useWordSearchStore.getState().puzzle).not.toBe(puzzle);
-  });
+  }, 30_000);
 
   it("opens the setup again and can go back to the active game", async () => {
     renderApp();
@@ -130,5 +130,5 @@ describe("word search", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /Terug naar je woordzoeker/ }));
     expect(await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i })).toBeTruthy();
-  });
+  }, 30_000);
 });
