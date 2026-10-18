@@ -18,6 +18,8 @@ test-results
 
 # Cloudflare
 .wrangler/
+.dev.vars
+.dev.vars.*
 
 # Editor directories and files
 .vscode/*

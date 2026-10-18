@@ -76,6 +76,8 @@
     "features-pokemon-quiz",
     "features-french-listening",
     "features-profile-switcher",
+    "features-auth",
+    "pages-account",
     "entities-game",
     "entities-profile",
     "entities-french",

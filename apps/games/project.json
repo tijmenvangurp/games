@@ -89,6 +89,8 @@
     "features-word-search",
     "features-profile-switcher",
     "features-crossword",
+    "features-auth",
+    "pages-account",
     "entities-game",
     "entities-profile",
     "entities-french",
