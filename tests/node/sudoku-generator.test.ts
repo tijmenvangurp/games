@@ -5,8 +5,10 @@ import {
   SUDOKU_SIZES,
   clueCount,
   countSolutions,
+  createPlayState,
   generatePuzzle,
   geometryFor,
+  revealHint,
 } from "@entities/sudoku";
 import { isValidSolution } from "./sudoku-fixtures";
 
@@ -48,6 +50,25 @@ describe("sudoku generator", () => {
     const first = generatePuzzle(6, "makkelijk", 11);
     const second = generatePuzzle(6, "makkelijk", 12);
     expect(first.givens).not.toEqual(second.givens);
+  });
+
+  it("generates puzzles that can be solved with logical hints", () => {
+    for (const size of SUDOKU_SIZES) {
+      for (const difficulty of DIFFICULTIES) {
+        const puzzle = generatePuzzle(size, difficulty);
+        let state = createPlayState(puzzle);
+
+        for (let step = 0; step < puzzle.givens.length; step += 1) {
+          const next = revealHint(state);
+          if (next === state) {
+            break;
+          }
+          state = next;
+        }
+
+        expect(state.solved).toBe(true);
+      }
+    }
   });
 
   it("generates a hard 9x9 puzzle quickly", () => {

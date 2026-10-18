@@ -4,12 +4,12 @@ export { CLUE_TARGETS, boxIndexFor, geometryFor, isPeer, isSudokuSize } from "./
 export { DIFFICULTIES, SUDOKU_SIZES } from "./model/types";
 export {
   countMistakes,
+  completedValues,
   createPlayState,
   enterValue,
   eraseCell,
   filledCount,
   isComplete,
-  MAX_FALLBACK_HINTS,
   moveSelection,
   restartPuzzle,
   revealHint,

@@ -182,3 +182,21 @@ export function findHint(
 
   return forced[0] ?? null;
 }
+
+/**
+ * Returns true when repeatedly applying naked and hidden singles fills the
+ * whole grid. Generated puzzles use this check so a hint never has to guess.
+ */
+export function isSolvableWithSingles(puzzle: SudokuPuzzle): boolean {
+  const entries = Array.from({ length: puzzle.givens.length }, () => 0);
+
+  for (let step = 0; step < entries.length; step += 1) {
+    const hint = findHint(puzzle, entries, null);
+    if (!hint) {
+      return entries.every((value, index) => (puzzle.givens[index] || value) !== 0);
+    }
+    entries[hint.index] = hint.value;
+  }
+
+  return true;
+}

@@ -17,8 +17,12 @@ test.describe("op een telefoon", () => {
     await expect(board.getByRole("button")).toHaveCount(16);
 
     await board.getByRole("button", { name: /^leeg/ }).first().click();
-    await page.getByRole("button", { name: "Kies 🐱" }).click();
-    await expect(board.getByRole("button", { name: /^🐱, rij/ }).first()).toBeVisible();
+    const numberButton = page.locator('button[aria-label^="Kies"]:not([disabled])').first();
+    const symbol = (await numberButton.textContent()) ?? "";
+    await numberButton.click();
+    await expect(
+      board.getByRole("button", { name: new RegExp(`^${symbol}, rij`) }).first(),
+    ).toBeVisible();
 
     const overflows = (await page.evaluate(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
