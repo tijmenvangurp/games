@@ -3,10 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   TUTORIAL_LEVELS,
   TUTORIAL_LEVEL_IDS,
+  hintFor,
   legalMovesFor,
   levelFor,
   nextLevelId,
   playTutorialMove,
+  previewFor,
   rearmWhite,
 } from "@features/chess-tutorial";
 
@@ -49,6 +51,68 @@ describe("tutorial levels", () => {
       }
     }
   });
+
+  it("blocks the pawn's forward move so the child cannot get stuck", () => {
+    const level = levelFor("pawn-crossing");
+    expect(legalMovesFor(level, level.initialFen, "e2")).toEqual(["d3"]);
+  });
+
+  it("hints a legal next move for every level", () => {
+    for (const levelId of TUTORIAL_LEVEL_IDS) {
+      const level = levelFor(levelId);
+      const hint = hintFor(level, level.initialFen);
+
+      expect(hint, levelId).not.toBeNull();
+      if (!hint) throw new Error(`No hint for ${levelId}`);
+
+      const result = playTutorialMove(level, level.initialFen, hint.from, hint.to, 0);
+      expect(result.ok, levelId).toBe(true);
+      if (!result.ok) throw new Error(`Hint for ${levelId} is not legal`);
+
+      if (level.goal) {
+        expect(result.completed, levelId).toBe(true);
+      }
+    }
+  });
+
+  it("hints the first step of a two-move route", () => {
+    const queen = levelFor("queen-dance");
+    expect(hintFor(queen, queen.initialFen)).toEqual({ from: "d1", to: "d4" });
+  });
+
+  it("hints the special goal moves", () => {
+    const castling = levelFor("castling");
+    expect(hintFor(castling, castling.initialFen)).toEqual({ from: "e1", to: "g1" });
+
+    const check = levelFor("check");
+    expect(hintFor(check, check.initialFen)).toEqual({ from: "a1", to: "a8" });
+
+    const checkmate = levelFor("checkmate");
+    expect(hintFor(checkmate, checkmate.initialFen)).toEqual({ from: "g6", to: "g7" });
+  });
+
+  it("previews every legal move of the lesson piece", () => {
+    for (const levelId of TUTORIAL_LEVEL_IDS) {
+      const level = levelFor(levelId);
+      const preview = previewFor(level, level.initialFen);
+
+      expect(preview, levelId).not.toBeNull();
+      if (!preview) throw new Error(`No preview for ${levelId}`);
+
+      expect(preview.targets.length, levelId).toBeGreaterThan(0);
+      expect(preview.targets, levelId).toEqual(
+        legalMovesFor(level, level.initialFen, preview.square),
+      );
+    }
+  });
+
+  it("previews the new options after a pawn capture", () => {
+    const level = levelFor("pawn-crossing");
+    const capture = playTutorialMove(level, level.initialFen, "e2", "d3", 0);
+    if (!capture.ok) throw new Error("expected legal capture");
+
+    expect(previewFor(level, capture.nextFen)).toEqual({ square: "d3", targets: ["d4"] });
+  });
 });
 
 describe("rearmWhite", () => {
@@ -78,22 +142,15 @@ describe("tutorial engine", () => {
     expect(legalMovesFor(level, level.initialFen, "z9")).toEqual([]);
   });
 
-  it("plays a two-move rook route to the star", () => {
+  it("plays the rook to the star in one move", () => {
     const level = levelFor("rook-train");
-    const first = playTutorialMove(level, level.initialFen, "h1", "e1", 0);
-    expect(first.ok).toBe(true);
-    if (!first.ok) throw new Error("expected legal move");
+    const result = playTutorialMove(level, level.initialFen, "h1", "e1", 0);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("expected legal move");
 
-    expect(first.completed).toBe(false);
-    expect(first.move.san).toBe("Re1");
-    expect(first.nextFen.endsWith(" w - - 0 1")).toBe(true);
-
-    const second = playTutorialMove(level, first.nextFen, "e1", "e5", 1);
-    expect(second.ok).toBe(true);
-    if (!second.ok) throw new Error("expected legal move");
-
-    expect(second.completed).toBe(true);
-    expect(second.move.san).toBe("Re5");
+    expect(result.completed).toBe(true);
+    expect(result.move.san).toBe("Re1");
+    expect(result.nextFen.endsWith(" w - - 0 1")).toBe(true);
   });
 
   it("plays the bishop diagonal to the star", () => {
@@ -169,6 +226,17 @@ describe("tutorial engine", () => {
 
     expect(result.move.san).toBe("O-O");
     expect(result.completed).toBe(true);
+    expect(result.stuck).toBe(false);
+  });
+
+  it("marks the castling lesson as stuck after a king step", () => {
+    const level = levelFor("castling");
+    const result = playTutorialMove(level, level.initialFen, "e1", "f1", 0);
+    expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error("expected legal king step");
+
+    expect(result.completed).toBe(false);
+    expect(result.stuck).toBe(true);
   });
 
   it("completes a check against the black king", () => {
@@ -197,7 +265,7 @@ describe("tutorial engine", () => {
       ok: false,
       reason: "illegal-move",
     });
-    expect(playTutorialMove(level, level.initialFen, "b3", "b4", 0)).toEqual({
+    expect(playTutorialMove(level, level.initialFen, "d3", "d4", 0)).toEqual({
       ok: false,
       reason: "wrong-color",
     });
@@ -213,7 +281,7 @@ describe("tutorial engine", () => {
 
   it("rejects a white piece that is not the lesson piece", () => {
     const level = { ...levelFor("pawn-crossing"), playerPiece: "r" as const };
-    expect(playTutorialMove(level, level.initialFen, "a2", "a3", 0)).toEqual({
+    expect(playTutorialMove(level, level.initialFen, "e2", "e3", 0)).toEqual({
       ok: false,
       reason: "wrong-piece",
     });

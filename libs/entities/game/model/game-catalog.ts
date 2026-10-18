@@ -91,8 +91,8 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   },
   {
     id: "chess-tutorial",
-    name: "Schaaktutorial",
-    description: "Leer de toren, het paard en de pion stap voor stap kennen.",
+    name: "Schaakles",
+    description: "Leer stap voor stap alle stukken en zet je eerste schaakmat.",
     emoji: "♞",
     status: "available",
     to: "/schaken",

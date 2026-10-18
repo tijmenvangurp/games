@@ -142,18 +142,21 @@ test.describe("schaaktutorial op een telefoon", () => {
     };
 
     await dragPiece("h1", "e1");
-    await expect(page.getByText(/Je deed al 1 zet/)).toBeVisible();
-
-    await dragPiece("e1", "e5");
-    await expect(page.getByText(/Gelukt! Je hebt de ster op e5 gehaald/)).toBeVisible();
+    await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
   });
 
   test("speelt de torenles met tikken", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /schaaktutorial/i }).click();
+    await page.getByRole("link", { name: /schaakles/i }).click();
 
-    await expect(page.getByRole("heading", { name: "Schaaktutorial" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Schaakles" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "De Toren-trein" })).toBeVisible();
+    await expect(page.getByText("Kijk! Zo rijdt de toren. Tik op een blauwe stip.")).toBeVisible();
+
+    const kijk = page.getByRole("button", { name: "Kijk" });
+    await expect(kijk).toHaveAttribute("aria-pressed", "true");
+    await kijk.click();
+    await expect(page.getByText("Rijd met de toren naar de ster.")).toBeVisible();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await expect(board).toBeVisible();
@@ -162,13 +165,9 @@ test.describe("schaaktutorial op een telefoon", () => {
 
     await board.locator('[data-square="h1"]').click();
     await board.locator('[data-square="e1"]').click();
-    await expect(page.getByText(/Je deed al 1 zet/)).toBeVisible();
 
-    await board.locator('[data-square="e1"]').click();
-    await board.locator('[data-square="e5"]').click();
-
-    await expect(page.getByText(/Gelukt! Je hebt de ster op e5 gehaald/)).toBeVisible();
-    await expect(page.getByRole("button", { name: "Volgende" })).toBeEnabled();
+    await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Volgende les" })).toBeEnabled();
 
     const overflows = (await page.evaluate(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
@@ -178,35 +177,38 @@ test.describe("schaaktutorial op een telefoon", () => {
 
   test("speelt de rokade", async ({ page }) => {
     await page.goto("/schaken");
-    await page.getByRole("button", { name: "Rokade", exact: true }).click();
+    await page.getByText("Kies een les").click();
+    await page.getByRole("button", { name: "Les 7: Rokade" }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="e1"]').click();
     await board.locator('[data-square="g1"]').click();
 
-    await expect(page.getByText(/Gelukt! De koning is gerokeerd/)).toBeVisible();
+    await expect(page.getByText("Rokade! Koning en toren zijn veilig.")).toBeVisible();
   });
 
   test("zet de koning schaak", async ({ page }) => {
     await page.goto("/schaken");
-    await page.getByRole("button", { name: "Schaak zetten", exact: true }).click();
+    await page.getByText("Kies een les").click();
+    await page.getByRole("button", { name: "Les 8: Schaak zetten" }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="a1"]').click();
     await board.locator('[data-square="a8"]').click();
 
-    await expect(page.getByText(/Gelukt! Je hebt schaak gezet/)).toBeVisible();
+    await expect(page.getByText("Schaak! De koning wordt aangevallen.")).toBeVisible();
   });
 
   test("zet schaakmat met de dame", async ({ page }) => {
     await page.goto("/schaken");
-    await page.getByRole("button", { name: "Schaakmat", exact: true }).click();
+    await page.getByText("Kies een les").click();
+    await page.getByRole("button", { name: "Les 9: Schaakmat" }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="g6"]').click();
     await board.locator('[data-square="g7"]').click();
 
-    await expect(page.getByText(/Schaakmat! Knap gedaan/)).toBeVisible();
+    await expect(page.getByText("Schaakmat! De koning kan nergens meer heen.")).toBeVisible();
   });
 });
 
@@ -220,8 +222,10 @@ test.describe("schaaktutorial op een tablet", () => {
     await expect(board).toBeVisible();
     await expect(board.getByText("a", { exact: true })).toBeVisible();
     await expect(board.getByText("8", { exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Kijk" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Toon zet" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Opnieuw" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Volgende" })).toBeVisible();
+    await expect(page.getByText("Kies een les")).toBeVisible();
   });
 });
 
