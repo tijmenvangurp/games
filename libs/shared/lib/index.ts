@@ -1,3 +1,4 @@
+export { ACCOUNT_CHANGED_EVENT, announceAccountChange } from "./account-events";
 export {
   chessBoardOptions,
   chessSquareStyles,
@@ -17,6 +18,16 @@ export {
   profileStorageKey,
   readActiveProfileId,
   readStoredJson,
+  writeGameProgress,
 } from "./profile-storage";
+export {
+  getProgressAdapter,
+  notifyProfilesChanged,
+  notifyProgressChanged,
+  registerProgressAdapter,
+  subscribeProfilesChanged,
+  subscribeProgressChanges,
+  withSuppressedProgressEvents,
+} from "./progress-bridge";
 export { createSeed, mulberry32, shuffledIndexes } from "./random";
 export { isSoundEnabled, playSound, setSoundEnabled, toggleSound, useSoundEnabled } from "./sound";

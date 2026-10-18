@@ -13,6 +13,7 @@ export {
   removeProfile,
   selectProfile,
   type ProfileAvatarId,
+  type Profile,
   type ProfileExportFile,
   type ProfileGameData,
   type ProfileState,

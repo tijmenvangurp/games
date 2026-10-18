@@ -6,6 +6,7 @@ import {
   type ProfileAvatarId,
   type ProfileState,
 } from "@entities/profile";
+import { notifyProfilesChanged } from "@shared/lib";
 import {
   clearProfileGames,
   exportProfilesJson,
@@ -36,6 +37,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     }
     saveProfileState(next);
     set({ state: next, error: null });
+    notifyProfilesChanged();
     return true;
   },
 
@@ -47,6 +49,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     }
     saveProfileState(next);
     set({ state: next, error: null });
+    notifyProfilesChanged();
     return true;
   },
 
@@ -64,6 +67,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     clearProfileGames(id);
     saveProfileState(next);
     set({ state: next, error: null });
+    notifyProfilesChanged();
     return true;
   },
 
@@ -76,6 +80,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       return false;
     }
     set({ state: next, error: null });
+    notifyProfilesChanged();
     return true;
   },
 

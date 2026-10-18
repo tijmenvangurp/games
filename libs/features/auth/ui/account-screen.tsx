@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { avatarFor } from "@entities/profile";
+import { announceAccountChange } from "@shared/lib";
 import { Button, KeyRound, LogOut, ShieldCheck } from "@shared/ui";
 import { accountAuthClient } from "../model/auth-client";
 import type { AccountAuthClient, AccountSession, AuthCapabilities } from "../model/types";
@@ -373,6 +374,12 @@ export function AccountScreen({ client = defaultClient }: AccountScreenProps) {
   const [linkedProviders, setLinkedProviders] = useState<readonly string[]>([]);
   const supportsPasskeys = passkeysSupported();
   const sessionKey = session?.user.email ?? null;
+
+  useEffect(() => {
+    // The sync feature listens for this event and re-reads the session. The
+    // auth screen itself stays independent of the sync feature.
+    announceAccountChange();
+  }, [sessionKey]);
 
   useEffect(() => {
     let active = true;

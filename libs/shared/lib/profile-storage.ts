@@ -1,3 +1,5 @@
+import { notifyProgressChanged } from "./progress-bridge";
+
 /**
  * Profile-aware localStorage keys.
  *
@@ -82,4 +84,31 @@ export function profileStorageKey(
 /** True for keys that belong to an extra profile namespace. */
 export function isProfileNamespaceKey(key: string): boolean {
   return PROFILE_NAMESPACE_PATTERN.test(key);
+}
+
+/**
+ * Writes a game snapshot for one profile and tells sync about the change.
+ * Identical values are skipped, so merely opening a game never schedules an
+ * upload. Failures are swallowed: private mode still plays.
+ */
+export function writeGameProgress(
+  baseKey: string,
+  gameId: string,
+  value: unknown,
+  profileId?: string,
+): void {
+  try {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+    const key = profileStorageKey(baseKey, profileId);
+    const raw = JSON.stringify(value);
+    if (localStorage.getItem(key) === raw) {
+      return;
+    }
+    localStorage.setItem(key, raw);
+    notifyProgressChanged(gameId);
+  } catch {
+    // Storage may be unavailable; the in-memory game still works.
+  }
 }
