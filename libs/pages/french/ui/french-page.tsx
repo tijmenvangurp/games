@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { allFrenchItems, dueItemIds, lessonStars, listPublishedLessons } from "@entities/french";
 import { useFrenchProgressStore } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, Play, Sparkles, Star } from "@shared/ui";
+import { Button, LayoutGrid, Play, Sparkles, Star } from "@shared/ui";
 
 export function FrenchPage() {
   const navigate = useNavigate();
@@ -76,6 +76,11 @@ export function FrenchPage() {
             Herhaal {dueCount} {dueCount === 1 ? "item" : "items"}
           </Button>
         ) : null}
+
+        <Button size="lg" variant="outline" onClick={() => navigate({ to: "/frans/sorteren" })}>
+          <LayoutGrid aria-hidden="true" className="size-5" />
+          Sorteer de woorden
+        </Button>
 
         <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
           <Sparkles aria-hidden="true" className="size-3.5" />

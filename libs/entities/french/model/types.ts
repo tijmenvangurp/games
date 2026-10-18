@@ -39,6 +39,8 @@ export interface FrenchLesson {
   id: string;
   title: string;
   subtitle: string;
+  /** Dutch label used by cross-lesson exercises such as category sorting. */
+  category: string;
   emoji: string;
   level: FrenchLevel;
   status: FrenchLessonStatus;

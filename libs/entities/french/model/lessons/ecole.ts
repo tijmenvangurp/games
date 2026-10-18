@@ -6,6 +6,7 @@ export const LESSON_ECOLE = defineLesson({
   id: "ecole",
   title: "L’école",
   subtitle: "Op school.",
+  category: "School",
   emoji: "🏫",
   level: "A1.2",
   status: "reviewed",

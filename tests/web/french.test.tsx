@@ -157,6 +157,22 @@ describe("Frans luisterspel", () => {
     expect(useFrenchProgressStore.getState().progress.items).toEqual({});
   });
 
+  it("sorteert een woord in een categorie", async () => {
+    renderApp("/frans/sorteren");
+    expect(await screen.findByText("Sorteer de woorden")).toBeTruthy();
+
+    const word = document.querySelector<HTMLButtonElement>("[data-sort-word]");
+    const category = document.querySelector<HTMLButtonElement>("[data-sort-category]");
+    if (!word || !category) {
+      throw new Error("Geen sorteerbare word of categorie");
+    }
+    const wordText = word.textContent ?? "";
+    fireEvent.click(word);
+    fireEvent.click(category);
+
+    expect(screen.getByRole("button", { name: `Verwijder ${wordText}` })).toBeTruthy();
+  });
+
   it("toont een lege herhaalsessie zonder due-items", async () => {
     expect(useFrenchProgressStore.getState().progress.items).toEqual({});
     renderApp("/frans/herhalen");

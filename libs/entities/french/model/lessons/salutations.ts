@@ -6,6 +6,7 @@ export const LESSON_SALUTATIONS = defineLesson({
   id: "salutations",
   title: "Les salutations",
   subtitle: "Groeten en beleefdheid.",
+  category: "Groeten",
   emoji: "👋",
   level: "A1.1",
   status: "reviewed",

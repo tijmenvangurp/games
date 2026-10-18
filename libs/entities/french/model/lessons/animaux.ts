@@ -12,6 +12,7 @@ export const LESSON_ANIMAUX = defineLesson({
   id: "animaux",
   title: "Les animaux",
   subtitle: "Dieren: luister en kies de juiste vertaling.",
+  category: "Dieren",
   emoji: "🐱",
   level: "A1.2",
   status: "reviewed",

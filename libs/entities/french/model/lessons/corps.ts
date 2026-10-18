@@ -6,6 +6,7 @@ export const LESSON_CORPS = defineLesson({
   id: "corps",
   title: "Le corps",
   subtitle: "Het lichaam.",
+  category: "Het lichaam",
   emoji: "🧍",
   level: "A1.2",
   status: "reviewed",

@@ -42,11 +42,12 @@ describe("Frans curriculum", () => {
   });
 
   it("meldt lege lesvelden", () => {
-    const lesson = fixture({ id: "", title: "", subtitle: "" });
+    const lesson = fixture({ id: "", title: "", subtitle: "", category: "" });
     const result = messages(lesson);
     expect(result).toContain("Lesson id is empty.");
     expect(result).toContain("Lesson title is empty.");
     expect(result).toContain("Lesson subtitle is empty.");
+    expect(result).toContain("Lesson category is empty.");
   });
 
   it("meldt dubbele item-id's en een verkeerde prefix", () => {

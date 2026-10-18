@@ -35,6 +35,9 @@ function validateLessonHeader(lesson: FrenchLesson, seenLessonIds: Set<string>):
   if (!lesson.subtitle.trim()) {
     issues.push(issue(lesson.id, "Lesson subtitle is empty."));
   }
+  if (!lesson.category.trim()) {
+    issues.push(issue(lesson.id, "Lesson category is empty."));
+  }
 
   return issues;
 }

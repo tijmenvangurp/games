@@ -6,6 +6,7 @@ export const LESSON_METEO = defineLesson({
   id: "meteo",
   title: "Le temps et les loisirs",
   subtitle: "Weer en vrije tijd.",
+  category: "Weer en vrije tijd",
   emoji: "☀️",
   level: "A1.2",
   status: "reviewed",

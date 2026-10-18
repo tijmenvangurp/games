@@ -10,6 +10,7 @@ function createReviewLesson(items: readonly FrenchItem[]): FrenchLesson {
     id: "review",
     title: "Herhalen",
     subtitle: "Je lastige woorden en zinnen.",
+    category: "Herhalen",
     emoji: "🔁",
     level: "A1.2",
     status: "reviewed",

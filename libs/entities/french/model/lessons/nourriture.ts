@@ -6,6 +6,7 @@ export const LESSON_NOURRITURE = defineLesson({
   id: "nourriture",
   title: "La nourriture",
   subtitle: "Eten en drinken.",
+  category: "Eten en drinken",
   emoji: "🍎",
   level: "A1.2",
   status: "reviewed",

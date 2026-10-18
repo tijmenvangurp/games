@@ -6,6 +6,7 @@ export const LESSON_FAMILLE = defineLesson({
   id: "famille",
   title: "La famille",
   subtitle: "Familieleden en mensen om je heen.",
+  category: "Familie",
   emoji: "👨‍👩‍👧",
   level: "A1.2",
   status: "reviewed",

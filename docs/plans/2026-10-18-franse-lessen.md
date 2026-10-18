@@ -59,7 +59,7 @@ Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen
 ## Fase 4 — meer oefenvormen
 
 - [x] Zin bouwen met woordtegels.
-- [ ] Categorie-sorteren.
+- [x] Categorie-sorteren over de hele curriculum.
 - [ ] Langere zinnen, snellere audio en een “meester”-modus.
 - [ ] Optioneel: drag-and-drop met `@dnd-kit/core` + `@dnd-kit/sortable`.
 
