@@ -72,7 +72,7 @@ function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHead
   );
 }
 
-({ options }: { readonly options: ChessboardOptions }) {
+function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
   return (
     <div
       aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Sleep een stuk of tik erop."
