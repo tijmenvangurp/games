@@ -1,7 +1,13 @@
 import { passkey } from "@better-auth/passkey";
-import { betterAuth } from "better-auth";
-import { readAuthSettings, type AuthSettings } from "./auth-config";
+import { betterAuth, type BetterAuthOptions } from "better-auth";
+import { APIError, getSessionFromCtx } from "better-auth/api";
+import { isGoogleConfigured, readAuthSettings, type AuthSettings } from "./auth-config";
 import type { Env } from "./env";
+import {
+  createPasskeyFirstUser,
+  resolvePasskeyFirstUser,
+  type PasskeyFirstUserStore,
+} from "./passkey-context";
 
 const SESSION_SECONDS = 60 * 60 * 24 * 7;
 const SESSION_UPDATE_SECONDS = 60 * 60 * 24;
@@ -18,29 +24,44 @@ function configKey(settings: AuthSettings): string {
   return [
     settings.baseURL,
     settings.secret,
-    settings.googleClientId,
-    settings.googleClientSecret,
+    settings.googleClientId ?? "",
+    settings.googleClientSecret ?? "",
   ].join("\n");
 }
 
-function createAuth(env: Env, settings: AuthSettings) {
-  return betterAuth({
+/**
+ * Better Auth configuration shared by the Worker and the tests. Google is only
+ * registered when both credentials exist; passkey works either way.
+ */
+export function createAuthOptions(
+  settings: AuthSettings,
+  database: BetterAuthOptions["database"],
+): BetterAuthOptions {
+  const googleConfigured = isGoogleConfigured(settings);
+
+  return {
     appName: RP_NAME,
     baseURL: settings.baseURL,
     basePath: "/api/auth",
     secret: settings.secret,
-    database: env.DB,
+    database,
     trustedOrigins: [settings.baseURL],
-    socialProviders: {
-      google: {
-        clientId: settings.googleClientId,
-        clientSecret: settings.googleClientSecret,
-      },
-    },
+    socialProviders: googleConfigured
+      ? {
+          google: {
+            clientId: settings.googleClientId ?? "",
+            clientSecret: settings.googleClientSecret ?? "",
+          },
+        }
+      : {},
     account: {
       accountLinking: {
         enabled: true,
         trustedProviders: ["google"],
+        // A passkey-first parent has a synthetic @invalid address. Linking an
+        // explicitly authenticated Google account must still work; the parent
+        // already proved possession of the passkey.
+        allowDifferentEmails: true,
       },
     },
     session: {
@@ -64,18 +85,49 @@ function createAuth(env: Env, settings: AuthSettings) {
         rpID: settings.rpID,
         rpName: RP_NAME,
         origin: settings.baseURL,
+        registration: {
+          // Passkey-first: a parent can create an account without Google.
+          requireSession: false,
+          resolveUser: ({ context }) => resolvePasskeyFirstUser(settings.secret, context),
+          afterVerification: async ({ ctx, user, context }) => {
+            const session = await getSessionFromCtx(ctx);
+
+            // Adding a passkey from an existing (Google or passkey) session.
+            if (session?.user?.id) {
+              if (session.user.id !== user.id) {
+                throw APIError.from("UNAUTHORIZED", {
+                  code: "PASSKEY_USER_MISMATCH",
+                  message: "This passkey belongs to a different account.",
+                });
+              }
+              return;
+            }
+
+            // First registration: create the parent only after the ceremony.
+            await createPasskeyFirstUser(
+              ctx.context.internalAdapter as unknown as PasskeyFirstUserStore,
+              settings.secret,
+              context,
+              user.id,
+            );
+          },
+        },
       }),
     ],
     telemetry: { enabled: false },
-  });
+  };
+}
+
+function createAuth(env: Env, settings: AuthSettings) {
+  return betterAuth(createAuthOptions(settings, env.DB));
 }
 
 type Auth = ReturnType<typeof createAuth>;
 
 /**
  * Returns a Better Auth instance for this environment, or `null` when the
- * feature flag or one of the secrets is missing. The instance is cached per D1
- * binding so schema validation does not run on every request.
+ * feature flag or one of the required secrets is missing. The instance is
+ * cached per D1 binding so schema validation does not run on every request.
  */
 export function getAuth(env: Env): Auth | null {
   const settings = readAuthSettings(env);
