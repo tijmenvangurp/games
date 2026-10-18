@@ -19,7 +19,8 @@ describe("illustratievergelijking", () => {
     expect(screen.getByRole("heading", { name: "Fluent Emoji Flat" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Phosphor Duotone" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Phosphor Fill" })).toBeTruthy();
-    expect(screen.getAllByText("Sudoku")).toHaveLength(3);
+    expect(screen.getByRole("heading", { name: "Zelfde kaart, zes accenten" })).toBeTruthy();
+    expect(screen.getAllByText("Sudoku")).toHaveLength(9);
 
     const toggle = screen.getByRole("button", { name: "Donkere achtergrond" });
     fireEvent.click(toggle);
