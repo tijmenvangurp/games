@@ -531,6 +531,68 @@ Als `wrangler.jsonc` naar een TypeScript-`main` wijst, bundelt `wrangler deploy`
 - **Uitrol:** deploy de Worker met de flag uit → test met het ouderaccount van de eigenaar → zet de flag aan voor de eigenaar → daarna pas de route zichtbaar maken. Een verborgen route is geen beveiliging, maar wel een rollback-mogelijkheid.
 - **Previews:** `preview_urls` staat aan in de repo. Auth op previews vraagt een aparte D1, een aparte secret en `trustedOrigins` voor elke preview-origin. Doe dat niet in fase 1; zet auth op previews uit of gebruik een wegwerp-database.
 
+### 5.7 Next.js of de huidige stack?
+
+**Blijf bij de huidige stack.** Next.js lost hier niets op en kost een hoop migratiewerk:
+
+- De app is een SPA met client-side spellen. SSR of React Server Components voegt geen gebruikerswaarde toe; de spellen hebben geen server-rendered HTML nodig.
+- De site is `noindex` en heeft geen publieke SEO-noden. Dat is juist het domein waar Next.js waarde toevoegt.
+- Better Auth heeft geen Next.js nodig. De handler werkt met standaard `Request`/`Response` in de Worker; de React-client is framework-agnostisch.
+- Next.js op Cloudflare vraagt OpenNext of een statische export. Dat is meer runtime, meer configuratie en zwaarder dan static assets, terwijl de gratis CPU-limiet juist bij een statische SPA goed uitkomt.
+- Een overstap betekent de router, pagina's, providers, tests, CSP en deploy opnieuw doen. De Nx/FSD-grenzen en Steiger zijn op de huidige `libs` ingericht; een app-router met server- en clientcomponenten maakt die scheiding onduidelijker.
+- De auth- en datalaag zijn bij een latere migratie alsnog bruikbaar. Je zit dus niet vast aan Vite.
+
+Next.js wordt pas interessant voor een **aparte** server-gerenderde ouder-dashboard of marketingpagina's. Doe dat als een extra app, niet als vervanging van de games. Zie ook [OpenNext voor Cloudflare](https://opennext.js.org/cloudflare).
+
+### 5.8 TanStack Query?
+
+**Niet nu, wel vanaf fase 1 — en alleen voor serverstate.** TanStack Query is geen vervanging voor de Zustand-stores of de sync-engine.
+
+| Gebruik                                          | Wel of niet                                                                         |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| Sessie en profielen                              | Wel; of Better Auth's `useSession` gebruiken en alleen de profielen in Query zetten |
+| Initiële progress-fetch en ouderoverzicht        | Wel                                                                                 |
+| Mutations: profiel aanmaken, account verwijderen | Wel, met invalidatie                                                                |
+| Spellogica en lokale voortgang                   | **Niet**; dat blijft in Zustand + `localStorage`                                    |
+| Offline outbox en merge                          | **Niet**; dat is een eigen, durabele sync-laag                                      |
+
+Waarom:
+
+- Query geeft cache, deduplicatie, retries, achtergrondverversing en invalidatie. Dat is precies wat de account- en ouder-UI nodig heeft.
+- Query is **geen durabele outbox**. `persistQueryClient` kan cache en mutaties bewaren, maar het is geen vervanging voor idempotente delta's, backoff en conflictregels. Die horen in de sync-laag uit [ADR 0012](../adr/0012-optionele-accounts-en-sync.md).
+- Twee state-lagen naast elkaar vragen een harde grens: **serverstate in Query, lokale state in Zustand**. Nooit hetzelfde veld in beide bijwerken.
+- Zonder backend voegt Query alleen bundle-grootte en een extra provider toe. De spellen laden nu synchroon uit `localStorage`; dat moet zo blijven.
+- TanStack Router en Query werken goed samen, maar de huidige routes gebruiken geen loaders. Voeg `ensureQueryData` pas toe als een route echt serverdata nodig heeft; de games mogen nooit op een query wachten om te starten.
+
+### 5.9 Branchpreviews en testen
+
+Cloudflare **Workers Previews** geven elke branch een geïsoleerde, productie-achtige omgeving met eigen variabelen, secrets en bindings. Een preview-build draait standaard `npx wrangler preview` en gebruikt de configuratie uit de `previews`-sectie van `wrangler.jsonc` ([Previews](https://developers.cloudflare.com/workers/previews/), [configuratie](https://developers.cloudflare.com/workers/previews/configuration/)).
+
+Wat je op een branch kunt voorbereiden:
+
+- De Worker-entry, `/api/auth/*` en `/api/progress/*`, achter een feature-flag.
+- Het D1-schema en de migraties op een **aparte preview-database** in de EU.
+- Preview-secrets (`BETTER_AUTH_SECRET`) en variabelen (`BETTER_AUTH_URL`, `ACCOUNTS_ENABLED`).
+- CSP, cookies en e2e-tests tegen de preview-URL.
+- Een Google OAuth-testclient met de preview-callback erin, als Google de gekozen methode is.
+
+Wat je niet op een branch kunt testen:
+
+- **Passkeys:** die zijn domeingebonden. Een passkey die op de preview-URL is geregistreerd, werkt niet op het productiedomein. Test de flow op de preview en registreer op productie opnieuw.
+- **Productie-secrets en echte gezinsdata.** Gebruik synthetische accounts.
+- **Het definitieve domein, DNS en productieverkeer.** Een preview lijkt op productie, maar is het niet.
+- **De exacte `main`-deploy.** Die volgt pas na de merge; de preview dekt wel dezelfde code en configuratie.
+
+Aandachtspunten:
+
+- Previews erven **geen** productie-instellingen. Zonder `previews`-blok ontbreken variabelen, secrets en de D1-binding.
+- Wijs een aparte preview-D1 aan. Anders test je in de productiedatabase.
+- Draai de migraties op de preview-database vóór de preview-deploy.
+- Preview-URL's zijn openbaar. Gebruik alleen testdata en ruim de preview-database en testaccounts daarna op.
+- Preview-builds tellen mee voor de 3.000 gratis bouwminuten per maand.
+
+Aanbevolen volgorde: **lokaal** (`wrangler dev` met lokale D1) → **preview-branch** met aparte D1 en preview-secrets → **productie** met de flag uit → flag aan voor de eigenaar → brede uitrol.
+
 ## 6. Privacy en compliance
 
 Dit is geen juridisch advies. De conclusies hieronder zijn ontwerpkeuzes; de eigenaar moet ze met de Autoriteit Persoonsgegevens, een jurist of in ieder geval met het eigen verwerkingsregister laten toetsen.
