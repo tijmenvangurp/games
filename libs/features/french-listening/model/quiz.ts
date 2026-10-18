@@ -1,4 +1,10 @@
-import type { FrenchItem, FrenchLesson } from "@entities/french";
+import {
+  emptyFrenchProgress,
+  isDue,
+  type FrenchItem,
+  type FrenchLesson,
+  type FrenchProgressState,
+} from "@entities/french";
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 
 export const FRENCH_OPTION_COUNT = 4;
@@ -99,9 +105,39 @@ export function createFrenchQuestion(
   };
 }
 
-/** Shuffles the reviewed items once, so a lesson feels different every time. */
-export function createFrenchQueue(lesson: FrenchLesson, seed: number = createSeed()): FrenchItem[] {
+export interface FrenchQueueOptions {
+  progress?: FrenchProgressState;
+  seed?: number;
+  now?: number;
+}
+
+function shuffleItems(items: readonly FrenchItem[], random: () => number): FrenchItem[] {
+  return shuffledIndexes(items.length, random).map((index) => items[index]);
+}
+
+/**
+ * Due items come first, then unseen items, then items scheduled for later.
+ * Within each group the order is shuffled, so a lesson still feels fresh.
+ */
+export function createFrenchQueue(
+  lesson: FrenchLesson,
+  options: FrenchQueueOptions = {},
+): FrenchItem[] {
+  const progress = options.progress ?? emptyFrenchProgress();
+  const seed = options.seed ?? createSeed();
+  const now = options.now ?? Date.now();
+  const random = mulberry32(seed);
   const items = lesson.items.filter((item) => item.reviewed);
-  const order = shuffledIndexes(items.length, mulberry32(seed));
-  return order.map((index) => items[index]);
+
+  const due = items.filter((item) => isDue(progress.items[item.id], now));
+  const unseen = items.filter((item) => !progress.items[item.id]);
+  const later = items.filter(
+    (item) => progress.items[item.id] && !isDue(progress.items[item.id], now),
+  );
+
+  return [
+    ...shuffleItems(due, random),
+    ...shuffleItems(unseen, random),
+    ...shuffleItems(later, random),
+  ];
 }

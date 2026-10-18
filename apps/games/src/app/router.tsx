@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
-import { FrenchLessonPage, FrenchPage } from "@pages/french";
+import { FrenchLessonPage, FrenchPage, FrenchReviewPage } from "@pages/french";
 import { HomePage } from "@pages/home";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
@@ -43,6 +43,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/puzzels", PuzzlesPage),
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/frans", FrenchPage),
+    gameRoute("/frans/herhalen", FrenchReviewPage),
     frenchLessonRoute,
   ]);
 

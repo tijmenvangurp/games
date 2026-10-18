@@ -102,7 +102,7 @@ describe("Frans luisterspel", () => {
   });
 
   it("schudt alle gereviewde items door elkaar", () => {
-    const queue = createFrenchQueue(LESSON_ANIMAUX, 7);
+    const queue = createFrenchQueue(LESSON_ANIMAUX, { seed: 7 });
     expect(queue).toHaveLength(LESSON_ANIMAUX.items.length);
     expect(new Set(queue.map((item) => item.id)).size).toBe(queue.length);
     expect(queue.every((item) => item.reviewed)).toBe(true);

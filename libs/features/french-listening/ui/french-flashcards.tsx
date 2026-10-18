@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { frenchAudioSrc, frenchExampleAudioSrc, type FrenchLesson } from "@entities/french";
 import { Button, Volume2 } from "@shared/ui";
+import { useFrenchProgressStore } from "../model/use-french-progress-store";
 import { FrenchFlashcard } from "./french-flashcard";
 import { FrenchFlashcardSummary } from "./french-flashcard-summary";
 import { useFrenchAudio } from "./use-french-audio";
@@ -29,6 +30,7 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
   };
 
   const mark = (didKnow: boolean) => {
+    useFrenchProgressStore.getState().record(item.id, didKnow);
     if (didKnow) {
       setKnown((value) => value + 1);
     } else {

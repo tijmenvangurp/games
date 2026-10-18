@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { frenchAudioSrc, frenchExampleAudioSrc } from "@entities/french";
 import { playSound } from "@shared/lib";
+import { useFrenchProgressStore } from "../model/use-french-progress-store";
 import { useFrenchQuizStore } from "../model/use-french-quiz-store";
 import { FrenchAudioPanel } from "./french-audio-panel";
 import { FrenchFeedback } from "./french-feedback";
@@ -18,6 +19,7 @@ export function FrenchQuiz() {
   const queue = useFrenchQuizStore((state) => state.queue);
   const finished = useFrenchQuizStore((state) => state.finished);
   const lesson = useFrenchQuizStore((state) => state.lesson);
+  const pool = useFrenchQuizStore((state) => state.pool);
   const { play } = useFrenchAudio();
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export function FrenchQuiz() {
         total={queue.length}
         onRestart={() => {
           if (lesson) {
-            useFrenchQuizStore.getState().start(lesson);
+            useFrenchQuizStore.getState().start(lesson, pool);
           }
         }}
       />
@@ -51,7 +53,9 @@ export function FrenchQuiz() {
     useFrenchQuizStore.getState().answer(option);
     const next = useFrenchQuizStore.getState();
     if (!wasAnswered && next.answered && next.question) {
-      playSound(option === next.question.item.nl ? "match" : "wrong");
+      const correctAnswer = option === next.question.item.nl;
+      useFrenchProgressStore.getState().record(next.question.item.id, correctAnswer);
+      playSound(correctAnswer ? "match" : "wrong");
     }
   };
 

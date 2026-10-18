@@ -1,11 +1,16 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { getLesson } from "@entities/french";
-import { FrenchFlashcards, FrenchQuiz, useFrenchQuizStore } from "@features/french-listening";
+import {
+  FrenchFlashcards,
+  FrenchQuiz,
+  FrenchSentenceBuilder,
+  useFrenchQuizStore,
+} from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, LayoutGrid, Play, Sparkles } from "@shared/ui";
+import { Button, LayoutGrid, Play, Puzzle, Sparkles } from "@shared/ui";
 
-type FrenchMode = "intro" | "quiz" | "cards";
+type FrenchMode = "intro" | "quiz" | "cards" | "build";
 
 export function FrenchLessonPage() {
   const navigate = useNavigate();
@@ -42,6 +47,12 @@ export function FrenchLessonPage() {
   const startCards = () => {
     setMode("cards");
   };
+
+  const startBuild = () => {
+    setMode("build");
+  };
+
+  const hasPhrases = lesson.items.some((item) => item.kind === "phrase" && item.reviewed);
 
   const reset = () => {
     useFrenchQuizStore.getState().reset();
@@ -80,6 +91,12 @@ export function FrenchLessonPage() {
             <LayoutGrid aria-hidden="true" className="size-5" />
             Oefen met kaarten
           </Button>
+          {hasPhrases ? (
+            <Button size="lg" variant="outline" onClick={startBuild}>
+              <Puzzle aria-hidden="true" className="size-5" />
+              Bouw de zin
+            </Button>
+          ) : null}
 
           <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
             <Sparkles aria-hidden="true" className="size-3.5" />
@@ -91,8 +108,10 @@ export function FrenchLessonPage() {
         </div>
       ) : mode === "quiz" ? (
         <FrenchQuiz />
-      ) : (
+      ) : mode === "cards" ? (
         <FrenchFlashcards lesson={lesson} />
+      ) : (
+        <FrenchSentenceBuilder lesson={lesson} />
       )}
     </GameShell>
   );

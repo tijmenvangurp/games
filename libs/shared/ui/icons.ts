@@ -11,6 +11,7 @@ export {
   Lock,
   Play,
   Plus,
+  Puzzle,
   RotateCcw,
   Search,
   Sparkles,

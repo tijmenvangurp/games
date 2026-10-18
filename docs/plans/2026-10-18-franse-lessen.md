@@ -1,7 +1,7 @@
 # Plan: Franse lessen schaalbaar maken
 
 - **Datum:** 2026-10-18
-- **Status:** Fase 1 afgerond; fase 2 is de volgende stap
+- **Status:** Fase 1–4 grotendeels afgerond; optionele uitbreidingen staan open
 - **Doel:** van één hardcoded les naar een curriculum waarin nieuwe lessen data + audio zijn, zonder page-, generator- of testwerk per les.
 
 ## Uitgangspunt
@@ -40,25 +40,26 @@ De UI en de generator praten alleen met die interfaces. Een nieuwe les is dan da
 
 ## Fase 2 — content
 
-- [ ] Salutations
-- [ ] Famille
-- [ ] Nourriture
-- [ ] École
-- [ ] Météo / vrije tijd
-- [ ] Corps
+- [x] Salutations
+- [x] Famille
+- [x] Nourriture
+- [x] École
+- [x] Météo / vrije tijd
+- [x] Corps
 
-Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen en audio. Liever 90 goede items dan 500 matige.
+Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen en audio. Liever 90 goede items dan 500 matige. De curriculum bevat nu 7 lessen, 105 items en 175 audiofragmenten.
 
 ## Fase 3 — leren over lessen heen
 
-- [ ] `FrenchProgress`: box, `dueAt`, eerste-poging-correct per item.
-- [ ] Sterren per les en een “review due”-modus over alle lessen.
-- [ ] Eén localStorage-key met schema-versie en migratie.
+- [x] `FrenchProgress`: box, `dueAt`, eerste-poging-correct per item.
+- [x] Sterren per les en een “review due”-modus over alle lessen.
+- [x] Eén localStorage-key met schema-versie; corrupte data valt terug op leeg.
 - [ ] Optioneel: meerdere lokale profielen.
 
 ## Fase 4 — meer oefenvormen
 
-- [ ] Zin bouwen/sorteren.
+- [x] Zin bouwen met woordtegels.
+- [ ] Categorie-sorteren.
 - [ ] Langere zinnen, snellere audio en een “meester”-modus.
 - [ ] Optioneel: drag-and-drop met `@dnd-kit/core` + `@dnd-kit/sortable`.
 
@@ -71,6 +72,6 @@ Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen
 - **Afleiders zijn beleid, geen content per vraag.** Woorden gebruiken `contrastWith`/tags; zinnen houden handmatige afleiders.
 - **Review is een status, geen aanname.** Alleen `reviewed` lessen komen in de app en in de audio-check.
 
-## Eerste PR
+## Deze PR
 
-Deze PR bevat fase 1: curriculum, validator, dynamische route, leskeuze, generator over de curriculum en de content-contracttests. Nog geen nieuwe lessen.
+Deze PR bevat fase 1–4: curriculum, validator, dynamische route, leskeuze, zeven lessen, SRS met sterren en herhaling, de zinbouwer en de content-contracttests.
