@@ -13,7 +13,6 @@
 - `adr/0009-woordzoeker.md` — de woordzoeker, de generator-bibliotheek, de formaten en de zoomstand.
 - `adr/0010-tafel-topper.md` — de reken trainer, de niveaus, sterren en lokale beste scores.
 - `adr/0011-woordzoeker-richtingen.md` — de eigen generator en de richtingniveaus van de woordzoeker.
-- `adr/0012-kruiswoordpuzzel.md` — de handgemaakte Pokémon-kruiswoordpuzzel en de invoerflow.
 - `adr/0012-optionele-accounts-en-sync.md` — optionele ouderaccounts, kindprofielen en sync zonder loginmuur.
 - `adr/0013-privacy-optionele-accounts.md` — dataminimalisatie, toestemming, bewaartermijnen en verwerkers.
 - `adr/0014-schaaktutorial-een-opdracht-per-scherm.md` — minder tekst, een coachbubbel en een visuele hint in de schaaktutorial.
