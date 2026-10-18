@@ -34,12 +34,12 @@
 }
 
 :root {
-  /* Eén rustige basis: ivoor papier, inkt en terracotta als enige accent. */
+  /* Eén rustige basis: ivoor papier, inkt en indigo als enige accent. */
   --background: oklch(0.965 0.02 88);
   --foreground: oklch(0.3 0.025 145);
   --card: oklch(0.992 0.008 88);
-  --primary: oklch(0.53 0.12 38);
-  --primary-foreground: oklch(0.99 0.01 88);
+  --primary: #4f5d9e;
+  --primary-foreground: #f8f9ff;
   --muted: oklch(0.935 0.02 88);
   --muted-foreground: oklch(0.48 0.027 120);
   --border: oklch(0.84 0.023 88);
