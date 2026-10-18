@@ -45,13 +45,15 @@ interface PuzzleHeaderProps {
 function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHeaderProps) {
   return (
     <header className="space-y-1 text-center">
-      <p className="text-xs font-black uppercase tracking-widest text-teal-700">
+      <p className="text-xs font-black uppercase tracking-widest text-primary">
         Puzzel {index + 1} van {total}
       </p>
-      <h2 id={titleId} className="text-2xl font-black text-slate-900 sm:text-3xl">
+      <h2 id={titleId} className="text-2xl font-black text-foreground sm:text-3xl">
         {titleFor(puzzle.kind)}
       </h2>
-      <p className="text-sm font-semibold text-slate-600">{promptFor(puzzle.kind, playerColor)}</p>
+      <p className="text-sm font-semibold text-muted-foreground">
+        {promptFor(puzzle.kind, playerColor)}
+      </p>
     </header>
   );
 }
@@ -75,8 +77,8 @@ function DifficultyPicker({ current, onSelect }: DifficultyPickerProps) {
             className={cn(
               "min-h-11 rounded-xl border-2 px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
               active
-                ? "border-teal-500 bg-teal-100 text-teal-950"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-white/15 bg-white/5 text-muted-foreground hover:bg-white/10",
             )}
             onClick={() => onSelect(option.id)}
           >
@@ -84,7 +86,7 @@ function DifficultyPicker({ current, onSelect }: DifficultyPickerProps) {
             <span
               className={cn(
                 "mt-0.5 block text-xs font-medium",
-                active ? "text-teal-800" : "text-slate-500",
+                active ? "text-primary" : "text-muted-foreground",
               )}
             >
               {option.hint}
@@ -144,7 +146,7 @@ function PuzzleStatusBanner({ feedback, kind, status }: PuzzleStatusProps) {
             ? "bg-rose-100 text-rose-900"
             : feedback === "correct"
               ? "bg-sky-100 text-sky-900"
-              : "bg-slate-100 text-slate-700",
+              : "bg-white/10 text-muted-foreground",
       )}
     >
       {status === "solved" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}

@@ -39,15 +39,15 @@ function TutorialHeader({ currentIndex, level, titleId }: TutorialHeaderProps) {
     <header className="flex items-center gap-3">
       <span
         aria-hidden="true"
-        className="grid size-12 shrink-0 place-items-center rounded-2xl bg-sky-100 text-3xl leading-none text-sky-900 shadow-sm"
+        className="grid size-12 shrink-0 place-items-center rounded-2xl border border-primary/35 bg-primary/10 text-3xl leading-none text-primary"
       >
         {PIECE_GLYPHS[level.playerPiece]}
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-black uppercase tracking-widest text-sky-700">
+        <p className="text-xs font-black uppercase tracking-widest text-primary">
           Les {currentIndex + 1} van {TUTORIAL_LEVEL_IDS.length}
         </p>
-        <h2 id={titleId} className="text-xl font-black leading-tight text-slate-900 sm:text-2xl">
+        <h2 id={titleId} className="text-xl font-black leading-tight text-foreground sm:text-2xl">
           {level.title}
         </h2>
       </div>
@@ -64,8 +64,8 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   return (
-    <details ref={detailsRef} className="rounded-2xl border border-slate-200 bg-white/80">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 [&::-webkit-details-marker]:hidden">
+    <details ref={detailsRef} className="rounded-2xl border border-white/15 bg-white/5">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 [&::-webkit-details-marker]:hidden">
         <LayoutGrid aria-hidden="true" className="size-4" />
         Kies een les
       </summary>
@@ -84,10 +84,10 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
               aria-label={`Les ${index + 1}: ${level.title}`}
               aria-pressed={active}
               className={cn(
-                "flex min-h-11 flex-col items-center justify-center rounded-xl border-2 px-1 py-1 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300",
+                "flex min-h-11 flex-col items-center justify-center rounded-xl border-2 px-1 py-1 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45",
                 active
-                  ? "border-sky-500 bg-sky-100 text-sky-950"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-white/15 bg-white/5 text-muted-foreground hover:bg-white/10",
               )}
               title={level.title}
               onClick={() => {
@@ -307,7 +307,7 @@ function TutorialActions({
           aria-pressed={previewActive}
           className={cn(
             "min-h-12 px-2 text-xs sm:text-sm",
-            previewActive && "border-sky-400 bg-sky-100 text-sky-950",
+            previewActive && "border-primary bg-primary/10 text-primary",
           )}
           disabled={playDisabled}
           variant="outline"
@@ -357,14 +357,14 @@ function objectiveLabel(level: TutorialLevel): string {
 
 function WhyCard({ level }: { readonly level: TutorialLevel }) {
   return (
-    <details className="rounded-2xl border border-slate-200 bg-white/80">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-300 [&::-webkit-details-marker]:hidden">
+    <details className="rounded-2xl border border-white/15 bg-white/5">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-2xl px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 [&::-webkit-details-marker]:hidden">
         <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
         Waarom?
       </summary>
-      <div className="space-y-2 px-4 pb-4 text-sm font-medium text-slate-600">
+      <div className="space-y-2 px-4 pb-4 text-sm font-medium text-muted-foreground">
         <p>{level.explanation}</p>
-        <p className="font-bold text-sky-800">Tip: {level.hint}</p>
+        <p className="font-bold text-primary">Tip: {level.hint}</p>
       </div>
     </details>
   );

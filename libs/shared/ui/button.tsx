@@ -4,14 +4,16 @@ import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@shared/lib";
 
 const buttonVariants = cva(
-  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl font-semibold transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl border font-bold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/45 disabled:pointer-events-none disabled:opacity-45",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
-        outline: "border-2 border-border bg-card text-foreground hover:bg-muted",
-        ghost: "text-foreground hover:bg-muted",
-        success: "bg-success text-white shadow-sm hover:bg-success/90",
+        default:
+          "border-primary/60 bg-gradient-to-r from-cyan-300 to-sky-400 text-primary-foreground shadow-[0_0_26px_-9px_var(--primary)] hover:brightness-110",
+        outline: "border-primary/35 bg-white/5 text-foreground backdrop-blur-sm hover:bg-white/10",
+        ghost: "border-transparent text-muted-foreground hover:bg-white/5 hover:text-foreground",
+        success:
+          "border-lime-300/60 bg-gradient-to-r from-lime-300 to-emerald-400 text-primary-foreground shadow-[0_0_26px_-9px_var(--success)] hover:brightness-110",
       },
       size: {
         default: "h-10 px-4 text-sm",

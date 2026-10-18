@@ -14,6 +14,8 @@
   --font-sans:
     ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
     sans-serif;
+  --font-display:
+    ui-monospace, "SFMono-Regular", "Cascadia Code", "Segoe UI Mono", Menlo, monospace;
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.25s ease-out;
 }
@@ -31,15 +33,17 @@
 }
 
 :root {
-  --background: oklch(0.985 0.012 85);
-  --foreground: oklch(0.27 0.03 265);
-  --card: oklch(1 0 0);
-  --primary: oklch(0.58 0.16 255);
-  --primary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.95 0.012 85);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --border: oklch(0.9 0.012 85);
-  --success: oklch(0.66 0.15 155);
+  /* Nachtarcade: diep ruimteblauw met cyaan en magenta neon. */
+  color-scheme: dark;
+  --background: oklch(0.18 0.055 275);
+  --foreground: oklch(0.96 0.015 250);
+  --card: oklch(0.24 0.065 275);
+  --primary: oklch(0.82 0.15 205);
+  --primary-foreground: oklch(0.16 0.04 260);
+  --muted: oklch(0.29 0.06 275);
+  --muted-foreground: oklch(0.76 0.04 260);
+  --border: oklch(0.42 0.09 275);
+  --success: oklch(0.86 0.19 130);
 }
 
 @layer base {
@@ -53,6 +57,15 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at 18% -8%, oklch(0.82 0.15 205 / 0.18), transparent 34rem),
+      radial-gradient(circle at 92% 2%, oklch(0.68 0.24 330 / 0.16), transparent 30rem),
+      radial-gradient(oklch(0.96 0.015 250 / 0.22) 1px, transparent 1.4px);
+    background-size:
+      auto,
+      auto,
+      30px 30px;
+    background-attachment: fixed;
     overscroll-behavior-y: none;
   }
 
@@ -70,6 +83,42 @@
 }
 
 @layer games {
+  /*
+   * Nachtarcade-surface: donker glas met een dunne neonrand en een zachte
+   * gloed. Spelpanelen, HUD's en de shell delen dezelfde laag.
+   */
+  .game-panel {
+    border: 1px solid oklch(0.62 0.12 250 / 0.4);
+    border-radius: 1.5rem;
+    background-color: var(--card);
+    background-image: linear-gradient(
+      160deg,
+      oklch(0.27 0.07 275 / 0.92),
+      oklch(0.19 0.06 275 / 0.94)
+    );
+    box-shadow:
+      inset 0 1px 0 oklch(0.99 0 0 / 0.08),
+      0 24px 50px -32px oklch(0.08 0.04 275 / 0.9),
+      0 0 34px -18px oklch(0.82 0.15 205 / 0.7);
+  }
+
+  .game-card {
+    border: 1px solid oklch(0.58 0.12 255 / 0.4);
+    border-radius: 1.5rem;
+    background-color: oklch(0.22 0.06 275 / 0.9);
+    box-shadow:
+      inset 0 1px 0 oklch(0.99 0 0 / 0.07),
+      0 20px 44px -30px oklch(0.06 0.03 275 / 0.95);
+  }
+
+  .game-card:hover {
+    border-color: oklch(0.82 0.15 205 / 0.7);
+    box-shadow:
+      inset 0 1px 0 oklch(0.99 0 0 / 0.1),
+      0 26px 54px -30px oklch(0.06 0.03 275 / 0.95),
+      0 0 30px -14px oklch(0.82 0.15 205 / 0.75);
+  }
+
   .memory-card {
     perspective: 900px;
   }

@@ -36,7 +36,7 @@ export function CelebrationDialog({
       aria-describedby="celebration-description"
       aria-labelledby="celebration-title"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#030616]/80 p-4 backdrop-blur-md"
       role="dialog"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
@@ -46,14 +46,17 @@ export function CelebrationDialog({
       }}
     >
       {confetti ? <Confetti pieces={28} /> : null}
-      <div className="animate-pop w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl">
+      <div className="game-panel animate-pop w-full max-w-sm p-6 text-center">
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
-          <Sparkles className="animate-rise size-10 text-rose-400" />
-          <Star className="size-10 text-amber-400" />
-          <Sparkles className="animate-rise size-10 text-amber-400" />
+          <Sparkles className="animate-rise size-10 text-cyan-300" />
+          <Star className="size-10 text-amber-300" />
+          <Sparkles className="animate-rise size-10 text-fuchsia-300" />
         </div>
-        <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-amber-500" />
-        <h2 className="text-2xl font-black" id="celebration-title">
+        <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-amber-300" />
+        <h2
+          className="font-display text-2xl font-black uppercase tracking-wide"
+          id="celebration-title"
+        >
           {title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground" id="celebration-description">

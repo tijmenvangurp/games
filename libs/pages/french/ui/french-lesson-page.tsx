@@ -69,14 +69,16 @@ export function FrenchLessonPage() {
     >
       {mode === "intro" ? (
         <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
-          <section className="rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-6 text-center shadow-sm">
+          <section className="game-panel bg-gradient-to-br from-blue-500/30 via-sky-500/10 to-transparent p-6 text-center">
             <span aria-hidden="true" className="text-5xl">
               {lesson.emoji}
             </span>
-            <p className="mt-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <p className="mt-2 font-display text-[0.65rem] font-bold uppercase tracking-[0.25em] text-primary">
               Thema
             </p>
-            <h2 className="mt-1 text-3xl font-black">{lesson.title}</h2>
+            <h2 className="mt-1 font-display text-2xl font-black uppercase tracking-wide">
+              {lesson.title}
+            </h2>
             <p className="mt-2 text-muted-foreground">{lesson.subtitle}</p>
             <p className="mt-3 text-sm font-semibold text-muted-foreground">
               {lesson.items.length} items · {lesson.level}
