@@ -1,6 +1,6 @@
 # API Worker: auth-fundament
 
-Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundament en `/api/health`; issue #43 voegt **Better Auth 1.7.10** toe met een ouderlogin via **Google OAuth** en **passkey**. Issue #64 maakt **passkey een zelfstandige loginmethode**: een ouder kan zonder Google een account aanmaken en Google later koppelen. Voortgang syncen (`/api/progress`) volgt in #44 en de volledige UI-, flag- en e2e-afwerking in #45.
+Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundament en `/api/health`; issue #43 voegt **Better Auth 1.7.10** toe met een ouderlogin via **Google OAuth** en **passkey**. Issue #64 maakt **passkey een zelfstandige loginmethode**: een ouder kan zonder Google een account aanmaken en Google later koppelen. Issue #44 voegt de **serverkant van kindprofielen en voortgang** toe (`/api/players`, `/api/progress`); de sync-client, flag en e2e-afwerking volgen in #44/#45.
 
 `apps/api` is een eigen Nx-project met de tags `layer:app`, `scope:api` en `type:app`. De Worker mag alleen uit `entities` en `shared` importeren, nooit uit `features`, `pages` of `widgets`.
 
@@ -16,13 +16,18 @@ Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundam
 }
 ```
 
-| Route                             | Methode | Gedrag                                                                    |
-| --------------------------------- | ------- | ------------------------------------------------------------------------- |
-| `/api/health`                     | `GET`   | `SELECT 1 AS ok` op D1; `200` of `503` bij een D1-fout                    |
-| `/api/auth/capabilities`          | `GET`   | `{ "passkey": true, "google": boolean }`; `503` als auth uit staat        |
-| `/api/auth/passkey-first/context` | `POST`  | Ondertekende, 5 minuten geldige context voor passkey-first registratie    |
-| `/api/auth/*`                     | alle    | `auth.handler(request)`; `503` als de flag of auth-configuratie ontbreekt |
-| overig                            | alle    | JSON-`404` (`{"error":"not_found"}`)                                      |
+| Route                             | Methode  | Gedrag                                                                    |
+| --------------------------------- | -------- | ------------------------------------------------------------------------- |
+| `/api/health`                     | `GET`    | `SELECT 1 AS ok` op D1; `200` of `503` bij een D1-fout                    |
+| `/api/auth/capabilities`          | `GET`    | `{ "passkey": true, "google": boolean }`; `503` als auth uit staat        |
+| `/api/auth/passkey-first/context` | `POST`   | Ondertekende, 5 minuten geldige context voor passkey-first registratie    |
+| `/api/auth/*`                     | alle     | `auth.handler(request)`; `503` als de flag of auth-configuratie ontbreekt |
+| `/api/players`                    | `GET`    | Actieve kindprofielen van de ingelogde ouder                              |
+| `/api/players`                    | `POST`   | Kindprofiel aanmaken (maximaal vier, slot 1–4)                            |
+| `/api/players/:id`                | `DELETE` | Eigen profiel + voortgang soft-deleten; `204`                             |
+| `/api/progress`                   | `GET`    | Voortgang van één eigen profiel (`?playerId=...`)                         |
+| `/api/progress`                   | `POST`   | Idempotente, revision-guarded upsert van één spel-document                |
+| overig                            | alle     | JSON-`404` (`{"error":"not_found"}`)                                      |
 
 Alle API-responses krijgen `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `X-Robots-Tag: noindex`, `Referrer-Policy: no-referrer` en een strikte CSP (`default-src 'none'; frame-ancestors 'none'`). De statische `_headers` krijgen in #43 alleen `connect-src 'self'`; de volledige CSP-afwerking hoort bij #45.
 
@@ -120,6 +125,130 @@ Een ingelogde ouder (passkey-only) kan `linkSocial({ provider: "google", callbac
 
 Er is **geen e-mailherstel**. Herstel gaat via een tweede passkey op een ander toestel of, na koppeling, via "Inloggen met Google". De UI zegt dat expliciet.
 
+## Profielen en voortgang (#44)
+
+`/api/players` en `/api/progress` draaien in dezelfde Worker en gebruiken dezelfde sessie als `/api/auth/*`. Elke route roept `getAuth(env)` aan en daarna `auth.api.getSession({ headers: request.headers })`.
+
+| Situatie                                       | Antwoord                                |
+| ---------------------------------------------- | --------------------------------------- |
+| `ACCOUNTS_ENABLED` uit of auth niet compleet   | `503` `{ "error": "auth_unavailable" }` |
+| Geen of verlopen sessie                        | `401` `{ "error": "unauthorized" }`     |
+| Profiel van een andere ouder (lezen/schrijven) | `403` `{ "error": "forbidden" }`        |
+| Profiel van een andere ouder (verwijderen)     | `404` `{ "error": "player_not_found" }` |
+
+Bij verwijderen is `404` bewust: zo bevestigt het endpoint niet dat een profiel van iemand anders bestaat. Een kind heeft geen account, e-mailadres of naam op de server; een profiel is alleen `id`, `slot` en `avatar`.
+
+### `GET /api/players`
+
+```http
+GET /api/players
+```
+
+```json
+{
+  "players": [
+    { "id": "player_…", "slot": 1, "avatar": "bear", "createdAt": "2026-10-18T10:00:00.000Z" }
+  ]
+}
+```
+
+Alleen actieve profielen (`deletedAt IS NULL`) van de ingelogde ouder, gesorteerd op `slot`.
+
+### `POST /api/players`
+
+```http
+POST /api/players
+Content-Type: application/json
+
+{ "slot": 2, "avatar": "fox" }
+```
+
+- `slot`: geheel getal 1–4; per ouder uniek zolang het profiel actief is.
+- `avatar`: server-gevalideerd patroon `^[a-z0-9][a-z0-9-]{0,31}$`, bedoeld voor de id's uit de lokale avatarset (`bear`, `fox`, `panda`, `frog`, `cat`, `unicorn`, `octopus`, `turtle`).
+- Maximaal vier actieve profielen per ouder.
+
+Succes is `201` met `{ "player": { "id", "slot", "avatar", "createdAt" } }`. Fouten: `400 invalid_request` met `field`, `409 player_slot_taken` (slot bezet) of `409 player_limit_reached` (vier profielen). De `id` is server-gegenereerd (`player_<uuid>`); de client kan hem niet kiezen.
+
+### `DELETE /api/players/:id`
+
+```http
+DELETE /api/players/:id
+```
+
+Soft-deletet het profiel én alle `progress`-rijen van dat profiel in één D1-batch (`deletedAt` wordt gezet). Antwoord is `204` zonder body. Het slot komt vrij voor een nieuw profiel. `progress_mutation`-rijen blijven staan: die bevatten alleen de idempotency-key, het spel en de toegepaste revision, geen kinddata.
+
+### `GET /api/progress?playerId=…`
+
+```http
+GET /api/progress?playerId=player_…
+```
+
+```json
+{
+  "progress": [
+    {
+      "gameId": "sudoku",
+      "schemaVersion": 1,
+      "revision": 3,
+      "data": { "settings": { "theme": "dark" } },
+      "clientUpdatedAt": "2026-10-18T10:00:00.000Z",
+      "serverUpdatedAt": "2026-10-18T10:00:01.000Z"
+    }
+  ]
+}
+```
+
+Alleen actieve rijen van het opgegeven, eigen profiel. Ontbreekt `playerId`, dan is het antwoord `400 invalid_request`.
+
+### `POST /api/progress`
+
+```http
+POST /api/progress
+Content-Type: application/json
+
+{
+  "playerId": "player_…",
+  "gameId": "sudoku",
+  "schemaVersion": 1,
+  "baseRevision": 2,
+  "clientUpdatedAt": "2026-10-18T10:00:00.000Z",
+  "data": { "settings": { "theme": "dark" }, "best": { "4x4": 3 } },
+  "idempotencyKey": "0f0f4a7e-…"
+}
+```
+
+| Veld              | Regel                                                                              |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `playerId`        | Verplicht; moet een actief profiel van de ingelogde ouder zijn                     |
+| `gameId`          | Verplicht; moet in de allowlist staan (zie hieronder)                              |
+| `schemaVersion`   | Positief geheel getal                                                              |
+| `baseRevision`    | Geheel getal ≥ 0; `0` voor een nieuw document, anders de laatst bekende revision   |
+| `clientUpdatedAt` | Parseerbare datum; wordt als ISO-8601 opgeslagen                                   |
+| `data`            | JSON-object, geserialiseerd maximaal 64 KB (UTF-8); de server leest de inhoud niet |
+| `idempotencyKey`  | 1–128 tekens uit `A-Z a-z 0-9 . _ : -`                                             |
+
+Succes is `200` met `{ "progress": { "gameId", "schemaVersion", "revision", "data", "clientUpdatedAt", "serverUpdatedAt" } }`. De revision begint bij 1 en stijgt met één per toegepaste mutatie.
+
+De schrijfvolgorde:
+
+1. Valideer de envelop (geen inhoudelijke kennis van `data`).
+2. Bestaat de `idempotencyKey` al, retourneer dan het **huidige** document zonder opnieuw toe te passen. Dezelfde key voor een ander profiel of spel is `409 idempotency_key_reuse`.
+3. Wijkt `baseRevision` af van de huidige revision, dan is het antwoord `409` met `{ "error": "conflict", "progress": <huidig document of null> }`. De client merget en probeert opnieuw met de nieuwe revision.
+4. Anders schrijft één D1-batch de `progress`-upsert en de `progress_mutation`-insert. De upsert heeft `WHERE revision = baseRevision` als extra slot op de deur; verliest hij een race, dan volgt alsnog `409` met het actuele document.
+5. `serverUpdatedAt` wordt door de server gezet; `clientUpdatedAt` komt ongewijzigd (genormaliseerd naar ISO) mee.
+
+De allowlist staat in `apps/api/src/game-ids.ts` en is een serverkopie van `gameCatalog` uit `libs/entities/game`. `tests/api/progress.test.ts` vergelijkt beide lijsten, zodat een nieuw spel niet stilzwijgend niet kan syncen. De Worker importeert de client-lib niet, zodat de bundle geen FSD-laag meeneemt.
+
+### Opslag
+
+| Tabel               | Inhoud                                                                                                                 |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `player`            | `id`, `ownerUserId` (FK `user`), `slot`, `avatar`, `createdAt`, `deletedAt`                                            |
+| `progress`          | `playerId` + `gameId` (PK), `schemaVersion`, `revision`, `dataJson`, `clientUpdatedAt`, `serverUpdatedAt`, `deletedAt` |
+| `progress_mutation` | `idempotencyKey` (PK), `playerId`, `gameId`, `appliedRevision`, `createdAt`                                            |
+
+`player` heeft een **partiële** unieke index op `(ownerUserId, slot) WHERE deletedAt IS NULL`: een slot is uniek zolang het profiel leeft en komt na verwijderen vrij. Er zijn indexen op `player.ownerUserId`, `progress.playerId` en `progress_mutation.(playerId, gameId)`.
+
 ## D1 en migraties
 
 Migraties staan in `apps/api/migrations/`:
@@ -128,8 +257,9 @@ Migraties staan in `apps/api/migrations/`:
 | ------------------- | ----------------------------------------------------------------------------------------- |
 | `0001_app_meta.sql` | `app_meta`                                                                                |
 | `0002_auth.sql`     | Better Auth-tabellen `user`, `session`, `account`, `verification`, `passkey`, `rateLimit` |
+| `0003_progress.sql` | `player`, `progress`, `progress_mutation` en hun indexen                                  |
 
-`0002_auth.sql` is gegenereerd met de Better Auth 1.7.10 Kysely/SQLite-generator voor de core-tabellen, de passkey-plugin en `rateLimit.storage = "database"`. Alle statements zijn idempotent (`IF NOT EXISTS`) en veilig voor een nieuwe database. Better Auth controleert het schema bij initialisatie; ontbrekende tabellen of kolommen laten requests falen.
+`0002_auth.sql` is gegenereerd met de Better Auth 1.7.10 Kysely/SQLite-generator voor de core-tabellen, de passkey-plugin en `rateLimit.storage = "database"`. `0003_progress.sql` is met de hand geschreven en gebruikt bewust een partiële unieke index voor `(ownerUserId, slot)`. Alle statements zijn idempotent (`IF NOT EXISTS`) en veilig voor een nieuwe database. Better Auth controleert het schema bij initialisatie; ontbrekende tabellen of kolommen laten requests falen.
 
 Lokaal:
 
@@ -195,7 +325,20 @@ corepack pnpm run fsd
 corepack pnpm run quality
 ```
 
-De Worker gebruikt `@cloudflare/workers-types` in `tsconfig.worker.json`, zonder DOM-lib. De health- en auth-routetests draaien in de bestaande Vitest-opzet met een fake D1. `@cloudflare/vitest-pool-workers` is bewust niet toegevoegd.
+De Worker gebruikt `@cloudflare/workers-types` in `tsconfig.worker.json`, zonder DOM-lib. De health-, auth-, player- en progress-routetests draaien in de bestaande Vitest-opzet. Voor de nieuwe routes gebruiken de tests een **in-memory SQLite** achter een D1-vormige adapter (`tests/api/fake-d1.ts`): de echte migraties worden toegepast, zodat constraints, upserts en batches echt worden uitgevoerd. `@cloudflare/vitest-pool-workers` is bewust niet toegevoegd.
+
+De player- en progress-tests dekken:
+
+- `401` zonder sessie en `503` zonder auth-configuratie;
+- `403` bij andermans profiel, ook na verwijderen;
+- maximaal vier profielen, dubbele slots en het vrijgeven van een slot na verwijderen;
+- payloadvalidatie: onbekend spel, verkeerde typen, ontbrekende velden, ongeldige timestamps en data boven 64 KB;
+- de eerste write (revision 1), opeenvolgende writes en het normaliseren van `clientUpdatedAt`;
+- een idempotente retry die het huidige document teruggeeft en de mutatie niet dubbel toepast;
+- `409 conflict` met het actuele document bij een verouderde `baseRevision`, gevolgd door een geslaagde merge-retry;
+- `409 idempotency_key_reuse` bij hergebruik van een key voor een ander spel;
+- de soft-delete van profiel én voortgang in één batch;
+- dat de server-allowlist gelijk blijft aan `gameCatalog`.
 
 De passkey-first-tests dekken:
 
@@ -211,10 +354,13 @@ De passkey-first-tests dekken:
 - De volledige Google OAuth-flow vereist echte Google-clientcredentials en een bereikbare callback-URL. In CI en in deze repo staan geen credentials.
 - De passkey-ceremonie vereist een browser met WebAuthn en een echte RP-origin (HTTPS of `localhost`). De unit-tests dekken de context-, user- en UI-flow en de foutpaden, maar niet de echte WebAuthn-ceremonie of een echte authenticator.
 - Better Auth's schema-validatie en D1-gedrag zijn niet met een echte D1 getest; de migratie is gegenereerd uit Better Auth 1.7.10 en moet vóór de eerste preview/login met `wrangler d1 migrations apply` worden toegepast.
+- De player- en progress-tests draaien tegen in-memory SQLite met de echte migraties, maar niet tegen D1 zelf. D1-specifieke `batch()`-atomiciteit, `meta.changes` en gelijktijdige schrijvers moeten op een preview met de echte D1 worden gecontroleerd.
+- De routetests injecteren een sessieresolver; ze doorlopen geen echte Better Auth-cookie. De sessie zelf is in #43 getest en moet samen met de client op een preview worden getest.
 - De context-endpoint heeft geen eigen rate limiter. Test in productie of Cloudflare-rate-limiting nodig is voordat de registratie breed open staat.
+- De sync-client (outbox, debounce, merge per spel) bestaat nog niet; deze wijziging levert alleen het servercontract.
 
 ## Volgende stappen (#44/#45)
 
 - #64: passkey-first registratie, optionele Google-configuratie en accountlinking zijn klaar; de echte WebAuthn-ceremonie moet nog op een toestel met authenticator worden getest.
-- #44: `/api/progress/*`, `player`/`progress`/`progress_mutation`/`consent` en de sync-client.
+- #44: de serverkant van `/api/players` en `/api/progress` met `player`/`progress`/`progress_mutation` is klaar. De sync-client, de `consent`-registratie en de UI blijven open.
 - #45: `VITE_ACCOUNTS_ENABLED`, de menu-ingang, de volledige CSP- en headeraudit, e2e-tests en de uitrol achter de flag.
