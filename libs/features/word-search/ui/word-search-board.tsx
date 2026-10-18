@@ -1,5 +1,6 @@
 import type { Cell, WordSearchPuzzle } from "@entities/word-search";
 import { cn } from "@shared/lib";
+import { useWordSearchDrag } from "./use-word-search-drag";
 
 interface WordSearchCellProps {
   cell: Cell;
@@ -97,6 +98,13 @@ export function WordSearchBoard({
       )
       .map(cellKey),
   );
+  const drag = useWordSearchDrag(!zoomed);
+
+  const handleCellClick = (cell: Cell) => {
+    if (!drag.consumeClick()) {
+      onCellClick(cell);
+    }
+  };
 
   return (
     <div
@@ -104,8 +112,13 @@ export function WordSearchBoard({
       className={cn(
         "select-none rounded-2xl border-2 border-slate-300 bg-white p-1 shadow-sm",
         zoomed ? "overflow-x-auto" : "overflow-hidden",
+        !zoomed && "cursor-crosshair",
       )}
       role="group"
+      onPointerCancel={drag.onPointerCancel}
+      onPointerDown={drag.onPointerDown}
+      onPointerMove={drag.onPointerMove}
+      onPointerUp={drag.onPointerUp}
     >
       <div
         className="grid w-full"
@@ -114,7 +127,7 @@ export function WordSearchBoard({
           gridTemplateColumns: `repeat(${puzzle.size}, ${
             zoomed ? "minmax(44px, 1fr)" : "minmax(0, 1fr)"
           })`,
-          touchAction: zoomed ? "pan-x pan-y" : "manipulation",
+          touchAction: zoomed ? "pan-x pan-y" : "none",
         }}
       >
         {puzzle.grid.map((row, rowIndex) =>
@@ -132,7 +145,7 @@ export function WordSearchBoard({
                 selected={selectedKeys.has(key)}
                 size={puzzle.size}
                 wrong={wrong}
-                onSelect={onCellClick}
+                onSelect={handleCellClick}
               />
             );
           }),

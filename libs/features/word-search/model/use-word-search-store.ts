@@ -8,7 +8,7 @@ import {
   type WordSearchPuzzle,
   type WordSearchTheme,
 } from "@entities/word-search";
-import { playSound, vibrate } from "@shared/lib";
+import { playHaptic, playSound } from "@shared/lib";
 import { loadWordSearchState, saveWordSearchState } from "./storage";
 import type { WordSearchSettings } from "./settings";
 
@@ -22,6 +22,7 @@ interface WordSearchStore {
   found: readonly string[];
   lastFound: string | null;
   selected: readonly Cell[];
+  dragStart: Cell | null;
   wrong: boolean;
   hint: Hint | null;
   settings: WordSearchSettings;
@@ -30,6 +31,10 @@ interface WordSearchStore {
   chooseTheme: (theme: WordSearchTheme) => void;
   chooseDifficulty: (difficulty: WordSearchDifficulty) => void;
   tapCell: (cell: Cell) => void;
+  startDrag: (cell: Cell) => void;
+  dragTo: (cell: Cell) => void;
+  commitDrag: () => void;
+  cancelDrag: () => void;
   clearWrong: () => void;
   showHint: (word: string) => void;
   clearHint: () => void;
@@ -44,7 +49,15 @@ type StoreGet = () => WordSearchStore;
 function startGame(set: StoreSet, get: StoreGet): void {
   const { settings } = get();
   const puzzle = createWordSearch(settings.theme, settings.difficulty);
-  set({ puzzle, found: [], lastFound: null, selected: [], wrong: false, hint: null });
+  set({
+    puzzle,
+    found: [],
+    lastFound: null,
+    selected: [],
+    dragStart: null,
+    wrong: false,
+    hint: null,
+  });
   saveWordSearchState({ settings, puzzle, found: [] });
 }
 
@@ -60,14 +73,49 @@ function setDifficulty(set: StoreSet, get: StoreGet, difficulty: WordSearchDiffi
   saveWordSearchState({ settings, puzzle: get().puzzle, found: get().found });
 }
 
+function resolveSelection(set: StoreSet, get: StoreGet, cells: readonly Cell[]): void {
+  const { puzzle, found } = get();
+  if (!puzzle) {
+    return;
+  }
+
+  const matched = puzzle.placements.find((placement) => selectionMatches(placement, cells));
+  if (!matched) {
+    set({ selected: cells, dragStart: null, wrong: true });
+    playSound("wrong");
+    playHaptic("wrong");
+    return;
+  }
+
+  if (found.includes(matched.word)) {
+    set({ selected: [], dragStart: null, wrong: false });
+    playSound("tap");
+    playHaptic("tap");
+    return;
+  }
+
+  const nextFound = [...found, matched.word];
+  set({
+    found: nextFound,
+    lastFound: matched.word,
+    selected: [],
+    dragStart: null,
+    wrong: false,
+    hint: null,
+  });
+  playSound("match");
+  playHaptic("match");
+  saveWordSearchState({ settings: get().settings, puzzle, found: nextFound });
+}
+
 function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
-  const { puzzle, found, selected } = get();
+  const { puzzle, selected } = get();
   if (!puzzle) {
     return;
   }
 
   if (selected.length === 0) {
-    set({ selected: [cell], wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false });
     playSound("tap");
     return;
   }
@@ -78,35 +126,48 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
   }
 
   if (start.row === cell.row && start.col === cell.col) {
-    set({ selected: [], wrong: false });
+    set({ selected: [], dragStart: null, wrong: false });
     return;
   }
 
   const cells = cellsBetween(start, cell);
   if (cells.length === 0) {
-    set({ selected: [cell], wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false });
     playSound("tap");
     return;
   }
 
-  const matched = puzzle.placements.find((placement) => selectionMatches(placement, cells));
-  if (!matched) {
-    set({ selected: cells, wrong: true });
-    playSound("wrong");
+  resolveSelection(set, get, cells);
+}
+
+function startDrag(set: StoreSet, cell: Cell): void {
+  set({ selected: [cell], dragStart: cell, wrong: false });
+}
+
+function dragTo(set: StoreSet, get: StoreGet, cell: Cell): void {
+  const { dragStart } = get();
+  if (!dragStart) {
     return;
   }
 
-  if (found.includes(matched.word)) {
-    set({ selected: [], wrong: false });
-    playSound("tap");
+  const cells = cellsBetween(dragStart, cell);
+  if (cells.length === 0) {
     return;
   }
 
-  const nextFound = [...found, matched.word];
-  set({ found: nextFound, lastFound: matched.word, selected: [], wrong: false, hint: null });
-  playSound("match");
-  vibrate(20);
-  saveWordSearchState({ settings: get().settings, puzzle, found: nextFound });
+  set({ selected: cells, wrong: false });
+}
+
+function commitDrag(set: StoreSet, get: StoreGet): void {
+  const { selected } = get();
+  set({ dragStart: null });
+  if (selected.length >= 2) {
+    resolveSelection(set, get, selected);
+  }
+}
+
+function cancelDrag(set: StoreSet): void {
+  set({ selected: [], dragStart: null, wrong: false });
 }
 
 function handleHint(set: StoreSet, get: StoreGet, word: string): void {
@@ -129,6 +190,7 @@ export const useWordSearchStore = create<WordSearchStore>((set, get) => ({
   found: initial.found,
   lastFound: null,
   selected: [],
+  dragStart: null,
   wrong: false,
   hint: null,
   settings: initial.settings,
@@ -138,7 +200,11 @@ export const useWordSearchStore = create<WordSearchStore>((set, get) => ({
   chooseTheme: (theme) => setTheme(set, get, theme),
   chooseDifficulty: (difficulty) => setDifficulty(set, get, difficulty),
   tapCell: (cell) => handleTap(set, get, cell),
-  clearWrong: () => set({ selected: [], wrong: false }),
+  startDrag: (cell) => startDrag(set, cell),
+  dragTo: (cell) => dragTo(set, get, cell),
+  commitDrag: () => commitDrag(set, get),
+  cancelDrag: () => cancelDrag(set),
+  clearWrong: () => set({ selected: [], dragStart: null, wrong: false }),
   showHint: (word) => handleHint(set, get, word),
   clearHint: () => set({ hint: null }),
 }));

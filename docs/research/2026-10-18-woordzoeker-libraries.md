@@ -22,7 +22,7 @@ Een eigen generator is hier geen “not invented here”-reflex: de plaatsingslo
 
 ## 1. Context en eisen
 
-Het spel is een klassieke woordzoeker: een rechthoekig grid met letters, een woordenlijst ernaast en een gevonden-status per woord. De speler tikt de eerste en de laatste letter aan; een sleepbeweging kan als extra gemak. Bij een correcte selectie wordt het woord doorgestreept en blijven de cellen gemarkeerd.
+Het spel is een klassieke woordzoeker: een rechthoekig grid met letters, een woordenlijst ernaast en een gevonden-status per woord. De speler sleept over het woord; twee tikken blijven als alternatief. Bij een correcte selectie wordt het woord doorgestreept en blijven de cellen gemarkeerd.
 
 | Eis          | Waarde                                                                         |
 | ------------ | ------------------------------------------------------------------------------ |
@@ -542,7 +542,7 @@ Dat is nog steeds klein (een grid van 10×10 tot 14×14 plus een handvol paden),
 `WordSearchBoard`:
 
 - een CSS-grid van echte `<button>`-elementen, één per cel, met `data-row` en `data-col`;
-- twee tikken: de eerste tik kiest de eerste letter, de tweede tik de laatste letter. De cellen ertussen worden berekend met `cellsBetween`; een ongeldige lijn (geen rechte lijn) wordt genegeerd;
+- slepen is de primaire route in de passende stand: de cellen tussen start en huidige cel lichten op. Twee tikken (eerste en laatste letter) blijven werken, ook met het toetsenbord; een ongeldige lijn (geen rechte lijn) wordt genegeerd;
 - op desktop mag slepen als extra gemak, maar het tikpad blijft de primaire en toegankelijke route;
 - in de passende stand: `touch-action: manipulation`; in de vergrote stand: `touch-action: pan-x pan-y`, zodat het bord horizontaal en verticaal kan scrollen;
 - `user-select: none` en `-webkit-touch-callout: none` alleen op de board, niet globaal;
@@ -571,7 +571,7 @@ Toegankelijkheid:
 Mobiel:
 
 - Op 390 px is 10×10 zonder zoom ongeveer 37 px per cel, 12×12 ongeveer 30 px en 14×14 ongeveer 26 px. Daarmee haal je de 44 px-richtlijn niet. Daarom heeft het bord twee standen: **Passend** (het hele bord in beeld) en **Vergroot** (cellen minstens 44 px, horizontaal scrollen).
-- In de vergrote stand selecteer je met twee tikken: eerst de eerste letter, dan de laatste. Zo botsen pannen en selecteren niet. In de passende stand kan slepen als extra gemak, maar twee tikken blijft de basissnelheid.
+- In de passende stand sleep je over het woord. In de vergrote stand staan pannen en twee tikken voorop, zodat schuiven en selecteren elkaar niet in de weg zitten.
 - Op tablet past 14×14 met 44 px-cellen ruim, dus daar is de zoomstand zelden nodig.
 - Test op 390 px en 1024 px, met touch en toetsenbord, zoals `AGENTS.md` voorschrijft.
 
