@@ -20,6 +20,7 @@ describe("sudoku storage", () => {
   it("round-trips a saved game", () => {
     const state = createPlayState(generatePuzzle(4, "makkelijk", 5));
     state.entries[0] = state.puzzle.solution[0];
+    state.fallbackHints = 2;
     const payload = {
       play: state,
       settings: { size: 4 as const, difficulty: "makkelijk" as const, theme: "animals" as const },
@@ -29,7 +30,22 @@ describe("sudoku storage", () => {
 
     const restored = loadSudokuState();
     expect(restored?.play?.entries[0]).toBe(state.entries[0]);
+    expect(restored?.play?.fallbackHints).toBe(2);
     expect(restored?.settings).toEqual(payload.settings);
+  });
+
+  it("starts the fallback hints at zero for an old saved game", () => {
+    const state = createPlayState(generatePuzzle(4, "makkelijk", 5));
+    const { puzzle, entries, hinted, selected, solved } = state;
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        play: { puzzle, entries, hinted, selected, solved },
+        settings: DEFAULT_SETTINGS,
+      }),
+    );
+
+    expect(loadSudokuState()?.play?.fallbackHints).toBe(0);
   });
 
   it("ignores corrupt JSON", () => {

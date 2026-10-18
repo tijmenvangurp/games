@@ -47,28 +47,47 @@ function isPuzzle(value: unknown): value is SudokuPuzzle {
   );
 }
 
-function isSelectedCell(value: unknown, cells: number): boolean {
+function isSelectedCell(value: unknown, cells: number): value is number | null {
   return (
     value === null ||
     (typeof value === "number" && Number.isInteger(value) && value >= 0 && value < cells)
   );
 }
 
-function isPlayState(value: unknown): value is PlayState {
+function readFallbackHints(value: unknown): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 ? value : 0;
+}
+
+function readPlayState(value: unknown): PlayState | null {
   if (!isRecord(value)) {
-    return false;
+    return null;
   }
   const puzzle = value.puzzle;
   if (!isPuzzle(puzzle)) {
-    return false;
+    return null;
   }
   const cells = puzzle.givens.length;
-  return (
-    isIntegerArray(value.entries, cells) &&
-    isBooleanArray(value.hinted, cells) &&
-    isSelectedCell(value.selected, cells) &&
-    typeof value.solved === "boolean"
-  );
+  const entries = value.entries;
+  const hinted = value.hinted;
+  const selected = value.selected;
+  const solved = value.solved;
+  if (
+    !isIntegerArray(entries, cells) ||
+    !isBooleanArray(hinted, cells) ||
+    !isSelectedCell(selected, cells) ||
+    typeof solved !== "boolean"
+  ) {
+    return null;
+  }
+
+  return {
+    puzzle,
+    entries,
+    hinted,
+    selected,
+    solved,
+    fallbackHints: readFallbackHints(value.fallbackHints),
+  };
 }
 
 function isSettings(value: unknown): value is SudokuSettings {
@@ -94,7 +113,7 @@ export function loadSudokuState(): PersistedSudokuState | null {
       return null;
     }
     return {
-      play: isPlayState(parsed.play) ? parsed.play : null,
+      play: readPlayState(parsed.play),
       settings: isSettings(parsed.settings) ? parsed.settings : DEFAULT_SETTINGS,
     };
   } catch {

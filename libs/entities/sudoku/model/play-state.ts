@@ -1,4 +1,7 @@
-import type { SudokuPuzzle } from "@entities/sudoku";
+import type { SudokuPuzzle } from "./types";
+import { findHint } from "./hints";
+
+export const MAX_FALLBACK_HINTS = 3;
 
 export interface PlayState {
   puzzle: SudokuPuzzle;
@@ -6,6 +9,8 @@ export interface PlayState {
   hinted: boolean[];
   selected: number | null;
   solved: boolean;
+  /** Hints that revealed a digit when the board had no basic logical move. */
+  fallbackHints: number;
 }
 
 export function isComplete(puzzle: SudokuPuzzle, entries: readonly number[]): boolean {
@@ -35,6 +40,7 @@ export function createPlayState(puzzle: SudokuPuzzle): PlayState {
     hinted: Array.from({ length: puzzle.givens.length }, () => false),
     selected: null,
     solved: false,
+    fallbackHints: 0,
   };
 }
 
@@ -90,38 +96,58 @@ export function eraseCell(state: PlayState): PlayState {
   return { ...state, entries, solved: false };
 }
 
-export function revealHint(state: PlayState): PlayState {
-  if (state.solved) {
-    return state;
-  }
-
-  const candidates: number[] = [];
-  state.entries.forEach((value, index) => {
-    const editable = state.puzzle.givens[index] === 0 && !state.hinted[index];
-    if (editable && value !== state.puzzle.solution[index]) {
-      candidates.push(index);
-    }
-  });
-
-  if (candidates.length === 0) {
-    return state;
-  }
-
-  const target =
-    state.selected !== null && candidates.includes(state.selected) ? state.selected : candidates[0];
-
+function reveal(state: PlayState, index: number, value: number, fallbackHints: number): PlayState {
   const entries = state.entries.slice();
-  entries[target] = state.puzzle.solution[target];
+  entries[index] = value;
   const hinted = state.hinted.slice();
-  hinted[target] = true;
+  hinted[index] = true;
 
   return {
     ...state,
     entries,
     hinted,
-    selected: target,
+    selected: index,
     solved: isComplete(state.puzzle, entries),
+    fallbackHints,
   };
+}
+
+function fallbackTarget(state: PlayState): number | null {
+  const isEmpty = (index: number) =>
+    state.puzzle.givens[index] === 0 && state.entries[index] === 0 && !state.hinted[index];
+
+  if (state.selected !== null && isEmpty(state.selected)) {
+    return state.selected;
+  }
+  for (let index = 0; index < state.entries.length; index += 1) {
+    if (isEmpty(index)) {
+      return index;
+    }
+  }
+  return null;
+}
+
+export function revealHint(state: PlayState): PlayState {
+  if (state.solved) {
+    return state;
+  }
+
+  const hint = findHint(state.puzzle, state.entries, state.selected);
+  if (hint) {
+    return reveal(state, hint.index, hint.value, state.fallbackHints);
+  }
+
+  const boardHasMistake = countMistakes(state.entries, state.puzzle.solution).length > 0;
+  if (boardHasMistake || state.fallbackHints >= MAX_FALLBACK_HINTS) {
+    return state;
+  }
+
+  const target = fallbackTarget(state);
+  if (target === null) {
+    return state;
+  }
+
+  return reveal(state, target, state.puzzle.solution[target], state.fallbackHints + 1);
 }
 
 export function restartPuzzle(state: PlayState): PlayState {
@@ -131,5 +157,6 @@ export function restartPuzzle(state: PlayState): PlayState {
     hinted: Array.from({ length: state.hinted.length }, () => false),
     selected: null,
     solved: false,
+    fallbackHints: 0,
   };
 }

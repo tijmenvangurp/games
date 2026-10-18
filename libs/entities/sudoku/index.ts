@@ -9,6 +9,7 @@ export {
   eraseCell,
   filledCount,
   isComplete,
+  MAX_FALLBACK_HINTS,
   moveSelection,
   restartPuzzle,
   revealHint,
