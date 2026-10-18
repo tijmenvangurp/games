@@ -30,10 +30,15 @@ function currentQuestion() {
   return question;
 }
 
-async function startQuiz(): Promise<void> {
+async function openLesson(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Bonjour !" })).toBeTruthy();
+  fireEvent.click(await screen.findByRole("link", { name: /Les animaux/ }));
   expect(await screen.findByRole("heading", { name: "Les animaux" })).toBeTruthy();
+}
+
+async function startQuiz(): Promise<void> {
+  await openLesson();
   fireEvent.click(screen.getByRole("button", { name: "Start luisteroefening" }));
   expect(await screen.findByRole("group", { name: "Kies de juiste vertaling" })).toBeTruthy();
 }
@@ -95,8 +100,7 @@ describe("Frans luisterspel", () => {
   });
 
   it("oefent met flipcards", async () => {
-    renderApp();
-    expect(await screen.findByRole("heading", { name: "Bonjour !" })).toBeTruthy();
+    await openLesson();
     fireEvent.click(screen.getByRole("button", { name: "Oefen met kaarten" }));
 
     const card = await screen.findByRole("button", { name: /^Frans:/ });
@@ -111,6 +115,12 @@ describe("Frans luisterspel", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Ken ik" }));
     expect(await screen.findByText("Kaart 2 van 15")).toBeTruthy();
+  });
+
+  it("toont een melding voor een onbekende les", async () => {
+    renderApp("/frans/onbekend");
+    expect(await screen.findByRole("heading", { name: "Les niet gevonden" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Terug naar lessen" })).toBeTruthy();
   });
 
   it("toont de eindscore na alle vragen", async () => {

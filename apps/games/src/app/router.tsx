@@ -8,7 +8,7 @@ import {
 } from "@tanstack/react-router";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
-import { FrenchPage } from "@pages/french";
+import { FrenchLessonPage, FrenchPage } from "@pages/french";
 import { HomePage } from "@pages/home";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
@@ -25,6 +25,12 @@ export function createAppRouter(history?: RouterHistory) {
   const gameRoute = <TPath extends string>(path: TPath, component: RouteComponent) =>
     createRoute({ getParentRoute: () => rootRoute, path, component });
 
+  const frenchLessonRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/frans/$lessonId",
+    component: FrenchLessonPage,
+  });
+
   const routeTree = rootRoute.addChildren([
     gameRoute("/", HomePage),
     gameRoute("/sudoku", SudokuPage),
@@ -37,6 +43,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/puzzels", PuzzlesPage),
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/frans", FrenchPage),
+    frenchLessonRoute,
   ]);
 
   return createRouter({ routeTree, ...(history ? { history } : {}) });

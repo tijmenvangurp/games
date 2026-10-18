@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
-  FRENCH_LESSONS,
+  FRENCH_CURRICULUM,
   LESSON_ANIMAUX,
   frenchAudioSrc,
   frenchExampleAudioSrc,
@@ -46,10 +46,10 @@ describe("Frans luisterspel", () => {
   });
 
   it("bevat alleen lessen met items", () => {
-    expect(FRENCH_LESSONS.length).toBeGreaterThan(0);
-    for (const lesson of FRENCH_LESSONS) {
+    expect(FRENCH_CURRICULUM.length).toBeGreaterThan(0);
+    for (const lesson of FRENCH_CURRICULUM) {
       expect(lesson.items.length).toBeGreaterThan(0);
-      expect(lesson.items.every((item) => item.theme === lesson.id)).toBe(true);
+      expect(lesson.status).toMatch(/^(draft|reviewed)$/u);
     }
   });
 
@@ -73,6 +73,21 @@ describe("Frans luisterspel", () => {
     expect(createFrenchQuestion(item, LESSON_ANIMAUX.items, 1)).not.toEqual(
       createFrenchQuestion(item, LESSON_ANIMAUX.items, 2),
     );
+  });
+
+  it("gebruikt de handmatige contrastwoorden als afleiders", () => {
+    const item = LESSON_ANIMAUX.items.find((candidate) => candidate.contrastWith?.length);
+    if (!item?.contrastWith) {
+      throw new Error("Geen woord met contrastwoorden");
+    }
+    const question = createFrenchQuestion(item, LESSON_ANIMAUX.items, 5);
+    for (const id of item.contrastWith) {
+      const contrast = LESSON_ANIMAUX.items.find((candidate) => candidate.id === id);
+      if (!contrast) {
+        throw new Error(`Onbekend contrastwoord ${id}`);
+      }
+      expect(question.options).toContain(contrast.nl);
+    }
   });
 
   it("gebruikt de handmatige afleiders voor zinnen", () => {

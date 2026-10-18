@@ -32,6 +32,7 @@
     "prepare": "husky",
     "icons": "pnpm exec tsx scripts/generate-app-icons.ts",
     "audio:french": "pnpm exec tsx scripts/generate-french-audio.ts",
+    "audio:check:french": "pnpm exec tsx scripts/generate-french-audio.ts --check",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

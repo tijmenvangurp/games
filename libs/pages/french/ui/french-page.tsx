@@ -1,76 +1,63 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { LESSON_ANIMAUX } from "@entities/french";
-import { FrenchFlashcards, FrenchQuiz, useFrenchQuizStore } from "@features/french-listening";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { listPublishedLessons } from "@entities/french";
 import { GameShell } from "@widgets/game-shell";
-import { Button, LayoutGrid, Play, Sparkles } from "@shared/ui";
-
-type FrenchMode = "intro" | "quiz" | "cards";
+import { Play, Sparkles } from "@shared/ui";
 
 export function FrenchPage() {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<FrenchMode>("intro");
-
-  const startQuiz = () => {
-    useFrenchQuizStore.getState().start(LESSON_ANIMAUX);
-    setMode("quiz");
-  };
-
-  const startCards = () => {
-    setMode("cards");
-  };
-
-  const reset = () => {
-    useFrenchQuizStore.getState().reset();
-    setMode("intro");
-  };
+  const lessons = listPublishedLessons();
 
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
-      onNewGame={mode === "intro" ? undefined : reset}
-      subtitle={mode === "intro" ? "Frans luisteren · A1.2" : "Les animaux · A1.2"}
+      subtitle="Frans luisteren · A1.2"
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"
     >
-      {mode === "intro" ? (
-        <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
-          <section className="rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-6 text-center shadow-sm">
-            <span aria-hidden="true" className="text-5xl">
-              {LESSON_ANIMAUX.emoji}
-            </span>
-            <p className="mt-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Thema
-            </p>
-            <h2 className="mt-1 text-3xl font-black">{LESSON_ANIMAUX.title}</h2>
-            <p className="mt-2 text-muted-foreground">{LESSON_ANIMAUX.subtitle}</p>
-            <p className="mt-3 text-sm font-semibold text-muted-foreground">
-              {LESSON_ANIMAUX.items.length} items · {LESSON_ANIMAUX.level}
-            </p>
-          </section>
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+        <p className="text-muted-foreground">
+          Kies een les. Je hoort Frans en kiest de juiste Nederlandse vertaling.
+        </p>
 
-          <Button size="lg" onClick={startQuiz}>
-            <Play aria-hidden="true" className="size-5" />
-            Start luisteroefening
-          </Button>
-          <Button size="lg" variant="outline" onClick={startCards}>
-            <LayoutGrid aria-hidden="true" className="size-5" />
-            Oefen met kaarten
-          </Button>
+        {lessons.length === 0 ? (
+          <p className="rounded-3xl border border-dashed bg-card/60 p-6 text-center text-muted-foreground">
+            Er zijn nog geen lessen gepubliceerd.
+          </p>
+        ) : (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {lessons.map((lesson) => (
+              <Link
+                key={lesson.id}
+                className="group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br from-sky-100 via-white to-blue-50 p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+                params={{ lessonId: lesson.id }}
+                to="/frans/$lessonId"
+              >
+                <div className="flex items-start justify-between">
+                  <span aria-hidden="true" className="text-4xl">
+                    {lesson.emoji}
+                  </span>
+                  <span className="grid size-9 place-items-center rounded-full bg-white/80 text-primary shadow-sm transition group-hover:bg-white">
+                    <Play aria-hidden="true" className="size-4" />
+                  </span>
+                </div>
+                <h2 className="mt-3 text-lg font-black">{lesson.title}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">{lesson.subtitle}</p>
+                <span className="mt-auto pt-4 text-sm font-bold text-primary">
+                  {lesson.items.length} items · {lesson.level}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
 
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
-            <Sparkles aria-hidden="true" className="size-3.5" />
-            Prototype · inhoud nog niet taalkundig gereviewd.
-          </p>
-          <p className="text-center text-xs text-muted-foreground">
-            Audio: Piper (MIT) · stem Tom (dataset AGPLv3).
-          </p>
-        </div>
-      ) : mode === "quiz" ? (
-        <FrenchQuiz />
-      ) : (
-        <FrenchFlashcards lesson={LESSON_ANIMAUX} />
-      )}
+        <p className="flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+          <Sparkles aria-hidden="true" className="size-3.5" />
+          Meer lessen komen eraan.
+        </p>
+        <p className="text-center text-xs text-muted-foreground">
+          Audio: Piper (MIT) · stem Tom (dataset AGPLv3).
+        </p>
+      </div>
     </GameShell>
   );
 }

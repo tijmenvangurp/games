@@ -24,6 +24,41 @@ function unique(values: readonly string[], exclude: string): string[] {
   return result;
 }
 
+function contrastDistractors(item: FrenchItem, pool: readonly FrenchItem[]): string[] {
+  const byId = new Map(pool.map((candidate) => [candidate.id, candidate.nl]));
+  return (item.contrastWith ?? [])
+    .map((id) => byId.get(id))
+    .filter((value): value is string => Boolean(value));
+}
+
+function curatedDistractors(item: FrenchItem, pool: readonly FrenchItem[]): string[] | null {
+  if (item.distractors?.length) {
+    return [...item.distractors];
+  }
+  if (!item.contrastWith?.length) {
+    return null;
+  }
+  const values = contrastDistractors(item, pool);
+  return values.length > 0 ? values : null;
+}
+
+function chooseDistractors(
+  candidates: readonly string[],
+  fallback: readonly string[],
+  random: () => number,
+): string[] {
+  if (candidates.length >= FRENCH_OPTION_COUNT - 1) {
+    return shuffledIndexes(candidates.length, random)
+      .slice(0, FRENCH_OPTION_COUNT - 1)
+      .map((index) => candidates[index]);
+  }
+
+  const fill = shuffledIndexes(fallback.length, random)
+    .slice(0, FRENCH_OPTION_COUNT - 1 - candidates.length)
+    .map((index) => fallback[index]);
+  return [...candidates, ...fill];
+}
+
 /**
  * Builds one listening question. Words draw their distractors from other words
  * in the same lesson; phrases use the curated `distractors` so the options stay
@@ -36,23 +71,17 @@ export function createFrenchQuestion(
 ): FrenchQuestion {
   const random = mulberry32(seed);
   const sameKind = pool.filter((candidate) => candidate.kind === item.kind);
-  const preferred = item.distractors?.length
-    ? item.distractors
-    : sameKind.map((candidate) => candidate.nl);
+  const curated = curatedDistractors(item, pool);
+  const preferred = curated ?? sameKind.map((candidate) => candidate.nl);
   const candidates = unique(preferred, item.nl);
 
-  // Defensive fallback: the prototype lessons always provide enough options,
-  // but a future lesson should never crash on a short pool.
+  // Fill from the wider pool only when a lesson has fewer than three curated
+  // or same-kind candidates.
   const fallback = unique(
     pool.map((candidate) => candidate.nl),
     item.nl,
   ).filter((value) => !candidates.includes(value));
-  // Curated phrase distractors win; only short lessons need the fallback.
-  const all =
-    candidates.length >= FRENCH_OPTION_COUNT - 1 ? candidates : [...candidates, ...fallback];
-  const distractors = shuffledIndexes(all.length, random)
-    .slice(0, FRENCH_OPTION_COUNT - 1)
-    .map((index) => all[index]);
+  const distractors = chooseDistractors(candidates, fallback, random);
 
   const options = [item.nl, ...distractors];
   for (let index = options.length - 1; index > 0; index -= 1) {
