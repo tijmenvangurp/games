@@ -1,0 +1,161 @@
+# Spelideeën
+
+- **Datum:** 2026-10-18
+- **Status:** Woordzoeker is geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
+- **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
+
+## Wat er nu is
+
+| Spel                 | Route          | Leerzame kant                                                                   |
+| -------------------- | -------------- | ------------------------------------------------------------------------------- |
+| Sudoku               | `/sudoku`      | Logisch redeneren, patroonherkenning, cijfers of dieren                         |
+| Pijlen               | `/pijlen`      | Ruimtelijk inzicht, planning, doordacht bewegen                                 |
+| Waar is Wobbel?      | `/zoeken`      | Visuele aandacht, observeren, vergelijken                                       |
+| Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                     |
+| Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                 |
+| Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
+| Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
+| Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
+
+De app dekt daarmee **logica, ruimte, geheugen, taal, lezen en schaken**. De grootste gaten zijn nu **rekenen, wereldoriëntatie en computationeel denken**.
+
+## Overzicht
+
+| Prioriteit | Idee             | Domein                | Effort      | Kern                                                      |
+| ---------- | ---------------- | --------------------- | ----------- | --------------------------------------------------------- |
+| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0009 en het bibliotheekonderzoek |
+| 2          | Tafel Topper     | Rekenen               | Laag        | Optellen, aftrekken, tafels en delen                      |
+| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                         |
+| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen            |
+| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen     |
+| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Provincies en hoofdsteden van Nederland                   |
+| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                     |
+| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                              |
+| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden      |
+
+## 1. Woordzoeker
+
+**Leerdoel:** woorden herkennen, spelling oefenen, visueel scannen en de woordenschat van een thema versterken.
+
+**Vorm:** een klassieke woordzoeker met de thema's **Tuin** en **Onder water** uit _Waar is Wobbel?_. De speler tikt de eerste en de laatste letter van een woord aan. Gevonden woorden worden doorgestreept. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
+
+**Waarom:** taal is het grootste gat in het huidige aanbod. Een woordzoeker is laagdrempelig, goed te herspelen en vraagt geen nieuwe backend of externe assets.
+
+**Techniek:** `libs/entities/word-search` voor de generator en selectieregels, `libs/features/word-search` voor de Zustand-store en UI, `libs/pages/word-search` voor het scherm. De generator komt uit `@aydee-app/word-search` (MIT, ESM, TypeScript, 1,8 KB). De hele puzzel wordt lokaal bewaard, niet alleen een seed. Zie [ADR 0009](../adr/0009-woordzoeker.md).
+
+**Aandachtspunten:** de bibliotheek is jong; pin de exacte versie en houd de adapter klein. Voor 44 px-cellen is op mobiel de zoomstand nodig. Zie `research/2026-10-18-woordzoeker-libraries.md` voor de onderbouwing.
+
+## 2. Tafel Topper
+
+**Leerdoel:** optellen en aftrekken tot 10 en 20, tafels 1 tot 10, delen. Later breuken en geld.
+
+**Vorm:** kies een tafel of "mix". Een ronde bestaat uit ongeveer tien korte sommen. Het kind typt het antwoord in of kiest uit drie opties. Bij een fout antwoord komt er geen "fout!" maar een korte uitleg met blokjes of een getallenlijn. Sterren en een streak geven voortgang. Een timer is optioneel en nooit standaard.
+
+**Waarom:** hoog leerrendement per regel code, onbeperkt herspeelbaar en volledig te testen met pure functies.
+
+**Techniek:** `entities/math` met een generator en regels, `features/math-trainer` met Zustand en UI, een eigen page en route. Geen nieuwe dependencies. Voortgang in `localStorage` onder een eigen key, bijvoorbeeld `games.math.v1`.
+
+**Aandachtspunten:** geen straf voor fouten, geen verdwijnende levens, geen verplichte timer. Verschillende niveaus moeten echt verschillende vaardigheden raken, niet alleen grotere getallen.
+
+## 3. Klokkijken
+
+**Leerdoel:** een analoge klok lezen, hele uren tot 5 minuten, en digitaal omzetten naar analoog en terug.
+
+**Vorm:** een zelfgetekende SVG-klok. Twee modi: "Hoe laat is het?" met meerkeuze, en "Zet de wijzers" door te tikken of te slepen. Korte contextzinnen zoals "Om 8 uur ga je naar school" maken de tijd betekenisvol. Niveaus: hele uren, halve uren, kwartieren en 5 minuten.
+
+**Waarom:** sterk visueel, veel geoefend op de basisschool en volledig te maken zonder externe plaatjes of bibliotheken.
+
+**Techniek:** `entities/clock` voor tijdberekeningen en niveau-opbouw, `features/clock-reading` voor de store en UI. Knoppen als alternatief voor slepen, minimaal 44 px touch-targets en testen op 390 px en 1024 px.
+
+**Aandachtspunten:** onderscheid tussen "over" en "voor half" is in het Nederlands lastig. Kies één consequente uitleg en test die met kinderen.
+
+## 4. Robo Route
+
+**Leerdoel:** sequentiële instructies, herhaling, plannen en debuggen.
+
+**Vorm:** een robot in een grid moet sterren pakken. Het kind sleept commando's (vooruit, links, rechts, later "herhaal 3×") in een programma en drukt op **Start**. Gaat het mis, dan stopt de robot en verbetert het kind het programma. Niveaus bouwen op van losse stappen naar herhaling en langere routes.
+
+**Waarom:** echt anders dan Pijlen. Pijlen is reageren en sturen; Robo Route is eerst nadenken, dan uitvoeren. Dat is de basis van programmeren.
+
+**Techniek:** een pure interpreter en levels in `entities/robot`, een eigen feature en page. Geen dependencies. De levels kunnen later worden uitgebreid met obstakels, sleutels en meerdere robots.
+
+**Aandachtspunten:** fouten moeten leerzaam zijn. Toon waar het programma misgaat en laat het kind de fout herstellen zonder het hele level opnieuw te hoeven starten.
+
+## 5. Schaakmat in 1
+
+**Leerdoel:** schaakmat herkennen en zetten leren plannen.
+
+**Vorm:** korte stellingen waarin het kind in één zet schaakmat zet. Na de zet laat de app zien waarom het mat is. Daarna een nieuwe stelling. Niveaus: mat met de dame, met de toren, met twee stukken en met een pion.
+
+**Waarom:** de bestaande tutorial leert de regels en `Schaakpuzzels` dekt al korte puzzels. Dit idee is een gerichte uitbreiding daarvan, niet een nieuw spel.
+
+**Techniek:** uitbreiding van de bestaande `features/chess-puzzles` en de bijbehorende entity, met `chess.js`. Geen nieuwe dependencies.
+
+**Aandachtspunten:** alleen stellingen opnemen die met de bestaande engine gevalideerd zijn. Geen stellingen waarin meerdere zetten mat geven zonder dat de uitleg dat aankan.
+
+## 6. Provincie Prik
+
+**Leerdoel:** de twaalf provincies en hun hoofdsteden kennen, en Nederland op de kaart plaatsen.
+
+**Vorm:** een vereenvoudigde, zelfgetekende SVG-kaart van Nederland. Modi: "Waar ligt Friesland?", "Wat is de hoofdstad van Gelderland?" en "Sleep de provincie naar de juiste plek". De kaart is het middelpunt; de vragen zijn kort.
+
+**Waarom:** wereldoriëntatie ontbreekt nog volledig. Het is een klassiek onderwerp voor groep 5 tot en met 8.
+
+**Techniek:** `entities/netherlands` met provincies, hoofdsteden en posities, `features/province-quiz` met de UI. Een zorgvuldige, originele SVG-kaart is het grootste werk. Geen externe kaart of API.
+
+**Aandachtspunten:** de kaart moet kloppen en auteursrechtelijk veilig zijn. Overweeg een eigen vereenvoudigde vorm in plaats van een bestaande kaart over te nemen. Voor de posities zijn geen exacte geografische coördinaten nodig, alleen herkenbare vlakken.
+
+## 7. Breuken en geld
+
+**Leerdoel:** breuken herkennen en vergelijken, en rekenen met euro's.
+
+**Vorm:** breuken met pizza's, taarten of chocoladerepen: "Welk deel is gekleurd?" en "Wat is meer?". Geld met munten en briefjes: "Hoeveel is dit?" en "Betaal 3,50 met zo weinig mogelijk munten". Sluit aan op Tafel Topper.
+
+**Waarom:** concrete, visuele rekenvaardigheid die goed past bij dezelfde generator en opslag als Tafel Topper.
+
+**Techniek:** uitbreiding van `entities/math` of een aparte entity `money`. Eigen SVG of emoji voor munten en breuken. Geen dependencies.
+
+**Aandachtspunten:** gebruik geen bedragen met privacygevoelige voorbeelden. Houd het bij algemene bedragen en duidelijke munten.
+
+## 8. Noten lezen
+
+**Leerdoel:** noten op de notenbalk herkennen en intervallen horen.
+
+**Vorm:** een notenbalk met een noot; het kind kiest de juiste naam. Een tweede modus speelt twee tonen en vraagt welke hoger is. Later een korte melodie naspelen.
+
+**Waarom:** muziek ontbreekt nog. WebAudio kan tonen synthetiseren zonder audiobestanden of externe requests.
+
+**Techniek:** `entities/music` voor noten en frequenties, `features/note-reading` voor de UI en WebAudio. Geen assets nodig.
+
+**Aandachtspunten:** geluid moet altijd dempbaar zijn en nooit automatisch starten. Voor jonge kinderen is visuele ondersteuning belangrijker dan muziektheorie. Toegankelijkheid zonder geluid moet mogelijk blijven.
+
+## 9. Kleine varianten
+
+Deze ideeën zijn klein genoeg om als variant op een bestaand spel te beginnen.
+
+- **Letter-memory:** memory met hoofdletters en kleine letters, of met een woord en een bijpassend plaatje. Hergebruikt de memory-infrastructuur.
+- **Woordbouw:** sleep letters naar de juiste plek bij een emoji of tekening. Geschikt voor spelling zoals ei/ij en au/ou. Gebruik een eigen, korte woordenlijst.
+- **Dierenquiz:** "Welk dier is dit?" met originele tekeningen of emoji, plus één weetje per dier. Past bij de natuur en wereldoriëntatie.
+- **Verkeersborden:** herken borden en weet wat ze betekenen. Leerzaam en veilig, maar vraagt originele SVG-borden.
+
+## Gemeenschappelijke aanpak
+
+Voor elk nieuw spel:
+
+1. Pure regels en generatoren in `libs/entities/<domein>`.
+2. Een Zustand-store en UI in `libs/features/<naam>`.
+3. Een page in `libs/pages/<naam>`, een route in `apps/games/src/app/router.tsx` en een entry in `libs/entities/game/model/game-catalog.ts`.
+4. Tests in `tests/node` voor de pure logica en in `tests/web` voor de UI.
+5. Een e2e-test voor de belangrijkste mobiele flow.
+6. Geen nieuwe dependency zonder expliciete afweging. Als een dependency nodig is, eerst een ADR.
+7. Voortgang alleen lokaal in `localStorage`, met een eigen versie-key.
+8. Touch-targets van minimaal 44 px, veilige marges en testen op 390 px en 1024 px.
+
+## Open vragen
+
+- Voor welke leeftijd is elk spel precies bedoeld? De huidige spellen lopen van ongeveer 4 tot 10 jaar.
+- Willen we op de homepage gaan groeperen op **Rekenen, Taal, Denken en Wereld** zodra er meer dan acht spellen zijn?
+- Moet er een oudervriendelijk overzicht komen met leerdoelen per spel?
+- Blijft voortgang alleen lokaal, of is een gedeelde score ooit gewenst? Dat laatste vraagt een nieuwe ADR en een privacyontwerp.
+- Willen we de ideeën al als `coming-soon` in de catalogus tonen, of pas als ze echt bijna af zijn?

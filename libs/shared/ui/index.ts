@@ -22,4 +22,6 @@ export {
   Sparkles,
   Undo2,
   X,
+  ZoomIn,
+  ZoomOut,
 } from "./icons";

@@ -71,6 +71,7 @@
     "pages-memory",
     "pages-seek",
     "pages-pokemon-quiz",
+    "pages-word-search",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -80,12 +81,14 @@
     "features-memory-game",
     "features-seek-and-find",
     "features-pokemon-quiz",
+    "features-word-search",
     "entities-game",
     "entities-sudoku",
     "entities-arrow",
     "entities-memory",
     "entities-hidden-object",
     "entities-pokedex",
+    "entities-word-search",
     "shared-lib",
     "shared-ui"
   ]

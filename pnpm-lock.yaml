@@ -166,6 +166,9 @@ importers:
 
   .:
     dependencies:
+      '@aydee-app/word-search':
+        specifier: 0.1.1
+        version: 0.1.1
       '@radix-ui/react-slot':
         specifier: ^1.5.0
         version: 1.5.0(@types/react@19.3.0)(react@19.3.1)
@@ -285,6 +288,9 @@ packages:
   '@asamuzakjp/dom-selector@10.0.3':
     resolution: {integrity: sha512-3+777rEPsOOjoy5/sRmIzHnoRDaLpm3XWY2dmWn/N7f/XwDG0bcpnFaKL3X9FYJUbNwLmpcJC1bUYexJRxsFlw==}
     engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
+
+  '@aydee-app/word-search@0.1.1':
+    resolution: {integrity: sha512-Q9MBSob8cs6hypIZd6xF9qZZ7w79HUB6PFUai2+RYrGSmaDiM1bj+W1CQXhlanWkaS0athvVlcN8mjNc8aZHiA==}
 
   '@babel/code-frame@7.29.7':
     resolution: {integrity: sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw==}
@@ -3141,6 +3147,8 @@ snapshots:
       css-tree: 3.2.1
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.5.3
+
+  '@aydee-app/word-search@0.1.1': {}
 
   '@babel/code-frame@7.29.7':
     dependencies:
