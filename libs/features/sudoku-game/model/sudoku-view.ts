@@ -17,6 +17,22 @@ export function hintText(hint: SudokuHint): string {
   }
 }
 
+export function hintDetailText(hint: SudokuHint): string {
+  if (hint.technique === "naked-single") {
+    return "Streep de cijfers weg die al in de rij, kolom en box staan.";
+  }
+  switch (hint.unit) {
+    case "row":
+      return "Welk cijfer kan nergens anders in deze rij?";
+    case "column":
+      return "Welk cijfer kan nergens anders in deze kolom?";
+    case "box":
+      return "Welk cijfer kan nergens anders in dit blok?";
+    default:
+      return "Welk cijfer kan nergens anders op deze plek?";
+  }
+}
+
 interface StatusInput {
   solved: boolean;
   conflictCount: number;

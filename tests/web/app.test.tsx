@@ -255,6 +255,14 @@ describe("games app", () => {
     expect(explanation.textContent).not.toMatch(/[1-9]/);
     expect(explanation.textContent).not.toMatch(/🐶|🐱|🐰|🦊/);
     expect(screen.queryAllByRole("button", { name: /, hint$/ })).toHaveLength(0);
+    expect(screen.getByRole("button", { name: "Waarom?" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Waarom?" }));
+    const detail = screen.getByText(/Streep de cijfers|Welk cijfer kan nergens anders/);
+    expect(detail.textContent).not.toMatch(/[1-9]/);
+    expect(detail.textContent).not.toMatch(/🐶|🐱|🐰|🦊/);
+    expect(screen.queryByRole("button", { name: "Waarom?" })).toBeNull();
+    expect(screen.queryAllByRole("button", { name: /, hint$/ })).toHaveLength(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Plaats" }));
     expect(screen.getAllByRole("button", { name: /, hint$/ })).toHaveLength(1);

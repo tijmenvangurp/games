@@ -1,11 +1,13 @@
-import { Button, Check, Eraser, Lightbulb, RotateCcw, Undo2 } from "@shared/ui";
+import { Button, Check, Eraser, Lightbulb, RotateCcw, Search, Undo2 } from "@shared/ui";
 
 interface SudokuControlsProps {
   hintActive: boolean;
+  hintDetailed: boolean;
   canUndo: boolean;
   checkMode: boolean;
   solved: boolean;
   onHint: () => void;
+  onHintDetail: () => void;
   onUndo: () => void;
   onErase: () => void;
   onRestart: () => void;
@@ -14,10 +16,12 @@ interface SudokuControlsProps {
 
 export function SudokuControls({
   hintActive,
+  hintDetailed,
   canUndo,
   checkMode,
   solved,
   onHint,
+  onHintDetail,
   onUndo,
   onErase,
   onRestart,
@@ -43,6 +47,13 @@ export function SudokuControls({
           Opnieuw
         </Button>
       </div>
+
+      {hintActive && !hintDetailed ? (
+        <Button className="w-full" size="sm" variant="ghost" onClick={onHintDetail}>
+          <Search aria-hidden="true" className="size-4" />
+          Waarom?
+        </Button>
+      ) : null}
 
       {checkMode ? (
         <Button className="w-full" disabled={solved} variant="outline" onClick={onCheck}>
