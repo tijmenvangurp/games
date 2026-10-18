@@ -63,6 +63,12 @@ describe("Frans luisterspel", () => {
       screen.getByRole("button", { name: question.item.nl }).getAttribute("data-answer-state"),
     ).toBe("correct");
 
+    if (question.item.example) {
+      expect(screen.getByText(question.item.example.fr)).toBeTruthy();
+      expect(screen.getByText(question.item.example.nl)).toBeTruthy();
+      expect(screen.getByRole("button", { name: "Beluister de voorbeeldzin" })).toBeTruthy();
+    }
+
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
     expect(useFrenchQuizStore.getState().answered).toBe(false);
     expect(useFrenchQuizStore.getState().selected).toBeNull();
@@ -100,6 +106,8 @@ describe("Frans luisterspel", () => {
     expect(screen.getByText("Nederlands")).toBeTruthy();
     expect(card.getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByText(LESSON_ANIMAUX.items[0].nl)).toBeTruthy();
+    expect(screen.getByText(LESSON_ANIMAUX.items[0].example?.fr ?? "")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Beluister voorbeeldzin/ })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Ken ik" }));
     expect(await screen.findByText("Kaart 2 van 15")).toBeTruthy();

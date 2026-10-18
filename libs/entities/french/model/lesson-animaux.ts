@@ -24,6 +24,10 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐱",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Mon chat aime le lait.",
+        nl: "Mijn kat houdt van melk.",
+      },
       reviewed: true,
     },
     {
@@ -35,6 +39,10 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐶",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Le chien joue dans le jardin.",
+        nl: "De hond speelt in de tuin.",
+      },
       reviewed: true,
     },
     {
@@ -47,6 +55,11 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐦",
       note: "‘l’’ staat voor ‘le’ of ‘la’ vóór een klinker.",
+      example: {
+        fr: "L’oiseau chante le matin.",
+        audioText: "L'oiseau chante le matin.",
+        nl: "De vogel zingt in de ochtend.",
+      },
       reviewed: true,
     },
     {
@@ -58,6 +71,11 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐟",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Le poisson nage dans l’eau.",
+        audioText: "Le poisson nage dans l'eau.",
+        nl: "De vis zwemt in het water.",
+      },
       reviewed: true,
     },
     {
@@ -69,6 +87,10 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐴",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Le cheval mange une pomme.",
+        nl: "Het paard eet een appel.",
+      },
       reviewed: true,
     },
     {
@@ -80,6 +102,11 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐄",
       note: "‘la’ is vrouwelijk.",
+      example: {
+        fr: "La vache mange de l’herbe.",
+        audioText: "La vache mange de l'herbe.",
+        nl: "De koe eet gras.",
+      },
       reviewed: true,
     },
     {
@@ -91,6 +118,10 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐰",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Le lapin saute dans le jardin.",
+        nl: "Het konijn springt in de tuin.",
+      },
       reviewed: true,
     },
     {
@@ -102,6 +133,10 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐭",
       note: "‘la’ is vrouwelijk.",
+      example: {
+        fr: "La souris mange du fromage.",
+        nl: "De muis eet kaas.",
+      },
       reviewed: true,
     },
     {
@@ -113,6 +148,11 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🦁",
       note: "‘le’ is mannelijk.",
+      example: {
+        fr: "Le lion dort sous l’arbre.",
+        audioText: "Le lion dort sous l'arbre.",
+        nl: "De leeuw slaapt onder de boom.",
+      },
       reviewed: true,
     },
     {
@@ -125,6 +165,11 @@ export const LESSON_ANIMAUX: FrenchLesson = {
       level: "A1.2",
       emoji: "🐘",
       note: "‘l’’ staat voor ‘le’ vóór een klinker.",
+      example: {
+        fr: "L’éléphant boit beaucoup d’eau.",
+        audioText: "L'éléphant boit beaucoup d'eau.",
+        nl: "De olifant drinkt veel water.",
+      },
       reviewed: true,
     },
     {

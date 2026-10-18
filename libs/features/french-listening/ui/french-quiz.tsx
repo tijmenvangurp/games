@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { frenchAudioSrc } from "@entities/french";
+import { frenchAudioSrc, frenchExampleAudioSrc } from "@entities/french";
 import { playSound } from "@shared/lib";
 import { useFrenchQuizStore } from "../model/use-french-quiz-store";
 import { FrenchAudioPanel } from "./french-audio-panel";
@@ -84,7 +84,12 @@ export function FrenchQuiz() {
       </div>
 
       {answered ? (
-        <FrenchFeedback correct={correct} item={question.item} onNext={handleNext} />
+        <FrenchFeedback
+          correct={correct}
+          item={question.item}
+          onNext={handleNext}
+          onPlayExample={() => play(frenchExampleAudioSrc(question.item))}
+        />
       ) : (
         <p aria-live="polite" className="text-center text-xs text-muted-foreground">
           Kies de Nederlandse vertaling.

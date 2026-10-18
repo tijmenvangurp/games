@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { frenchAudioSrc, type FrenchLesson } from "@entities/french";
+import { frenchAudioSrc, frenchExampleAudioSrc, type FrenchLesson } from "@entities/french";
 import { Button, Volume2 } from "@shared/ui";
 import { FrenchFlashcard } from "./french-flashcard";
 import { FrenchFlashcardSummary } from "./french-flashcard-summary";
@@ -65,7 +65,7 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
 
       <FrenchFlashcard flipped={flipped} item={item} onFlip={() => setFlipped((value) => !value)} />
 
-      <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center gap-2">
         <Button
           variant="outline"
           onClick={() => {
@@ -73,8 +73,19 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
           }}
         >
           <Volume2 aria-hidden="true" className="size-5" />
-          Beluister
+          {item.kind === "word" ? "Beluister woord" : "Beluister zin"}
         </Button>
+        {item.example ? (
+          <Button
+            variant="outline"
+            onClick={() => {
+              play(frenchExampleAudioSrc(item));
+            }}
+          >
+            <Volume2 aria-hidden="true" className="size-5" />
+            Beluister voorbeeldzin
+          </Button>
+        ) : null}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">

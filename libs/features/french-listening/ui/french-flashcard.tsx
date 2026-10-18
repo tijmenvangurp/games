@@ -34,6 +34,12 @@ export function FrenchFlashcard({ item, flipped, onFlip }: FrenchFlashcardProps)
             <span className="text-sm text-muted-foreground">ook: {item.nlAlt.join(", ")}</span>
           ) : null}
           {item.note ? <span className="text-xs text-muted-foreground">{item.note}</span> : null}
+          {item.example ? (
+            <span className="mt-1 rounded-xl bg-sky-50 px-3 py-2 text-sm">
+              <span className="block font-semibold">{item.example.fr}</span>
+              <span className="block text-xs text-muted-foreground">{item.example.nl}</span>
+            </span>
+          ) : null}
         </span>
       </button>
     </div>

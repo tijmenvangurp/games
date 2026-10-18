@@ -87,20 +87,26 @@ function looksLikeMp3(bytes: Uint8Array): boolean {
 }
 
 async function requestSpeech(config: Config, input: string): Promise<Uint8Array> {
-  const response = await fetch(`${config.baseUrl}/audio/speech`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
-    },
-    body: JSON.stringify({
-      model: config.model,
-      voice: config.voice,
-      input,
-      response_format: "mp3",
-      speed: config.speed,
-    }),
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${config.baseUrl}/audio/speech`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
+      },
+      body: JSON.stringify({
+        model: config.model,
+        voice: config.voice,
+        input,
+        response_format: "mp3",
+        speed: config.speed,
+      }),
+    });
+  } catch {
+    // Never include the private endpoint in an error message or stack.
+    throw new Error("TTS-verzoek mislukt (netwerk).");
+  }
 
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
@@ -110,39 +116,65 @@ async function requestSpeech(config: Config, input: string): Promise<Uint8Array>
   return new Uint8Array(await response.arrayBuffer());
 }
 
-function shouldSkip(item: LessonItem, options: Options): boolean {
-  const outputPath = join(outputDirectory, `${item.id}.mp3`);
+interface Clip {
+  id: string;
+  input: string;
+}
+
+function wordClip(item: LessonItem): Clip {
+  return { id: item.id, input: item.audioText ?? item.fr };
+}
+
+function exampleClip(item: LessonItem): Clip | null {
+  if (!item.example) {
+    return null;
+  }
+  return {
+    id: `${item.id}-example`,
+    input: item.example.audioText ?? item.example.fr,
+  };
+}
+
+function clipsFor(items: readonly LessonItem[]): Clip[] {
+  const clips: Clip[] = [];
+  for (const item of items) {
+    clips.push(wordClip(item));
+    const example = exampleClip(item);
+    if (example) {
+      clips.push(example);
+    }
+  }
+  return clips;
+}
+
+function shouldSkip(clip: Clip, options: Options): boolean {
+  const outputPath = join(outputDirectory, `${clip.id}.mp3`);
   return !options.force && existsSync(outputPath);
 }
 
-async function writeAudio(item: LessonItem, config: Config, input: string): Promise<void> {
-  const bytes = await requestSpeech(config, input);
+async function writeAudio(clip: Clip, config: Config): Promise<void> {
+  const bytes = await requestSpeech(config, clip.input);
   if (!looksLikeMp3(bytes)) {
-    throw new Error(`TTS gaf geen MP3 voor ${item.id} (${bytes.byteLength} bytes).`);
+    throw new Error(`TTS gaf geen MP3 voor ${clip.id} (${bytes.byteLength} bytes).`);
   }
-  const outputPath = join(outputDirectory, `${item.id}.mp3`);
+  const outputPath = join(outputDirectory, `${clip.id}.mp3`);
   await writeFile(outputPath, bytes);
   console.log(`  -> ${outputPath} (${bytes.byteLength} bytes)`);
-}
-
-function inputFor(item: LessonItem): string {
-  return item.audioText ?? item.fr;
 }
 
 function actionLabel(options: Options): string {
   return options.dryRun ? "dry-run" : "genereer";
 }
 
-async function generateItem(item: LessonItem, config: Config, options: Options): Promise<void> {
-  if (shouldSkip(item, options)) {
-    console.log(`skip ${item.id} (bestaat al)`);
+async function generateClip(clip: Clip, config: Config, options: Options): Promise<void> {
+  if (shouldSkip(clip, options)) {
+    console.log(`skip ${clip.id} (bestaat al)`);
     return;
   }
 
-  const input = inputFor(item);
-  console.log(`${actionLabel(options)} ${item.id}: ${input}`);
+  console.log(`${actionLabel(options)} ${clip.id}: ${clip.input}`);
   if (!options.dryRun) {
-    await writeAudio(item, config, input);
+    await writeAudio(clip, config);
   }
 }
 
@@ -168,8 +200,8 @@ async function main(): Promise<void> {
     await mkdir(outputDirectory, { recursive: true });
   }
 
-  for (const item of items) {
-    await generateItem(item, config, options);
+  for (const clip of clipsFor(items)) {
+    await generateClip(clip, config, options);
   }
 }
 

@@ -1,7 +1,12 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { FRENCH_LESSONS, LESSON_ANIMAUX, frenchAudioSrc } from "@entities/french";
+import {
+  FRENCH_LESSONS,
+  LESSON_ANIMAUX,
+  frenchAudioSrc,
+  frenchExampleAudioSrc,
+} from "@entities/french";
 import {
   FRENCH_OPTION_COUNT,
   createFrenchQuestion,
@@ -21,6 +26,22 @@ describe("Frans luisterspel", () => {
       expect(item.reviewed).toBe(true);
       expect(frenchAudioSrc(item)).toBe(`/audio/fr/${item.id}.mp3`);
       expect(existsSync(join(audioDirectory, `${item.id}.mp3`))).toBe(true);
+
+      if (item.example) {
+        expect(item.example.fr.length).toBeGreaterThan(0);
+        expect(item.example.nl.length).toBeGreaterThan(0);
+        expect(frenchExampleAudioSrc(item)).toBe(`/audio/fr/${item.id}-example.mp3`);
+        expect(existsSync(join(audioDirectory, `${item.id}-example.mp3`))).toBe(true);
+      }
+    }
+  });
+
+  it("geeft elk woord een voorbeeldzin met eigen audio", () => {
+    const words = LESSON_ANIMAUX.items.filter((item) => item.kind === "word");
+    expect(words.length).toBeGreaterThan(0);
+    for (const word of words) {
+      expect(word.example).toBeDefined();
+      expect(word.example?.fr).toContain(word.fr.replace(/^(le|la|l’)\s?/u, "").slice(0, 4));
     }
   });
 

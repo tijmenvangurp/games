@@ -103,7 +103,7 @@ Dezelfde vijf zinnen zijn met vijf stemmen gegenereerd. Daarna is de gemiddelde 
 | `gilles`           |        ~107 Hz | Mannelijk; verstaanbaar, maar 16 kHz/low                                                |
 | `mls`              |        ~104 Hz | Mannelijk, maar de output was onverstaanbaar (Whisper gaf herhaalde nonsense); afwijzen |
 
-De les `Les animaux` is met `tom` gegenereerd: 15 MP3's, samen ongeveer 230 KB, in `apps/games/public/audio/fr/`. De app leest die bestanden lokaal; tijdens het spelen is er geen TTS-aanroep.
+De les `Les animaux` is met `tom` gegenereerd: 25 MP3's (15 lesitems en 10 voorbeeldzinnen bij de woorden), samen ongeveer 455 KB, in `apps/games/public/audio/fr/`. De app leest die bestanden lokaal; tijdens het spelen is er geen TTS-aanroep.
 
 ### 2.3 Audio genereren
 
@@ -135,7 +135,7 @@ Dit is de hoofdmodus en precies wat de opdracht vraagt:
 
 1. Het kind hoort een Frans woord of een hele zin.
 2. Het kiest uit 3–5 Nederlandse vertalingen.
-3. Na het antwoord ziet het de Franse tekst, de Nederlandse vertaling en eventueel een korte uitleg.
+3. Na het antwoord ziet het de Franse tekst, de Nederlandse vertaling, eventueel een korte uitleg en een voorbeeldzin met eigen audio.
 4. Het kan het fragment opnieuw beluisteren, ook langzaam (0,75×).
 5. Bij een fout antwoord: geen straf, maar het item komt sneller terug.
 
@@ -146,11 +146,12 @@ Belangrijk voor de kwaliteit:
 - **Afleiders zijn plausibel**: dezelfde woordsoort, hetzelfde thema en bij zinnen slechts één verschil (onderwerp, werkwoord of object). Niet drie willekeurige woorden.
 - **Geen dubbele juiste antwoorden**: één primaire vertaling per item; alternatieven alleen voor de flipcard, niet als quizoptie.
 - **Tekst pas na het antwoord** (of via een "toon tekst"-knop), zodat het kind echt luistert. Voor accessibility is de tekst altijd bereikbaar.
+- **Elk woord heeft een contextzin** met eigen audio. De quiz toont die na het antwoord; de flipcard op de achterkant. Zo hoort het kind het woord meteen in een natuurlijke zin.
 
 ### 3.2 Flashcard-oefening
 
 - Voorkant: Frans woord of zin, emoji/afbeelding en een speakerknop.
-- Achterkant: Nederlandse vertaling, lidwoord/gender en een voorbeeldzin.
+- Achterkant: Nederlandse vertaling, lidwoord/gender en een voorbeeldzin met een aparte audioknop.
 - Twee knoppen: "Nog oefenen" en "Ken ik". Die sturen de spatiëring.
 - Gebruik de bestaande CSS-3D-flip uit de memory-game. Bij `prefers-reduced-motion` wordt het een fade.
 - Geen drag, geen swipe-verplichting; gewoon tikken.
@@ -293,7 +294,7 @@ interface FrenchItem {
 ### Fase 0 — spike (uitgevoerd)
 
 1. Vijf stemmen getest: `upmc` (standaard), `siwis`, `tom`, `gilles` en `mls`. `mls` is afgevallen; `tom` is de werkende mannenstem.
-2. De les `Les animaux` met 10 woorden en 5 zinnen is met `tom` gegenereerd (15 MP3's, ~190 KB).
+2. De les `Les animaux` met 10 woorden en 5 zinnen is met `tom` gegenereerd, inclusief 10 voorbeeldzinnen bij de woorden (25 MP3's, ~455 KB).
 3. De quiz `Luister & kies` en de flipcard-oefening zijn gebouwd.
 4. **Nog te doen:** op telefoon (390 px) en tablet (1024 px) beluisteren en de stem/het volume definitief kiezen.
 
