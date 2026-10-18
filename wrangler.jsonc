@@ -1,12 +1,43 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "games",
+  "main": "./apps/api/src/index.ts",
   "compatibility_date": "2026-10-17",
   "assets": {
     "directory": "./apps/games/dist",
     "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
   },
-  "previews": {},
+  // Placeholder: replace with the id of the production D1 database after
+  // `wrangler d1 create games`. The id is not a secret, but the repo should
+  // not claim a database that does not exist yet.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "games",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "./apps/api/migrations",
+    },
+  ],
+  "vars": {
+    "ACCOUNTS_ENABLED": "false",
+  },
+  // Previews inherit no production settings. Point them at a separate D1
+  // database created with `wrangler d1 create games-preview`, then replace
+  // this placeholder in both this file and wrangler.preview-migrations.jsonc.
+  "previews": {
+    "vars": {
+      "ACCOUNTS_ENABLED": "false",
+    },
+    "d1_databases": [
+      {
+        "binding": "DB",
+        "database_name": "games-preview",
+        "database_id": "00000000-0000-0000-0000-000000000001",
+        "migrations_dir": "./apps/api/migrations",
+      },
+    ],
+  },
   "workers_dev": true,
   "preview_urls": true,
 }

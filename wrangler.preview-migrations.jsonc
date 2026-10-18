@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // Migrations for the preview D1 database. Keep `database_name` and
+  // `database_id` in sync with `previews.d1_databases` in wrangler.jsonc.
+  "d1_databases": [
+    {
+      "binding": "PREVIEW_DB",
+      "database_name": "games-preview",
+      "database_id": "00000000-0000-0000-0000-000000000001",
+      "migrations_dir": "./apps/api/migrations",
+    },
+  ],
+}

@@ -24,11 +24,19 @@ export default defineConfig({
           setupFiles: ["tests/web/setup.ts"],
         },
       },
+      {
+        extends: true,
+        test: {
+          name: "api",
+          environment: "node",
+          include: ["tests/api/**/*.test.ts"],
+        },
+      },
     ],
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["apps/games/src/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}"],
+      include: ["apps/games/src/**/*.{ts,tsx}", "apps/api/src/**/*.ts", "libs/**/*.{ts,tsx}"],
       exclude: ["apps/games/src/app/main.tsx", "libs/entities/sudoku/model/types.ts", "**/*.d.ts"],
       thresholds: {
         branches: 80,

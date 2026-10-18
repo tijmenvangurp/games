@@ -1,0 +1,43 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "api",
+  "projectType": "application",
+  "sourceRoot": "apps/api/src",
+  "tags": ["layer:app", "scope:api", "type:app"],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{workspaceRoot}/apps/api/**/*",
+        "{workspaceRoot}/tests/api/**/*",
+        "{workspaceRoot}/tsconfig.worker.json",
+        "{workspaceRoot}/tsconfig.base.json",
+        "{workspaceRoot}/package.json",
+        "{workspaceRoot}/pnpm-lock.yaml"
+      ],
+      "options": {
+        "command": "tsc --project tsconfig.worker.json",
+        "cwd": "."
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint src",
+        "cwd": "apps/api"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "dependsOn": [{ "projects": ["games"], "target": "build" }],
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "wrangler deploy --dry-run --outdir apps/api/dist",
+        "cwd": "."
+      }
+    }
+  }
+}
