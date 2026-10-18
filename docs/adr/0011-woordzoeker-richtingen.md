@@ -20,7 +20,7 @@ De gewenste opbouw is:
 3. **Elk woord wordt gegarandeerd geplaatst.** De generator probeert per woord maximaal 400 startpunten en richtingen. Lukt een puzzel niet, dan volgt een nieuwe poging met een lege grid, maximaal acht keer. Er verdwijnen dus geen woorden stil.
 4. **Dezelfde seed geeft dezelfde puzzel.** Woordkeuze, plaatsing en vulletters gebruiken één deterministische randomreeks. De puzzel wordt nog steeds als geheel in `localStorage` bewaard.
 5. **De dependency verdwijnt.** `@aydee-app/word-search` wordt uit `package.json` en de lockfile verwijderd. De generator is ongeveer 150 regels en heeft alleen `@shared/lib` nodig.
-6. **Gevonden woorden krijgen een handgetekende streep.** De overlay ligt over de letters met een dunne, halftransparante inktlijn en een bredere markerhighlight, zodat de letters leesbaar blijven.
+6. **Gevonden woorden krijgen een handgetekende streep.** De overlay ligt boven de letters met een dunne blauwe inktlijn en lage opacity, zodat de letters zichtbaar blijven.
 
 ## Gevolgen
 
