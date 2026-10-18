@@ -15,7 +15,7 @@
 - `adr/0011-woordzoeker-richtingen.md` — de eigen generator en de richtingniveaus van de woordzoeker.
 - `adr/0012-optionele-accounts-en-sync.md` — optionele ouderaccounts, kindprofielen en sync zonder loginmuur.
 - `adr/0013-privacy-optionele-accounts.md` — dataminimalisatie, toestemming, bewaartermijnen en verwerkers.
-- `adr/0014-schermtijd-per-profiel.md` — dagbudget, lokale timer, blokkade en ouderlijke override per profiel.
+- `adr/0014-schaaktutorial-een-opdracht-per-scherm.md` — minder tekst, een coachbubbel en een visuele hint in de schaaktutorial.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

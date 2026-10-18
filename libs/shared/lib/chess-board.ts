@@ -61,6 +61,8 @@ export interface SquareStylesInput {
   readonly lastMove: BoardMoveLike | null;
   readonly selectedSquare: Square | null;
   readonly legalTargets: readonly Square[];
+  readonly previewSquare?: Square | null;
+  readonly previewTargets?: readonly Square[];
   readonly targetSquare?: Square | null;
   readonly hintMove?: BoardMoveLike | null;
 }
@@ -69,6 +71,8 @@ export function chessSquareStyles({
   lastMove,
   selectedSquare,
   legalTargets,
+  previewSquare,
+  previewTargets,
   targetSquare,
   hintMove,
 }: SquareStylesInput): Record<string, CSSProperties> {
@@ -90,6 +94,19 @@ export function chessSquareStyles({
     merge(square, {
       backgroundImage: "radial-gradient(circle, rgba(15, 118, 110, 0.7) 0 15%, transparent 16%)",
       boxShadow: "inset 0 0 0 4px rgba(13, 148, 136, 0.4)",
+    });
+  }
+
+  for (const square of previewTargets ?? []) {
+    merge(square, {
+      backgroundImage: "radial-gradient(circle, rgba(2, 132, 199, 0.52) 0 15%, transparent 16%)",
+      boxShadow: "inset 0 0 0 4px rgba(2, 132, 199, 0.3)",
+    });
+  }
+
+  if (previewSquare) {
+    merge(previewSquare, {
+      boxShadow: "inset 0 0 0 4px rgba(2, 132, 199, 0.55)",
     });
   }
 

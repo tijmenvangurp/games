@@ -3,6 +3,7 @@ export {
   ArrowUp,
   Check,
   Eraser,
+  Eye,
   Gamepad2,
   Heart,
   Home,
