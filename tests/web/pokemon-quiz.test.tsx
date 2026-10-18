@@ -47,6 +47,22 @@ function targetName(): string {
   return target.name;
 }
 
+function artworkImage(): HTMLImageElement {
+  const image = document.querySelector<HTMLImageElement>("img[data-revealed]");
+  if (!image) {
+    throw new Error("No quiz artwork");
+  }
+  return image;
+}
+
+async function startHardGame(): Promise<void> {
+  renderApp();
+  expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Moeilijk/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+  expect(await screen.findByRole("group", { name: "Kies de juiste naam" })).toBeTruthy();
+}
+
 async function startGame(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -118,6 +134,38 @@ describe("wie is deze pokémon", () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toEqual({
       difficulty: "moeilijk",
     });
+  });
+
+  it("shows only a silhouette on hard until an answer is picked", async () => {
+    await startHardGame();
+
+    expect(artworkImage().getAttribute("data-revealed")).toBe("false");
+    expect(artworkImage().getAttribute("alt")).toBe("");
+
+    const name = targetName();
+    fireEvent.click(screen.getByRole("button", { name }));
+
+    expect(artworkImage().getAttribute("data-revealed")).toBe("true");
+    expect(artworkImage().getAttribute("alt")).toBe(name);
+  });
+
+  it("reveals the artwork after a wrong hard answer", async () => {
+    await startHardGame();
+
+    const name = targetName();
+    const wrong = currentQuestion()
+      .optionIds.map((id) => getPokemon(id)?.name)
+      .find((optionName): optionName is string => Boolean(optionName) && optionName !== name);
+    if (!wrong) {
+      throw new Error("No wrong option found");
+    }
+
+    fireEvent.click(screen.getByRole("button", { name: wrong }));
+
+    expect(usePokemonQuizStore.getState().answered).toBe(true);
+    expect(artworkImage().getAttribute("data-revealed")).toBe("true");
+    expect(artworkImage().getAttribute("alt")).toBe(name);
+    expect(screen.getByText(`Het juiste antwoord is ${name}.`)).toBeTruthy();
   });
 
   it("returns to the setup without losing the score", async () => {
