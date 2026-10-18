@@ -21,6 +21,11 @@
   ],
   "vars": {
     "ACCOUNTS_ENABLED": "false",
+    // Public origin, not a secret. Set this per environment, for example
+    // "BETTER_AUTH_URL": "https://games.example.invalid". Leave it unset
+    // until the owner is ready to enable accounts; auth then answers 503.
+    // BETTER_AUTH_SECRET, GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET are
+    // Workers secrets and must never be added to this file.
   },
   // Previews inherit no production settings. Point them at a separate D1
   // database created with `wrangler d1 create games-preview`, then replace

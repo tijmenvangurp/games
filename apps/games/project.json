@@ -87,11 +87,10 @@
     "features-pokemon-quiz",
     "features-french-listening",
     "features-word-search",
-<<<<<<< HEAD
-    "features-profile-switcher",
-=======
     "features-crossword",
->>>>>>> origin/main
+    "features-profile-switcher",
+    "features-auth",
+    "pages-account",
     "entities-game",
     "entities-profile",
     "entities-french",

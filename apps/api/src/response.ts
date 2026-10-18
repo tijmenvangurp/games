@@ -24,3 +24,20 @@ export function jsonResponse(
     },
   });
 }
+
+/**
+ * Adds the API security headers to a response produced by Better Auth while
+ * preserving its status, body and `Set-Cookie` headers.
+ */
+export function withApiHeaders(response: Response): Response {
+  const headers = new Headers(response.headers);
+  for (const [name, value] of Object.entries(API_HEADERS)) {
+    headers.set(name, value);
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
