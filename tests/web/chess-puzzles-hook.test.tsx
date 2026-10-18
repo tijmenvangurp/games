@@ -1,10 +1,35 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { PUZZLES, useChessPuzzle } from "@features/chess-puzzles";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  PUZZLES,
+  PUZZLE_PROGRESS_STORAGE_KEY,
+  useChessPuzzle,
+  usePuzzleProgress,
+} from "@features/chess-puzzles";
+
+beforeEach(() => {
+  localStorage.clear();
+});
 
 afterEach(() => {
   cleanup();
   Reflect.deleteProperty(navigator, "vibrate");
+});
+
+describe("usePuzzleProgress", () => {
+  it("marks a puzzle solved and stores it locally", () => {
+    const { result } = renderHook(() => usePuzzleProgress());
+    const puzzleId = PUZZLES[0].id;
+
+    act(() => {
+      result.current.markSolved(puzzleId);
+    });
+
+    expect(result.current.solved.has(puzzleId)).toBe(true);
+    expect(JSON.parse(localStorage.getItem(PUZZLE_PROGRESS_STORAGE_KEY) ?? "{}")).toEqual({
+      solved: [puzzleId],
+    });
+  });
 });
 
 describe("useChessPuzzle", () => {

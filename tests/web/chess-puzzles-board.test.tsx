@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PUZZLES, PuzzlePlay } from "@features/chess-puzzles";
 
@@ -15,6 +15,7 @@ describe("PuzzlePlay", () => {
         total={12}
         onDifficultyChange={vi.fn()}
         onNext={onNext}
+        onOverview={vi.fn()}
       />,
     );
 
@@ -43,10 +44,30 @@ describe("PuzzlePlay", () => {
         total={1}
         onDifficultyChange={vi.fn()}
         onNext={vi.fn()}
+        onOverview={vi.fn()}
       />,
     );
 
     expect(screen.getByRole("heading", { name: "Vind de beste zet!" })).toBeTruthy();
     expect(screen.getByText(/Welke zet is de beste\?/)).toBeTruthy();
+  });
+
+  it("opens the overview", () => {
+    const onOverview = vi.fn();
+
+    render(
+      <PuzzlePlay
+        difficulty="easy"
+        index={0}
+        puzzle={PUZZLES[0]}
+        total={42}
+        onDifficultyChange={vi.fn()}
+        onNext={vi.fn()}
+        onOverview={onOverview}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Overzicht" }));
+    expect(onOverview).toHaveBeenCalledTimes(1);
   });
 });
