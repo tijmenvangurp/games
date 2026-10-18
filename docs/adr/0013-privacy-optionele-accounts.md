@@ -41,7 +41,7 @@ Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die
 | Sessie met IP en user-agent  | Beveiliging en misbruikdetectie | Gerechtvaardigd belang | 7 dagen, intrekbaar                     | D1 (EU)    |
 | Kindprofiel: slot en avatar  | Profielscheiding                | Toestemming ouder      | Tot profiel- of accountverwijdering     | D1 (EU)    |
 | Voortgang per profiel        | Synchroniseren van state        | Toestemming ouder      | 12 maanden inactief, daarna verwijderen | D1 (EU)    |
-| Toestemmingsbewijs           | Verantwoordingsplicht           | Wettelijke plicht      | Zolang account bestaat + 2 jaar         | D1 (EU)    |
+| Toestemmingsbewijs           | Verantwoordingsplicht           | Wettelijke plicht      | Tot accountverwijdering                 | D1 (EU)    |
 | Rate-limit-teller            | Misbruikpreventie               | Gerechtvaardigd belang | Kort, per venster                       | D1 (EU)    |
 | Operationele logs            | Storingen en beveiliging        | Gerechtvaardigd belang | 7–30 dagen, zonder PII                  | Cloudflare |
 

@@ -4,6 +4,10 @@
 - `tooling.md` — Nx-daemon, cache, Fallow en de bijbehorende permission-regels.
 - `api-worker.md` — Worker-entry, `/api/*`-routing, D1-migraties, previews en de placeholders die de eigenaar moet invullen.
 - `local-profiles.md` — lokale profielen, de localStorage-sleutels en het export/importformaat.
+- `privacy/privacyverklaring.md` — concept-privacyverklaring voor het optionele ouderaccount.
+- `privacy/kinderuitleg.md` — kindvriendelijke samenvatting van wat wel en niet wordt opgeslagen.
+- `privacy/verwerkingsregister.md` — concept-verwerkingsregister voor account, profielen en voortgang.
+- `privacy/verwerkers.md` — Cloudflare en Google als verwerkers, met DPA- en doorgifteplaceholders.
 - `adr/0001-publieke-statische-spellen-app.md` — waarom een aparte publieke, statische repository.
 - `adr/0002-kwaliteitsgate.md` — dezelfde kwaliteitscontroles als `homelab-control`, inclusief de afwijking rond pnpm `minimumReleaseAge`.
 - `adr/0003-originele-spelassets.md` — waarom de games originele personages gebruiken en geen beschermde of externe assets.

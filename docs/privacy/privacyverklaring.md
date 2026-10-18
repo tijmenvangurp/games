@@ -109,7 +109,7 @@ Bij een passkey bewaren we geen wachtwoord. Het systeem heeft technisch een inlo
 | Kindprofiel                   | Tot je het profiel of het account verwijdert.                                                                  |
 | Voortgang per profiel         | Tot je het profiel of het account verwijdert. Na 12 maanden inactiviteit verwijderen we de voortgang.          |
 | Sessie                        | Zeven dagen na de laatste verlenging. Uitloggen trekt de sessie direct in.                                     |
-| Toestemmingsbewijs            | Zolang het account bestaat, en daarna hooguit twee jaar als minimaal bewijs van toestemming.                   |
+| Toestemmingsbewijs            | Zolang het account bestaat; bij accountverwijdering wordt het verwijderd.                                      |
 | Rate-limit-teller             | Kort, alleen voor de duur van het venster (seconden tot minuten).                                              |
 | Applicatielogs                | Zeven tot dertig dagen, zonder e-mailadres, token, cookie, IP-adres of request-body.                           |
 | Lokale gastvoortgang          | Tot je die op het toestel wist of de app-gegevens verwijdert.                                                  |
@@ -131,7 +131,7 @@ Je hebt de volgende rechten:
 
 - **Inzage en export:** je kunt in de accountinstellingen een JSON-bestand downloaden met je accountgegevens, profielen en voortgang. Dat bestand bevat geen lokale gastgegevens en geen wachtwoorden of tokens.
 - **Correctie:** je kunt je weergavenaam aanpassen en, als je een e-mailadres hebt opgegeven, je e-mailadres.
-- **Verwijdering:** je kunt een kindprofiel verwijderen; de voortgang van dat profiel wordt mee verwijderd. Je kunt ook je hele account verwijderen; dan verwijderen we de login, sessies, profielen, voortgang en technische registraties die dubbel opslaan voorkomen. Van het toestemmingsbewijs bewaren we daarna hooguit twee jaar een minimale registratie, omdat we moeten kunnen aantonen dat je toestemming gaf. De lokale voortgang op het toestel blijft staan. Exporteer die eerst als je hem wilt bewaren.
+- **Verwijdering:** je kunt een kindprofiel verwijderen; de voortgang van dat profiel wordt mee verwijderd. Je kunt ook je hele account verwijderen; dan verwijderen we de login, sessies, profielen, voortgang en technische registraties die dubbel opslaan voorkomen. Het toestemmingsbewijs wordt samen met het account verwijderd. De lokale voortgang op het toestel blijft staan. Exporteer die eerst als je hem wilt bewaren.
 - **Beperking en bezwaar:** je kunt bezwaar maken tegen de verwerking op basis van gerechtvaardigd belang, bijvoorbeeld tegen beveiligingslogs. We beoordelen dan of we die verwerking kunnen stoppen of beperken.
 - **Dataportabiliteit:** je krijgt dezelfde JSON-export in een gangbaar, machineleesbaar formaat.
 - **Toestemming intrekken:** je kunt je account verwijderen of de synchronisatie uitzetten. De app blijft daarna lokaal werken. Het intrekken geldt niet met terugwerkende kracht voor wat al rechtmatig is verwerkt.
@@ -166,4 +166,4 @@ Deze verklaring heeft een versienummer en een datum. Bij een belangrijke wijzigi
 
 ## Noot voor de eigenaar (niet publiceren)
 
-Vul minimaal in: `[naam verwerkingsverantwoordelijke]`, `[contactadres]`, `[versie]` en `[datum]`. Kies of een passkey-account een echt ouder-e-mailadres krijgt of een synthetische waarde op `example.invalid`, en pas de alinea over passkeys daarop aan. Er is geen e-mailherstel; herstel verloopt via een tweede passkey of herstelcodes. Bevestig de bewaartermijn van 12 maanden voor inactieve accounts en voortgang. Los de tegenstrijdigheid over het toestemmingsbewijs op: [ADR 0013](../adr/0013-privacy-optionele-accounts.md) noemt enerzijds "account + 2 jaar" en verwijdert het bewijs anderzijds bij accountverwijdering. Laat de hele tekst toetsen aan de AVG, de Nederlandse leeftijdsgrens van 16 jaar en, als de site ooit op kinderen in de VS is gericht, aan COPPA.
+Vul minimaal in: `[naam verwerkingsverantwoordelijke]`, `[contactadres]`, `[versie]` en `[datum]`. Kies of een passkey-account een echt ouder-e-mailadres krijgt of een synthetische waarde op `example.invalid`, en pas de alinea over passkeys daarop aan. Er is geen e-mailherstel; herstel verloopt via een tweede passkey of herstelcodes. Bevestig de bewaartermijn van 12 maanden voor inactieve accounts en voortgang. Bevestig dat het toestemmingsbewijs bij accountverwijdering wordt verwijderd. Laat de hele tekst toetsen aan de AVG, de Nederlandse leeftijdsgrens van 16 jaar en, als de site ooit op kinderen in de VS is gericht, aan COPPA.
