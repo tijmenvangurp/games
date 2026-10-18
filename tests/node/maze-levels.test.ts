@@ -1,14 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
+  findHint,
   isArrowRemovable,
   isSolved,
   LEVEL_COUNT,
   MAZE_LEVELS,
   levelAt,
+  nearestArrow,
   removableArrows,
   solveMaze,
+  visibleArrowPoints,
 } from "@entities/arrow";
-import type { MazeLevel, Point } from "@entities/arrow";
+import type { MazeArrow, MazeLevel, Point } from "@entities/arrow";
+import { mulberry32 } from "@shared/lib";
 
 interface Segment {
   a: Point;
@@ -92,6 +96,52 @@ describe("maze levels", () => {
     }
   });
 
+  it("always has a free arrow, whatever arrows are already gone", () => {
+    for (const level of MAZE_LEVELS) {
+      const order = solveMaze(level);
+      if (!order) {
+        throw new Error(`${level.id} has no solution`);
+      }
+
+      for (let round = 0; round < 64; round += 1) {
+        const random = mulberry32(level.arrows.length * 7919 + round);
+        const removed = new Set(order.filter(() => random() < 0.5));
+        const next = order.find((id) => !removed.has(id));
+        if (next === undefined) {
+          continue;
+        }
+        const arrow = level.arrows.find((candidate) => candidate.id === next);
+        if (!arrow) {
+          throw new Error(`${level.id} lost arrow ${next}`);
+        }
+        expect(
+          isArrowRemovable(arrow, level, removed),
+          `${level.id}: arrow ${next} must be free after removing ${removed.size} arrows`,
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("stays solvable whatever order the player picks", () => {
+    for (const level of MAZE_LEVELS) {
+      for (let round = 0; round < 12; round += 1) {
+        const random = mulberry32(level.arrows.length * 1000 + round);
+        const removed = new Set<number>();
+
+        while (removed.size < level.arrows.length) {
+          const free = removableArrows(level, removed);
+          expect(free.length, `${level.id} deadlocks after ${removed.size} arrows`).toBeGreaterThan(
+            0,
+          );
+          const choice = free[Math.floor(random() * free.length)] as MazeArrow;
+          removed.add(choice.id);
+        }
+
+        expect(isSolved(level, removed)).toBe(true);
+      }
+    }
+  });
+
   it("stays solvable after any free first move", () => {
     for (const level of MAZE_LEVELS) {
       // Three free moves per level keep this fast enough for CI while still
@@ -102,6 +152,26 @@ describe("maze levels", () => {
           arrows: level.arrows.filter((candidate) => candidate.id !== arrow.id),
         };
         expect(solveMaze(rest), `${level.id} deadlocks after removing ${arrow.id}`).not.toBeNull();
+      }
+    }
+  });
+
+  it("keeps every hint tappable until the whole level is cleared", () => {
+    for (const level of MAZE_LEVELS) {
+      const removed = new Set<number>();
+
+      while (removed.size < level.arrows.length) {
+        const hint = findHint(level, removed);
+        if (!hint) {
+          throw new Error(`${level.id} has no hint while arrows remain`);
+        }
+        const points = visibleArrowPoints(level, hint);
+        const tip = points[points.length - 1] as Point;
+        expect(
+          nearestArrow(level, removed, tip, 1.35)?.id,
+          `${level.id}: tapping the head of hinted arrow ${hint.id} must select that arrow`,
+        ).toBe(hint.id);
+        removed.add(hint.id);
       }
     }
   });
