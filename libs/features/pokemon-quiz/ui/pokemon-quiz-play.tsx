@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { getPokemon, usePokemonCry, type Pokemon } from "@entities/pokedex";
 import { playSound } from "@shared/lib";
+import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
 import { QuizFeedback } from "./quiz-feedback";
@@ -51,7 +52,8 @@ export function PokemonQuizPlay() {
       <div className="order-1 lg:col-span-3">
         <QuizArtwork
           answered={answered}
-          silhouette={question.difficulty === "moeilijk"}
+          fragment={isFragmentDifficulty(question.difficulty)}
+          silhouette={isSilhouetteDifficulty(question.difficulty)}
           target={target}
         />
       </div>

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_POKEMON_QUIZ_SETTINGS,
+  QUIZ_DIFFICULTIES,
   loadPokemonQuizSettings,
   savePokemonQuizSettings,
 } from "@features/pokemon-quiz";
@@ -21,8 +22,10 @@ describe("pokémon quiz settings storage", () => {
   });
 
   it("round-trips valid settings", () => {
-    savePokemonQuizSettings({ difficulty: "moeilijk" });
-    expect(loadPokemonQuizSettings()).toEqual({ difficulty: "moeilijk" });
+    for (const difficulty of QUIZ_DIFFICULTIES) {
+      savePokemonQuizSettings({ difficulty });
+      expect(loadPokemonQuizSettings()).toEqual({ difficulty });
+    }
   });
 
   it("ignores corrupt or invalid settings", () => {
