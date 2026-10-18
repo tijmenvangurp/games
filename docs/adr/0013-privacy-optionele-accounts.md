@@ -32,18 +32,20 @@ Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die
 
 ## Gegevensinventaris
 
-| Gegeven                      | Doel                            | Grondslag              | Bewaartermijn                           | Waar       |
-| ---------------------------- | ------------------------------- | ---------------------- | --------------------------------------- | ---------- |
-| E-mailadres ouder            | Inloggen en herstel             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| Weergavenaam ouder           | UI en accountbeheer             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| OAuth-provider en subject-id | Inloggen via Google             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
-| Passkey (publieke sleutel)   | Inloggen zonder wachtwoord      | Toestemming            | Tot verwijdering van de passkey         | D1 (EU)    |
-| Sessie met IP en user-agent  | Beveiliging en misbruikdetectie | Gerechtvaardigd belang | 7 dagen, intrekbaar                     | D1 (EU)    |
-| Kindprofiel: slot en avatar  | Profielscheiding                | Toestemming ouder      | Tot profiel- of accountverwijdering     | D1 (EU)    |
-| Voortgang per profiel        | Synchroniseren van state        | Toestemming ouder      | 12 maanden inactief, daarna verwijderen | D1 (EU)    |
-| Toestemmingsbewijs           | Verantwoordingsplicht           | Wettelijke plicht      | Tot accountverwijdering                 | D1 (EU)    |
-| Rate-limit-teller            | Misbruikpreventie               | Gerechtvaardigd belang | Kort, per venster                       | D1 (EU)    |
-| Operationele logs            | Storingen en beveiliging        | Gerechtvaardigd belang | 7–30 dagen, zonder PII                  | Cloudflare |
+| Gegeven                               | Doel                            | Grondslag              | Bewaartermijn                           | Waar       |
+| ------------------------------------- | ------------------------------- | ---------------------- | --------------------------------------- | ---------- |
+| E-mailadres ouder (alleen bij Google) | Inloggen via Google             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| Weergavenaam ouder                    | UI en accountbeheer             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| OAuth-provider en subject-id          | Inloggen via Google             | Toestemming            | Tot accountverwijdering                 | D1 (EU)    |
+| Passkey (publieke sleutel)            | Inloggen zonder wachtwoord      | Toestemming            | Tot verwijdering van de passkey         | D1 (EU)    |
+| Sessie met IP en user-agent           | Beveiliging en misbruikdetectie | Gerechtvaardigd belang | 7 dagen, intrekbaar                     | D1 (EU)    |
+| Kindprofiel: slot en avatar           | Profielscheiding                | Toestemming ouder      | Tot profiel- of accountverwijdering     | D1 (EU)    |
+| Voortgang per profiel                 | Synchroniseren van state        | Toestemming ouder      | 12 maanden inactief, daarna verwijderen | D1 (EU)    |
+| Toestemmingsbewijs                    | Verantwoordingsplicht           | Wettelijke plicht      | Tot accountverwijdering                 | D1 (EU)    |
+| Rate-limit-teller                     | Misbruikpreventie               | Gerechtvaardigd belang | Kort, per venster                       | D1 (EU)    |
+| Operationele logs                     | Storingen en beveiliging        | Gerechtvaardigd belang | 7–30 dagen, zonder PII                  | Cloudflare |
+
+Een **passkey-only account** heeft geen echt e-mailadres. Better Auth vereist technisch een unieke `email`-waarde; die is synthetisch (`passkey-<random>@invalid`) en bevat geen persoonsgegevens. Koppelt de ouder later Google, dan komt er een `account`-rij bij met het Google-subject; het `user`-id, de synthetische e-mail en de passkey blijven ongewijzigd. Er is geen e-mailherstel: herstel gaat via een tweede passkey of, na koppeling, via "Inloggen met Google".
 
 **Niet verzameld:** naam van het kind, e-mail van het kind, geboortedatum, geslacht, foto, locatie, school, IP-adres in applicatielogs, volledige request-bodies en inhoud van `progress.data_json` in logs.
 

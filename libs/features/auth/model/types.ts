@@ -18,6 +18,11 @@ export interface AuthActionResult {
   readonly error?: { readonly message?: string } | null;
 }
 
+export interface AuthCapabilities {
+  readonly passkey: boolean;
+  readonly google: boolean;
+}
+
 /**
  * Small structural interface for the parts of the Better Auth client that the
  * account screen uses. Tests can pass a fake implementation without a network
@@ -25,12 +30,20 @@ export interface AuthActionResult {
  */
 export interface AccountAuthClient {
   useSession(): AccountSessionState;
+  getCapabilities(): Promise<AuthCapabilities>;
+  createPasskeyContext(): Promise<string>;
+  listLinkedProviders(): Promise<readonly string[]>;
   readonly signIn: {
     social(input: { provider: "google"; callbackURL: string }): Promise<unknown>;
     passkey(): Promise<AuthActionResult>;
   };
+  linkSocial(input: { provider: "google"; callbackURL: string }): Promise<unknown>;
   readonly passkey: {
-    addPasskey(input: { name: string }): Promise<AuthActionResult>;
+    addPasskey(input: {
+      name: string;
+      context?: string;
+      createSession?: boolean;
+    }): Promise<AuthActionResult>;
   };
   signOut(): Promise<unknown>;
 }
