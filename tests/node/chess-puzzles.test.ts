@@ -9,10 +9,13 @@ const uci = (value: string) => ({
 });
 
 describe("Lichess puzzle data", () => {
-  it("contains 25 unique curated puzzles", () => {
-    expect(PUZZLES).toHaveLength(25);
+  it("contains 34 unique puzzles in three balanced tiers", () => {
+    expect(PUZZLES).toHaveLength(34);
     expect(new Set(PUZZLES.map((puzzle) => puzzle.id)).size).toBe(PUZZLES.length);
-    expect(PUZZLES.filter((puzzle) => puzzle.kind === "mate")).toHaveLength(20);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "easy")).toHaveLength(12);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "medium")).toHaveLength(12);
+    expect(PUZZLES.filter((puzzle) => puzzle.difficulty === "hard")).toHaveLength(10);
+    expect(PUZZLES.filter((puzzle) => puzzle.kind === "mate")).toHaveLength(29);
     expect(PUZZLES.filter((puzzle) => puzzle.kind === "capture")).toHaveLength(5);
   });
 
@@ -73,7 +76,13 @@ describe("puzzle engine", () => {
   });
 
   it("solves a hanging-piece capture", () => {
-    const state = createPuzzleState(PUZZLES[20]);
+    const puzzle = PUZZLES.find((candidate) => candidate.id === "k6mqE");
+
+    if (!puzzle) {
+      throw new Error("Hanging-piece puzzle not found");
+    }
+
+    const state = createPuzzleState(puzzle);
     const attempt = attemptPuzzleMove(state, "e7", "f6");
 
     expect(attempt.ok).toBe(true);

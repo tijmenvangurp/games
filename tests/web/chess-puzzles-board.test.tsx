@@ -7,10 +7,19 @@ afterEach(cleanup);
 describe("PuzzlePlay", () => {
   it("shows the puzzle, coordinates and navigation", () => {
     const onNext = vi.fn();
-    render(<PuzzlePlay index={0} puzzle={PUZZLES[0]} total={25} onNext={onNext} />);
+    render(
+      <PuzzlePlay
+        difficulty="easy"
+        index={0}
+        puzzle={PUZZLES[0]}
+        total={12}
+        onDifficultyChange={vi.fn()}
+        onNext={onNext}
+      />,
+    );
 
     expect(screen.getByRole("heading", { name: "Zet schaakmat!" })).toBeTruthy();
-    expect(screen.getByText(/Puzzel 1 van 25/)).toBeTruthy();
+    expect(screen.getByText(/Puzzel 1 van 12/)).toBeTruthy();
     expect(screen.getByRole("group", { name: /coördinaten/i })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Hint" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Opnieuw" })).toBeTruthy();
