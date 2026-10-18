@@ -5,7 +5,7 @@ interface NumberPadProps {
   size: SudokuSize;
   symbols: readonly string[];
   activeValue?: number | null;
-  completedValues?: ReadonlySet<number>;
+  remaining?: readonly number[];
   disabled?: boolean;
   onPick: (value: number) => void;
 }
@@ -20,7 +20,7 @@ export function NumberPad({
   size,
   symbols,
   activeValue = null,
-  completedValues,
+  remaining,
   disabled,
   onPick,
 }: NumberPadProps) {
@@ -33,7 +33,8 @@ export function NumberPad({
     >
       {symbols.map((symbol, index) => {
         const value = index + 1;
-        const isCompleted = completedValues?.has(value) ?? false;
+        const left = remaining?.[value];
+        const isCompleted = left !== undefined && left <= 0;
         return (
           <button
             key={value}
@@ -41,7 +42,7 @@ export function NumberPad({
             aria-label={`Kies ${symbol}`}
             aria-pressed={activeValue === value}
             className={cn(
-              "flex aspect-square w-full max-w-20 select-none items-center justify-center justify-self-center rounded-2xl border-2 border-white bg-white font-bold text-slate-700 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:opacity-50",
+              "relative flex aspect-square w-full max-w-20 select-none items-center justify-center justify-self-center rounded-2xl border-2 border-white bg-white font-bold text-slate-700 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:opacity-50",
               size === 4 ? "text-3xl" : "text-2xl",
               activeValue === value && "border-sky-300 bg-sky-100 text-sky-700",
             )}
@@ -49,6 +50,14 @@ export function NumberPad({
             onClick={() => onPick(value)}
           >
             {symbol}
+            {left !== undefined ? (
+              <span
+                aria-hidden="true"
+                className="absolute right-1.5 top-1 text-xs font-semibold leading-none text-slate-400"
+              >
+                {Math.max(0, left)}
+              </span>
+            ) : null}
           </button>
         );
       })}

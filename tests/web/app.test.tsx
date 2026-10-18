@@ -3,15 +3,36 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { generatePuzzle } from "@entities/sudoku";
+import { createPlayState, generatePuzzle, type SudokuPuzzle } from "@entities/sudoku";
 import { DEFAULT_SETTINGS, useSudokuStore } from "@features/sudoku-game";
 
 const STORAGE_KEY = "games.sudoku.v1";
 
+const fixturePuzzle: SudokuPuzzle = {
+  size: 4,
+  difficulty: "makkelijk",
+  seed: 1,
+  givens: [1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1],
+  solution: [1, 2, 3, 4, 3, 4, 1, 2, 2, 1, 4, 3, 4, 3, 2, 1],
+};
+
+const directSettings = {
+  size: 4 as const,
+  difficulty: "makkelijk" as const,
+  theme: "animals" as const,
+  mistakeMode: "direct" as const,
+};
+
 beforeEach(() => {
   cleanup();
   localStorage.clear();
-  useSudokuStore.setState({ play: null, settings: DEFAULT_SETTINGS });
+  useSudokuStore.setState({
+    play: null,
+    settings: DEFAULT_SETTINGS,
+    history: [],
+    hintPreview: null,
+    hintUnavailable: false,
+  });
 });
 
 afterEach(() => {
@@ -34,8 +55,38 @@ function preloadSolvedGame() {
       selected: null,
       solved: true,
     },
-    settings: { size: 4, difficulty: "makkelijk", theme: "animals" },
+    settings: { size: 4, difficulty: "makkelijk", theme: "animals", mistakeMode: "direct" },
   });
+}
+
+function preloadFixture(
+  mode: "direct" | "check" = "direct",
+  entries: Readonly<Record<number, number>> = {},
+) {
+  const play = createPlayState(fixturePuzzle);
+  for (const [index, value] of Object.entries(entries)) {
+    play.entries[Number(index)] = value;
+  }
+  useSudokuStore.setState({
+    play,
+    settings: { ...directSettings, mistakeMode: mode },
+    history: [],
+    hintPreview: null,
+    hintUnavailable: false,
+  });
+  return play;
+}
+
+function pickEnabledNumber(): string {
+  const button = screen
+    .getAllByRole("button", { name: /^Kies/ })
+    .find((candidate) => !candidate.hasAttribute("disabled"));
+  if (!button) {
+    throw new Error("No enabled number button");
+  }
+  const symbol = button.getAttribute("aria-label")?.replace("Kies ", "") ?? "";
+  fireEvent.click(button);
+  return symbol;
 }
 
 function findEmptyCell(board: HTMLElement): HTMLElement {
@@ -75,13 +126,13 @@ describe("games app", () => {
     if (!numberButton) {
       throw new Error("No enabled number button");
     }
-    const symbol = numberButton.textContent ?? "";
+    const symbol = numberButton.getAttribute("aria-label")?.replace("Kies ", "") ?? "";
 
     fireEvent.click(numberButton);
     expect(cell.getAttribute("aria-label")?.startsWith(`${symbol}, rij`)).toBe(true);
     expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
 
-    fireEvent.click(numberButton);
+    fireEvent.click(screen.getByRole("button", { name: "Wissen" }));
     expect(cell.getAttribute("aria-label")).toMatch(/^leeg/);
 
     const keyboardCell = findEmptyCell(board);
@@ -95,6 +146,8 @@ describe("games app", () => {
     fireEvent.keyDown(window, { key: "ArrowDown" });
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+    expect(screen.getAllByRole("button", { name: /, tip$/ })).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Plaats" }));
     expect(screen.getAllByRole("button", { name: /, hint$/ })).toHaveLength(1);
 
     fireEvent.click(screen.getByRole("button", { name: "Wissen" }));
@@ -163,14 +216,87 @@ describe("games app", () => {
         selected: null,
         solved: false,
       },
-      settings: { size: 4, difficulty: "makkelijk", theme: "animals" },
+      settings: { size: 4, difficulty: "makkelijk", theme: "animals", mistakeMode: "direct" },
     });
 
     renderApp("/sudoku");
 
     await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
-    expect(screen.getByRole("button", { name: "Kies 🐶" }).hasAttribute("disabled")).toBe(true);
+    const dog = screen.getByRole("button", { name: "Kies 🐶" });
+    expect(dog.hasAttribute("disabled")).toBe(true);
+    expect(dog.textContent).toContain("0");
     expect(screen.getByRole("button", { name: "Kies 🐱" }).hasAttribute("disabled")).toBe(false);
+  });
+
+  it("undoes the last sudoku move", async () => {
+    preloadFixture();
+    renderApp("/sudoku");
+
+    const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    const cell = findEmptyCell(board);
+    fireEvent.click(cell);
+    const symbol = pickEnabledNumber();
+    expect(cell.getAttribute("aria-label")?.startsWith(`${symbol}, rij`)).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Ongedaan" }));
+    expect(cell.getAttribute("aria-label")).toMatch(/^leeg/);
+  });
+
+  it("previews a hint before placing it", async () => {
+    preloadFixture();
+    renderApp("/sudoku");
+
+    await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+
+    expect(screen.getAllByRole("button", { name: /, tip$/ })).toHaveLength(1);
+    expect(screen.getByText(/In deze rij|In deze kolom|In dit blok|In dit vakje/)).toBeTruthy();
+    expect(screen.queryAllByRole("button", { name: /, hint$/ })).toHaveLength(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Plaats" }));
+    expect(screen.getAllByRole("button", { name: /, hint$/ })).toHaveLength(1);
+  });
+
+  it("shows a mistake only after checking in check mode", async () => {
+    preloadFixture("check", { 1: 3 });
+    renderApp("/sudoku");
+
+    const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    const wrong = within(board).getAllByRole("button")[1];
+    expect(wrong?.getAttribute("aria-label")).not.toContain("fout");
+
+    fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
+    expect(wrong?.getAttribute("aria-label")).toContain("fout");
+    expect(screen.getByText("Er staat nog een foutje in.")).toBeTruthy();
+  });
+
+  it("marks duplicate digits as conflicts", async () => {
+    preloadFixture("direct", { 1: 4 });
+    renderApp("/sudoku");
+
+    const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    const duplicate = within(board).getAllByRole("button")[1];
+    expect(duplicate?.getAttribute("aria-label")).toContain("conflict");
+    expect(screen.getByText("Er staan dubbele cijfers.")).toBeTruthy();
+  });
+
+  it("shows a near-solved message with one cell left", async () => {
+    const entries = fixturePuzzle.solution.map((value, index) => (index === 1 ? 0 : value));
+    useSudokuStore.setState({
+      play: {
+        puzzle: fixturePuzzle,
+        entries,
+        hinted: fixturePuzzle.givens.map(() => false),
+        selected: null,
+        solved: false,
+      },
+      settings: { ...directSettings },
+    });
+
+    renderApp("/sudoku");
+
+    await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
+    expect(screen.getByText("Nog één vakje!")).toBeTruthy();
   });
 
   it("goes back to the setup screen from the win dialog", async () => {

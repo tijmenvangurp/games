@@ -2,16 +2,20 @@ import type { Difficulty, SudokuSize } from "@entities/sudoku";
 
 export type SymbolTheme = "numbers" | "animals";
 
+export type MistakeMode = "direct" | "check";
+
 export interface SudokuSettings {
   size: SudokuSize;
   difficulty: Difficulty;
   theme: SymbolTheme;
+  mistakeMode: MistakeMode;
 }
 
 export const DEFAULT_SETTINGS: SudokuSettings = {
   size: 4,
   difficulty: "makkelijk",
   theme: "animals",
+  mistakeMode: "direct",
 };
 
 const ANIMAL_SYMBOLS: Record<4 | 6, readonly string[]> = {
@@ -34,6 +38,15 @@ export const DIFFICULTY_OPTIONS: readonly {
   { value: "makkelijk", label: "Makkelijk", emoji: "🌱" },
   { value: "gemiddeld", label: "Gemiddeld", emoji: "🌤️" },
   { value: "moeilijk", label: "Moeilijk", emoji: "🔥" },
+];
+
+export const MISTAKE_MODE_OPTIONS: readonly {
+  value: MistakeMode;
+  label: string;
+  emoji: string;
+}[] = [
+  { value: "direct", label: "Direct", emoji: "👀" },
+  { value: "check", label: "Controleren", emoji: "🔍" },
 ];
 
 export const SIZE_OPTIONS: readonly {

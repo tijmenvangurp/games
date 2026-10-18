@@ -1,6 +1,7 @@
-import { boxIndexFor, geometryFor } from "./geometry";
+import { geometryFor } from "./geometry";
 import type { SudokuPuzzle } from "./types";
-import { findHint } from "./hints";
+import { findHint, type SudokuHint } from "./hints";
+import { unitsFor } from "./units";
 
 export interface PlayState {
   puzzle: SudokuPuzzle;
@@ -31,37 +32,59 @@ export function filledCount(entries: readonly number[]): number {
 }
 
 /**
- * Returns the digits that already appear exactly once in every row, column and
- * box. Those digits are complete and cannot be placed anywhere else.
+ * Counts how often each digit is visible on the board. Index 0 is unused.
  */
-export function completedValues(puzzle: SudokuPuzzle, entries: readonly number[]): Set<number> {
-  const { size } = puzzle;
-  const geometry = geometryFor(size);
-  const boxCount = (size / geometry.boxRows) * (size / geometry.boxCols);
-  const rows = Array.from({ length: size }, () => new Uint8Array(size + 1));
-  const cols = Array.from({ length: size }, () => new Uint8Array(size + 1));
-  const boxes = Array.from({ length: boxCount }, () => new Uint8Array(size + 1));
-
+export function digitCounts(puzzle: SudokuPuzzle, entries: readonly number[]): number[] {
+  const counts = Array.from({ length: puzzle.size + 1 }, () => 0);
   for (let index = 0; index < puzzle.givens.length; index += 1) {
     const value = puzzle.givens[index] || entries[index] || 0;
+    if (value !== 0) {
+      counts[value] += 1;
+    }
+  }
+  return counts;
+}
+
+/**
+ * Marks every cell that shares a digit with another cell in the same unit.
+ */
+function markUnitConflicts(
+  indexes: readonly number[],
+  values: readonly number[],
+  conflicts: Set<number>,
+): void {
+  const positions = new Map<number, number[]>();
+  for (const index of indexes) {
+    const value = values[index];
     if (value === 0) {
       continue;
     }
-    rows[Math.floor(index / size)][value] += 1;
-    cols[index % size][value] += 1;
-    boxes[boxIndexFor(index, geometry)][value] += 1;
+    const matches = positions.get(value) ?? [];
+    matches.push(index);
+    positions.set(value, matches);
   }
-
-  const complete = new Set<number>();
-  for (let value = 1; value <= size; value += 1) {
-    const completeInRows = rows.every((counts) => counts[value] === 1);
-    const completeInCols = cols.every((counts) => counts[value] === 1);
-    const completeInBoxes = boxes.every((counts) => counts[value] === 1);
-    if (completeInRows && completeInCols && completeInBoxes) {
-      complete.add(value);
+  for (const matches of positions.values()) {
+    if (matches.length > 1) {
+      for (const index of matches) {
+        conflicts.add(index);
+      }
     }
   }
-  return complete;
+}
+
+/**
+ * Returns cells that share a digit with another cell in the same row, column
+ * or box. These are invalid regardless of the puzzle solution.
+ */
+export function findConflicts(puzzle: SudokuPuzzle, entries: readonly number[]): Set<number> {
+  const values = puzzle.givens.map((given, index) => given || entries[index] || 0);
+  const conflicts = new Set<number>();
+
+  for (const unit of unitsFor(geometryFor(puzzle.size))) {
+    markUnitConflicts(unit.indexes, values, conflicts);
+  }
+
+  return conflicts;
 }
 
 export function createPlayState(puzzle: SudokuPuzzle): PlayState {
@@ -141,13 +164,15 @@ function reveal(state: PlayState, index: number, value: number): PlayState {
   };
 }
 
-export function revealHint(state: PlayState): PlayState {
-  if (state.solved) {
+export function revealHint(
+  state: PlayState,
+  hint: SudokuHint | null = findHint(state.puzzle, state.entries, state.selected),
+): PlayState {
+  if (state.solved || !hint) {
     return state;
   }
 
-  const hint = findHint(state.puzzle, state.entries, state.selected);
-  return hint ? reveal(state, hint.index, hint.value) : state;
+  return reveal(state, hint.index, hint.value);
 }
 
 export function restartPuzzle(state: PlayState): PlayState {

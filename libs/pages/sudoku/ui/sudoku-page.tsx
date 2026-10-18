@@ -43,6 +43,7 @@ export function SudokuPage() {
             onDifficultyChange={(difficulty) =>
               useSudokuStore.getState().chooseDifficulty(difficulty)
             }
+            onMistakeModeChange={(mode) => useSudokuStore.getState().chooseMistakeMode(mode)}
             onSizeChange={(size) => useSudokuStore.getState().chooseSize(size)}
             onStart={startGame}
             onThemeChange={(theme) => useSudokuStore.getState().chooseTheme(theme)}
