@@ -81,7 +81,7 @@ function resolveSelection(set: StoreSet, get: StoreGet, cells: readonly Cell[]):
 
   const matched = puzzle.placements.find((placement) => selectionMatches(placement, cells));
   if (!matched) {
-    set({ selected: cells, dragStart: null, wrong: true });
+    set({ selected: cells, dragStart: null, wrong: true, lastFound: null });
     playSound("wrong");
     playHaptic("wrong");
     return;
@@ -115,7 +115,7 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
   }
 
   if (selected.length === 0) {
-    set({ selected: [cell], dragStart: null, wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false, lastFound: null });
     playSound("tap");
     return;
   }
@@ -126,13 +126,13 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
   }
 
   if (start.row === cell.row && start.col === cell.col) {
-    set({ selected: [], dragStart: null, wrong: false });
+    set({ selected: [], dragStart: null, wrong: false, lastFound: null });
     return;
   }
 
   const cells = cellsBetween(start, cell);
   if (cells.length === 0) {
-    set({ selected: [cell], dragStart: null, wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false, lastFound: null });
     playSound("tap");
     return;
   }
@@ -141,7 +141,7 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
 }
 
 function startDrag(set: StoreSet, cell: Cell): void {
-  set({ selected: [cell], dragStart: cell, wrong: false });
+  set({ selected: [cell], dragStart: cell, wrong: false, lastFound: null });
 }
 
 function dragTo(set: StoreSet, get: StoreGet, cell: Cell): void {
@@ -167,7 +167,7 @@ function commitDrag(set: StoreSet, get: StoreGet): void {
 }
 
 function cancelDrag(set: StoreSet): void {
-  set({ selected: [], dragStart: null, wrong: false });
+  set({ selected: [], dragStart: null, wrong: false, lastFound: null });
 }
 
 function handleHint(set: StoreSet, get: StoreGet, word: string): void {

@@ -78,6 +78,7 @@ export function LettersPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={round ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={subtitleFor(round)}
       title="Letterpret"
     >

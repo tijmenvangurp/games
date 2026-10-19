@@ -26,6 +26,7 @@ export function SudokuPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={play ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={
         play
           ? `${play.puzzle.size} × ${play.puzzle.size} · ${play.puzzle.difficulty}`

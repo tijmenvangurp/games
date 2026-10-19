@@ -48,6 +48,15 @@ spelnamen. Geen externe fonts.
 - `CelebrationDialog` — afsluiting met optionele confetti.
 - `Confetti` — alleen bij een echte overwinning.
 
+## Spraak
+
+- `GameShell` toont `SpeechToggle` naast `SoundToggle` als de game spraak heeft. Voorlezen en geluidseffecten zijn apart te bedienen.
+- `SpeechButton` herhaalt één spraakregel; `SpokenText` toont tekst en een sprekerknop.
+- `useAutoSpeech` leest een nieuwe opdracht of feedback automatisch voor, maar pas na de eerste tik.
+- Elke game met spraak heeft een `model/audio.ts` met `speechGroups`. De generator ontdekt die zelf.
+- Nieuwe games verklaren in `gameCatalog` hoe ze met spraak omgaan: een groep, `visual`, `pending` of `legacy`.
+- `pnpm run audio:check` en de `speech-coverage`-test bewaken dat er geen game zonder audio of expliciete keuze bijkomt.
+
 ## Spelregels
 
 - Gebruik in nieuwe schermen `GameShell`, `game-panel` en de gedeelde knoppen.

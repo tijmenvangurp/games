@@ -14,6 +14,7 @@
     "scripts/generate-geography.ts",
     "scripts/generate-french-audio.ts",
     "scripts/generate-sounds.ts",
+    "scripts/generate-audio.ts",
     "scripts/run-playwright.ts",
     "scripts/hooks/commit-msg.ts",
     "scripts/hooks/pre-commit.ts",
@@ -49,6 +50,18 @@
         "maxCognitive": 22,
         "maxCrap": 60,
         "reason": "React-schermen met veel voorwaardelijke SVG-attributen; de CRAP-schatting telt JSX-takken mee. Gedekt door tests/web/puzzle.test.tsx, tests/web/flags.test.tsx en de mobiele e2e-ronde."
+      },
+      {
+        "files": [
+          "scripts/generate-audio.ts",
+          "scripts/lib/audio-catalog.ts",
+          "scripts/lib/tts.ts",
+          "scripts/generate-french-audio.ts"
+        ],
+        "maxCyclomatic": 14,
+        "maxCognitive": 26,
+        "maxCrap": 120,
+        "reason": "Dev-only audiogeneratoren en de catalogusscanner; de uitvoer wordt bewaakt door pnpm run audio:check en tests/node/speech-audio.test.ts."
       }
     ]
   },

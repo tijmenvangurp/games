@@ -117,6 +117,7 @@ export function FlagsPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={activeRound ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={subtitleFor(activeRound)}
       title="Vlaggenreis"
     >

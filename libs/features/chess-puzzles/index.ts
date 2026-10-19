@@ -1,5 +1,11 @@
 export { PuzzleOverview } from "./ui/PuzzleOverview";
 export { PuzzlePlay } from "./ui/PuzzlePlay";
+export {
+  puzzlePromptSpeech,
+  puzzleStatusSpeech,
+  puzzleTitleSpeech,
+  speechGroups as PUZZLE_SPEECH_GROUPS,
+} from "./model/audio";
 export { PUZZLES } from "./model/puzzles";
 export { attemptPuzzleMove, createPuzzleState, hintFor } from "./model/puzzle-engine";
 export {

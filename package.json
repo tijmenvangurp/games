@@ -36,6 +36,8 @@
     "elements": "pnpm exec tsx scripts/fetch-element-sprites.ts",
     "audio:french": "pnpm exec tsx scripts/generate-french-audio.ts",
     "audio:check:french": "pnpm exec tsx scripts/generate-french-audio.ts --check",
+    "audio:nl": "pnpm exec tsx scripts/generate-audio.ts",
+    "audio:check": "pnpm exec tsx scripts/generate-audio.ts --check",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

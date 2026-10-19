@@ -25,6 +25,7 @@ export function PokemonQuizPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={question ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={
         question ? `${question.difficulty} · ${question.optionIds.length} namen` : "Kies je spel"
       }

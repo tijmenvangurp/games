@@ -5,6 +5,7 @@ export {
   BookOpen,
   Check,
   Ear,
+  EarOff,
   Eraser,
   Eye,
   Flame,

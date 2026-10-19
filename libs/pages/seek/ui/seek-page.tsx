@@ -29,6 +29,7 @@ export function SeekPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={scene ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={scene ? `${scene.difficulty} · ${THEME_LABELS[scene.theme]}` : "Kies je zoekveld"}
       title="Waar is Wobbel?"
     >

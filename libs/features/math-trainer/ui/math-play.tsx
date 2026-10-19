@@ -1,6 +1,12 @@
-import { explanationFor, type MathQuestion } from "@entities/math";
+import {
+  explanationFor,
+  mathFeedbackSpeech,
+  mathQuestionSpeech,
+  type MathQuestion,
+} from "@entities/math";
 import { cn } from "@shared/lib";
-import { Button, Check, Flame, Star, X } from "@shared/ui";
+import { Button, Check, Flame, SpeechButton, Star, X } from "@shared/ui";
+import { useMathSpeech } from "../model/use-math-speech";
 import { useMathStore } from "../model/use-math-store";
 import { MathVisual } from "./math-visual";
 
@@ -123,12 +129,15 @@ function MathFeedback({
 
   return (
     <div className="space-y-2">
-      <p
-        aria-live="polite"
-        className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-danger")}
-      >
-        {correct ? "Goed gerekend!" : `Het juiste antwoord is ${question.answer}.`}
-      </p>
+      <div className="flex items-center justify-center gap-2">
+        <p
+          aria-live="polite"
+          className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-danger")}
+        >
+          {correct ? "Goed gerekend!" : `Het juiste antwoord is ${question.answer}.`}
+        </p>
+        <SpeechButton label="Beluister het antwoord" line={mathFeedbackSpeech(question, correct)} />
+      </div>
       <MathVisual question={question} />
       <p className="text-center text-sm font-semibold text-muted-foreground">
         {explanationFor(question)}
@@ -152,9 +161,12 @@ function QuestionCard({
 }) {
   return (
     <section className="game-panel p-4 sm:p-6">
-      <p className="text-center text-4xl font-black tracking-tight sm:text-5xl">
-        {question.prompt} = ?
-      </p>
+      <div className="flex items-center justify-center gap-1">
+        <p className="text-center text-4xl font-black tracking-tight sm:text-5xl">
+          {question.prompt} = ?
+        </p>
+        <SpeechButton label="Beluister de som" line={mathQuestionSpeech(question)} />
+      </div>
 
       <div className="mt-5">
         <MathChoices
@@ -196,12 +208,14 @@ export function MathPlay() {
   const correct = useMathStore((state) => state.correct);
   const stars = useMathStore((state) => state.stars);
   const streak = useMathStore((state) => state.streak);
+  const question = round?.questions[questionIndex];
+
+  useMathSpeech({ round, question, answered, correct, wrongChoices });
 
   if (!round) {
     return null;
   }
 
-  const question = round.questions[questionIndex];
   if (!question) {
     return null;
   }

@@ -13,6 +13,7 @@ export function FrenchPage() {
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
+      showSpeech={false}
       subtitle="Frans luisteren · A1.2"
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"

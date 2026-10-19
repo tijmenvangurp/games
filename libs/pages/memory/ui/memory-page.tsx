@@ -24,6 +24,7 @@ export function MemoryPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={scene ? () => setShowSetup(true) : undefined}
+      showSpeech={false}
       subtitle={scene ? `${scene.pairs} paren · Generatie 1` : "Kies je spel"}
       title="Pokémon Memory"
     >

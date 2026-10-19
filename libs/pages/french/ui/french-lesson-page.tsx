@@ -22,6 +22,7 @@ export function FrenchLessonPage() {
     return (
       <GameShell
         onBack={() => navigate({ to: "/frans" })}
+        showSpeech={false}
         subtitle="Frans luisteren"
         title="Bonjour !"
         titleClassName="text-xl sm:text-2xl"
@@ -63,6 +64,7 @@ export function FrenchLessonPage() {
     <GameShell
       onBack={() => navigate({ to: "/frans" })}
       onNewGame={mode === "intro" ? undefined : reset}
+      showSpeech={false}
       subtitle={`${lesson.title} · ${lesson.level}`}
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"

@@ -1,7 +1,7 @@
 import { useId, useMemo, useRef } from "react";
-import type { Color, PieceSymbol } from "chess.js";
+import type { PieceSymbol } from "chess.js";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
-import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
+import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
 import {
   Button,
   ArrowRight,
@@ -11,9 +11,12 @@ import {
   Lightbulb,
   Play,
   RotateCcw,
+  SpeechButton,
+  SpokenText,
   Star,
   X,
 } from "@shared/ui";
+import { CHESS_LEVEL_LINES, coachSpeechFor, type CoachSpeech } from "../model/audio";
 import { levelFor, nextLevelId } from "../model/levels";
 import {
   TUTORIAL_LEVEL_IDS,
@@ -144,68 +147,9 @@ function BoardPanel({
 
 interface CoachBubbleProps {
   readonly feedback: TutorialFeedback;
-  readonly level: TutorialLevel;
   readonly preview: TutorialPreview | null;
-  readonly selectedColor: Color | null;
-  readonly selectedSquare: string | null;
+  readonly speech: CoachSpeech;
   readonly status: TutorialStatus;
-}
-
-function terminalCoachText(
-  status: TutorialStatus,
-  feedback: TutorialFeedback,
-  level: TutorialLevel,
-): string | null {
-  if (status === "completed") {
-    return level.success ?? "Ster! Knap gedaan.";
-  }
-
-  if (status === "stuck") {
-    return "Oei! De rokade kan niet meer. Druk op Opnieuw.";
-  }
-
-  if (feedback === "illegal") {
-    return "Die mag niet. Sleep naar een groene stip.";
-  }
-
-  if (feedback === "hint") {
-    return "Kijk! Sleep naar de groene stip.";
-  }
-
-  return null;
-}
-
-function coachText({
-  feedback,
-  level,
-  preview,
-  selectedColor,
-  selectedSquare,
-  status,
-}: CoachBubbleProps): string {
-  const terminal = terminalCoachText(status, feedback, level);
-  if (terminal) {
-    return terminal;
-  }
-
-  if (feedback === "moved") {
-    return (
-      level.nextStep ??
-      (level.targetSquare ? "Goed! Ga verder naar de ster." : "Goed! Nog een zet.")
-    );
-  }
-
-  if (preview) {
-    return `${level.preview} Tik op het stuk om te kijken.`;
-  }
-
-  if (selectedSquare) {
-    return selectedColor === "b"
-      ? "Kijk! Dit is een zwart stuk. Sleep je eigen stuk om te zetten."
-      : "Sleep naar een groene stip.";
-  }
-
-  return level.instruction;
 }
 
 function coachTone(
@@ -272,14 +216,7 @@ function coachIcon(
   return <ArrowRight className="size-6" />;
 }
 
-function CoachBubble({
-  feedback,
-  level,
-  preview,
-  selectedColor,
-  selectedSquare,
-  status,
-}: CoachBubbleProps) {
+function CoachBubble({ feedback, preview, speech, status }: CoachBubbleProps) {
   return (
     <div
       aria-atomic="true"
@@ -292,7 +229,8 @@ function CoachBubble({
       <span aria-hidden="true" className="shrink-0">
         {coachIcon(status, feedback, preview)}
       </span>
-      <span>{coachText({ feedback, level, preview, selectedColor, selectedSquare, status })}</span>
+      <span className="min-w-0 flex-1">{speech.text}</span>
+      <SpeechButton className="shrink-0" label="Beluister de coach" line={speech.lines} />
     </div>
   );
 }
@@ -372,6 +310,8 @@ function objectiveLabel(level: TutorialLevel): string {
 }
 
 function WhyCard({ level }: { readonly level: TutorialLevel }) {
+  const speech = CHESS_LEVEL_LINES[level.id];
+
   return (
     <details className="rounded-lg border border-border bg-card">
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 [&::-webkit-details-marker]:hidden">
@@ -379,8 +319,13 @@ function WhyCard({ level }: { readonly level: TutorialLevel }) {
         Waarom?
       </summary>
       <div className="space-y-2 px-4 pb-4 text-sm font-medium text-muted-foreground">
-        <p>{level.explanation}</p>
-        <p className="font-bold text-primary">Tip: {level.hint}</p>
+        <SpokenText line={speech.explanation} label="Beluister de uitleg" />
+        <SpokenText
+          className="font-bold text-primary"
+          label="Beluister de tip"
+          line={speech.hint}
+          text={`Tip: ${level.hint}`}
+        />
       </div>
     </details>
   );
@@ -450,6 +395,16 @@ export function TutorialBoard({
 
   const currentIndex = TUTORIAL_LEVEL_IDS.indexOf(tutorial.level.id);
   const nextId = nextLevelId(tutorial.level.id);
+  const coachSpeech = coachSpeechFor(
+    tutorial.level,
+    tutorial.feedback,
+    tutorial.preview,
+    tutorial.selectedColor,
+    tutorial.selectedSquare,
+    tutorial.status,
+    tutorial.moveCount,
+  );
+  useAutoSpeech(coachSpeech.key, coachSpeech.lines);
 
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-3">
@@ -457,10 +412,8 @@ export function TutorialBoard({
       <BoardPanel label={objectiveLabel(tutorial.level)} options={boardOptions} />
       <CoachBubble
         feedback={tutorial.feedback}
-        level={tutorial.level}
         preview={tutorial.preview}
-        selectedColor={tutorial.selectedColor}
-        selectedSquare={tutorial.selectedSquare}
+        speech={coachSpeech}
         status={tutorial.status}
       />
       <TutorialActions

@@ -7,6 +7,13 @@ import {
   validateCurriculum,
 } from "../libs/entities/french/index.ts";
 import type { FrenchItem } from "../libs/entities/french/index.ts";
+import {
+  looksLikeMp3,
+  readTtsConfig,
+  requestSpeechMp3,
+  type TtsConfig,
+  type TtsDefaults,
+} from "./lib/tts.ts";
 
 /**
  * Genereert de Franse audiofragmenten voor alle gepubliceerde lessen.
@@ -21,14 +28,6 @@ import type { FrenchItem } from "../libs/entities/french/index.ts";
  * de TTS-server nodig te hebben. De URL en sleutel horen in de omgeving,
  * nooit in de repo.
  */
-interface Config {
-  baseUrl: string;
-  model: string;
-  voice: string;
-  apiKey?: string;
-  speed: number;
-}
-
 interface Options {
   only?: string;
   lesson?: string;
@@ -38,40 +37,11 @@ interface Options {
 }
 
 const outputDirectory = join("apps", "games", "public", "audio", "fr");
-
-function readBaseUrl(): string {
-  const baseUrl = process.env.TTS_BASE_URL?.replace(/\/+$/, "");
-  if (!baseUrl) {
-    console.error(
-      "TTS_BASE_URL ontbreekt. Zet bijvoorbeeld TTS_BASE_URL=http://localhost:8000/v1 in je shell.",
-    );
-    process.exit(1);
-  }
-  return baseUrl;
-}
-
-function isValidSpeed(speed: number): boolean {
-  return Number.isFinite(speed) && speed >= 0.25 && speed <= 4;
-}
-
-function readSpeed(): number {
-  const speed = Number(process.env.TTS_SPEED ?? "1");
-  if (!isValidSpeed(speed)) {
-    console.error("TTS_SPEED moet tussen 0.25 en 4 liggen.");
-    process.exit(1);
-  }
-  return speed;
-}
-
-function readConfig(): Config {
-  return {
-    baseUrl: readBaseUrl(),
-    model: process.env.TTS_MODEL ?? "speaches-ai/piper-fr_FR-tom-medium",
-    voice: process.env.TTS_VOICE ?? "tom",
-    apiKey: process.env.TTS_API_KEY,
-    speed: readSpeed(),
-  };
-}
+const FRENCH_DEFAULTS: TtsDefaults = {
+  model: "speaches-ai/piper-fr_FR-tom-medium",
+  voice: "tom",
+  speed: 1,
+};
 
 function readOptions(): Options {
   const args = new Set(process.argv.slice(2));
@@ -88,48 +58,6 @@ function readOptions(): Options {
     dryRun: args.has("--dry-run"),
     check: args.has("--check"),
   };
-}
-
-function isId3Tag(bytes: Uint8Array): boolean {
-  return bytes.length >= 3 && bytes[0] === 0x49 && bytes[1] === 0x44 && bytes[2] === 0x33;
-}
-
-function isMp3Frame(bytes: Uint8Array): boolean {
-  return bytes.length >= 2 && bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0;
-}
-
-function looksLikeMp3(bytes: Uint8Array): boolean {
-  return isId3Tag(bytes) || isMp3Frame(bytes);
-}
-
-async function requestSpeech(config: Config, input: string): Promise<Uint8Array> {
-  let response: Response;
-  try {
-    response = await fetch(`${config.baseUrl}/audio/speech`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}),
-      },
-      body: JSON.stringify({
-        model: config.model,
-        voice: config.voice,
-        input,
-        response_format: "mp3",
-        speed: config.speed,
-      }),
-    });
-  } catch {
-    // Never include the private endpoint in an error message or stack.
-    throw new Error("TTS-verzoek mislukt (netwerk).");
-  }
-
-  if (!response.ok) {
-    const detail = await response.text().catch(() => "");
-    throw new Error(`TTS gaf ${response.status}: ${detail.slice(0, 200)}`);
-  }
-
-  return new Uint8Array(await response.arrayBuffer());
 }
 
 interface Clip {
@@ -168,8 +96,8 @@ function shouldSkip(clip: Clip, options: Options): boolean {
   return !options.force && existsSync(outputPath);
 }
 
-async function writeAudio(clip: Clip, config: Config): Promise<void> {
-  const bytes = await requestSpeech(config, clip.input);
+async function writeAudio(clip: Clip, config: TtsConfig): Promise<void> {
+  const bytes = await requestSpeechMp3(config, clip.input);
   if (!looksLikeMp3(bytes)) {
     throw new Error(`TTS gaf geen MP3 voor ${clip.id} (${bytes.byteLength} bytes).`);
   }
@@ -182,7 +110,7 @@ function actionLabel(options: Options): string {
   return options.dryRun ? "dry-run" : "genereer";
 }
 
-async function generateClip(clip: Clip, config: Config | null, options: Options): Promise<void> {
+async function generateClip(clip: Clip, config: TtsConfig | null, options: Options): Promise<void> {
   if (shouldSkip(clip, options)) {
     console.log(`skip ${clip.id} (bestaat al)`);
     return;
@@ -233,7 +161,7 @@ async function runGeneration(options: Options): Promise<void> {
     await mkdir(outputDirectory, { recursive: true });
   }
 
-  const config = options.dryRun ? null : readConfig();
+  const config = options.dryRun ? null : readTtsConfig(FRENCH_DEFAULTS);
   for (const clip of clipsFor(items)) {
     await generateClip(clip, config, options);
   }

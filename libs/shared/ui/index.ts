@@ -6,6 +6,9 @@ export { OptionPicker } from "./option-picker";
 export { PageHeader } from "./page-header";
 export { SetupActions } from "./setup-actions";
 export { SoundToggle } from "./sound-toggle";
+export { SpeechButton } from "./speech-button";
+export { SpeechToggle } from "./speech-toggle";
+export { SpokenText } from "./spoken-text";
 export {
   ArrowLeft,
   ArrowRight,
