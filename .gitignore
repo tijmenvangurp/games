@@ -19,6 +19,9 @@ test-results
 # Cloudflare
 .wrangler/
 
+# Prototype-audio (lokaal gegenereerd, niet committen)
+prototype/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
