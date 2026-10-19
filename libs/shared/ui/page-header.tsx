@@ -13,7 +13,7 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, onBack, actions, titleClassName }: PageHeaderProps) {
   return (
-    <header className="flex items-center gap-2">
+    <header className="flex min-w-0 items-center gap-2">
       {onBack ? (
         <Button aria-label="Terug naar het menu" size="icon" variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
@@ -32,7 +32,7 @@ export function PageHeader({ title, subtitle, onBack, actions, titleClassName }:
         </h1>
         {subtitle ? <p className="truncate text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
-      {actions}
+      {actions ? <div className="flex shrink-0 items-center">{actions}</div> : null}
     </header>
   );
 }

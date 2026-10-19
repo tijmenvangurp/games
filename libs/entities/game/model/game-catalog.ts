@@ -4,6 +4,12 @@ interface GameCatalogBase {
   description: string;
 }
 
+export type GameSpeech =
+  | { readonly kind: "group"; readonly folder: string }
+  | { readonly kind: "visual"; readonly reason: string }
+  | { readonly kind: "pending"; readonly reason: string }
+  | { readonly kind: "legacy"; readonly reason: string };
+
 export type GameCatalogEntry = GameCatalogBase &
   (
     | {
@@ -23,6 +29,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/letters"
           | "/vlaggen";
         thumbnail: string;
+        /** Elke game kiest expliciet hoe het met spraak omgaat. */
+        speech: GameSpeech;
       }
     | { status: "coming-soon" }
   );
@@ -35,6 +43,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/sudoku",
     thumbnail: "/thumbnails/sudoku-4c71fa62.jpg",
+    speech: { kind: "visual", reason: "Het bord en de symbolen zijn visueel." },
   },
   {
     id: "math-trainer",
@@ -43,6 +52,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/rekenen",
     thumbnail: "/thumbnails/math-trainer-52c58abf.jpg",
+    speech: { kind: "group", folder: "math" },
   },
   {
     id: "arrows",
@@ -51,6 +61,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/pijlen",
     thumbnail: "/thumbnails/arrows-381e560b.jpg",
+    speech: { kind: "visual", reason: "De pijlen en het bord zijn visueel." },
   },
   {
     id: "seek",
@@ -59,6 +70,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/zoeken",
     thumbnail: "/thumbnails/seek-3c60cc62.jpg",
+    speech: { kind: "visual", reason: "Het zoekveld is visueel." },
   },
   {
     id: "word-search",
@@ -67,6 +79,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/woordzoeker",
     thumbnail: "/thumbnails/word-search-bdb93413.jpg",
+    speech: { kind: "group", folder: "words" },
   },
   {
     id: "alchemy",
@@ -75,6 +88,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/mengelmoes",
     thumbnail: "/thumbnails/alchemy-0cda3400.jpg",
+    speech: { kind: "visual", reason: "Sleep- en combinatiespel; de elementen zijn visueel." },
   },
   {
     id: "memory",
@@ -83,6 +97,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/memory",
     thumbnail: "/thumbnails/memory-144b9a2e.jpg",
+    speech: { kind: "visual", reason: "Alleen de instructie; nog geen spraakcatalogus." },
   },
   {
     id: "pokemon-quiz",
@@ -91,6 +106,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/raad",
     thumbnail: "/thumbnails/pokemon-quiz-0327a69d.jpg",
+    speech: { kind: "pending", reason: "Buiten scope; later opnieuw bekijken." },
   },
   {
     id: "chess-tutorial",
@@ -99,6 +115,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/schaken",
     thumbnail: "/thumbnails/chess-tutorial-6b1e58dd.jpg",
+    speech: { kind: "group", folder: "chess" },
   },
   {
     id: "chess-puzzles",
@@ -107,6 +124,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/puzzels",
     thumbnail: "/thumbnails/chess-puzzles-d7f67a74.jpg",
+    speech: { kind: "group", folder: "chess-puzzles" },
   },
   {
     id: "flags",
@@ -115,6 +133,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/vlaggen",
     thumbnail: "/thumbnails/flags-bd19d257.jpg",
+    speech: { kind: "pending", reason: "Optioneel; volgt later." },
   },
   {
     id: "french-listening",
@@ -123,6 +142,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/frans",
     thumbnail: "/thumbnails/french-listening-ffc3da24.jpg",
+    speech: { kind: "legacy", reason: "Heeft een eigen Franse audiospeler." },
   },
   {
     id: "letters",
@@ -131,5 +151,6 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/letters",
     thumbnail: "/thumbnails/letters-6b90ec8a.jpg",
+    speech: { kind: "legacy", reason: "Heeft een eigen Nathalie-audiospeler." },
   },
 ];

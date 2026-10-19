@@ -1,16 +1,10 @@
 import { useEffect, useId, useMemo, useRef } from "react";
-import type { Color } from "chess.js";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
-import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, Check, LayoutGrid, Lightbulb, Play, RotateCcw } from "@shared/ui";
+import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
+import { Button, Check, LayoutGrid, Lightbulb, Play, RotateCcw, SpeechButton } from "@shared/ui";
+import { puzzlePromptSpeech, puzzleStatusSpeech, puzzleTitleSpeech } from "../model/audio";
 import { useChessPuzzle } from "../model/useChessPuzzle";
-import type {
-  ChessPuzzle,
-  PuzzleDifficulty,
-  PuzzleFeedback,
-  PuzzleKind,
-  PuzzleStatus,
-} from "../model/types";
+import type { ChessPuzzle, PuzzleDifficulty, PuzzleFeedback, PuzzleStatus } from "../model/types";
 import { PuzzleDifficultyPicker } from "./PuzzleDifficultyPicker";
 
 interface PuzzlePlayProps {
@@ -24,51 +18,27 @@ interface PuzzlePlayProps {
   readonly onSolved?: (puzzle: ChessPuzzle) => void;
 }
 
-function titleFor(kind: PuzzleKind): string {
-  switch (kind) {
-    case "mate":
-      return "Zet schaakmat!";
-    case "capture":
-      return "Win een stuk!";
-    case "tactic":
-      return "Vind de beste zet!";
-  }
-}
-
-function promptFor(kind: PuzzleKind, playerColor: "w" | "b"): string {
-  const player = playerColor === "w" ? "wit" : "zwart";
-  const opponent = playerColor === "w" ? "zwarte" : "witte";
-
-  switch (kind) {
-    case "mate":
-      return `Je bent ${player}. Zet de ${opponent} koning schaakmat.`;
-    case "capture":
-      return `Je bent ${player}. Welke zet wint een stuk?`;
-    case "tactic":
-      return `Je bent ${player}. Welke zet is de beste?`;
-  }
-}
-
 interface PuzzleHeaderProps {
   readonly index: number;
-  readonly playerColor: "w" | "b";
-  readonly puzzle: ChessPuzzle;
+  readonly prompt: ReturnType<typeof puzzlePromptSpeech>;
+  readonly title: ReturnType<typeof puzzleTitleSpeech>;
   readonly titleId: string;
   readonly total: number;
 }
 
-function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHeaderProps) {
+function PuzzleHeader({ index, prompt, title, titleId, total }: PuzzleHeaderProps) {
   return (
     <header className="space-y-1 text-center">
       <p className="text-xs font-black uppercase tracking-widest text-primary">
         Puzzel {index + 1} van {total}
       </p>
       <h2 id={titleId} className="text-2xl font-black text-foreground sm:text-3xl">
-        {titleFor(puzzle.kind)}
+        {title.text}
       </h2>
-      <p className="text-sm font-semibold text-muted-foreground">
-        {promptFor(puzzle.kind, playerColor)}
-      </p>
+      <div className="flex items-center justify-center gap-1">
+        <p className="text-sm font-semibold text-muted-foreground">{prompt.text}</p>
+        <SpeechButton className="shrink-0" label="Beluister de opdracht" line={prompt} />
+      </div>
     </header>
   );
 }
@@ -88,71 +58,45 @@ function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
 }
 
 interface PuzzleStatusProps {
-  readonly feedback: PuzzleFeedback;
-  readonly kind: PuzzleKind;
-  readonly playerColor: Color;
-  readonly selectedColor: Color | null;
-  readonly status: PuzzleStatus;
+  readonly speech: ReturnType<typeof puzzleStatusSpeech>;
+  readonly solved: boolean;
+  readonly tone: "success" | "danger" | "primary" | "muted";
 }
 
-function statusText(
-  feedback: PuzzleFeedback,
-  kind: PuzzleKind,
-  status: PuzzleStatus,
-  playerColor: Color,
-  selectedColor: Color | null,
-): string {
-  if (status === "solved") {
-    switch (kind) {
-      case "mate":
-        return "Schaakmat! Knap gedaan.";
-      case "capture":
-        return "Gelukt! Je hebt een stuk gewonnen.";
-      case "tactic":
-        return "Gelukt! Je hebt de beste zet gevonden.";
-    }
-  }
+const TONE_CLASSES: Record<PuzzleStatusProps["tone"], string> = {
+  success: "bg-success/10 text-success",
+  danger: "bg-danger/10 text-danger",
+  primary: "bg-primary/10 text-primary",
+  muted: "bg-muted text-muted-foreground",
+};
 
-  if (feedback === "wrong") {
-    return "Die zet is niet de beste. Probeer nog eens.";
-  }
-
-  if (feedback === "correct") {
-    return "Goed zo! De tegenstander heeft geantwoord. Jij mag weer.";
-  }
-
-  if (selectedColor && selectedColor !== playerColor) {
-    return "Kijk! Dit stuk is van de tegenstander. Sleep je eigen stuk om te zetten.";
-  }
-
-  return "Tik op een stuk om te kijken waar het heen kan. Sleep je stuk naar een groene stip.";
-}
-
-function PuzzleStatusBanner({
-  feedback,
-  kind,
-  playerColor,
-  selectedColor,
-  status,
-}: PuzzleStatusProps) {
+function PuzzleStatusBanner({ speech, solved, tone }: PuzzleStatusProps) {
   return (
     <div
       aria-live="polite"
       className={cn(
         "flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-bold",
-        status === "solved"
-          ? "bg-success/10 text-success"
-          : feedback === "wrong"
-            ? "bg-danger/10 text-danger"
-            : feedback === "correct"
-              ? "bg-primary/10 text-primary"
-              : "bg-muted text-muted-foreground",
+        TONE_CLASSES[tone],
       )}
     >
-      {status === "solved" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      <span>{statusText(feedback, kind, status, playerColor, selectedColor)}</span>
+      {solved ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
+      <span className="min-w-0">{speech.text}</span>
+      <SpeechButton className="shrink-0" label="Beluister de feedback" line={speech} />
     </div>
   );
+}
+
+function statusTone(status: PuzzleStatus, feedback: PuzzleFeedback): PuzzleStatusProps["tone"] {
+  if (status === "solved") {
+    return "success";
+  }
+  if (feedback === "wrong") {
+    return "danger";
+  }
+  if (feedback === "correct") {
+    return "primary";
+  }
+  return "muted";
 }
 
 interface PuzzleActionsProps {
@@ -206,6 +150,23 @@ export function PuzzlePlay({
   const puzzleState = useChessPuzzle(puzzle);
   const titleId = useId();
   const solvedRef = useRef(false);
+  const title = puzzleTitleSpeech(puzzle.kind);
+  const prompt = puzzlePromptSpeech(puzzle.kind, puzzleState.playerColor);
+  const status = puzzleStatusSpeech(
+    puzzleState.feedback,
+    puzzle.kind,
+    puzzleState.status,
+    puzzleState.playerColor,
+    puzzleState.selectedColor,
+  );
+  const solved = puzzleState.status === "solved";
+  const tone = statusTone(puzzleState.status, puzzleState.feedback);
+
+  useAutoSpeech(`puzzle-prompt-${puzzle.id}`, prompt);
+  useAutoSpeech(
+    `puzzle-status-${puzzle.id}-${puzzleState.status}-${puzzleState.feedback}-${puzzleState.selectedColor ?? "none"}`,
+    status,
+  );
 
   useEffect(() => {
     if (puzzleState.status !== "solved" || solvedRef.current) {
@@ -243,22 +204,10 @@ export function PuzzlePlay({
 
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-4">
-      <PuzzleHeader
-        index={index}
-        playerColor={puzzleState.playerColor}
-        puzzle={puzzle}
-        titleId={titleId}
-        total={total}
-      />
+      <PuzzleHeader index={index} prompt={prompt} title={title} titleId={titleId} total={total} />
       <PuzzleDifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
       <BoardPanel options={boardOptions} />
-      <PuzzleStatusBanner
-        feedback={puzzleState.feedback}
-        kind={puzzle.kind}
-        playerColor={puzzleState.playerColor}
-        selectedColor={puzzleState.selectedColor}
-        status={puzzleState.status}
-      />
+      <PuzzleStatusBanner speech={status} solved={solved} tone={tone} />
       <PuzzleActions
         solved={puzzleState.status === "solved"}
         onHint={puzzleState.showHint}

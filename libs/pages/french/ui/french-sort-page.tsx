@@ -9,6 +9,7 @@ export function FrenchSortPage() {
   return (
     <GameShell
       onBack={() => navigate({ to: "/frans" })}
+      showSpeech={false}
       subtitle="Sorteren"
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"

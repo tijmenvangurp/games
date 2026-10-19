@@ -44,6 +44,10 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 **Mengelmoes** gebruikt lokale SVG's uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (Flat). Die vallen onder de MIT-licentie; de volledige tekst staat in [`LICENSES/fluent-emoji-MIT.txt`](LICENSES/fluent-emoji-MIT.txt). De bestanden staan in `apps/games/public/elements/` en worden niet tijdens het spelen bij een externe host opgehaald.
 
+## Audio
+
+Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md).
+
 ## Deployment
 
 De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workernaam `games`). **Cloudflare Workers Builds** bouwt en deployt bij elke push naar `main`; er zijn geen GitHub-secrets of API-tokens nodig.

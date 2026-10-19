@@ -2,6 +2,7 @@
 
 - `../README.md` — wat de app is, scripts, deployment en privacyregels.
 - `tooling.md` — Nx-daemon, cache, Fallow en de bijbehorende permission-regels.
+- `design-system.md` — de visuele basis, gedeelde componenten en de afspraken voor spraak.
 - `adr/0001-publieke-statische-spellen-app.md` — waarom een aparte publieke, statische repository.
 - `adr/0002-kwaliteitsgate.md` — dezelfde kwaliteitscontroles als `homelab-control`, inclusief de afwijking rond pnpm `minimumReleaseAge`.
 - `adr/0003-originele-spelassets.md` — waarom de games originele personages gebruiken en geen beschermde of externe assets.
@@ -24,6 +25,7 @@
 - `adr/0020-kaartpuzzel.md` — de kaartpuzzel als tweede speelwijze: acht stukken rond een ankergebied, slepen of tikken en de hintniveaus.
 - `adr/0021-provinciegeometrie.md` — de twaalf provincievormen uit Natural Earth, als lazy chunk voor de puzzel en de vlaggenquiz.
 - `adr/0022-schaakbord-tikken-is-kijken.md` — tikken toont zetten (ook van de tegenstander), slepen en neerzetten doet de zet.
+- `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
@@ -33,6 +35,8 @@
 - `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
+- `research/2026-10-19-voorlezen-met-tts.md` — onderzoek naar vooraf gegenereerde Nederlandse TTS met de bestaande Nathalie-stem, leesafhankelijkheid per game en ontwerpprincipes voor audiofeedback.
+- `plans/2026-10-19-voorlezen-in-alle-games.md` — plan voor een gedeelde spraakspeler, een catalogus met teksthashes en gefaseerde audio in de Nederlandse games.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.
 - `ideas/spelideeen.md` — verzamelde educatieve spelideeën, prioriteiten en aandachtspunten.
