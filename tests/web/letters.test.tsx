@@ -53,7 +53,12 @@ describe("letter game", () => {
 
     for (let index = 0; index < round.questions.length; index += 1) {
       const question = round.questions[index];
-      if (!question || question.kind === "lees") {
+      if (
+        !question ||
+        question.kind === "lees" ||
+        question.kind === "plek" ||
+        question.kind === "zoem"
+      ) {
         throw new Error("Geen lettervraag");
       }
 
@@ -99,11 +104,97 @@ describe("letter game", () => {
     expect(loadLetterProgress().i.attempts).toBe(0);
   });
 
+  it("speelt een volledige woordtrein-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/woordtrein/i);
+    expect(round.lesson).toBe("trein");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "trein") {
+        throw new Error("Geen treinvraag");
+      }
+
+      for (const letter of question.word.letters) {
+        fireEvent.click(screen.getByRole("button", { name: `Letter ${letter}` }));
+      }
+
+      expect(useLetterStore.getState().answered).toBe(true);
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap gebouwd!" })).toBeTruthy();
+    // Woordtrein oefent synthese en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
+  it("speelt een volledige klankplek-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/klankplek/i);
+    expect(round.lesson).toBe("klankplek");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "plek") {
+        throw new Error("Geen klankplekvraag");
+      }
+
+      const box = question.position === "begin" ? 1 : question.position === "midden" ? 2 : 3;
+      fireEvent.click(screen.getByRole("button", { name: `Vak ${box}` }));
+      expect(useLetterStore.getState().answered).toBe(true);
+
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap geluisterd!" })).toBeTruthy();
+    // Klankplek oefent analyse en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
+  it("speelt een volledige zoemlees-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/zoemlees/i);
+    expect(round.lesson).toBe("zoemlees");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "zoem") {
+        throw new Error("Geen zoemvraag");
+      }
+
+      for (const letter of question.word.letters) {
+        fireEvent.click(screen.getByRole("button", { name: `Letter ${letter}` }));
+      }
+
+      expect(useLetterStore.getState().answered).toBe(true);
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap gelezen!" })).toBeTruthy();
+    // Zoemlees oefent lezen en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
   it("geeft na twee fouten het juiste antwoord", async () => {
     renderLetters();
     const round = await startLesson(/letterronde/i);
     const question = round.questions[0];
-    if (!question || question.kind === "trein" || question.kind === "lees") {
+    if (
+      !question ||
+      question.kind === "trein" ||
+      question.kind === "lees" ||
+      question.kind === "plek" ||
+      question.kind === "zoem"
+    ) {
       throw new Error("Eerste vraag is geen klankvraag");
     }
 

@@ -9,15 +9,44 @@ function subtitleFor(round: LetterRound | null): string {
   if (!round) {
     return "Hoor de klank en kies de letter";
   }
-  return round.lesson === "woorden" ? "Woordlezen · 6 woorden" : "Letterronde · 6 vragen";
+  if (round.lesson === "woorden") {
+    return "Woordlezen · 6 woorden";
+  }
+  if (round.lesson === "trein") {
+    return "Woordtrein · 6 woorden";
+  }
+  if (round.lesson === "klankplek") {
+    return "Klankplek · 6 woorden";
+  }
+  if (round.lesson === "zoemlees") {
+    return "Zoemlees · 6 woorden";
+  }
+  return "Letterronde · 6 vragen";
 }
 
+const CELEBRATIONS: Partial<Record<LetterLesson, { title: string; description: string }>> = {
+  woorden: {
+    title: "Knap gelezen!",
+    description: "Je las zes woorden. Probeer het nog eens met andere woorden.",
+  },
+  trein: {
+    title: "Knap gebouwd!",
+    description: "Je bouwde zes woorden. Probeer het nog eens met andere woorden.",
+  },
+  klankplek: {
+    title: "Knap geluisterd!",
+    description: "Je hoorde waar de klank zat. Probeer het nog eens met andere woorden.",
+  },
+  zoemlees: {
+    title: "Knap gelezen!",
+    description: "Je las zes woorden door de letters te verbinden.",
+  },
+};
+
 function celebrationFor(round: LetterRound | null, known: readonly string[]) {
-  if (round?.lesson === "woorden") {
-    return {
-      title: "Knap gelezen!",
-      description: "Je las zes woorden. Probeer het nog eens met andere woorden.",
-    };
+  const celebration = round ? CELEBRATIONS[round.lesson] : undefined;
+  if (celebration) {
+    return celebration;
   }
 
   return {

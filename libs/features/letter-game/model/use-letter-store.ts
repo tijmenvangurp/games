@@ -1,7 +1,10 @@
 import { create } from "zustand";
 import {
   createLetterRound,
+  createPlekRound,
+  createTrainRound,
   createWordRound,
+  createZoomRound,
   recordLetterAnswer,
   type LetterId,
   type LetterLesson,
@@ -25,6 +28,7 @@ interface LetterStore {
   start: (lesson?: LetterLesson) => void;
   choose: (answer: string) => void;
   submitTrain: (letter: LetterId) => void;
+  submitZoom: (index: number) => void;
   next: () => void;
 }
 
@@ -44,8 +48,24 @@ function applyProgress(set: StoreSet, get: StoreGet, letter: LetterId, correct: 
   saveLetterProgress(progress);
 }
 
+function roundFor(lesson: LetterLesson, progress: LetterProgressMap): LetterRound {
+  if (lesson === "woorden") {
+    return createWordRound();
+  }
+  if (lesson === "trein") {
+    return createTrainRound();
+  }
+  if (lesson === "klankplek") {
+    return createPlekRound();
+  }
+  if (lesson === "zoemlees") {
+    return createZoomRound();
+  }
+  return createLetterRound(progress);
+}
+
 function startRound(set: StoreSet, get: StoreGet, lesson: LetterLesson = "letters"): void {
-  const round = lesson === "woorden" ? createWordRound() : createLetterRound(get().progress);
+  const round = roundFor(lesson, get().progress);
   set({
     round,
     index: 0,
@@ -61,17 +81,23 @@ function startRound(set: StoreSet, get: StoreGet, lesson: LetterLesson = "letter
 }
 
 function expectedAnswer(question: LetterQuestion): string {
+  if (question.kind === "plek") {
+    return question.position;
+  }
+  if (question.kind === "zoem") {
+    return question.word.id;
+  }
   return question.kind === "lees" ? question.target.id : question.target;
 }
 
-/** Woordlezen is oefenen; alleen lettervragen werken de lettervoortgang bij. */
+/** Woordlezen, Klankplek en Zoemlees zijn oefenen; alleen lettervragen werken de voortgang bij. */
 function applyChoiceProgress(
   set: StoreSet,
   get: StoreGet,
   question: LetterQuestion,
   correct: boolean,
 ): void {
-  if (question.kind === "lees") {
+  if (question.kind === "lees" || question.kind === "plek" || question.kind === "zoem") {
     return;
   }
   applyProgress(set, get, question.target, correct);
@@ -80,7 +106,7 @@ function applyChoiceProgress(
 function choose(set: StoreSet, get: StoreGet, answer: string): void {
   const question = currentQuestion(get);
   const { answered, wrongChoices } = get();
-  if (!question || question.kind === "trein" || answered) {
+  if (!question || question.kind === "trein" || question.kind === "zoem" || answered) {
     return;
   }
 
@@ -104,7 +130,7 @@ function choose(set: StoreSet, get: StoreGet, answer: string): void {
 
 function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
   const question = currentQuestion(get);
-  const { answered, filled, wrongLetters } = get();
+  const { answered, filled, round, wrongLetters } = get();
   if (!question || question.kind !== "trein" || answered) {
     return;
   }
@@ -130,7 +156,35 @@ function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
   }
 
   set({ filled: nextFilled, answered: true, correct: true });
-  applyProgress(set, get, question.target, wrongLetters.length === 0);
+  // Woordtrein oefent synthese; de losse letters zijn al geoefend. Alleen in de
+  // letterronde telt de trein mee voor de voortgang van de beginletter.
+  if (round?.lesson !== "trein") {
+    applyProgress(set, get, question.target, wrongLetters.length === 0);
+  }
+  playSound("match");
+  playHaptic("match");
+}
+
+function submitZoom(set: StoreSet, get: StoreGet, index: number): void {
+  const question = currentQuestion(get);
+  const { answered, filled } = get();
+  if (!question || question.kind !== "zoem" || answered) {
+    return;
+  }
+
+  const letter = question.word.letters[index];
+  if (index !== filled.length || !letter) {
+    return;
+  }
+
+  const nextFilled = [...filled, letter];
+  if (nextFilled.length < question.word.letters.length) {
+    set({ filled: nextFilled });
+    playHaptic("tap");
+    return;
+  }
+
+  set({ filled: nextFilled, answered: true, correct: true });
   playSound("match");
   playHaptic("match");
 }
@@ -175,5 +229,6 @@ export const useLetterStore = create<LetterStore>((set, get) => ({
   start: (lesson) => startRound(set, get, lesson),
   choose: (answer) => choose(set, get, answer),
   submitTrain: (letter) => submitTrain(set, get, letter),
+  submitZoom: (index) => submitZoom(set, get, index),
   next: () => nextQuestion(set, get),
 }));

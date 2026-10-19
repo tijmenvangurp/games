@@ -5,11 +5,27 @@ import {
   type LetterLesson,
   type LetterProgressMap,
 } from "@entities/letter";
-import { Button, Eye, Play } from "@shared/ui";
+import { BookOpen, Button, Ear, Eye, Play, TrainFront } from "@shared/ui";
 
 interface LetterSetupProps {
   progress: LetterProgressMap;
   onStart: (lesson: LetterLesson) => void;
+}
+
+function LessonIcon({ lesson }: { lesson: LetterLesson }) {
+  if (lesson === "letters") {
+    return <Play aria-hidden="true" className="size-5" />;
+  }
+  if (lesson === "woorden") {
+    return <Eye aria-hidden="true" className="size-5" />;
+  }
+  if (lesson === "klankplek") {
+    return <Ear aria-hidden="true" className="size-5" />;
+  }
+  if (lesson === "zoemlees") {
+    return <BookOpen aria-hidden="true" className="size-5" />;
+  }
+  return <TrainFront aria-hidden="true" className="size-5" />;
 }
 
 export function LetterSetup({ progress, onStart }: LetterSetupProps) {
@@ -22,8 +38,8 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
       </p>
       <h2 className="mt-1 text-2xl font-black tracking-tight">Kies je les</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Hoor de klank en kies de letter, of lees hele woorden. Beide lessen gebruiken dezelfde
-        letters.
+        Hoor de klank en kies de letter, lees woorden of bouw ze zelf. Alle lessen gebruiken
+        dezelfde letters.
       </p>
 
       <div className="mt-4 grid gap-2">
@@ -36,11 +52,7 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
             onClick={() => onStart(lesson.id)}
           >
             <span className="flex items-center gap-2 text-base font-black">
-              {lesson.id === "letters" ? (
-                <Play aria-hidden="true" className="size-5" />
-              ) : (
-                <Eye aria-hidden="true" className="size-5" />
-              )}
+              <LessonIcon lesson={lesson.id} />
               {lesson.title}
             </span>
             <span className="text-sm font-semibold opacity-80">{lesson.description}</span>

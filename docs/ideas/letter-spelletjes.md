@@ -1,7 +1,7 @@
 # Ideeën: letter-spelletjes voor groep 1–3
 
 - **Datum:** 2026-10-18
-- **Status:** MVP-prototype met twee lessen (Letterronde en Woordlezen). De TTS-klankset met Nathalie is gekozen (36 klankeenheden; de lessen gebruiken de 10 startletters). Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md).
+- **Status:** MVP-prototype gebouwd met vijf lessen (Letterronde, Woordlezen, Woordtrein, Klankplek en Zoemlees). De TTS-klankset met Nathalie is gekozen (36 klankeenheden; de lessen gebruiken de 10 startletters). Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md).
 - **Kader:** de regels uit `AGENTS.md` en [ADR 0001](../adr/0001-publieke-statische-spellen-app.md): publiek, statisch, alleen TypeScript, geen externe requests, geen backend, strikte CSP, mobile-first en touch-targets van minimaal 44 px.
 - **Onderbouwing:** [methodiek](../research/2026-10-18-letters-leren-basisschool.md) en [didactiek en spelletjes](../research/2026-10-18-letterdidactiek-en-spelletjes.md).
 
@@ -22,7 +22,7 @@ Dit document vertaalt die principes naar spelconcepten. Het is een ideeënlijst,
 **Bouw één dagelijkse "Letterronde" als ruggengraat, met drie kernspellen. Houd het daarna klein.**
 
 - **MVP:** Letterronde + Klank & Letter + Letterjacht + Klankvanger, met 8–10 letters en 5 minuten per sessie.
-- **Daarna:** Woordlezen, Woordtrein, Lettermemory en Samen aan tafel.
+- **Daarna:** Woordlezen, Woordtrein, Klankplek en Zoemlees (gebouwd), Lettermemory en Samen aan tafel.
 - **Later:** Teken de Letter, Tweelingletters, Geheime Brief en het Letterboek.
 - **Eén set engines, veel varianten.** Klank & Letter, Klankvanger en Rijmrad delen dezelfde audiokeuze-engine. Letterjacht en Tweelingletters delen het zoekveld. Woordtrein en Geheime Brief delen de woordbouw-engine. Zo blijft de code klein.
 - **Geen "26 letters"-spel.** Begin met een verdedigbare startset en laat de ouder of leerkracht de methode van school kiezen.
@@ -83,6 +83,18 @@ De scheduler kiest de letters: eerst wat bijna vergeten is, dan de nieuwe letter
 - **Let op:** geen ambigue plaatjes nodig; letters zijn genoeg. Geen woorden die het kind nog niet kent als de taak over klanken gaat.
 - **Hergebruik:** dezelfde engine als Klank & Letter, met een andere promptsoort.
 
+### 2b. Klankplek (must, gebouwd)
+
+**Pitch:** "Waar hoor je de klank? Vooraan, in het midden of achteraan?"
+
+- **Doel:** auditieve analyse: een klank in een gesproken woord herkennen en de positie bepalen.
+- **Hoe het werkt:** het kind hoort een woord en ziet de doelletter als een sleepbare tegel. Het sleept de tegel naar het juiste vakje van het woord, of tikt op een vakje. De vakjes zijn leeg tot het antwoord; daarna verschijnt het woord, met de doelletter in het gekozen vakje. Tikken op de lettertegel speelt de klank opnieuw af.
+- **Didactiek:** Klankvanger oefent alleen de beginletter; Klankplek maakt de stap naar midden en eind. Dat is moeilijker, omdat het kind niet op de eerste letter van het woord kan leunen. Auditieve analyse is een must in de onderzoekslijn.
+- **Feedback:** "Ja! De m zit vooraan in mis." of "De m zit in het midden van mis." Het woord is daarna opnieuw te beluisteren.
+- **Content:** alleen woorden van drie letters met unieke letters, zodat de plek van elke klank eenduidig is. Per ronde komen begin, midden en eind elk twee keer aan bod.
+- **Voortgang:** Klankplek is oefenen en raakt de lettervoortgang niet aan; de les meet analyse, niet de beheersing van een losse letter.
+- **Let op:** toon het geschreven woord pas na het antwoord, anders kan het kind de positie visueel aflezen. Drag is nooit de enige route: tikken op een vakje werkt altijd (WCAG 2.5.7).
+
 ### 3. Letterjacht (must)
 
 **Pitch:** "Zoek alle m's tussen de andere letters."
@@ -95,7 +107,7 @@ De scheduler kiest de letters: eerst wat bijna vergeten is, dan de nieuwe letter
 - **Let op:** geen drukke achtergrond; niet alleen vorm zonder klank; `b` en `d` niet meteen samen.
 - **Hergebruik:** het zoekveld van "Waar is Wobbel?" is een goede basis.
 
-### 4. Woordtrein (should)
+### 4. Woordtrein (gebouwd)
 
 **Pitch:** "Bouw het woord. De trein gaat rijden als het klopt."
 
@@ -105,6 +117,8 @@ De scheduler kiest de letters: eerst wat bijna vergeten is, dan de nieuwe letter
 - **Feedback:** bij een fout wordt het woord gesegmenteerd en wijst de app de juiste letter aan. Het kind probeert opnieuw; de trein wacht.
 - **Content:** mkm-woorden die passen bij de gekozen letterreeks (`ik`, `is`, `mis`, `kim`, `aap`, `vis`, `pet`, `maan`).
 - **Let op:** niet te vroeg; geen lange woorden; audio-model vooraf; tikken in plaats van alleen slepen.
+- **Standalone les:** Woordtrein is naast de letterronde een eigen les van zes woorden. De les gebruikt de dertien woorden met unieke letters uit de bestaande woordlijst, zodat elke lettertegel maar één keer op tafel ligt. Woorden met dubbele letters (`aap`, `eet`) blijven buiten deze les tot de tegelweergave dat aankan.
+- **Voortgang:** Woordtrein is oefenen en raakt de lettervoortgang niet aan; de les meet synthese, niet de beheersing van één losse letter.
 - **Hergebruik:** dezelfde engine als Geheime Brief.
 
 ### 4b. Woordlezen (must, gebouwd)
@@ -118,6 +132,18 @@ De scheduler kiest de letters: eerst wat bijna vergeten is, dan de nieuwe letter
 - **Voortgang:** Woordlezen is oefenen en raakt de lettervoortgang niet aan. De afsluiting toont daarom geen "deze letters ken je al", maar een leescompliment.
 - **Let op:** geen nieuwe audio nodig; gebruik de bestaande woordopnames. Alleen woorden die het kind al als klank kent.
 - **Leskeuze:** Letterronde en Woordlezen staan samen op één spelkaartje en één pagina. De keuzelijst is data-gedreven (`LETTER_LESSONS`), zodat een volgende les erbij past zonder een nieuw spelkaartje.
+
+### 4c. Zoemlees (later, gebouwd)
+
+**Pitch:** "Lees het woord. Tik de letters en hoor hoe het klinkt."
+
+- **Doel:** de elementaire leeshandeling oefenen: een geschreven woord van links naar rechts verklanken en de klanken verbinden.
+- **Hoe het werkt:** het kind ziet een woord als lettertegels. Het tikt de letters van links naar rechts; elke letter klinkt. Als alle letters gedaan zijn, klinkt het hele woord en verschijnt de feedback.
+- **Didactiek:** zoemend lezen als ondersteunde leesstrategie. De app geeft het audio-model per letter en daarna het hele woord; het kind hoeft de klank nog niet zelf te produceren. Pas zinvol als de letters redelijk bekend zijn.
+- **Feedback:** "Ja! Je las mis." Het woord is daarna opnieuw te beluisteren.
+- **Content:** dezelfde dertien woorden met unieke letters. `aap` en `eet` blijven buiten deze les: de bestaande losse klanken zijn korte klinkers, waardoor `aa` en `ee` niet kloppen.
+- **Voortgang:** Zoemlees is oefenen en raakt de lettervoortgang niet aan.
+- **Let op:** geen hakkerig hakken en plakken als enige strategie; Woordlezen en Woordtrein blijven ernaast staan.
 
 ### 5. Geheime Brief (should, 6–7 jaar)
 
@@ -299,13 +325,13 @@ De FSD-indeling blijft: `libs/entities/letter` voor data en pure regels, `libs/f
 
 ## Roadmap
 
-| Fase              | Inhoud                                                                  | Waarom nu                                           |
-| ----------------- | ----------------------------------------------------------------------- | --------------------------------------------------- |
-| **0. Content**    | 8–10 letters, klankopnames, 30–40 mkm-woorden, lettervolgordes          | Zonder goede audio en woorden is elk spel zwak      |
-| **1. MVP**        | Letterronde, Klank & Letter, Letterjacht, Klankvanger, lokale voortgang | Drie kernvaardigheden, klein genoeg om te testen    |
-| **2. Uitbreiden** | Woordlezen (gebouwd), Woordtrein, Lettermemory, Samen aan tafel         | Lezen van woorden, synthese, herhaling en de ouder  |
-| **3. Verdiepen**  | Teken de Letter, Tweelingletters, Geheime Brief, Letterboek             | Motoriek, discriminatie, transfer en motivatie      |
-| **4. Testen**     | 5–8 kinderen, twee sessies, observatie en ouderfeedback                 | Vaststellen of de lus werkt voordat je verder bouwt |
+| Fase              | Inhoud                                                                                                             | Waarom nu                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| **0. Content**    | 8–10 letters, klankopnames, 30–40 mkm-woorden, lettervolgordes                                                     | Zonder goede audio en woorden is elk spel zwak                             |
+| **1. MVP**        | Letterronde, Klank & Letter, Letterjacht, Klankvanger, lokale voortgang                                            | Drie kernvaardigheden, klein genoeg om te testen                           |
+| **2. Uitbreiden** | Woordlezen (gebouwd), Woordtrein (gebouwd), Klankplek (gebouwd), Zoemlees (gebouwd), Lettermemory, Samen aan tafel | Lezen van woorden, synthese, analyse, zoemend lezen, herhaling en de ouder |
+| **3. Verdiepen**  | Teken de Letter, Tweelingletters, Geheime Brief, Letterboek                                                        | Motoriek, discriminatie, transfer en motivatie                             |
+| **4. Testen**     | 5–8 kinderen, twee sessies, observatie en ouderfeedback                                                            | Vaststellen of de lus werkt voordat je verder bouwt                        |
 
 ## Toetsen met kinderen
 

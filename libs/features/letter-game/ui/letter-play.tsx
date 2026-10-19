@@ -1,9 +1,11 @@
 import {
+  KLANK_POSITION_PHRASES,
   LETTER_BY_ID,
   type JachtQuestion,
   type KlankQuestion,
   type LeesQuestion,
   type LetterId,
+  type LetterLesson,
   type LetterQuestion,
   type LetterWord,
   type TreinQuestion,
@@ -13,9 +15,27 @@ import { Button } from "@shared/ui";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
+import { PlekView } from "./plek-view";
 import { WordTile } from "./word-tile";
+import { ZoomView } from "./zoom-view";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
+
+function lessonHeader(lesson: LetterLesson): { unit: string; title: string } {
+  if (lesson === "woorden") {
+    return { unit: "Woord", title: "Woordlezen" };
+  }
+  if (lesson === "trein") {
+    return { unit: "Woord", title: "Woordtrein" };
+  }
+  if (lesson === "klankplek") {
+    return { unit: "Klank", title: "Klankplek" };
+  }
+  if (lesson === "zoemlees") {
+    return { unit: "Woord", title: "Zoemlees" };
+  }
+  return { unit: "Vraag", title: "Letterronde" };
+}
 
 function choiceState(
   letter: LetterId,
@@ -268,6 +288,10 @@ function successMessage(question: LetterQuestion): string {
       return `Ja, dit is de ${question.target}.`;
     case "lees":
       return `Ja! Dit is ${question.target.word}.`;
+    case "plek":
+      return `Ja! De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+    case "zoem":
+      return `Ja! Je las ${question.word.word}.`;
     case "trein":
       return `Goed gebouwd: ${question.word.word}.`;
   }
@@ -283,6 +307,10 @@ function retryMessage(question: LetterQuestion): string {
       return `Dit is de ${question.target}.`;
     case "lees":
       return `Bijna. Dit woord is ${question.target.word}.`;
+    case "plek":
+      return `De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+    case "zoem":
+      return `Het woord is ${question.word.word}.`;
     case "trein":
       return `Het woord is ${question.word.word}.`;
   }
@@ -316,6 +344,12 @@ function Feedback({
     if (question.kind === "lees") {
       return question.target.audio;
     }
+    if (question.kind === "plek") {
+      return question.word.audio;
+    }
+    if (question.kind === "zoem") {
+      return question.word.audio;
+    }
     if (question.kind === "vanger" || question.kind === "trein") {
       return question.word.audio;
     }
@@ -339,6 +373,44 @@ function Feedback({
   );
 }
 
+function QuestionView({
+  question,
+  answered,
+  wrongChoices,
+  filled,
+  wrongLetters,
+}: {
+  question: LetterQuestion;
+  answered: boolean;
+  wrongChoices: readonly string[];
+  filled: readonly LetterId[];
+  wrongLetters: readonly LetterId[];
+}) {
+  switch (question.kind) {
+    case "klank":
+      return <KlankView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "vanger":
+      return <VangerView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "jacht":
+      return <JachtView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "lees":
+      return <LeesView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "plek":
+      return <PlekView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "zoem":
+      return <ZoomView answered={answered} filled={filled} question={question} />;
+    case "trein":
+      return (
+        <TreinView
+          answered={answered}
+          filled={filled}
+          question={question}
+          wrongLetters={wrongLetters}
+        />
+      );
+  }
+}
+
 function QuestionCard({
   question,
   answered,
@@ -358,26 +430,13 @@ function QuestionCard({
 }) {
   return (
     <section className="game-panel p-4 sm:p-6">
-      {question.kind === "klank" ? (
-        <KlankView answered={answered} question={question} wrongChoices={wrongChoices} />
-      ) : null}
-      {question.kind === "vanger" ? (
-        <VangerView answered={answered} question={question} wrongChoices={wrongChoices} />
-      ) : null}
-      {question.kind === "jacht" ? (
-        <JachtView answered={answered} question={question} wrongChoices={wrongChoices} />
-      ) : null}
-      {question.kind === "lees" ? (
-        <LeesView answered={answered} question={question} wrongChoices={wrongChoices} />
-      ) : null}
-      {question.kind === "trein" ? (
-        <TreinView
-          answered={answered}
-          filled={filled}
-          question={question}
-          wrongLetters={wrongLetters}
-        />
-      ) : null}
+      <QuestionView
+        answered={answered}
+        filled={filled}
+        question={question}
+        wrongChoices={wrongChoices}
+        wrongLetters={wrongLetters}
+      />
 
       <div className="mt-4">
         <Feedback
@@ -420,17 +479,15 @@ export function LetterPlay() {
     return null;
   }
 
-  const isWordLesson = round.lesson === "woorden";
+  const header = lessonHeader(round.lesson);
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <header className="game-panel flex items-center justify-between px-3 py-2">
         <p className="text-sm font-black text-muted-foreground">
-          {isWordLesson ? "Woord" : "Vraag"} {index + 1} van {round.questions.length}
+          {header.unit} {index + 1} van {round.questions.length}
         </p>
-        <span className="text-sm font-bold text-primary">
-          {isWordLesson ? "Woordlezen" : "Letterronde"}
-        </span>
+        <span className="text-sm font-bold text-primary">{header.title}</span>
       </header>
       <QuestionCard
         answered={answered}

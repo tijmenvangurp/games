@@ -1,5 +1,7 @@
 export {
   CONFUSION_GROUPS,
+  KLANK_POSITION_PHRASES,
+  KLANK_POSITIONS,
   LETTER_BY_ID,
   LETTER_LESSONS,
   LETTER_ORDER,
@@ -19,10 +21,17 @@ export {
   recordLetterAnswer,
   stageForCorrect,
 } from "./model/progress";
-export { createLetterRound, createWordRound } from "./model/round";
+export {
+  createLetterRound,
+  createPlekRound,
+  createTrainRound,
+  createWordRound,
+  createZoomRound,
+} from "./model/round";
 export { LETTER_IDS } from "./model/types";
 export type {
   JachtQuestion,
+  KlankPosition,
   KlankQuestion,
   LeesQuestion,
   LetterId,
@@ -32,6 +41,8 @@ export type {
   LetterQuestion,
   LetterRound,
   LetterWord,
+  PlekQuestion,
   TreinQuestion,
   VangerQuestion,
+  ZoemQuestion,
 } from "./model/types";
