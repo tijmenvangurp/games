@@ -17,7 +17,7 @@
 
 ## Stand van de implementatie
 
-De gedeelde speler, de catalogusontdekking, de audiolock en de coverage-poort staan in de repository. Schaakles, Schaakpuzzels, Rekenen en Woordzoeker hebben echte Nathalie-audio: samen 222 fragmenten, ongeveer 2,5 MB. Vlaggenreis, memory, zoeken, sudoku, pijlen en het hoofdmenu volgen later. Zie [ADR 0023](../adr/0023-voorlezen-met-tts.md) en het [plan](../plans/2026-10-19-voorlezen-in-alle-games.md).
+De gedeelde speler, de catalogusontdekking, de audiolock en de coverage-poort staan in de repository. Schaakles, Schaakpuzzels, Rekenen en Woordzoeker hebben echte Nathalie-audio: samen 222 fragmenten, ongeveer 2,5 MB. Vlaggenreis, memory, zoeken, sudoku, pijlen, Mengelmoes en het hoofdmenu volgen later. Zie [ADR 0023](../adr/0023-voorlezen-met-tts.md) en het [plan](../plans/2026-10-19-voorlezen-in-alle-games.md).
 
 ## 1. Wat is er nu?
 
@@ -80,6 +80,7 @@ De Web Speech API is extra riskant omdat de CSP `connect-src 'none'` niet kan ga
 | **Vlaggenreis**          | vraag, land- of provincienaam en feedback                 | **Ja**, de namen zijn de antwoorden                             | Namen vast (~200), vragen vast             | **P2/P3**  |
 | **Sudoku**               | setup, status, “nog één vakje”                            | **Nee**, het bord is visueel; uitleg wel                        | Status dynamisch                           | **P3**     |
 | **Memory**               | instructie en status                                      | **Nee**, het spel is visueel                                    | Status dynamisch                           | **P3**     |
+| **Mengelmoes**           | instructie, feedback en hints                             | **Nee**, het slepen en combineren is visueel                    | Status en hints dynamisch                  | **P3**     |
 | **Waar is Wobbel?**      | instructie en status                                      | **Nee**, het spel is visueel                                    | Status dynamisch                           | **P3**     |
 | **Pijlen**               | intro, levelnaam en status                                | **Nee**, het spel is visueel                                    | Status dynamisch                           | **P3**     |
 | **Hoofdmenu**            | spelnamen en beschrijvingen                               | **Deels**, iconen helpen, maar niet genoeg                      | Vast                                       | **P3**     |

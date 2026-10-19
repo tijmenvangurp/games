@@ -407,6 +407,7 @@ Deze fase draait om de zinnen die een kind nodig heeft om te weten wat het moet 
 - [ ] **Waar is Wobbel?:** instructie, hint, “nog niet” en “gevonden”.
 - [ ] **Sudoku:** status, “nog één vakje”, “opgelost” en eventueel de dierennamen bij selectie.
 - [ ] **Pijlen:** intro-instructie, geblokkeerde pijl, hint en levelopgelost.
+- [ ] **Mengelmoes:** het spel is visueel en heeft nu `speech: visual`. Instructie en feedback kunnen later worden voorgelezen; de elementnamen en hints zijn dan de grootste contentklus.
 - [ ] **Letterpret:** bestaande Nathalie-klanken en -woorden niet opnieuw genereren; `LetterAudio` wel op de gedeelde speler zetten.
 - [ ] Hergebruik waar mogelijk de algemene feedback.
 - [ ] Per game een korte luistertest en een test met de muis/touch.
