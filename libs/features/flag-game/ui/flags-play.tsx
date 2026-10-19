@@ -45,15 +45,18 @@ const CHOICE_CLASSES: Record<ChoiceState, string> = {
 interface ChoiceProps {
   subject: { code: string; name: string };
   state: ChoiceState;
+  /** Dense layout for levels with many choices, such as all twelve provinces. */
+  compact: boolean;
   onSelect: () => void;
 }
 
-function NameChoice({ subject, state, onSelect }: ChoiceProps) {
+function NameChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
     <button
       aria-label={subject.name}
       className={cn(
-        "flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 px-3 text-base font-bold transition active:scale-95",
+        "flex items-center justify-center gap-2 rounded-2xl border-2 font-bold transition active:scale-95",
+        compact ? "min-h-12 px-1 text-sm" : "min-h-14 px-3 text-base",
         CHOICE_CLASSES[state],
       )}
       disabled={state !== "default"}
@@ -66,12 +69,13 @@ function NameChoice({ subject, state, onSelect }: ChoiceProps) {
   );
 }
 
-function FlagChoice({ subject, state, onSelect }: ChoiceProps) {
+function FlagChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
     <button
       aria-label={subject.name}
       className={cn(
-        "flex min-h-16 items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
+        "flex items-center justify-center gap-1 rounded-2xl border-2 transition active:scale-95",
+        compact ? "min-h-14 p-1" : "min-h-16 p-2",
         CHOICE_CLASSES[state],
       )}
       disabled={state !== "default"}
@@ -108,12 +112,18 @@ function FlagChoices({
   wrongChoices: readonly string[];
   answered: boolean;
 }) {
+  const count = question.choices.length;
+  const compact = count > 6;
   const columns =
     question.direction === "vlag-naar-land"
-      ? "grid-cols-1 sm:grid-cols-2"
-      : question.choices.length === 3
-        ? "grid-cols-3"
-        : "grid-cols-2 sm:grid-cols-4";
+      ? compact
+        ? "grid-cols-2 sm:grid-cols-3"
+        : "grid-cols-1 sm:grid-cols-2"
+      : compact
+        ? "grid-cols-4 sm:grid-cols-6"
+        : count === 3
+          ? "grid-cols-3"
+          : "grid-cols-2 sm:grid-cols-4";
 
   return (
     <div aria-label="Kies het juiste antwoord" className={cn("grid gap-2", columns)} role="group">
@@ -122,9 +132,21 @@ function FlagChoices({
         const select = () => useFlagStore.getState().chooseAnswer(subject.code);
 
         return question.direction === "vlag-naar-land" ? (
-          <NameChoice key={subject.code} subject={subject} state={state} onSelect={select} />
+          <NameChoice
+            key={subject.code}
+            compact={compact}
+            subject={subject}
+            state={state}
+            onSelect={select}
+          />
         ) : (
-          <FlagChoice key={subject.code} subject={subject} state={state} onSelect={select} />
+          <FlagChoice
+            key={subject.code}
+            compact={compact}
+            subject={subject}
+            state={state}
+            onSelect={select}
+          />
         );
       })}
     </div>

@@ -185,3 +185,12 @@ export function flagSrc(subject: Pick<FlagSubject, "code">): string {
 export function regionLabel(region: Region): string {
   return REGION_INFO[region].label;
 }
+
+/** The level hint, which changes when a scope has few enough subjects. */
+export function levelHint(level: FlagLevel, scope: FlagScope): string {
+  if (level === "moeilijk" && scope === "nederland") {
+    return `Alle ${PROVINCES.length} provincies`;
+  }
+
+  return FLAG_LEVEL_INFO[level].hint;
+}

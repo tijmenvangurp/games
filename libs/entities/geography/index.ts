@@ -6,6 +6,7 @@ export {
   FLAG_LOOKALIKES,
   FLAG_SCOPE_INFO,
   flagSrc,
+  levelHint,
   lookalikeCodes,
   subjectsFor,
 } from "./model/config";

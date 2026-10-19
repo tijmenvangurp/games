@@ -2,7 +2,7 @@ import type { FlagLevel, FlagScope } from "@entities/geography";
 import { cn } from "@shared/lib";
 import { OptionPicker, SetupActions } from "@shared/ui";
 import {
-  FLAG_LEVEL_OPTIONS,
+  flagLevelOptions,
   FLAG_MODE_OPTIONS,
   FLAG_SCOPE_OPTIONS,
   scoreKey,
@@ -91,7 +91,7 @@ export function FlagsSetup({
       <div className="mt-5">
         <OptionPicker
           legend="Niveau"
-          options={FLAG_LEVEL_OPTIONS}
+          options={flagLevelOptions(settings.scope)}
           selected={settings.level}
           onSelect={onLevelChange}
         />

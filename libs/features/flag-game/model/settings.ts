@@ -3,6 +3,7 @@ import {
   FLAG_LEVELS,
   FLAG_SCOPE_INFO,
   FLAG_SCOPES,
+  levelHint,
   type FlagLevel,
   type FlagScope,
 } from "@entities/geography";
@@ -41,11 +42,13 @@ export const FLAG_SCOPE_OPTIONS = FLAG_SCOPES.map((scope) => ({
   hint: FLAG_SCOPE_INFO[scope].hint,
 }));
 
-export const FLAG_LEVEL_OPTIONS = FLAG_LEVELS.map((level) => ({
-  value: level,
-  label: FLAG_LEVEL_INFO[level].label,
-  hint: FLAG_LEVEL_INFO[level].hint,
-}));
+export function flagLevelOptions(scope: FlagScope) {
+  return FLAG_LEVELS.map((level) => ({
+    value: level,
+    label: FLAG_LEVEL_INFO[level].label,
+    hint: levelHint(level, scope),
+  }));
+}
 
 /** Best score key of the flag quiz; unchanged so existing scores survive. */
 export function bestKey(scope: FlagScope, level: FlagLevel): string {
