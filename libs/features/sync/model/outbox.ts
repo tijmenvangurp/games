@@ -169,3 +169,11 @@ export function removeOutboxEntry(entry: Pick<OutboxEntry, "profileId" | "gameId
   const key = entryKey(entry);
   writeOutbox(readOutbox().filter((candidate) => entryKey(candidate) !== key));
 }
+
+/**
+ * Removes every pending snapshot of one profile. Disabling its sync opt-in
+ * must leave nothing behind that could silently upload later.
+ */
+export function removeOutboxForProfile(profileId: string): void {
+  writeOutbox(readOutbox().filter((candidate) => candidate.profileId !== profileId));
+}

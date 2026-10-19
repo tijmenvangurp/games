@@ -2,6 +2,8 @@ export { createProgressApi, ProgressApiError, type ProgressApi } from "./model/a
 export {
   flushProgressOutbox,
   hydrateProgress,
+  isProfileSyncEnabled,
+  setProfileSyncEnabled,
   startProgressSync,
   stopProgressSync,
 } from "./model/engine";
