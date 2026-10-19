@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { createEmptyProgressMap } from "@entities/letter";
+import { createEmptyProgressMap, KLANK_POSITION_LABELS } from "@entities/letter";
 import { loadLetterProgress, useLetterStore } from "@features/letter-game";
 
 beforeEach(() => {
@@ -53,7 +53,7 @@ describe("letter game", () => {
 
     for (let index = 0; index < round.questions.length; index += 1) {
       const question = round.questions[index];
-      if (!question || question.kind === "lees") {
+      if (!question || question.kind === "lees" || question.kind === "plek") {
         throw new Error("Geen lettervraag");
       }
 
@@ -126,11 +126,43 @@ describe("letter game", () => {
     expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
   });
 
+  it("speelt een volledige klankplek-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/klankplek/i);
+    expect(round.lesson).toBe("klankplek");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "plek") {
+        throw new Error("Geen klankplekvraag");
+      }
+
+      fireEvent.click(
+        screen.getByRole("button", { name: KLANK_POSITION_LABELS[question.position] }),
+      );
+      expect(useLetterStore.getState().answered).toBe(true);
+
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap geluisterd!" })).toBeTruthy();
+    // Klankplek oefent analyse en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
   it("geeft na twee fouten het juiste antwoord", async () => {
     renderLetters();
     const round = await startLesson(/letterronde/i);
     const question = round.questions[0];
-    if (!question || question.kind === "trein" || question.kind === "lees") {
+    if (
+      !question ||
+      question.kind === "trein" ||
+      question.kind === "lees" ||
+      question.kind === "plek"
+    ) {
       throw new Error("Eerste vraag is geen klankvraag");
     }
 

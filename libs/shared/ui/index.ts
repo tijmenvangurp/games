@@ -11,6 +11,7 @@ export {
   ArrowRight,
   ArrowUp,
   Check,
+  Ear,
   Eraser,
   Eye,
   Flame,

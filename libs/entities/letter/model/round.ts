@@ -10,6 +10,7 @@ import {
 import { createEmptyProgressMap, dueLetters, todayIso } from "./progress";
 import type {
   JachtQuestion,
+  KlankPosition,
   KlankQuestion,
   LeesQuestion,
   LetterId,
@@ -17,6 +18,7 @@ import type {
   LetterQuestion,
   LetterRound,
   LetterWord,
+  PlekQuestion,
   TreinQuestion,
   VangerQuestion,
 } from "./types";
@@ -216,4 +218,59 @@ export function createTrainRound(random: () => number = Math.random): LetterRoun
   }
 
   return { lesson: "trein", questions, newLetters: [] };
+}
+
+/**
+ * Woorden met drie unieke letters. Daardoor is de plek van elke klank
+ * eenduidig: begin, midden of eind.
+ */
+const POSITION_WORDS = WORDS.filter(
+  (word) => word.letters.length === 3 && new Set(word.letters).size === word.letters.length,
+);
+
+const POSITION_PATTERN: readonly KlankPosition[] = [
+  "begin",
+  "midden",
+  "eind",
+  "begin",
+  "midden",
+  "eind",
+];
+
+function letterAtPosition(word: LetterWord, position: KlankPosition): LetterId {
+  const index = position === "begin" ? 0 : position === "midden" ? 1 : word.letters.length - 1;
+  const letter = word.letters[index];
+  if (!letter) {
+    throw new Error(`Geen letter op plek ${position} in ${word.word}`);
+  }
+  return letter;
+}
+
+function buildPlek(id: string, word: LetterWord, position: KlankPosition): PlekQuestion {
+  return {
+    kind: "plek",
+    id,
+    word,
+    target: letterAtPosition(word, position),
+    position,
+  };
+}
+
+/**
+ * Bouwt een Klankplek-ronde: het kind hoort een woord en bepaalt waar de
+ * gevraagde klank zit. Twee vragen per positie, zodat begin, midden en eind
+ * alle drie aan bod komen.
+ */
+export function createPlekRound(random: () => number = Math.random): LetterRound {
+  const words = shuffle(POSITION_WORDS, random).slice(0, ROUND_SIZE);
+  const positions = shuffle(POSITION_PATTERN, random);
+  const questions = words.map<PlekQuestion>((word, index) =>
+    buildPlek(`q${index + 1}`, word, positions[index] ?? "begin"),
+  );
+
+  if (questions.length !== ROUND_SIZE) {
+    throw new Error("Klankplek heeft een onverwachte lengte");
+  }
+
+  return { lesson: "klankplek", questions, newLetters: [] };
 }

@@ -59,4 +59,20 @@ test.describe("letterpret op een telefoon", () => {
       /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
     );
   });
+
+  test("start klankplek en kiest de plek van de klank", async ({ page }) => {
+    await page.goto("/letters");
+
+    await expect(page.getByRole("heading", { name: "Kies je les" })).toBeVisible();
+    await page.getByRole("button", { name: /klankplek/i }).click();
+
+    await expect(page.getByText("Klank 1 van 6")).toBeVisible();
+    const positions = page.getByRole("group", { name: "Kies de plek van de klank" });
+    await expect(positions.getByRole("button")).toHaveCount(3);
+
+    await expect(page.locator("audio").first()).toHaveAttribute(
+      "src",
+      /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
+    );
+  });
 });

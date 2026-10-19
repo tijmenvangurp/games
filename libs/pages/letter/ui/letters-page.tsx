@@ -15,6 +15,9 @@ function subtitleFor(round: LetterRound | null): string {
   if (round.lesson === "trein") {
     return "Woordtrein · 6 woorden";
   }
+  if (round.lesson === "klankplek") {
+    return "Klankplek · 6 woorden";
+  }
   return "Letterronde · 6 vragen";
 }
 
@@ -30,6 +33,13 @@ function celebrationFor(round: LetterRound | null, known: readonly string[]) {
     return {
       title: "Knap gebouwd!",
       description: "Je bouwde zes woorden. Probeer het nog eens met andere woorden.",
+    };
+  }
+
+  if (round?.lesson === "klankplek") {
+    return {
+      title: "Knap geluisterd!",
+      description: "Je hoorde waar de klank zat. Probeer het nog eens met andere woorden.",
     };
   }
 

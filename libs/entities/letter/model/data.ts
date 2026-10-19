@@ -1,5 +1,6 @@
 import {
   LETTER_IDS,
+  type KlankPosition,
   type Letter,
   type LetterId,
   type LetterLessonInfo,
@@ -29,7 +30,26 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
     title: "Woordtrein",
     description: "Bouw het woord met letters. Zes korte woorden.",
   },
+  {
+    id: "klankplek",
+    title: "Klankplek",
+    description: "Waar hoor je de klank? Vooraan, in het midden of achteraan. Zes woorden.",
+  },
 ];
+
+export const KLANK_POSITIONS: readonly KlankPosition[] = ["begin", "midden", "eind"];
+
+export const KLANK_POSITION_LABELS: Readonly<Record<KlankPosition, string>> = {
+  begin: "Vooraan",
+  midden: "In het midden",
+  eind: "Achteraan",
+};
+
+export const KLANK_POSITION_PHRASES: Readonly<Record<KlankPosition, string>> = {
+  begin: "vooraan in",
+  midden: "in het midden van",
+  eind: "achteraan in",
+};
 
 export const LETTERS: readonly Letter[] = [
   { id: "i", glyph: "i", kind: "vowel", sound: sound("i") },

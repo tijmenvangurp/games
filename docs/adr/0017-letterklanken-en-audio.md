@@ -65,7 +65,7 @@ Bron: Wikimedia Commons. De bestanden zijn getrimd, genormaliseerd en naar WAV o
 ## Gevolgen
 
 - Het spel werkt volledig offline en zonder externe requests; de audio staat in de repository.
-- **Woordlezen** (luisteren → geschreven woord kiezen) en **Woordtrein** (woord bouwen uit letters) hergebruiken dezelfde vijftien woordopnames; die lessen voegden geen nieuwe audiobestanden toe.
+- **Woordlezen** (luisteren → geschreven woord kiezen), **Woordtrein** (woord bouwen uit letters) en **Klankplek** (de plek van een klank in een woord) hergebruiken dezelfde vijftien woordopnames en de tien losse klanken; die lessen voegden geen nieuwe audiobestanden toe.
 - De klanken zijn echte fonemen. Bij stopletters (`k`, `p`, `t`) is de klank kort — dat is fonetisch correct, maar vraagt om een luistertest met een leesspecialist.
 - De klankstem (Belgisch-Nederlands, vrouwelijk) en de woordstemmen (diverse Nederlandse mannen) verschillen. Dat is een bewuste, tijdelijke prototype-beperking.
 - Zolang de Commons-woorden in gebruik zijn, geldt attributie en share-alike voor die bestanden. De app-code valt daar niet onder; een nieuwe opname-set maakt de repository volledig CC0/eigen werk.

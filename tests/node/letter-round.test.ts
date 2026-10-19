@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createEmptyProgressMap,
   createLetterRound,
+  createPlekRound,
   createTrainRound,
   createWordRound,
   WORDS,
@@ -185,5 +186,54 @@ describe("train round", () => {
     const first = createTrainRound(mulberry32(23));
     const second = createTrainRound(mulberry32(23));
     expect(first).toEqual(second);
+  });
+});
+
+describe("plek round", () => {
+  it("bouwt zes klankplekvragen met twee per positie", () => {
+    const round = createPlekRound(mulberry32(31));
+    expect(round.lesson).toBe("klankplek");
+    expect(round.newLetters).toEqual([]);
+    expect(round.questions).toHaveLength(6);
+
+    const positions = new Map<string, number>();
+    const words = new Set<string>();
+    for (const question of round.questions) {
+      expect(question.kind).toBe("plek");
+      if (question.kind !== "plek") {
+        continue;
+      }
+
+      words.add(question.word.id);
+      expect(question.word.letters).toHaveLength(3);
+      expect(question.word.letters).toContain(question.target);
+      expect(new Set(question.word.letters).size).toBe(3);
+
+      const index = question.word.letters.indexOf(question.target);
+      const expected = index === 0 ? "begin" : index === 2 ? "eind" : "midden";
+      expect(question.position).toBe(expected);
+      positions.set(question.position, (positions.get(question.position) ?? 0) + 1);
+    }
+
+    expect(words.size).toBe(6);
+    expect(positions.get("begin")).toBe(2);
+    expect(positions.get("midden")).toBe(2);
+    expect(positions.get("eind")).toBe(2);
+  });
+
+  it("is deterministisch met dezelfde seed", () => {
+    const first = createPlekRound(mulberry32(32));
+    const second = createPlekRound(mulberry32(32));
+    expect(first).toEqual(second);
+  });
+
+  it("gebruikt alleen woorden met drie unieke letters en lokale audio", () => {
+    const round = createPlekRound(mulberry32(33));
+    for (const question of round.questions) {
+      if (question.kind === "plek") {
+        expect(question.word.word).toMatch(/^[a-z]{3}$/);
+        expect(question.word.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+      }
+    }
   });
 });

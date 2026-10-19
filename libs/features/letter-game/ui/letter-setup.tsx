@@ -5,7 +5,7 @@ import {
   type LetterLesson,
   type LetterProgressMap,
 } from "@entities/letter";
-import { Button, Eye, Play, TrainFront } from "@shared/ui";
+import { Button, Ear, Eye, Play, TrainFront } from "@shared/ui";
 
 interface LetterSetupProps {
   progress: LetterProgressMap;
@@ -18,6 +18,9 @@ function LessonIcon({ lesson }: { lesson: LetterLesson }) {
   }
   if (lesson === "woorden") {
     return <Eye aria-hidden="true" className="size-5" />;
+  }
+  if (lesson === "klankplek") {
+    return <Ear aria-hidden="true" className="size-5" />;
   }
   return <TrainFront aria-hidden="true" className="size-5" />;
 }

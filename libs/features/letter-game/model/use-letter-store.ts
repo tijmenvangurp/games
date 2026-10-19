@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {
   createLetterRound,
+  createPlekRound,
   createTrainRound,
   createWordRound,
   recordLetterAnswer,
@@ -52,6 +53,9 @@ function roundFor(lesson: LetterLesson, progress: LetterProgressMap): LetterRoun
   if (lesson === "trein") {
     return createTrainRound();
   }
+  if (lesson === "klankplek") {
+    return createPlekRound();
+  }
   return createLetterRound(progress);
 }
 
@@ -72,17 +76,20 @@ function startRound(set: StoreSet, get: StoreGet, lesson: LetterLesson = "letter
 }
 
 function expectedAnswer(question: LetterQuestion): string {
+  if (question.kind === "plek") {
+    return question.position;
+  }
   return question.kind === "lees" ? question.target.id : question.target;
 }
 
-/** Woordlezen is oefenen; alleen lettervragen werken de lettervoortgang bij. */
+/** Woordlezen en Klankplek zijn oefenen; alleen lettervragen werken de voortgang bij. */
 function applyChoiceProgress(
   set: StoreSet,
   get: StoreGet,
   question: LetterQuestion,
   correct: boolean,
 ): void {
-  if (question.kind === "lees") {
+  if (question.kind === "lees" || question.kind === "plek") {
     return;
   }
   applyProgress(set, get, question.target, correct);
