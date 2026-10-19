@@ -19,7 +19,7 @@ Vlaggen zijn vrijwel allemaal publiek domein, maar de keuze van de bestanden, de
 
 ## Beslissing
 
-1. **Eén spel, twee richtingen.** Vlaggenreis stelt per ronde tien vragen. De helft toont een vlag met de vraag welk land erbij hoort, de helft toont een landennaam met de vraag welke vlag erbij hoort. De richtingen wisselen elkaar in willekeurige volgorde af; er is geen aparte spellingsmodus.
+1. **Eén spel, twee richtingen.** Vlaggenreis stelt per ronde tien vragen. Naast deze vlaggenmodus heeft het spel een kaartpuzzel; zie [ADR 0020](0020-kaartpuzzel.md). De helft toont een vlag met de vraag welk land erbij hoort, de helft toont een landennaam met de vraag welke vlag erbij hoort. De richtingen wisselen elkaar in willekeurige volgorde af; er is geen aparte spellingsmodus.
 2. **Per continent, de hele wereld of Nederland.** De speler kiest Europa, Azië, Afrika, Noord-Amerika, Zuid-Amerika, Oceanië, de hele wereld of de twaalf provincies van Nederland. Binnen een ronde komt elk onderwerp maximaal één keer langs en blijven de afleiders binnen het gekozen gebied.
 3. **Drie niveaus.** Makkelijk geeft 3 keuzes, bij voorkeur uit een ander continent; gemiddeld 4 keuzes uit hetzelfde continent; moeilijk 4 keuzes uit hetzelfde continent, waarbij vlaggen die op elkaar lijken (`libs/entities/geography/model/config.ts`) voorgaan. In de provinciescope valt de groep "ander continent" weg en komen de afleiders altijd uit de twaalf provincies.
 4. **De vlaggen staan lokaal** in `apps/games/public/flags/<code>.svg`. Landen gebruiken de ISO 3166-1 alpha-2-code in kleine letters (`nl.svg`); provincies de ISO 3166-2-code (`nl-dr.svg`). De app bouwt zelf het pad; er gaat geen request naar buiten.

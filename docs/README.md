@@ -21,6 +21,7 @@
 - `adr/0017-letterklanken-en-audio.md` — CC0-klanken uit Rhasspy Nathalie en prototype-woordaudio, te vervangen vóór lancering.
 - `adr/0018-vlaggenspel.md` — Vlaggenreis: lokale vlaggen, Wikidata-namen, de provinciescope en de niveaus.
 - `adr/0019-wereldkaart.md` — de kaartstack met d3-geo en Natural Earth, de lazy chunk en de marker-terugval.
+- `adr/0020-kaartpuzzel.md` — de kaartpuzzel als tweede speelwijze: acht stukken rond een ankeland, slepen of tikken en de hintniveaus.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
