@@ -425,7 +425,7 @@ function renderPage(manifest: Manifest): string {
   <p class="note">Beluister per klank de varianten en per stem. Noteer de variantnaam en de stem die het beste werken.</p>
   <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
   ${sections}
-  <p class="note">Prototype. Stemmen: nathalie (CC0) en mls-0 (CC BY 4.0). Zie <a href="./LICENSES.md">LICENSES.md</a>.</p>
+  <p class="note">Prototype. Zie <a href="./LICENSES.md">LICENSES.md</a> voor de herkomst en licenties van de stemmen.</p>
 </body>
 </html>
 `;

@@ -1,18 +1,12 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T07:42:49.315Z",
+  "generatedAt": "2026-10-19T07:49:16.242Z",
   "voices": [
     {
       "slug": "nathalie",
       "model": "speaches-ai/piper-nl_BE-nathalie-medium",
       "voice": "nathalie",
       "label": "nathalie"
-    },
-    {
-      "slug": "mls-0",
-      "model": "speaches-ai/piper-nl_NL-mls-medium",
-      "voice": "0",
-      "label": "mls-0"
     }
   ],
   "sounds": {
@@ -25,8 +19,7 @@
           "label": "Losse letter",
           "prompt": "a",
           "files": {
-            "nathalie": "./nathalie/a/letter.mp3",
-            "mls-0": "./mls-0/a/letter.mp3"
+            "nathalie": "./nathalie/a/letter.mp3"
           }
         },
         {
@@ -34,8 +27,7 @@
           "label": "Fonetische spelling",
           "prompt": "ah",
           "files": {
-            "nathalie": "./nathalie/a/fonetisch.mp3",
-            "mls-0": "./mls-0/a/fonetisch.mp3"
+            "nathalie": "./nathalie/a/fonetisch.mp3"
           }
         },
         {
@@ -43,8 +35,7 @@
           "label": "Fonetisch, langzaam",
           "prompt": "ah",
           "files": {
-            "nathalie": "./nathalie/a/langzaam.mp3",
-            "mls-0": "./mls-0/a/langzaam.mp3"
+            "nathalie": "./nathalie/a/langzaam.mp3"
           }
         },
         {
@@ -52,8 +43,7 @@
           "label": "Woord: mat (knip zelf)",
           "prompt": "mat",
           "files": {
-            "nathalie": "./nathalie/a/woord.mp3",
-            "mls-0": "./mls-0/a/woord.mp3"
+            "nathalie": "./nathalie/a/woord.mp3"
           }
         },
         {
@@ -73,8 +63,7 @@
           "label": "Losse letter",
           "prompt": "e",
           "files": {
-            "nathalie": "./nathalie/e/letter.mp3",
-            "mls-0": "./mls-0/e/letter.mp3"
+            "nathalie": "./nathalie/e/letter.mp3"
           }
         },
         {
@@ -82,8 +71,7 @@
           "label": "Fonetische spelling",
           "prompt": "eh",
           "files": {
-            "nathalie": "./nathalie/e/fonetisch.mp3",
-            "mls-0": "./mls-0/e/fonetisch.mp3"
+            "nathalie": "./nathalie/e/fonetisch.mp3"
           }
         },
         {
@@ -91,8 +79,7 @@
           "label": "Fonetisch, langzaam",
           "prompt": "eh",
           "files": {
-            "nathalie": "./nathalie/e/langzaam.mp3",
-            "mls-0": "./mls-0/e/langzaam.mp3"
+            "nathalie": "./nathalie/e/langzaam.mp3"
           }
         },
         {
@@ -100,8 +87,7 @@
           "label": "Woord: mes (knip zelf)",
           "prompt": "mes",
           "files": {
-            "nathalie": "./nathalie/e/woord.mp3",
-            "mls-0": "./mls-0/e/woord.mp3"
+            "nathalie": "./nathalie/e/woord.mp3"
           }
         },
         {
@@ -121,8 +107,7 @@
           "label": "Losse letter",
           "prompt": "i",
           "files": {
-            "nathalie": "./nathalie/i/letter.mp3",
-            "mls-0": "./mls-0/i/letter.mp3"
+            "nathalie": "./nathalie/i/letter.mp3"
           }
         },
         {
@@ -130,8 +115,7 @@
           "label": "Fonetische spelling",
           "prompt": "ih",
           "files": {
-            "nathalie": "./nathalie/i/fonetisch.mp3",
-            "mls-0": "./mls-0/i/fonetisch.mp3"
+            "nathalie": "./nathalie/i/fonetisch.mp3"
           }
         },
         {
@@ -139,8 +123,7 @@
           "label": "Fonetisch, langzaam",
           "prompt": "ih",
           "files": {
-            "nathalie": "./nathalie/i/langzaam.mp3",
-            "mls-0": "./mls-0/i/langzaam.mp3"
+            "nathalie": "./nathalie/i/langzaam.mp3"
           }
         },
         {
@@ -148,8 +131,7 @@
           "label": "Woord: vis (knip zelf)",
           "prompt": "vis",
           "files": {
-            "nathalie": "./nathalie/i/woord.mp3",
-            "mls-0": "./mls-0/i/woord.mp3"
+            "nathalie": "./nathalie/i/woord.mp3"
           }
         },
         {
@@ -169,8 +151,7 @@
           "label": "Losse letter",
           "prompt": "k",
           "files": {
-            "nathalie": "./nathalie/k/letter.mp3",
-            "mls-0": "./mls-0/k/letter.mp3"
+            "nathalie": "./nathalie/k/letter.mp3"
           }
         },
         {
@@ -178,8 +159,7 @@
           "label": "Fonetische spelling",
           "prompt": "kuh",
           "files": {
-            "nathalie": "./nathalie/k/fonetisch.mp3",
-            "mls-0": "./mls-0/k/fonetisch.mp3"
+            "nathalie": "./nathalie/k/fonetisch.mp3"
           }
         },
         {
@@ -187,8 +167,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "kkk",
           "files": {
-            "nathalie": "./nathalie/k/aangehouden.mp3",
-            "mls-0": "./mls-0/k/aangehouden.mp3"
+            "nathalie": "./nathalie/k/aangehouden.mp3"
           }
         },
         {
@@ -196,8 +175,7 @@
           "label": "Woord: kip (knip zelf)",
           "prompt": "kip",
           "files": {
-            "nathalie": "./nathalie/k/woord.mp3",
-            "mls-0": "./mls-0/k/woord.mp3"
+            "nathalie": "./nathalie/k/woord.mp3"
           }
         },
         {
@@ -223,8 +201,7 @@
           "label": "Losse letter",
           "prompt": "m",
           "files": {
-            "nathalie": "./nathalie/m/letter.mp3",
-            "mls-0": "./mls-0/m/letter.mp3"
+            "nathalie": "./nathalie/m/letter.mp3"
           }
         },
         {
@@ -232,8 +209,7 @@
           "label": "Fonetische spelling",
           "prompt": "mmm",
           "files": {
-            "nathalie": "./nathalie/m/fonetisch.mp3",
-            "mls-0": "./mls-0/m/fonetisch.mp3"
+            "nathalie": "./nathalie/m/fonetisch.mp3"
           }
         },
         {
@@ -241,8 +217,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "mmm",
           "files": {
-            "nathalie": "./nathalie/m/aangehouden.mp3",
-            "mls-0": "./mls-0/m/aangehouden.mp3"
+            "nathalie": "./nathalie/m/aangehouden.mp3"
           }
         },
         {
@@ -250,8 +225,7 @@
           "label": "Woord: mat (knip zelf)",
           "prompt": "mat",
           "files": {
-            "nathalie": "./nathalie/m/woord.mp3",
-            "mls-0": "./mls-0/m/woord.mp3"
+            "nathalie": "./nathalie/m/woord.mp3"
           }
         },
         {
@@ -277,8 +251,7 @@
           "label": "Losse letter",
           "prompt": "n",
           "files": {
-            "nathalie": "./nathalie/n/letter.mp3",
-            "mls-0": "./mls-0/n/letter.mp3"
+            "nathalie": "./nathalie/n/letter.mp3"
           }
         },
         {
@@ -286,8 +259,7 @@
           "label": "Fonetische spelling",
           "prompt": "nnn",
           "files": {
-            "nathalie": "./nathalie/n/fonetisch.mp3",
-            "mls-0": "./mls-0/n/fonetisch.mp3"
+            "nathalie": "./nathalie/n/fonetisch.mp3"
           }
         },
         {
@@ -295,8 +267,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "nnn",
           "files": {
-            "nathalie": "./nathalie/n/aangehouden.mp3",
-            "mls-0": "./mls-0/n/aangehouden.mp3"
+            "nathalie": "./nathalie/n/aangehouden.mp3"
           }
         },
         {
@@ -304,8 +275,7 @@
           "label": "Woord: net (knip zelf)",
           "prompt": "net",
           "files": {
-            "nathalie": "./nathalie/n/woord.mp3",
-            "mls-0": "./mls-0/n/woord.mp3"
+            "nathalie": "./nathalie/n/woord.mp3"
           }
         },
         {
@@ -331,8 +301,7 @@
           "label": "Losse letter",
           "prompt": "p",
           "files": {
-            "nathalie": "./nathalie/p/letter.mp3",
-            "mls-0": "./mls-0/p/letter.mp3"
+            "nathalie": "./nathalie/p/letter.mp3"
           }
         },
         {
@@ -340,8 +309,7 @@
           "label": "Fonetische spelling",
           "prompt": "puh",
           "files": {
-            "nathalie": "./nathalie/p/fonetisch.mp3",
-            "mls-0": "./mls-0/p/fonetisch.mp3"
+            "nathalie": "./nathalie/p/fonetisch.mp3"
           }
         },
         {
@@ -349,8 +317,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "ppp",
           "files": {
-            "nathalie": "./nathalie/p/aangehouden.mp3",
-            "mls-0": "./mls-0/p/aangehouden.mp3"
+            "nathalie": "./nathalie/p/aangehouden.mp3"
           }
         },
         {
@@ -358,8 +325,7 @@
           "label": "Woord: pen (knip zelf)",
           "prompt": "pen",
           "files": {
-            "nathalie": "./nathalie/p/woord.mp3",
-            "mls-0": "./mls-0/p/woord.mp3"
+            "nathalie": "./nathalie/p/woord.mp3"
           }
         },
         {
@@ -385,8 +351,7 @@
           "label": "Losse letter",
           "prompt": "s",
           "files": {
-            "nathalie": "./nathalie/s/letter.mp3",
-            "mls-0": "./mls-0/s/letter.mp3"
+            "nathalie": "./nathalie/s/letter.mp3"
           }
         },
         {
@@ -394,8 +359,7 @@
           "label": "Fonetische spelling",
           "prompt": "sss",
           "files": {
-            "nathalie": "./nathalie/s/fonetisch.mp3",
-            "mls-0": "./mls-0/s/fonetisch.mp3"
+            "nathalie": "./nathalie/s/fonetisch.mp3"
           }
         },
         {
@@ -403,8 +367,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "sss",
           "files": {
-            "nathalie": "./nathalie/s/aangehouden.mp3",
-            "mls-0": "./mls-0/s/aangehouden.mp3"
+            "nathalie": "./nathalie/s/aangehouden.mp3"
           }
         },
         {
@@ -412,8 +375,7 @@
           "label": "Woord: sap (knip zelf)",
           "prompt": "sap",
           "files": {
-            "nathalie": "./nathalie/s/woord.mp3",
-            "mls-0": "./mls-0/s/woord.mp3"
+            "nathalie": "./nathalie/s/woord.mp3"
           }
         },
         {
@@ -439,8 +401,7 @@
           "label": "Losse letter",
           "prompt": "t",
           "files": {
-            "nathalie": "./nathalie/t/letter.mp3",
-            "mls-0": "./mls-0/t/letter.mp3"
+            "nathalie": "./nathalie/t/letter.mp3"
           }
         },
         {
@@ -448,8 +409,7 @@
           "label": "Fonetische spelling",
           "prompt": "tuh",
           "files": {
-            "nathalie": "./nathalie/t/fonetisch.mp3",
-            "mls-0": "./mls-0/t/fonetisch.mp3"
+            "nathalie": "./nathalie/t/fonetisch.mp3"
           }
         },
         {
@@ -457,8 +417,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "ttt",
           "files": {
-            "nathalie": "./nathalie/t/aangehouden.mp3",
-            "mls-0": "./mls-0/t/aangehouden.mp3"
+            "nathalie": "./nathalie/t/aangehouden.mp3"
           }
         },
         {
@@ -466,8 +425,7 @@
           "label": "Woord: tak (knip zelf)",
           "prompt": "tak",
           "files": {
-            "nathalie": "./nathalie/t/woord.mp3",
-            "mls-0": "./mls-0/t/woord.mp3"
+            "nathalie": "./nathalie/t/woord.mp3"
           }
         },
         {
@@ -493,8 +451,7 @@
           "label": "Losse letter",
           "prompt": "v",
           "files": {
-            "nathalie": "./nathalie/v/letter.mp3",
-            "mls-0": "./mls-0/v/letter.mp3"
+            "nathalie": "./nathalie/v/letter.mp3"
           }
         },
         {
@@ -502,8 +459,7 @@
           "label": "Fonetische spelling",
           "prompt": "vvv",
           "files": {
-            "nathalie": "./nathalie/v/fonetisch.mp3",
-            "mls-0": "./mls-0/v/fonetisch.mp3"
+            "nathalie": "./nathalie/v/fonetisch.mp3"
           }
         },
         {
@@ -511,8 +467,7 @@
           "label": "Aangehouden / herhaald",
           "prompt": "vvv",
           "files": {
-            "nathalie": "./nathalie/v/aangehouden.mp3",
-            "mls-0": "./mls-0/v/aangehouden.mp3"
+            "nathalie": "./nathalie/v/aangehouden.mp3"
           }
         },
         {
@@ -520,8 +475,7 @@
           "label": "Woord: vis (knip zelf)",
           "prompt": "vis",
           "files": {
-            "nathalie": "./nathalie/v/woord.mp3",
-            "mls-0": "./mls-0/v/woord.mp3"
+            "nathalie": "./nathalie/v/woord.mp3"
           }
         },
         {
