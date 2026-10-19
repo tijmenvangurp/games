@@ -26,6 +26,7 @@ export {
   Search,
   Sparkles,
   Star,
+  TrainFront,
   Trophy,
   Undo2,
   Volume2,

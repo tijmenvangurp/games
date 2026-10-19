@@ -41,4 +41,22 @@ test.describe("letterpret op een telefoon", () => {
       /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
     );
   });
+
+  test("start woordtrein en speelt een woord af", async ({ page }) => {
+    await page.goto("/letters");
+
+    await expect(page.getByRole("heading", { name: "Kies je les" })).toBeVisible();
+    await page.getByRole("button", { name: /woordtrein/i }).click();
+
+    await expect(page.getByText("Woord 1 van 6")).toBeVisible();
+    await expect(page.getByLabel("Woordvakken")).toBeVisible();
+
+    const tiles = page.getByRole("group", { name: "Kies letters" }).getByRole("button");
+    expect(await tiles.count()).toBeGreaterThanOrEqual(3);
+
+    await expect(page.locator("audio").first()).toHaveAttribute(
+      "src",
+      /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
+    );
+  });
 });

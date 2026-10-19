@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   createEmptyProgressMap,
   createLetterRound,
+  createTrainRound,
   createWordRound,
   WORDS,
 } from "@entities/letter";
@@ -140,5 +141,49 @@ describe("word round", () => {
         expect(question.target.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
       }
     }
+  });
+});
+
+describe("train round", () => {
+  it("bouwt zes woorden uit losse letters", () => {
+    const round = createTrainRound(mulberry32(21));
+    expect(round.lesson).toBe("trein");
+    expect(round.newLetters).toEqual([]);
+    expect(round.questions).toHaveLength(6);
+
+    const words = new Set<string>();
+    for (const question of round.questions) {
+      expect(question.kind).toBe("trein");
+      if (question.kind !== "trein") {
+        continue;
+      }
+
+      words.add(question.word.id);
+      expect(question.target).toBe(question.word.letter);
+      expect(question.tiles).toHaveLength(question.word.letters.length + 1);
+      for (const letter of question.word.letters) {
+        expect(question.tiles).toContain(letter);
+      }
+      expect(new Set(question.tiles).size).toBe(question.tiles.length);
+    }
+
+    expect(words.size).toBe(6);
+  });
+
+  it("voegt precies één extra letter toe die niet in het woord zit", () => {
+    const round = createTrainRound(mulberry32(22));
+    for (const question of round.questions) {
+      if (question.kind !== "trein") {
+        continue;
+      }
+      const extras = question.tiles.filter((letter) => !question.word.letters.includes(letter));
+      expect(extras).toHaveLength(1);
+    }
+  });
+
+  it("is deterministisch met dezelfde seed", () => {
+    const first = createTrainRound(mulberry32(23));
+    const second = createTrainRound(mulberry32(23));
+    expect(first).toEqual(second);
   });
 });

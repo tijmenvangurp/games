@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import {
   createLetterRound,
+  createTrainRound,
   createWordRound,
   recordLetterAnswer,
   type LetterId,
@@ -44,8 +45,18 @@ function applyProgress(set: StoreSet, get: StoreGet, letter: LetterId, correct: 
   saveLetterProgress(progress);
 }
 
+function roundFor(lesson: LetterLesson, progress: LetterProgressMap): LetterRound {
+  if (lesson === "woorden") {
+    return createWordRound();
+  }
+  if (lesson === "trein") {
+    return createTrainRound();
+  }
+  return createLetterRound(progress);
+}
+
 function startRound(set: StoreSet, get: StoreGet, lesson: LetterLesson = "letters"): void {
-  const round = lesson === "woorden" ? createWordRound() : createLetterRound(get().progress);
+  const round = roundFor(lesson, get().progress);
   set({
     round,
     index: 0,
@@ -104,7 +115,7 @@ function choose(set: StoreSet, get: StoreGet, answer: string): void {
 
 function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
   const question = currentQuestion(get);
-  const { answered, filled, wrongLetters } = get();
+  const { answered, filled, round, wrongLetters } = get();
   if (!question || question.kind !== "trein" || answered) {
     return;
   }
@@ -130,7 +141,11 @@ function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
   }
 
   set({ filled: nextFilled, answered: true, correct: true });
-  applyProgress(set, get, question.target, wrongLetters.length === 0);
+  // Woordtrein oefent synthese; de losse letters zijn al geoefend. Alleen in de
+  // letterronde telt de trein mee voor de voortgang van de beginletter.
+  if (round?.lesson !== "trein") {
+    applyProgress(set, get, question.target, wrongLetters.length === 0);
+  }
   playSound("match");
   playHaptic("match");
 }

@@ -4,6 +4,7 @@ import {
   type KlankQuestion,
   type LeesQuestion,
   type LetterId,
+  type LetterLesson,
   type LetterQuestion,
   type LetterWord,
   type TreinQuestion,
@@ -16,6 +17,16 @@ import { LetterTile } from "./letter-tile";
 import { WordTile } from "./word-tile";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
+
+function lessonHeader(lesson: LetterLesson): { unit: string; title: string } {
+  if (lesson === "woorden") {
+    return { unit: "Woord", title: "Woordlezen" };
+  }
+  if (lesson === "trein") {
+    return { unit: "Woord", title: "Woordtrein" };
+  }
+  return { unit: "Vraag", title: "Letterronde" };
+}
 
 function choiceState(
   letter: LetterId,
@@ -420,17 +431,15 @@ export function LetterPlay() {
     return null;
   }
 
-  const isWordLesson = round.lesson === "woorden";
+  const header = lessonHeader(round.lesson);
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <header className="game-panel flex items-center justify-between px-3 py-2">
         <p className="text-sm font-black text-muted-foreground">
-          {isWordLesson ? "Woord" : "Vraag"} {index + 1} van {round.questions.length}
+          {header.unit} {index + 1} van {round.questions.length}
         </p>
-        <span className="text-sm font-bold text-primary">
-          {isWordLesson ? "Woordlezen" : "Letterronde"}
-        </span>
+        <span className="text-sm font-bold text-primary">{header.title}</span>
       </header>
       <QuestionCard
         answered={answered}

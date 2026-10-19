@@ -99,6 +99,33 @@ describe("letter game", () => {
     expect(loadLetterProgress().i.attempts).toBe(0);
   });
 
+  it("speelt een volledige woordtrein-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/woordtrein/i);
+    expect(round.lesson).toBe("trein");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "trein") {
+        throw new Error("Geen treinvraag");
+      }
+
+      for (const letter of question.word.letters) {
+        fireEvent.click(screen.getByRole("button", { name: `Letter ${letter}` }));
+      }
+
+      expect(useLetterStore.getState().answered).toBe(true);
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap gebouwd!" })).toBeTruthy();
+    // Woordtrein oefent synthese en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
   it("geeft na twee fouten het juiste antwoord", async () => {
     renderLetters();
     const round = await startLesson(/letterronde/i);

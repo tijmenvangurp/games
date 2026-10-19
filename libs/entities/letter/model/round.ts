@@ -200,3 +200,20 @@ export function createWordRound(random: () => number = Math.random): LetterRound
 
   return { lesson: "woorden", questions, newLetters: [] };
 }
+
+/**
+ * Bouwt een Woordtrein-ronde: zes woorden bouwen uit losse letters. Dit is de
+ * stap van woorden herkennen naar zelf decoderen (synthese).
+ */
+export function createTrainRound(random: () => number = Math.random): LetterRound {
+  const words = shuffle(TRAIN_WORDS, random).slice(0, ROUND_SIZE);
+  const questions = words.map<TreinQuestion>((word, index) =>
+    buildTrein(`q${index + 1}`, word, random),
+  );
+
+  if (questions.length !== ROUND_SIZE) {
+    throw new Error("Woordtrein heeft een onverwachte lengte");
+  }
+
+  return { lesson: "trein", questions, newLetters: [] };
+}

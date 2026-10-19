@@ -24,6 +24,11 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
     title: "Woordlezen",
     description: "Luister naar een woord en kies het juiste woord. Zes woorden.",
   },
+  {
+    id: "trein",
+    title: "Woordtrein",
+    description: "Bouw het woord met letters. Zes korte woorden.",
+  },
 ];
 
 export const LETTERS: readonly Letter[] = [

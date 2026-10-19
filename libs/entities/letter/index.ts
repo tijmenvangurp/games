@@ -19,7 +19,7 @@ export {
   recordLetterAnswer,
   stageForCorrect,
 } from "./model/progress";
-export { createLetterRound, createWordRound } from "./model/round";
+export { createLetterRound, createTrainRound, createWordRound } from "./model/round";
 export { LETTER_IDS } from "./model/types";
 export type {
   JachtQuestion,

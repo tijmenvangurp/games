@@ -4,7 +4,7 @@ export type LetterId = (typeof LETTER_IDS)[number];
 
 export type LetterKind = "vowel" | "consonant";
 
-export type LetterLesson = "letters" | "woorden";
+export type LetterLesson = "letters" | "woorden" | "trein";
 
 export interface LetterLessonInfo {
   id: LetterLesson;
