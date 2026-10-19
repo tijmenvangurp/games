@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-flag",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/flag",
+  "tags": ["layer:entities", "scope:flags", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/flag"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}
