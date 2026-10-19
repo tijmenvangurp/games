@@ -1,27 +1,41 @@
 import {
+  provinceMap,
   worldMap,
   type Country,
   type FlagSubject,
-  type MapPlace,
   type WorldMap,
 } from "@entities/geography";
 import { useEffect, useState } from "react";
 
 const MAP_WIDTH = 320;
 const MAP_HEIGHT = 180;
+// The Netherlands is almost square; a portrait frame shows it bigger.
+const PROVINCE_MAP_WIDTH = 240;
+const PROVINCE_MAP_HEIGHT = 260;
+
+function isCountry(subject: FlagSubject): subject is Country {
+  return "numeric" in subject;
+}
 
 /**
- * The atlas is a separate chunk, so the map only loads once the answer is
- * shown. Until then, and if loading fails, the map stays out of the way: the
- * text explanation already carries the answer.
+ * The maps are separate chunks, so nothing loads until the answer is shown.
+ * Countries use the world atlas; provinces use the Dutch province map, where
+ * a marker on a world map would put all twelve on the same dot.
  */
-function useWorldMap({ latitude, longitude, numeric }: MapPlace): WorldMap | null {
+function usePlaceMap(subject: FlagSubject): WorldMap | null {
   const [map, setMap] = useState<WorldMap | null>(null);
+  const { code, latitude, longitude } = subject;
+  const numeric = isCountry(subject) ? subject.numeric : undefined;
 
   useEffect(() => {
     let cancelled = false;
     setMap(null);
-    void worldMap({ latitude, longitude, numeric }, MAP_WIDTH, MAP_HEIGHT)
+    const load =
+      numeric === undefined
+        ? provinceMap(code, PROVINCE_MAP_WIDTH, PROVINCE_MAP_HEIGHT)
+        : worldMap({ latitude, longitude, numeric }, MAP_WIDTH, MAP_HEIGHT);
+
+    void load
       .then((next) => {
         if (!cancelled) {
           setMap(next);
@@ -34,21 +48,9 @@ function useWorldMap({ latitude, longitude, numeric }: MapPlace): WorldMap | nul
     return () => {
       cancelled = true;
     };
-  }, [latitude, longitude, numeric]);
+  }, [code, latitude, longitude, numeric]);
 
   return map;
-}
-
-function isCountry(subject: FlagSubject): subject is Country {
-  return "numeric" in subject;
-}
-
-function placeOf(subject: FlagSubject): MapPlace {
-  return {
-    latitude: subject.latitude,
-    longitude: subject.longitude,
-    numeric: isCountry(subject) ? subject.numeric : undefined,
-  };
 }
 
 /**
@@ -57,7 +59,7 @@ function placeOf(subject: FlagSubject): MapPlace {
  * adds nothing.
  */
 export function PlaceMap({ subject }: { subject: FlagSubject }) {
-  const map = useWorldMap(placeOf(subject));
+  const map = usePlaceMap(subject);
   if (!map) {
     return null;
   }
@@ -68,7 +70,7 @@ export function PlaceMap({ subject }: { subject: FlagSubject }) {
       className="mx-auto h-auto w-full max-w-xs rounded-2xl border bg-sky-50"
       data-testid="place-map"
       focusable="false"
-      viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+      viewBox={`0 0 ${map.width} ${map.height}`}
     >
       <path className="fill-emerald-50 stroke-emerald-200" d={map.land} strokeWidth={0.5} />
       {map.highlight ? (

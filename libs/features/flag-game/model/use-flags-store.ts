@@ -1,10 +1,13 @@
 import { create } from "zustand";
 import {
   COUNTRIES,
+  countryShapeCodes,
   createPuzzleRound,
   createRound,
+  PROVINCES,
+  provincePuzzleMap,
+  provinceShapeCodes,
   puzzleMap,
-  worldShapeCodes,
   type FlagLevel,
   type FlagRound,
   type FlagScope,
@@ -87,11 +90,7 @@ function startRound(set: StoreSet, get: StoreGet): void {
 }
 
 function chooseMode(set: StoreSet, get: StoreGet, mode: FlagMode): void {
-  const { scope } = get().settings;
-  // Provinces have no outline in the world atlas yet, so the puzzle stays on
-  // the map of a country scope.
-  const nextScope = mode === "kaartpuzzel" && scope === "nederland" ? "europa" : scope;
-  saveSettings(set, get, { mode, scope: nextScope });
+  saveSettings(set, get, { mode });
 }
 
 function chooseScope(set: StoreSet, get: StoreGet, scope: FlagScope): void {
@@ -177,13 +176,13 @@ async function startPuzzleRound(set: StoreSet, get: StoreGet): Promise<void> {
   });
 
   try {
-    const shapeCodes = await worldShapeCodes();
-    const round = createPuzzleRound(settings.scope, settings.level, shapeCodes);
-    const map = await puzzleMap(
-      round.questions.map((question) => question.country),
-      PUZZLE_MAP_WIDTH,
-      PUZZLE_MAP_HEIGHT,
-    );
+    const provinceScope = settings.scope === "nederland";
+    const available = provinceScope ? await provinceShapeCodes() : await countryShapeCodes();
+    const round = createPuzzleRound(settings.scope, settings.level, available);
+    const selected = round.questions.map((question) => question.subject);
+    const map = provinceScope
+      ? await provincePuzzleMap(selected, PUZZLE_MAP_WIDTH, PUZZLE_MAP_HEIGHT)
+      : await puzzleMap(selected, PUZZLE_MAP_WIDTH, PUZZLE_MAP_HEIGHT);
     set({
       puzzle: { round, map, selected: null, placed: [], mistakes: {}, feedback: null },
       puzzleLoading: false,
@@ -225,13 +224,13 @@ function lockPiece(
   mistakes: number,
 ): void {
   const { puzzle, stars, streak, best, settings } = get();
-  const question = puzzle?.round.questions.find((entry) => entry.country.code === puzzle?.selected);
+  const question = puzzle?.round.questions.find((entry) => entry.subject.code === puzzle?.selected);
   if (!puzzle || !question) {
     return;
   }
 
   const firstTry = kind === "correct" && mistakes === 0;
-  const placed = [...puzzle.placed, question.country.code];
+  const placed = [...puzzle.placed, question.subject.code];
   const nextStars = stars + (firstTry ? 1 : 0);
   const finished = placed.length === puzzle.round.questions.length;
   const nextBest = finished
@@ -243,7 +242,7 @@ function lockPiece(
       ...puzzle,
       selected: null,
       placed,
-      feedback: { kind, name: question.country.name },
+      feedback: { kind, name: question.subject.name },
     },
     stars: nextStars,
     streak: firstTry ? streak + 1 : 0,
@@ -269,7 +268,7 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
   }
 
   const code = puzzle.selected;
-  const question = puzzle.round.questions.find((entry) => entry.country.code === code);
+  const question = puzzle.round.questions.find((entry) => entry.subject.code === code);
   if (!question) {
     return;
   }
@@ -281,7 +280,7 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
 
   if (!targetCode) {
     // Dropped next to the map: no penalty, just point back to the board.
-    set({ puzzle: { ...puzzle, feedback: { kind: "wrong", name: question.country.name } } });
+    set({ puzzle: { ...puzzle, feedback: { kind: "wrong", name: question.subject.name } } });
     return;
   }
 
@@ -291,12 +290,13 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
     return;
   }
 
-  const wrongName = COUNTRIES.find((country) => country.code === targetCode)?.name;
+  const names = puzzle.round.scope === "nederland" ? PROVINCES : COUNTRIES;
+  const wrongName = names.find((subject) => subject.code === targetCode)?.name;
   set({
     puzzle: {
       ...puzzle,
       mistakes: { ...puzzle.mistakes, [code]: mistakes },
-      feedback: { kind: "wrong", name: question.country.name, wrongName },
+      feedback: { kind: "wrong", name: question.subject.name, wrongName },
     },
     streak: 0,
   });

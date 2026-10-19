@@ -76,7 +76,7 @@ describe("kaartpuzzel", () => {
 
   it("places a piece on the right country and scores a star", async () => {
     await startPuzzle();
-    const country = puzzleRound().questions[0]?.country;
+    const country = puzzleRound().questions[0]?.subject;
     if (!country) {
       throw new Error("Geen land");
     }
@@ -95,8 +95,8 @@ describe("kaartpuzzel", () => {
   it("names the wrong country and costs the star", async () => {
     await startPuzzle();
     const questions = puzzleRound().questions;
-    const answer = questions[0]?.country;
-    const wrong = questions[1]?.country;
+    const answer = questions[0]?.subject;
+    const wrong = questions[1]?.subject;
     if (!answer || !wrong) {
       throw new Error("Geen landen");
     }
@@ -112,9 +112,9 @@ describe("kaartpuzzel", () => {
   it("shows the right place after two mistakes", async () => {
     await startPuzzle();
     const questions = puzzleRound().questions;
-    const answer = questions[0]?.country;
-    const wrongA = questions[1]?.country;
-    const wrongB = questions[2]?.country;
+    const answer = questions[0]?.subject;
+    const wrongA = questions[1]?.subject;
+    const wrongB = questions[2]?.subject;
     if (!answer || !wrongA || !wrongB) {
       throw new Error("Geen landen");
     }
@@ -132,8 +132,8 @@ describe("kaartpuzzel", () => {
     await startPuzzle();
 
     for (const question of puzzleRound().questions) {
-      useFlagStore.getState().selectPiece(question.country.code);
-      useFlagStore.getState().placePiece(question.country.code);
+      useFlagStore.getState().selectPiece(question.subject.code);
+      useFlagStore.getState().placePiece(question.subject.code);
     }
 
     expect(await screen.findByRole("heading", { name: "Perfect!" })).toBeTruthy();
@@ -145,14 +145,29 @@ describe("kaartpuzzel", () => {
     expect(stored.best?.["kaartpuzzel:europa:makkelijk"]).toBe(8);
   });
 
-  it("disables the provinces and moves away from them in puzzle mode", async () => {
-    useFlagStore.getState().chooseScope("nederland");
-    useFlagStore.getState().chooseMode("kaartpuzzel");
-
-    expect(useFlagStore.getState().settings.scope).toBe("europa");
-
+  it("plays a round of provinces", async () => {
     renderApp();
-    const netherlands = await screen.findByRole("button", { name: /Nederland/ });
-    expect((netherlands as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(await screen.findByRole("button", { name: /Nederland/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Kaartpuzzel/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+    await screen.findByTestId("puzzle-map");
+
+    const round = puzzleRound();
+    expect(round.scope).toBe("nederland");
+    expect(round.questions).toHaveLength(8);
+    for (const question of round.questions) {
+      expect(question.subject.region).toBe("nederland");
+    }
+
+    const province = round.questions[0]?.subject;
+    if (!province) {
+      throw new Error("Geen provincie");
+    }
+
+    fireEvent.keyDown(pieceButton(province.name), { key: "Enter" });
+    fireEvent.click(targetElement(province.code));
+
+    expect(useFlagStore.getState().stars).toBe(1);
+    expect(useFlagStore.getState().puzzle?.placed).toContain(province.code);
   });
 });

@@ -12,19 +12,15 @@ import {
 
 interface ScopePickerProps {
   selected: FlagScope;
-  /** Provinces have no outline in the atlas, so the puzzle cannot use them yet. */
-  puzzleMode: boolean;
   onSelect: (scope: FlagScope) => void;
 }
 
-function ScopePicker({ selected, puzzleMode, onSelect }: ScopePickerProps) {
+function ScopePicker({ selected, onSelect }: ScopePickerProps) {
   return (
     <fieldset className="space-y-2">
       <legend className="mb-2 text-sm font-semibold">Waar wil je spelen?</legend>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {FLAG_SCOPE_OPTIONS.map((option) => {
-          const unavailable = puzzleMode && option.value === "nederland";
-
           return (
             <button
               key={option.value}
@@ -35,15 +31,11 @@ function ScopePicker({ selected, puzzleMode, onSelect }: ScopePickerProps) {
                 selected === option.value
                   ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
                   : "border-border bg-card hover:bg-muted",
-                unavailable && "cursor-not-allowed opacity-40",
               )}
-              disabled={unavailable}
               onClick={() => onSelect(option.value)}
             >
               <span className="truncate">{option.label}</span>
-              <span className="text-xs font-normal text-muted-foreground">
-                {unavailable ? "Nog geen kaart" : option.hint}
-              </span>
+              <span className="text-xs font-normal text-muted-foreground">{option.hint}</span>
             </button>
           );
         })}
@@ -93,11 +85,7 @@ export function FlagsSetup({
       />
 
       <div className="mt-5">
-        <ScopePicker
-          puzzleMode={settings.mode === "kaartpuzzel"}
-          selected={settings.scope}
-          onSelect={onScopeChange}
-        />
+        <ScopePicker selected={settings.scope} onSelect={onScopeChange} />
       </div>
 
       <div className="mt-5">

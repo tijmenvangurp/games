@@ -10,8 +10,8 @@ interface DragGhostProps {
 /** The piece that follows the finger while dragging. */
 export function DragGhost({ ghost, piece }: DragGhostProps) {
   const name = useFlagStore((state) =>
-    state.puzzle?.round.questions.find((question) => question.country.code === ghost.code),
-  )?.country.name;
+    state.puzzle?.round.questions.find((question) => question.subject.code === ghost.code),
+  )?.subject.name;
 
   return (
     <>

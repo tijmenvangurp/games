@@ -20,7 +20,7 @@ export function PieceShape({ piece }: { piece: PuzzlePiece | undefined }) {
 
 interface PuzzleTrayProps {
   pieces: ReadonlyMap<string, PuzzlePiece>;
-  questions: readonly { country: { code: string; name: string } }[];
+  subjects: readonly { code: string; name: string }[];
   placed: ReadonlySet<string>;
   selected: string | null;
   onGrab: (event: ReactPointerEvent, code: string) => void;
@@ -30,7 +30,7 @@ interface PuzzleTrayProps {
 /** The eight pieces; placed pieces stay visible as a faded check. */
 export function PuzzleTray({
   pieces,
-  questions,
+  subjects,
   placed,
   selected,
   onGrab,
@@ -40,7 +40,7 @@ export function PuzzleTray({
     <section className="rounded-3xl border bg-card p-3 shadow-sm">
       <p className="sr-only">Puzzelstukken</p>
       <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
-        {questions.map(({ country }) => {
+        {subjects.map((country) => {
           const isPlaced = placed.has(country.code);
           const isSelected = selected === country.code;
 

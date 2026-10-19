@@ -1,5 +1,5 @@
 import type { RefObject } from "react";
-import type { PuzzleMapCountry } from "@entities/geography";
+import type { PuzzleMapArea } from "@entities/geography";
 import { cn } from "@shared/lib";
 import { PUZZLE_MAP_HEIGHT, PUZZLE_MAP_WIDTH } from "../model/use-flags-store";
 
@@ -18,7 +18,7 @@ function countryKind(isTarget: boolean, isPlaced: boolean): keyof typeof COUNTRY
 }
 
 interface MapCountryProps {
-  country: PuzzleMapCountry;
+  country: PuzzleMapArea;
   name: string | undefined;
   isTarget: boolean;
   isPlaced: boolean;
@@ -72,7 +72,7 @@ function MapCountry({
 }
 
 interface PuzzleMapProps {
-  countries: readonly PuzzleMapCountry[];
+  areas: readonly PuzzleMapArea[];
   names: ReadonlyMap<string, string>;
   placed: ReadonlySet<string>;
   selected: string | null;
@@ -87,7 +87,7 @@ interface PuzzleMapProps {
  * a hint dot on every slot when the level allows it.
  */
 export function PuzzleMap({
-  countries,
+  areas,
   names,
   placed,
   selected,
@@ -98,9 +98,7 @@ export function PuzzleMap({
 }: PuzzleMapProps) {
   const showHints = level !== "moeilijk";
   const pulse = level === "makkelijk";
-  const openSlots = countries.filter(
-    (country) => names.has(country.code) && !placed.has(country.code),
-  );
+  const openSlots = areas.filter((area) => names.has(area.code) && !placed.has(area.code));
 
   return (
     <svg
@@ -111,27 +109,27 @@ export function PuzzleMap({
       role="group"
       viewBox={`0 0 ${PUZZLE_MAP_WIDTH} ${PUZZLE_MAP_HEIGHT}`}
     >
-      {countries.map((country) => (
+      {areas.map((area) => (
         <MapCountry
-          key={country.code}
+          key={area.code}
           canPlace={Boolean(selected)}
-          country={country}
-          isHighlighted={pulse && selected === country.code}
-          isPlaced={placed.has(country.code)}
-          isTarget={names.has(country.code)}
-          name={names.get(country.code)}
+          country={area}
+          isHighlighted={pulse && selected === area.code}
+          isPlaced={placed.has(area.code)}
+          isTarget={names.has(area.code)}
+          name={names.get(area.code)}
           onPlace={onPlace}
         />
       ))}
 
       {showHints
-        ? openSlots.map((country) => (
+        ? openSlots.map((area) => (
             <circle
-              key={`hint-${country.code}`}
+              key={`hint-${area.code}`}
               aria-hidden="true"
               className="pointer-events-none fill-primary"
-              cx={country.x}
-              cy={country.y}
+              cx={area.x}
+              cy={area.y}
               r={2.2}
             />
           ))

@@ -44,8 +44,8 @@ function closer(
 function nearestCountry(puzzle: PuzzleState, x: number, y: number): string | undefined {
   let nearest: { code: string; distance: number } | undefined;
 
-  for (const country of puzzle.map.countries) {
-    const candidate = { code: country.code, distance: Math.hypot(country.x - x, country.y - y) };
+  for (const area of puzzle.map.areas) {
+    const candidate = { code: area.code, distance: Math.hypot(area.x - x, area.y - y) };
     if (candidate.distance <= DROP_RADIUS && closer(candidate, nearest)) {
       nearest = candidate;
     }
@@ -157,7 +157,7 @@ export function PuzzlePlay() {
   const total = round.questions.length;
   const placedSet = new Set(placed);
   const names = new Map(
-    round.questions.map((question) => [question.country.code, question.country.name]),
+    round.questions.map((question) => [question.subject.code, question.subject.name]),
   );
   const pieces = new Map(map.pieces.map((piece) => [piece.code, piece]));
   const selectedName = selected ? names.get(selected) : undefined;
@@ -202,7 +202,7 @@ export function PuzzlePlay() {
 
       <section className="rounded-3xl border bg-card p-3 shadow-sm">
         <PuzzleMap
-          countries={map.countries}
+          areas={map.areas}
           level={round.level}
           names={names}
           placed={placedSet}
@@ -230,7 +230,7 @@ export function PuzzlePlay() {
       <PuzzleTray
         pieces={pieces}
         placed={placedSet}
-        questions={round.questions}
+        subjects={round.questions.map((question) => question.subject)}
         selected={selected}
         onGrab={startDrag}
         onKeyboardSelect={(code) => {
