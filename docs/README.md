@@ -18,6 +18,7 @@
 - `adr/0014-schaaktutorial-een-opdracht-per-scherm.md` — minder tekst, een coachbubbel en een visuele hint in de schaaktutorial.
 - `adr/0015-schaakpuzzels-uitbreiding.md` — 90 extra Lichess-puzzels, mat-in-twee, tactieken en meer stukvariatie.
 - `adr/0016-schaakpuzzeloverzicht.md` — het puzzeloverzicht en lokaal bewaarde opgeloste puzzels.
+- `adr/0017-letterklanken-en-audio.md` — CC0-klanken uit Rhasspy Nathalie en prototype-woordaudio, te vervangen vóór lancering.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

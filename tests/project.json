@@ -65,6 +65,7 @@
     "pages-seek",
     "pages-pokemon-quiz",
     "pages-french",
+    "pages-letter",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -75,6 +76,7 @@
     "features-seek-and-find",
     "features-pokemon-quiz",
     "features-french-listening",
+    "features-letter-game",
     "entities-game",
     "entities-french",
     "entities-sudoku",
@@ -82,6 +84,7 @@
     "entities-memory",
     "entities-hidden-object",
     "entities-pokedex",
+    "entities-letter",
     "shared-lib",
     "shared-ui"
   ]

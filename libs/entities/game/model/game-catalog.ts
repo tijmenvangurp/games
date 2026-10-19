@@ -18,7 +18,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/schaken"
           | "/puzzels"
           | "/woordzoeker"
-          | "/frans";
+          | "/frans"
+          | "/letters";
         thumbnail: string;
       }
     | { status: "coming-soon" }
@@ -104,5 +105,13 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/frans",
     thumbnail: "/thumbnails/french-listening-ffc3da24.jpg",
+  },
+  {
+    id: "letters",
+    name: "Letterpret",
+    description: "Hoor de klank, zoek de letter en bouw woordjes.",
+    status: "available",
+    to: "/letters",
+    thumbnail: "/thumbnails/letters-6b90ec8a.jpg",
   },
 ];

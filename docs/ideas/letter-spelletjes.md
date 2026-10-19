@@ -1,7 +1,7 @@
 # Ideeën: letter-spelletjes voor groep 1–3
 
 - **Datum:** 2026-10-18
-- **Status:** Backlog, nog geen beslissing
+- **Status:** MVP-prototype gebouwd; zie [ADR 0017](../adr/0017-letterklanken-en-audio.md) voor de audio-keuze
 - **Kader:** de regels uit `AGENTS.md` en [ADR 0001](../adr/0001-publieke-statische-spellen-app.md): publiek, statisch, alleen TypeScript, geen externe requests, geen backend, strikte CSP, mobile-first en touch-targets van minimaal 44 px.
 - **Onderbouwing:** [methodiek](../research/2026-10-18-letters-leren-basisschool.md) en [didactiek en spelletjes](../research/2026-10-18-letterdidactiek-en-spelletjes.md).
 
@@ -282,7 +282,7 @@ letters.progress.v1
 | `libs/features/math-trainer`               | Antwoordflow en feedbackpatroon          |
 | `libs/entities/game/model/game-catalog.ts` | Nieuwe `available`-entry voor `/letters` |
 
-De FSD-indeling blijft: `libs/entities/letters` voor data en pure regels, `libs/features/letter-game` voor de engine en de store, `libs/pages/letters` voor de sessie en de hub.
+De FSD-indeling blijft: `libs/entities/letter` voor data en pure regels, `libs/features/letter-game` voor de engine en de store, `libs/pages/letter` voor de sessie en de hub.
 
 ## Roadmap
 
