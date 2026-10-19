@@ -168,6 +168,9 @@ export interface PuzzleMap {
   areas: readonly PuzzleMapArea[];
   /** One normalized shape per selected area. */
   pieces: readonly PuzzlePiece[];
+  /** Size of the drawing area, so the SVG can use the right viewBox. */
+  width: number;
+  height: number;
 }
 
 /** A drawable shape with the centre used for zooming and hints. */
@@ -308,6 +311,41 @@ function pieceFor(code: string, geometry: Geometry): PuzzlePiece | undefined {
   };
 }
 
+function polygonsAsGeometry(polygons: readonly Polygon[]): Geometry {
+  return polygons.length === 1
+    ? (polygons[0] as Geometry)
+    : { type: "MultiPolygon", coordinates: polygons.map((polygon) => polygon.coordinates) };
+}
+
+/**
+ * The shapes the map should fit on. Land shapes are used as they are; a shape
+ * that crosses the antimeridian (Russia, Fiji) would make the fit span the
+ * whole world, so only its centre joins the fit.
+ */
+function fitFeatures(
+  shapes: ReadonlyMap<string, Feature>,
+  selected: readonly MapEntry[],
+): Feature[] {
+  return selected.flatMap((entry) => {
+    const shape = shapes.get(entry.code);
+    if (!shape?.geometry) {
+      return [];
+    }
+    const polygons = piecePolygons(shape.geometry);
+    if (polygons.length === 0) {
+      return [];
+    }
+    const geometry = polygonsAsGeometry(polygons);
+    const [[west], [east]] = geoBounds(geometry);
+    const fitGeometry =
+      west > east
+        ? ({ type: "Point", coordinates: [entry.longitude, entry.latitude] } as Geometry)
+        : geometry;
+
+    return [{ type: "Feature" as const, properties: {}, geometry: fitGeometry }];
+  });
+}
+
 function buildPuzzleMap(
   shapes: ReadonlyMap<string, Feature>,
   entries: readonly MapEntry[],
@@ -315,14 +353,23 @@ function buildPuzzleMap(
   width: number,
   height: number,
 ): PuzzleMap {
-  const centers = selected.map((entry) => [entry.longitude, entry.latitude] as [number, number]);
+  const features = fitFeatures(shapes, selected);
+  const fit =
+    features.length > 0
+      ? { type: "FeatureCollection" as const, features }
+      : {
+          type: "MultiPoint" as const,
+          coordinates: selected.map(
+            (entry) => [entry.longitude, entry.latitude] as [number, number],
+          ),
+        };
   const projection = geoMercator()
     .fitExtent(
       [
         [MAP_PADDING, MAP_PADDING],
         [width - MAP_PADDING, height - MAP_PADDING],
       ],
-      { type: "MultiPoint", coordinates: centers },
+      fit,
     )
     .clipExtent([
       [0, 0],
@@ -346,7 +393,7 @@ function buildPuzzleMap(
     return piece ? [piece] : [];
   });
 
-  return { areas, pieces };
+  return { areas, pieces, width, height };
 }
 
 /**

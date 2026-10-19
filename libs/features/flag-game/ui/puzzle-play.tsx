@@ -3,12 +3,7 @@ import { cn } from "@shared/lib";
 import { PuzzleMap } from "./puzzle-map";
 import { DragGhost } from "./puzzle-ghost";
 import { PuzzleTray } from "./puzzle-tray";
-import {
-  PUZZLE_MAP_HEIGHT,
-  PUZZLE_MAP_WIDTH,
-  type PuzzleState,
-  useFlagStore,
-} from "../model/use-flags-store";
+import { type PuzzleState, useFlagStore } from "../model/use-flags-store";
 
 /** Pointer travel below this is a tap, not a drag. */
 const DRAG_THRESHOLD = 8;
@@ -71,8 +66,8 @@ function countryAt(
   }
 
   const box = svg.getBoundingClientRect();
-  const x = ((clientX - box.left) * PUZZLE_MAP_WIDTH) / box.width;
-  const y = ((clientY - box.top) * PUZZLE_MAP_HEIGHT) / box.height;
+  const x = ((clientX - box.left) * puzzle.map.width) / box.width;
+  const y = ((clientY - box.top) * puzzle.map.height) / box.height;
 
   return nearestCountry(puzzle, x, y);
 }
@@ -189,7 +184,7 @@ export function PuzzlePlay() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
       <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
         <p className="text-sm font-black text-muted-foreground">
           {placed.length} van {total} geplaatst
@@ -206,9 +201,11 @@ export function PuzzlePlay() {
           level={round.level}
           names={names}
           placed={placedSet}
+          height={map.height}
           selected={selected}
           svgRef={svgRef}
           total={total}
+          width={map.width}
           onPlace={placeOnMap}
         />
 

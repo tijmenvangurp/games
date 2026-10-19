@@ -18,9 +18,12 @@ import { playHaptic, playSound } from "@shared/lib";
 import { bestKey, puzzleBestKey, type FlagMode, type FlagSettings } from "./settings";
 import { loadFlagState, saveFlagState } from "./storage";
 
-/** The puzzle board is drawn once in SVG units and scaled by CSS. */
-export const PUZZLE_MAP_WIDTH = 360;
-export const PUZZLE_MAP_HEIGHT = 280;
+/** The puzzle board is drawn in SVG units and scaled by CSS. Provinces get a
+ * portrait frame, because the Netherlands is taller than it is wide. */
+const PUZZLE_FRAMES = {
+  landen: { width: 360, height: 380 },
+  nederland: { width: 320, height: 400 },
+} as const;
 
 type PuzzleFeedback =
   | { kind: "correct"; name: string }
@@ -180,9 +183,10 @@ async function startPuzzleRound(set: StoreSet, get: StoreGet): Promise<void> {
     const available = provinceScope ? await provinceShapeCodes() : await countryShapeCodes();
     const round = createPuzzleRound(settings.scope, settings.level, available);
     const selected = round.questions.map((question) => question.subject);
+    const frame = provinceScope ? PUZZLE_FRAMES.nederland : PUZZLE_FRAMES.landen;
     const map = provinceScope
-      ? await provincePuzzleMap(selected, PUZZLE_MAP_WIDTH, PUZZLE_MAP_HEIGHT)
-      : await puzzleMap(selected, PUZZLE_MAP_WIDTH, PUZZLE_MAP_HEIGHT);
+      ? await provincePuzzleMap(selected, frame.width, frame.height)
+      : await puzzleMap(selected, frame.width, frame.height);
     set({
       puzzle: { round, map, selected: null, placed: [], mistakes: {}, feedback: null },
       puzzleLoading: false,

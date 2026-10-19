@@ -1,7 +1,6 @@
 import type { RefObject } from "react";
 import type { PuzzleMapArea } from "@entities/geography";
 import { cn } from "@shared/lib";
-import { PUZZLE_MAP_HEIGHT, PUZZLE_MAP_WIDTH } from "../model/use-flags-store";
 
 const COUNTRY_CLASSES = {
   context: "fill-emerald-100 stroke-emerald-200",
@@ -78,6 +77,8 @@ interface PuzzleMapProps {
   selected: string | null;
   level: "makkelijk" | "gemiddeld" | "moeilijk";
   total: number;
+  width: number;
+  height: number;
   svgRef: RefObject<SVGSVGElement | null>;
   onPlace: (code: string) => void;
 }
@@ -93,6 +94,8 @@ export function PuzzleMap({
   selected,
   level,
   total,
+  width,
+  height,
   svgRef,
   onPlace,
 }: PuzzleMapProps) {
@@ -107,7 +110,7 @@ export function PuzzleMap({
       data-testid="puzzle-map"
       ref={svgRef}
       role="group"
-      viewBox={`0 0 ${PUZZLE_MAP_WIDTH} ${PUZZLE_MAP_HEIGHT}`}
+      viewBox={`0 0 ${width} ${height}`}
     >
       {areas.map((area) => (
         <MapCountry
