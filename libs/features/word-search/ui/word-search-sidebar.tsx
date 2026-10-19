@@ -54,7 +54,7 @@ function WordSearchActions({
             }
           }}
         >
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
         <Button variant="outline" onClick={onNew}>
@@ -97,7 +97,7 @@ export function WordSearchSidebar({
 }: WordSearchSidebarProps) {
   return (
     <aside className="space-y-3 lg:order-2 lg:col-span-1">
-      <div className="rounded-3xl border bg-card p-3 shadow-sm">
+      <div className="game-panel p-3">
         <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           Te zoeken
         </p>

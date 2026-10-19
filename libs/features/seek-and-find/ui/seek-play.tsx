@@ -57,7 +57,7 @@ export function SeekPlay() {
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
-        <div className="order-1 flex items-center gap-3 rounded-3xl border bg-card p-3 shadow-sm">
+        <div className="order-1 game-panel flex items-center gap-3 p-3">
           <svg
             aria-label="Doel: de Wobbel met een ster op de hoed"
             className="size-16 shrink-0"
@@ -87,7 +87,7 @@ export function SeekPlay() {
                 useSeekStore.getState().showHint();
               }}
             >
-              <Search aria-hidden="true" className="size-4 text-amber-500" />
+              <Search aria-hidden="true" className="size-4 text-warning" />
               Hint
             </Button>
             <Button

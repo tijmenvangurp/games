@@ -19,15 +19,15 @@ function ModePicker({ selected, onSelect }: ModePickerProps) {
             type="button"
             aria-pressed={selected === option.value}
             className={cn(
-              "flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border-2 px-2 text-sm font-bold transition active:scale-95",
+              "flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-lg border p-3 text-sm font-bold transition active:scale-[0.99]",
               selected === option.value
-                ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                : "border-border bg-card hover:bg-muted",
+                ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                : "border-border bg-card hover:bg-muted/60",
             )}
             onClick={() => onSelect(option.value)}
           >
-            <span aria-hidden="true" className="text-2xl">
-              {option.emoji}
+            <span aria-hidden="true" className="font-display text-2xl leading-none">
+              {option.symbol}
             </span>
             {option.label}
             <span className="text-xs font-normal text-muted-foreground">{option.hint}</span>
@@ -60,9 +60,9 @@ export function MathSetup({
   const bestScore = best[bestKey(settings.mode, settings.level)] ?? 0;
 
   return (
-    <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel animate-rise p-4 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-xl font-black">Nieuw spel</h2>
+        <h2 className="font-display text-2xl">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">Kies wat je wilt oefenen.</p>
       </div>
 

@@ -30,26 +30,26 @@ function borderClassName(size: SudokuSize, row: number, col: number): string {
   return cn(
     col === size - 1 && "border-r-0",
     row === size - 1 && "border-b-0",
-    (col + 1) % boxCols === 0 && col !== size - 1 && "border-r-2 border-r-slate-400",
-    (row + 1) % boxRows === 0 && row !== size - 1 && "border-b-2 border-b-slate-400",
+    (col + 1) % boxCols === 0 && col !== size - 1 && "border-r-2 border-r-border",
+    (row + 1) % boxRows === 0 && row !== size - 1 && "border-b-2 border-b-border",
   );
 }
 
 function backgroundClassName(props: SudokuCellProps): string {
   return cn(
-    props.isPeerCell && "bg-sky-50",
-    props.isSameValue && "bg-amber-100",
-    props.isHintUnit && "bg-emerald-50",
-    props.isConflict && "bg-orange-100 font-bold text-orange-700",
-    props.isMistake && "bg-rose-50 font-bold text-rose-600",
-    props.isHinted && "bg-emerald-50 font-bold text-emerald-600",
+    props.isPeerCell && "bg-primary/5",
+    props.isSameValue && "bg-warning/15",
+    props.isHintUnit && "bg-success/10",
+    props.isConflict && "bg-warning/20 font-bold text-warning",
+    props.isMistake && "bg-danger/10 font-bold text-danger",
+    props.isHinted && "bg-success/10 font-bold text-success",
   );
 }
 
 function emphasisClassName(props: SudokuCellProps): string {
   return cn(
-    props.isSelected && "z-10 bg-sky-100 ring-2 ring-inset ring-sky-500",
-    props.isHintTarget && "z-10 bg-emerald-100 ring-2 ring-inset ring-emerald-500",
+    props.isSelected && "z-10 bg-primary/15 ring-2 ring-inset ring-primary",
+    props.isHintTarget && "z-10 bg-success/20 ring-2 ring-inset ring-success",
   );
 }
 
@@ -74,12 +74,12 @@ export function SudokuCell(props: SudokuCellProps) {
       aria-label={label(props)}
       aria-pressed={props.isSelected}
       className={cn(
-        "relative flex aspect-square select-none items-center justify-center border-b border-r border-slate-300/80 leading-none transition-colors",
+        "relative flex aspect-square select-none items-center justify-center border-b border-r border-border leading-none transition-colors",
         SYMBOL_TEXT_SIZE[props.size],
         borderClassName(props.size, props.row, props.col),
         backgroundClassName(props),
         emphasisClassName(props),
-        props.isGiven ? "font-bold text-slate-800" : "font-semibold text-sky-600",
+        props.isGiven ? "font-bold text-foreground" : "font-semibold text-primary",
       )}
       onClick={props.onSelect}
     >

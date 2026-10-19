@@ -250,8 +250,12 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await page.goto("/puzzels");
 
     await expect(page.getByRole("heading", { name: "Schaakpuzzels" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Kies een puzzel" })).toBeVisible();
+    await expect(page.getByText(/0 van 42 opgelost/)).toBeVisible();
+
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
     await expect(page.getByRole("heading", { name: "Zet schaakmat!" })).toBeVisible();
-    await expect(page.getByText(/Puzzel 1 van 12/)).toBeVisible();
+    await expect(page.getByText(/Puzzel 1 van 42/)).toBeVisible();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await expect(board.getByText("a", { exact: true })).toBeVisible();
@@ -263,12 +267,30 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await expect(next).toBeEnabled();
     await next.click();
 
-    await expect(page.getByText(/Puzzel 2 van 12/)).toBeVisible();
+    await expect(page.getByText(/Puzzel 2 van 42/)).toBeVisible();
 
     const overflows = (await page.evaluate(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("onthoudt welke puzzel je al hebt opgelost", async ({ page }) => {
+    await page.goto("/puzzels");
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="a1"]').click();
+    await board.locator('[data-square="a8"]').click();
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+
+    await page.getByRole("button", { name: "Overzicht" }).click();
+    await expect(page.getByText(/1 van 42 opgelost/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Puzzel 1, opgelost" })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByText(/1 van 42 opgelost/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Puzzel 1, opgelost" })).toBeVisible();
   });
 
   test("wisselt van moeilijkheidsgraad en lost een lastige puzzel op", async ({ page }) => {
@@ -277,7 +299,8 @@ test.describe("schaakpuzzels op een telefoon", () => {
     const medium = page.getByRole("button", { name: /Lastig/ });
     await medium.click();
     await expect(medium).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByText(/Puzzel 1 van 12/)).toBeVisible();
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
+    await expect(page.getByText(/Puzzel 1 van 42/)).toBeVisible();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="h7"]').click();
@@ -285,6 +308,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
 
     await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
 
+    await page.getByRole("button", { name: "Overzicht" }).click();
     const hard = page.getByRole("button", { name: /Uitdagend/ });
     await hard.click();
     await expect(hard).toHaveAttribute("aria-pressed", "true");
@@ -292,6 +316,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
 
   test("geeft feedback op een verkeerde zet en laat opnieuw proberen", async ({ page }) => {
     await page.goto("/puzzels");
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="a1"]').click();
@@ -310,10 +335,12 @@ test.describe("schaakpuzzels op een tablet", () => {
 
   test("toont het bord, de hint en de navigatie", async ({ page }) => {
     await page.goto("/puzzels");
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
 
     await expect(page.getByRole("group", { name: /coördinaten/i })).toBeVisible();
     await expect(page.getByRole("button", { name: "Hint" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Opnieuw" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Overzicht" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Volgende puzzel" })).toBeVisible();
   });
 });

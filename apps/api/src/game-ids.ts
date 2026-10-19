@@ -15,6 +15,7 @@ export const PROGRESS_GAME_IDS = [
   "chess-tutorial",
   "chess-puzzles",
   "french-listening",
+  "letters",
 ] as const;
 
 export type ProgressGameId = (typeof PROGRESS_GAME_IDS)[number];

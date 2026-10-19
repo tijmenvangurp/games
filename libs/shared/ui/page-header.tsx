@@ -22,7 +22,12 @@ export function PageHeader({ title, subtitle, onBack, actions, titleClassName }:
         <span aria-hidden="true" className="size-11" />
       )}
       <div className="min-w-0 flex-1">
-        <h1 className={cn("truncate text-2xl font-black tracking-tight", titleClassName)}>
+        <h1
+          className={cn(
+            "truncate font-display text-2xl font-normal tracking-tight",
+            titleClassName,
+          )}
+        >
           {title}
         </h1>
         {subtitle ? <p className="truncate text-sm text-muted-foreground">{subtitle}</p> : null}

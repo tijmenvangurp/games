@@ -22,7 +22,7 @@ export const MATH_MODE_OPTIONS = MATH_MODES.map((mode) => ({
   value: mode,
   label: MATH_MODE_INFO[mode].label,
   hint: MATH_MODE_INFO[mode].hint,
-  emoji: MATH_MODE_INFO[mode].emoji,
+  symbol: MATH_MODE_INFO[mode].symbol,
 }));
 
 export function levelOptionsFor(mode: MathMode) {
@@ -30,7 +30,6 @@ export function levelOptionsFor(mode: MathMode) {
     value: level,
     label: MATH_LEVEL_INFO[level].label,
     hint: levelHint(mode, level),
-    emoji: MATH_LEVEL_INFO[level].emoji,
   }));
 }
 

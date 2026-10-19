@@ -57,7 +57,7 @@ export function MemoryBoard() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-2xl rounded-3xl border border-white/70 bg-gradient-to-br from-amber-50 via-rose-50 to-sky-50 p-2 shadow-sm sm:p-3">
+    <div className="game-panel mx-auto w-full max-w-2xl p-2 sm:p-3">
       <div className={cn("grid w-full gap-2 sm:gap-3", COLUMN_CLASSES[scene.difficulty])}>
         {scene.cards.map((pokemonId, index) => {
           const pokemon = getPokemon(pokemonId);

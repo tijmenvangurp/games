@@ -11,6 +11,7 @@ import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
 import { HomePage } from "@pages/home";
+import { LettersPage } from "@pages/letter";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
@@ -47,6 +48,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),
+    gameRoute("/letters", LettersPage),
     frenchLessonRoute,
   ]);
 

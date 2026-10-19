@@ -74,6 +74,7 @@
     "pages-pokemon-quiz",
     "pages-french",
     "pages-word-search",
+    "pages-letter",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -89,6 +90,7 @@
     "features-profile-switcher",
     "features-auth",
     "features-sync",
+    "features-letter-game",
     "pages-account",
     "entities-game",
     "entities-profile",
@@ -101,6 +103,7 @@
     "entities-hidden-object",
     "entities-pokedex",
     "entities-word-search",
+    "entities-letter",
     "shared-lib",
     "shared-ui"
   ]

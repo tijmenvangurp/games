@@ -9,6 +9,7 @@ import {
   MAX_HEARTS,
   removableArrows,
   solveMaze,
+  visibleArrowPoints,
   type MazeArrow,
 } from "@entities/arrow";
 import { useArrowsStore } from "@features/arrow-game";
@@ -249,6 +250,37 @@ describe("arrows pointer gestures", () => {
     const point = segmentMidpoint(arrow);
     return { arrow, svg, x: point.x - bounds.minX, y: point.y - bounds.minY };
   }
+
+  it("removes the hinted arrow when the player taps its visible tip", async () => {
+    await startGame();
+    fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+
+    const state = useArrowsStore.getState();
+    const arrow = state.level.arrows.find((candidate) => candidate.id === state.hintId);
+    if (!arrow) {
+      throw new Error("Hint did not mark an arrow");
+    }
+
+    const bounds = levelBounds(state.level);
+    const svg = boardSvg();
+    mockBoardRect(svg, bounds);
+    const points = visibleArrowPoints(state.level, arrow);
+    const tip = points[points.length - 1] as { x: number; y: number };
+    const x = tip.x - bounds.minX;
+    const y = tip.y - bounds.minY;
+
+    fireEvent.pointerDown(svg, {
+      button: 0,
+      clientX: x,
+      clientY: y,
+      isPrimary: true,
+      pointerId: 1,
+    });
+    fireEvent.pointerUp(svg, { button: 0, clientX: x, clientY: y, isPrimary: true, pointerId: 1 });
+
+    expect(useArrowsStore.getState().removedIds).toContain(arrow.id);
+    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
+  });
 
   it("selects an arrow on a single stationary pointer tap", async () => {
     const { arrow, svg, x, y } = await tapTarget();

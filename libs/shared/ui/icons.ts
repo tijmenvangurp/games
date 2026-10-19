@@ -1,11 +1,12 @@
 export {
   ArrowLeft,
+  ArrowRight,
   ArrowUp,
   Check,
   Download,
   Eraser,
   Eye,
-  Gamepad2,
+  Flame,
   Heart,
   Home,
   KeyRound,

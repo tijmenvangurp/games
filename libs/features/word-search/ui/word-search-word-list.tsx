@@ -18,10 +18,10 @@ export function WordSearchWordList({ words, found, onHint }: WordSearchWordListP
             key={word}
             aria-pressed={isFound}
             className={cn(
-              "inline-flex min-h-11 items-center gap-1.5 rounded-xl border-2 px-3 py-1.5 text-sm font-bold transition active:scale-95",
+              "inline-flex min-h-11 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-bold transition active:scale-[0.99]",
               isFound
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                : "border-border bg-card text-foreground hover:bg-muted",
+                ? "border-success/40 bg-success/10 text-success"
+                : "border-border bg-card text-foreground hover:bg-muted/60",
             )}
             type="button"
             onClick={() => onHint(word)}

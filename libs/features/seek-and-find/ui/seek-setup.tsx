@@ -21,9 +21,9 @@ export function SeekSetup({
   onBack,
 }: SeekSetupProps) {
   return (
-    <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel animate-rise p-4 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-xl font-black">Nieuw spel</h2>
+        <h2 className="font-display text-2xl">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
           Kies hoe druk het zoekveld is en waar je zoekt.
         </p>
@@ -45,16 +45,13 @@ export function SeekSetup({
               type="button"
               aria-pressed={settings.theme === option.value}
               className={cn(
-                "flex min-h-16 items-center justify-center gap-2 rounded-2xl border-2 px-2 text-sm font-bold transition active:scale-95",
+                "flex min-h-16 items-center justify-center gap-2 rounded-lg border px-3 text-sm font-bold transition active:scale-[0.99]",
                 settings.theme === option.value
-                  ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
+                  ? "border-primary bg-primary/5 text-primary ring-1 ring-primary/20"
+                  : "border-border bg-card hover:bg-muted/60",
               )}
               onClick={() => onThemeChange(option.value)}
             >
-              <span aria-hidden="true" className="text-xl">
-                {option.emoji}
-              </span>
               {option.label}
             </button>
           ))}

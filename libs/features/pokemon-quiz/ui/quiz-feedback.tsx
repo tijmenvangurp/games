@@ -11,12 +11,12 @@ export function QuizFeedback({ correct, targetName, onNext }: QuizFeedbackProps)
   return (
     <div
       className={cn(
-        "animate-pop rounded-3xl border-2 p-4 text-center",
-        correct ? "border-emerald-300 bg-emerald-50" : "border-rose-300 bg-rose-50",
+        "animate-pop rounded-lg border p-4 text-center",
+        correct ? "border-success/45 bg-success/10" : "border-danger/45 bg-danger/10",
       )}
       role="status"
     >
-      <p className={cn("text-lg font-black", correct ? "text-emerald-800" : "text-rose-800")}>
+      <p className={cn("text-lg font-black", correct ? "text-success" : "text-danger")}>
         {correct ? "Goed gedaan!" : "Bijna!"}
       </p>
       <p className="text-sm text-muted-foreground">

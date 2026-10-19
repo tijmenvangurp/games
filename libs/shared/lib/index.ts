@@ -8,6 +8,7 @@ export {
 } from "./chess-board";
 export { cn } from "./utils";
 export { playHaptic, vibrate } from "./haptics";
+export { pointAlongPolyline, polylineLength, trimPolyline } from "./polyline";
 export {
   GAME_STORAGE_KEYS,
   GAME_STORAGE_KEY_LIST,
@@ -17,7 +18,6 @@ export {
   isProfileNamespaceKey,
   profileStorageKey,
   readActiveProfileId,
-  readStoredJson,
   writeGameProgress,
 } from "./profile-storage";
 export {
@@ -31,3 +31,4 @@ export {
 } from "./progress-bridge";
 export { createSeed, mulberry32, shuffledIndexes } from "./random";
 export { isSoundEnabled, playSound, setSoundEnabled, toggleSound, useSoundEnabled } from "./sound";
+export { readStoredJson, writeStoredJson } from "./storage";

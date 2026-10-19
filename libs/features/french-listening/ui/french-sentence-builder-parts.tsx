@@ -11,9 +11,9 @@ interface FinishedProps {
 
 export function SentenceBuilderFinished({ score, total, onRestart }: FinishedProps) {
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-3xl border bg-card p-6 text-center shadow-sm">
-      <Sparkles aria-hidden="true" className="size-10 text-amber-500" />
-      <h2 className="text-2xl font-black">Klaar!</h2>
+    <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
+      <Sparkles aria-hidden="true" className="size-10 text-primary" />
+      <h2 className="font-display text-2xl">Klaar!</h2>
       <p className="text-muted-foreground">
         Je had {score} van {total} zinnen goed.
       </p>
@@ -33,7 +33,7 @@ interface HeaderProps {
 
 export function SentenceBuilderHeader({ index, total, score }: HeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card px-4 py-3 shadow-sm">
+    <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
       <div>
         <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
           Bouw de zin
@@ -54,7 +54,7 @@ export function SentencePrompt({ item }: { item: FrenchItem }) {
   const { play } = useFrenchAudio();
 
   return (
-    <div className="rounded-3xl border bg-gradient-to-br from-sky-50 via-white to-blue-50 p-4 text-center shadow-sm">
+    <div className="game-panel p-4 text-center">
       <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
         Maak deze zin in het Frans
       </p>
@@ -83,7 +83,7 @@ export function SentenceAnswer({ selected, answered, onRemove }: AnswerProps) {
   return (
     <div
       aria-label="Jouw zin"
-      className="flex min-h-20 flex-wrap content-center justify-center gap-2 rounded-3xl border-2 border-dashed bg-card p-3"
+      className="flex min-h-20 flex-wrap content-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card p-3"
       role="group"
     >
       {selected.length === 0 ? (
@@ -93,7 +93,7 @@ export function SentenceAnswer({ selected, answered, onRemove }: AnswerProps) {
           <button
             key={token.id}
             aria-label={`Verwijder ${token.text}`}
-            className="min-h-11 rounded-xl border border-primary/30 bg-primary/10 px-3 py-2 font-bold text-primary transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+            className="min-h-11 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 font-bold text-primary transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
             disabled={answered}
             type="button"
             onClick={() => onRemove(token)}
@@ -119,7 +119,7 @@ export function SentenceWordBank({ available, answered, onChoose }: WordBankProp
         <button
           key={token.id}
           aria-label={`Kies ${token.text}`}
-          className="min-h-11 rounded-xl border-2 border-border bg-card px-3 py-2 font-bold transition hover:bg-muted active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-40"
+          className="min-h-11 rounded-lg border border-border bg-card px-3 py-2 font-bold transition hover:bg-muted active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:pointer-events-none disabled:opacity-40"
           disabled={answered}
           type="button"
           onClick={() => onChoose(token)}
@@ -139,8 +139,8 @@ interface FeedbackProps {
 
 export function SentenceFeedback({ item, correct, onNext }: FeedbackProps) {
   return (
-    <div aria-live="polite" className="space-y-2 rounded-3xl border bg-card p-4 shadow-sm">
-      <p className={correct ? "font-black text-emerald-700" : "font-black text-rose-700"}>
+    <div aria-live="polite" className="game-panel space-y-2 p-4">
+      <p className={correct ? "font-black text-success" : "font-black text-danger"}>
         {correct ? "Goed gedaan!" : "Bijna!"}
       </p>
       <p className="text-sm text-muted-foreground">

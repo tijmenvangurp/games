@@ -10,8 +10,10 @@ import {
   levelBounds,
   nearestArrow,
   solveMaze,
+  visibleArrowPoints,
   type MazeArrow,
   type MazeLevel,
+  type Point,
 } from "@entities/arrow";
 
 function arrow(id: number, points: [number, number][]): MazeArrow {
@@ -57,6 +59,22 @@ describe("maze geometry", () => {
     expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
     expect(isArrowRemovable(mover, testLevel, new Set([2]))).toBe(true);
     expect(findHint(testLevel, new Set())).toBe(blocker);
+  });
+
+  it("blocks a lane that crosses the middle of a straight run", () => {
+    const mover = arrow(1, [
+      [1, 1],
+      [2, 1],
+    ]);
+    // The level format stores a point at every cell; merging the run matters.
+    const run = arrow(2, [
+      [3, 0],
+      [3, 1],
+      [3, 2],
+    ]);
+    const testLevel = level([mover, run]);
+
+    expect(isArrowRemovable(mover, testLevel, new Set())).toBe(false);
   });
 
   it("does not treat a corner touch as a blocker", () => {
@@ -218,6 +236,40 @@ describe("maze geometry", () => {
     expect(nearestArrow(testLevel, new Set(), { x: 2, y: 1.2 }, 1)?.id).toBe(1);
     expect(nearestArrow(testLevel, new Set(), { x: 2, y: 3.8 }, 1)?.id).toBe(2);
     expect(nearestArrow(testLevel, new Set([1]), { x: 2, y: 1.2 }, 1)).toBeNull();
+  });
+
+  it("selects the arrow whose head is tapped, not the neighbour whose tail shares that point", () => {
+    const mover = arrow(1, [
+      [1, 1],
+      [2, 1],
+    ]);
+    const neighbour = arrow(2, [
+      [2, 1],
+      [2, 3],
+    ]);
+    const testLevel = level([mover, neighbour]);
+
+    expect(nearestArrow(testLevel, new Set(), { x: 2, y: 1 }, 1.35)?.id).toBe(1);
+    expect(nearestArrow(testLevel, new Set(), { x: 2, y: 2 }, 1.35)?.id).toBe(2);
+  });
+
+  it("keeps touching arrowheads apart and tappable", () => {
+    const first = arrow(1, [
+      [1, 1],
+      [2, 1],
+    ]);
+    const second = arrow(2, [
+      [3, 1],
+      [2, 1],
+    ]);
+    const testLevel = level([first, second]);
+    const firstTip = visibleArrowPoints(testLevel, first).at(-1) as Point;
+    const secondTip = visibleArrowPoints(testLevel, second).at(-1) as Point;
+
+    expect(firstTip.x).toBeLessThan(2);
+    expect(secondTip.x).toBeGreaterThan(2);
+    expect(nearestArrow(testLevel, new Set(), firstTip, 1.35)?.id).toBe(1);
+    expect(nearestArrow(testLevel, new Set(), secondTip, 1.35)?.id).toBe(2);
   });
 
   it("adds padding around the level", () => {

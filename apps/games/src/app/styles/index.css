@@ -14,6 +14,7 @@
   --font-sans:
     ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
     sans-serif;
+  --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.25s ease-out;
 }
@@ -28,18 +29,23 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
 }
 
 :root {
-  --background: oklch(0.985 0.012 85);
-  --foreground: oklch(0.27 0.03 265);
-  --card: oklch(1 0 0);
-  --primary: oklch(0.58 0.16 255);
-  --primary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.95 0.012 85);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --border: oklch(0.9 0.012 85);
-  --success: oklch(0.66 0.15 155);
+  /* Eén rustige basis: ivoor papier, inkt en indigo als enige accent. */
+  --background: oklch(0.965 0.02 88);
+  --foreground: oklch(0.3 0.025 145);
+  --card: oklch(0.992 0.008 88);
+  --primary: #4f5d9e;
+  --primary-foreground: #f8f9ff;
+  --muted: oklch(0.935 0.02 88);
+  --muted-foreground: oklch(0.48 0.027 120);
+  --border: oklch(0.84 0.023 88);
+  --success: oklch(0.5 0.1 150);
+  --warning: oklch(0.56 0.13 72);
+  --danger: oklch(0.53 0.17 25);
 }
 
 @layer base {
@@ -53,6 +59,12 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
+    background-image: radial-gradient(
+      circle at 50% -18%,
+      oklch(0.93 0.04 78 / 0.45),
+      transparent 38rem
+    );
+    background-attachment: fixed;
     overscroll-behavior-y: none;
   }
 
@@ -70,6 +82,35 @@
 }
 
 @layer games {
+  /*
+   * Eén surface voor panelen, kaarten en HUD's. Hairline-rand, vaste radius
+   * en nauwelijks schaduw, zodat kleur alleen voor betekenis wordt gebruikt.
+   */
+  .game-panel {
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background-color: var(--card);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.05),
+      0 16px 36px -30px oklch(0.3 0.025 145 / 0.4);
+  }
+
+  .game-card {
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background-color: var(--card);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.05),
+      0 16px 36px -30px oklch(0.3 0.025 145 / 0.35);
+  }
+
+  .game-card:hover {
+    border-color: oklch(0.72 0.05 55);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.06),
+      0 20px 40px -30px oklch(0.3 0.025 145 / 0.45);
+  }
+
   .memory-card {
     perspective: 900px;
   }

@@ -31,7 +31,7 @@ export function SudokuControls({
     <>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Button variant="outline" onClick={onHint}>
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           {hintActive ? "Plaats" : "Hint"}
         </Button>
         <Button variant="outline" disabled={!canUndo} onClick={onUndo}>

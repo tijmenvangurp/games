@@ -1,4 +1,5 @@
 import { notifyProgressChanged } from "./progress-bridge";
+import { readStoredJson } from "./storage";
 
 /**
  * Profile-aware localStorage keys.
@@ -37,24 +38,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/**
- * Reads and parses a local JSON value. Missing or corrupt values return
- * `undefined`, so every caller can fall back without its own try/catch.
- */
-export function readStoredJson(key: string): unknown {
-  try {
-    if (typeof localStorage === "undefined") {
-      return undefined;
-    }
-    const raw = localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as unknown) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/**
- * Reads the active profile without importing the profile feature. If the
+/** Reads the active profile without importing the profile feature. If the
  * preference is missing or corrupt, profile 1 (the legacy keys) is the safe
  * default during the first start and during a rollback to the old app.
  */

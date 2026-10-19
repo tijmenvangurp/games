@@ -60,6 +60,7 @@ export function MathPage() {
 
       {finished && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description={`Je haalde ${stars} van de 10 sterren.`}
           title={celebrationTitle(stars)}
           onAgain={() => useMathStore.getState().newRound()}
