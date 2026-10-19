@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["widgets-game-shell", "features-flag-quiz", "shared-ui"]
+  "implicitDependencies": ["widgets-game-shell", "features-flag-game", "shared-ui"]
 }

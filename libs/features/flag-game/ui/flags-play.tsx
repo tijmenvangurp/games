@@ -45,15 +45,18 @@ const CHOICE_CLASSES: Record<ChoiceState, string> = {
 interface ChoiceProps {
   subject: { code: string; name: string };
   state: ChoiceState;
+  /** Dense layout for levels with many choices, such as all twelve provinces. */
+  compact: boolean;
   onSelect: () => void;
 }
 
-function NameChoice({ subject, state, onSelect }: ChoiceProps) {
+function NameChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
     <button
       aria-label={subject.name}
       className={cn(
-        "flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 px-3 text-base font-bold transition active:scale-95",
+        "flex items-center justify-center gap-2 rounded-2xl border-2 font-bold transition active:scale-95",
+        compact ? "min-h-12 px-1 text-sm" : "min-h-14 px-3 text-base",
         CHOICE_CLASSES[state],
       )}
       disabled={state !== "default"}
@@ -66,12 +69,13 @@ function NameChoice({ subject, state, onSelect }: ChoiceProps) {
   );
 }
 
-function FlagChoice({ subject, state, onSelect }: ChoiceProps) {
+function FlagChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
     <button
       aria-label={subject.name}
       className={cn(
-        "flex min-h-16 items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
+        "flex items-center justify-center gap-1 rounded-2xl border-2 transition active:scale-95",
+        compact ? "min-h-14 p-1" : "min-h-16 p-2",
         CHOICE_CLASSES[state],
       )}
       disabled={state !== "default"}
@@ -108,12 +112,18 @@ function FlagChoices({
   wrongChoices: readonly string[];
   answered: boolean;
 }) {
+  const count = question.choices.length;
+  const compact = count > 6;
   const columns =
     question.direction === "vlag-naar-land"
-      ? "grid-cols-1 sm:grid-cols-2"
-      : question.choices.length === 3
-        ? "grid-cols-3"
-        : "grid-cols-2 sm:grid-cols-4";
+      ? compact
+        ? "grid-cols-2 sm:grid-cols-3"
+        : "grid-cols-1 sm:grid-cols-2"
+      : compact
+        ? "grid-cols-4 sm:grid-cols-6"
+        : count === 3
+          ? "grid-cols-3"
+          : "grid-cols-2 sm:grid-cols-4";
 
   return (
     <div aria-label="Kies het juiste antwoord" className={cn("grid gap-2", columns)} role="group">
@@ -122,9 +132,21 @@ function FlagChoices({
         const select = () => useFlagStore.getState().chooseAnswer(subject.code);
 
         return question.direction === "vlag-naar-land" ? (
-          <NameChoice key={subject.code} subject={subject} state={state} onSelect={select} />
+          <NameChoice
+            key={subject.code}
+            compact={compact}
+            subject={subject}
+            state={state}
+            onSelect={select}
+          />
         ) : (
-          <FlagChoice key={subject.code} subject={subject} state={state} onSelect={select} />
+          <FlagChoice
+            key={subject.code}
+            compact={compact}
+            subject={subject}
+            state={state}
+            onSelect={select}
+          />
         );
       })}
     </div>
@@ -189,38 +211,42 @@ function QuestionCard({
 
   return (
     <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
-      <p className="text-center text-sm font-bold text-muted-foreground">
-        {directionPrompt(question.direction, scope)}
-      </p>
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        <div>
+          <p className="text-center text-sm font-bold text-muted-foreground">
+            {directionPrompt(question.direction, scope)}
+          </p>
 
-      {showsFlag ? (
-        <div className="mx-auto mt-3 max-w-xs">
-          <FlagPicture className="bg-white" code={question.subject.code} />
+          {showsFlag ? (
+            <div className="mx-auto mt-3 max-w-sm">
+              <FlagPicture className="bg-white" code={question.subject.code} />
+            </div>
+          ) : (
+            <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
+              {question.subject.name}
+            </p>
+          )}
+
+          <div className="mt-4">
+            <FlagChoices answered={answered} question={question} wrongChoices={wrongChoices} />
+          </div>
         </div>
-      ) : (
-        <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
-          {question.subject.name}
-        </p>
-      )}
 
-      <div className="mt-4">
-        <FlagChoices answered={answered} question={question} wrongChoices={wrongChoices} />
+        <div className="mt-4 lg:mt-0">
+          <FlagFeedback answered={answered} correct={correct} question={question} />
+
+          {answered ? (
+            <Button
+              className="mt-4 w-full"
+              size="lg"
+              variant="success"
+              onClick={() => useFlagStore.getState().next()}
+            >
+              {isLast ? "Klaar" : "Volgende"}
+            </Button>
+          ) : null}
+        </div>
       </div>
-
-      <div className="mt-4">
-        <FlagFeedback answered={answered} correct={correct} question={question} />
-      </div>
-
-      {answered ? (
-        <Button
-          className="mt-4 w-full"
-          size="lg"
-          variant="success"
-          onClick={() => useFlagStore.getState().next()}
-        >
-          {isLast ? "Klaar" : "Volgende"}
-        </Button>
-      ) : null}
     </section>
   );
 }
@@ -237,7 +263,7 @@ export function FlagsPlay() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
+    <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
       <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
         <p className="text-sm font-black text-muted-foreground">
           Vraag {questionIndex + 1} van {round.questions.length}

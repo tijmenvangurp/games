@@ -13,7 +13,8 @@ import { fileURLToPath } from "node:url";
  * - Wikimedia Commons (public domain) for the twelve Dutch province flags;
  * - Wikidata (CC0) for the Dutch names, capitals, ISO codes and coordinates,
  *   and for the selection of sovereign states and provinces;
- * - Natural Earth 1:110m via world-atlas (ISC) for the country outlines.
+ * - Natural Earth 1:110m via world-atlas (ISC) for the country outlines;
+ * - Natural Earth 1:10m admin-1 (public domain) for the Dutch province shapes.
  *
  * Run `pnpm run geography` to regenerate, `pnpm run geography:check` to verify
  * the committed data and assets without touching the network. Generated files
@@ -30,10 +31,29 @@ const COMMONS_API = "https://commons.wikimedia.org/w/api.php";
 const DATA_FILE = "libs/entities/geography/model/countries.ts";
 const PROVINCE_DATA_FILE = "libs/entities/geography/model/provinces.ts";
 const ATLAS_FILE = "libs/entities/geography/model/world-110m.json";
+const NATURAL_EARTH_VERSION = "v5.1.2";
+const PROVINCE_GEOMETRY_URL = `https://raw.githubusercontent.com/nvkelso/natural-earth-vector/${NATURAL_EARTH_VERSION}/geojson/ne_10m_admin_1_states_provinces.geojson`;
+const PROVINCE_GEOMETRY_FILE = "libs/entities/geography/model/provinces-10m.json";
 const ASSET_DIR = "apps/games/public/flags";
 
 /** Wikidata class of the Dutch provinces. */
 const PROVINCE_CLASS = "Q134390";
+
+/** ISO 3166-2 codes of the twelve provinces, as Natural Earth writes them. */
+const PROVINCE_CODES = [
+  "nl-dr",
+  "nl-fl",
+  "nl-fr",
+  "nl-ge",
+  "nl-gr",
+  "nl-li",
+  "nl-nb",
+  "nl-nh",
+  "nl-ov",
+  "nl-ut",
+  "nl-ze",
+  "nl-zh",
+] as const;
 
 /** Outlines that must be present in the atlas, as a sanity check. */
 const REQUIRED_ATLAS_IDS = ["076", "250", "528", "710", "840"];
@@ -664,6 +684,79 @@ async function downloadProvinceFlags(provinces: readonly ProvinceSource[]): Prom
   );
 }
 
+/** Four decimals is about eleven metres: enough for a province map. */
+function roundCoordinates(value: unknown): unknown {
+  if (typeof value === "number") {
+    return Math.round(value * 10_000) / 10_000;
+  }
+
+  return Array.isArray(value) ? value.map(roundCoordinates) : value;
+}
+
+interface NaturalEarthFeature {
+  properties: Record<string, unknown>;
+  geometry: unknown;
+}
+
+function toProvinceShape(
+  feature: NaturalEarthFeature,
+): { code: string; geometry: unknown } | undefined {
+  const iso = readString(feature.properties, "iso_3166_2");
+  const type = readString(feature.properties, "type_en");
+  const code = iso?.toLowerCase();
+  if (
+    !code ||
+    !PROVINCE_CODES.includes(code as (typeof PROVINCE_CODES)[number]) ||
+    type !== "Province"
+  ) {
+    return undefined;
+  }
+
+  return { code, geometry: roundCoordinates(feature.geometry) };
+}
+
+/**
+ * Extracts the twelve Dutch provinces from the Natural Earth 1:10m admin-1
+ * dataset. The source is about 40 MB, but only the Dutch shapes are kept.
+ */
+async function downloadProvinceGeometry(): Promise<void> {
+  const payload = await fetchJson(PROVINCE_GEOMETRY_URL);
+  if (!isRecord(payload) || !Array.isArray(payload.features)) {
+    throw new Error("Natural Earth admin-1 heeft een onverwachte vorm");
+  }
+
+  const features = payload.features
+    .filter((feature): feature is NaturalEarthFeature => {
+      return isRecord(feature) && isRecord(feature.properties) && feature.geometry !== undefined;
+    })
+    .flatMap((feature) => {
+      const shape = toProvinceShape(feature);
+
+      return shape
+        ? [
+            {
+              type: "Feature" as const,
+              properties: { code: shape.code },
+              geometry: shape.geometry,
+            },
+          ]
+        : [];
+    })
+    .sort((left, right) => left.properties.code.localeCompare(right.properties.code));
+
+  if (features.length !== PROVINCE_CODES.length) {
+    throw new Error(`Natural Earth gaf ${features.length} provincies in plaats van 12`);
+  }
+
+  const changed = await writeIfChanged(
+    PROVINCE_GEOMETRY_FILE,
+    JSON.stringify({ type: "FeatureCollection", features }),
+  );
+  console.log(
+    `Provinciekaart: ${changed ? "geschreven" : "ongewijzigd"}, ${features.length} vlakken, ${Math.round(Buffer.byteLength(JSON.stringify(features)) / 1024)} KB in ${PROVINCE_GEOMETRY_FILE}`,
+  );
+}
+
 async function downloadAtlas(): Promise<void> {
   const atlas = await fetchText(WORLD_ATLAS_URL);
   const changed = await writeIfChanged(ATLAS_FILE, atlas);
@@ -793,6 +886,62 @@ async function checkAtlas(): Promise<void> {
   );
 }
 
+function provinceCode(feature: unknown): string | undefined {
+  if (!isRecord(feature) || !isRecord(feature.properties)) {
+    return undefined;
+  }
+
+  return readString(feature.properties, "code");
+}
+
+function provinceProblems(feature: unknown): string[] {
+  const code = provinceCode(feature);
+  const geometry = isRecord(feature) ? feature.geometry : undefined;
+  const type = isRecord(geometry) ? readString(geometry, "type") : undefined;
+  if (type === "Polygon" || type === "MultiPolygon") {
+    return code ? [] : ["een vlak zonder code"];
+  }
+
+  return [`${code ?? "?"} is geen vlak`];
+}
+
+/** Collects the missing or malformed shapes of the province geometry. */
+function provinceGeometryProblems(features: readonly unknown[]): string[] {
+  const codes = new Set(features.flatMap((feature) => provinceCode(feature) ?? []));
+  const missing = PROVINCE_CODES.filter((code) => !codes.has(code)).map(
+    (code) => `geen vlak voor ${code}`,
+  );
+
+  return [...features.flatMap(provinceProblems), ...missing];
+}
+
+/**
+ * Offline check: the province geometry holds all twelve provinces, each with a
+ * polygon. Small misalignment with `provinces.ts` would break the puzzle.
+ */
+async function checkProvinceGeometry(): Promise<void> {
+  if (!existsSync(PROVINCE_GEOMETRY_FILE)) {
+    console.error(`Provinciekaartcontrole mislukt: ${PROVINCE_GEOMETRY_FILE} ontbreekt`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const raw = await readFile(PROVINCE_GEOMETRY_FILE, "utf8");
+  const payload: unknown = JSON.parse(raw);
+  const features = isRecord(payload) && Array.isArray(payload.features) ? payload.features : [];
+  const problems = provinceGeometryProblems(features);
+
+  if (problems.length > 0) {
+    console.error(`Provinciekaartcontrole mislukt:\n  ${problems.join("\n  ")}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(
+    `Provinciekaartcontrole ok: ${features.length} vlakken, ${Math.round(Buffer.byteLength(raw) / 1024)} KB`,
+  );
+}
+
 const args = new Set(process.argv.slice(2));
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 process.chdir(repositoryRoot);
@@ -800,10 +949,12 @@ process.chdir(repositoryRoot);
 if (args.has("--check")) {
   await checkAssets();
   await checkAtlas();
+  await checkProvinceGeometry();
 } else {
   const { countries, provinces } = await collectGeography();
   await writeDataFiles(countries, provinces);
   await downloadCountryFlags(countries);
   await downloadProvinceFlags(provinces);
   await downloadAtlas();
+  await downloadProvinceGeometry();
 }

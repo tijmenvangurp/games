@@ -48,7 +48,7 @@ test.describe("vlaggen op een telefoon", () => {
   test("speelt een ronde met de Nederlandse provincies en toont de kaart", async ({ page }) => {
     await page.goto("/vlaggen");
     await page.getByRole("button", { name: /Nederland/ }).click();
-    await expect(page.getByText("12 provincies")).toBeVisible();
+    await expect(page.getByText("12 provincies", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Spelen" }).click();
 
     await expect(page.getByText(/Vraag 1 van 10/)).toBeVisible();
@@ -70,6 +70,57 @@ test.describe("vlaggen op een telefoon", () => {
 
     // The world map is a separate chunk; answering is what loads it.
     await expect(page.getByTestId("place-map")).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
+  test("speelt de kaartpuzzel met slepen en tikken", async ({ page }) => {
+    await page.goto("/vlaggen");
+    await page.getByRole("button", { name: /Kaartpuzzel/ }).click();
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const map = page.getByTestId("puzzle-map");
+    await expect(map).toBeVisible();
+    await map.scrollIntoViewIfNeeded();
+    await expect(page.getByText(/van 8 geplaatst/)).toBeVisible();
+
+    const pieces = page.getByRole("button", { name: /\(stuk\)$/ });
+    await expect(pieces).toHaveCount(8);
+
+    // De hintstippen liggen in het land zelf; het midden van een concave
+    // landvorm kan buiten de vorm vallen en dan klikt Playwright mis.
+    const hint = () => page.locator('svg[data-testid="puzzle-map"] circle').first();
+
+    // Slepen: het eerste stuk naar de eerste hintstip.
+    const source = await pieces.first().boundingBox();
+    const destination = await hint().boundingBox();
+    if (!source || !destination) {
+      throw new Error("Geen stuk of doelvlak");
+    }
+    await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(
+      destination.x + destination.width / 2,
+      destination.y + destination.height / 2,
+      { steps: 8 },
+    );
+    await page.mouse.up();
+
+    await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
+
+    // Tikken: stuk kiezen en daarna op een hintstip tikken.
+    await page.waitForTimeout(500);
+    await pieces.nth(2).click();
+    const target = await hint().boundingBox();
+    if (!target) {
+      throw new Error("Geen hintstip");
+    }
+    await page.mouse.click(target.x + target.width / 2, target.y + target.height / 2);
+
+    await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
 
     const overflows = (await page.evaluate(
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",

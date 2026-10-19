@@ -1,10 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { COUNTRIES, PROVINCES, type FlagQuestion } from "@entities/geography";
-import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-quiz";
+import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-game";
 
 const STORAGE_KEY = "games.vlaggen.v1";
 
@@ -169,6 +169,19 @@ describe("flag game", () => {
     expect(round.scope).toBe("azie");
     expect(round.level).toBe("moeilijk");
     expect(round.questions.every((question) => question.subject.region === "azie")).toBe(true);
+  });
+
+  it("offers all twelve provinces on the hardest level", async () => {
+    renderApp();
+
+    fireEvent.click(await screen.findByRole("button", { name: /Nederland/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Moeilijk/ }));
+    expect(screen.getByText("Alle 12 provincies")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+
+    const group = await screen.findByRole("group", { name: "Kies het juiste antwoord" });
+    expect(within(group).getAllByRole("button")).toHaveLength(12);
   });
 
   it("plays a round with the Dutch provinces", async () => {

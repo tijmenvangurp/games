@@ -1,5 +1,5 @@
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
-import { lookalikeCodes, regionLabel, subjectsFor } from "./config";
+import { HARD_LEVEL_CHOICES, lookalikeCodes, regionLabel, subjectsFor } from "./config";
 import {
   FLAG_DIRECTIONS,
   type FlagDirection,
@@ -58,9 +58,9 @@ function distractorChoices(
   answer: FlagSubject,
   level: FlagLevel,
   pool: readonly FlagSubject[],
+  needed: number,
   random: () => number,
 ): FlagSubject[] {
-  const needed = CHOICE_COUNT[level] - 1;
   const picked: FlagSubject[] = [];
   const pickedCodes = new Set([answer.code]);
 
@@ -101,6 +101,15 @@ function directionsFor(random: () => number): FlagDirection[] {
   );
 }
 
+function choiceCountFor(scope: FlagScope, level: FlagLevel, poolSize: number): number {
+  // The hardest level asks for twelve options; a smaller scope offers all it has.
+  if (level === "moeilijk") {
+    return Math.min(HARD_LEVEL_CHOICES, poolSize);
+  }
+
+  return CHOICE_COUNT[level];
+}
+
 export function createRound(
   scope: FlagScope,
   level: FlagLevel,
@@ -108,7 +117,7 @@ export function createRound(
 ): FlagRound {
   const random = mulberry32(seed);
   const pool = subjectsFor(scope);
-  const needed = CHOICE_COUNT[level] - 1;
+  const needed = choiceCountFor(scope, level, pool.length) - 1;
 
   if (pool.length < needed + 1) {
     throw new Error(`Te weinig onderwerpen voor ${scope}`);
@@ -118,7 +127,10 @@ export function createRound(
   const directions = directionsFor(random);
 
   const questions: FlagQuestion[] = chosen.map((subject, index) => {
-    const choices = shuffle([subject, ...distractorChoices(subject, level, pool, random)], random);
+    const choices = shuffle(
+      [subject, ...distractorChoices(subject, level, pool, needed, random)],
+      random,
+    );
 
     return {
       id: index,

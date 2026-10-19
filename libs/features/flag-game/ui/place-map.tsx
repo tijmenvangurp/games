@@ -1,27 +1,24 @@
-import {
-  worldMap,
-  type Country,
-  type FlagSubject,
-  type MapPlace,
-  type WorldMap,
-} from "@entities/geography";
+import { regionMap, type FlagSubject, type WorldMap } from "@entities/geography";
 import { useEffect, useState } from "react";
 
-const MAP_WIDTH = 320;
-const MAP_HEIGHT = 180;
+/** Countries use a landscape frame; the Netherlands is taller than it is wide. */
+const LANDSCAPE = { width: 320, height: 220 };
+const PORTRAIT = { width: 240, height: 260 };
 
 /**
- * The atlas is a separate chunk, so the map only loads once the answer is
- * shown. Until then, and if loading fails, the map stays out of the way: the
- * text explanation already carries the answer.
+ * The maps are separate chunks, so nothing loads until the answer is shown.
+ * The whole continent is drawn, not a close-up: that is where the child learns
+ * where the country lies. Provinces use the map of the Netherlands.
  */
-function useWorldMap({ latitude, longitude, numeric }: MapPlace): WorldMap | null {
+function useRegionMap(subject: FlagSubject): WorldMap | null {
   const [map, setMap] = useState<WorldMap | null>(null);
+  const { code, region, latitude, longitude } = subject;
+  const frame = region === "nederland" ? PORTRAIT : LANDSCAPE;
 
   useEffect(() => {
     let cancelled = false;
     setMap(null);
-    void worldMap({ latitude, longitude, numeric }, MAP_WIDTH, MAP_HEIGHT)
+    void regionMap(subject, frame.width, frame.height)
       .then((next) => {
         if (!cancelled) {
           setMap(next);
@@ -34,21 +31,10 @@ function useWorldMap({ latitude, longitude, numeric }: MapPlace): WorldMap | nul
     return () => {
       cancelled = true;
     };
-  }, [latitude, longitude, numeric]);
+    // The subject is fresh per question; its primitives are the real inputs.
+  }, [code, region, latitude, longitude, frame.width, frame.height]);
 
   return map;
-}
-
-function isCountry(subject: FlagSubject): subject is Country {
-  return "numeric" in subject;
-}
-
-function placeOf(subject: FlagSubject): MapPlace {
-  return {
-    latitude: subject.latitude,
-    longitude: subject.longitude,
-    numeric: isCountry(subject) ? subject.numeric : undefined,
-  };
 }
 
 /**
@@ -57,7 +43,7 @@ function placeOf(subject: FlagSubject): MapPlace {
  * adds nothing.
  */
 export function PlaceMap({ subject }: { subject: FlagSubject }) {
-  const map = useWorldMap(placeOf(subject));
+  const map = useRegionMap(subject);
   if (!map) {
     return null;
   }
@@ -65,10 +51,10 @@ export function PlaceMap({ subject }: { subject: FlagSubject }) {
   return (
     <svg
       aria-hidden="true"
-      className="mx-auto h-auto w-full max-w-xs rounded-2xl border bg-sky-50"
+      className="mx-auto h-auto w-full rounded-2xl border bg-sky-50"
       data-testid="place-map"
       focusable="false"
-      viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
+      viewBox={`0 0 ${map.width} ${map.height}`}
     >
       <path className="fill-emerald-50 stroke-emerald-200" d={map.land} strokeWidth={0.5} />
       {map.highlight ? (

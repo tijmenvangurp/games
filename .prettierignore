@@ -1,2 +1,4 @@
 # Gegenereerde wereldkaart (minified JSON van world-atlas); niet formatteren.
 libs/entities/geography/model/world-110m.json
+# Gegenereerde provinciegeometrie (minified GeoJSON van Natural Earth); niet formatteren.
+libs/entities/geography/model/provinces-10m.json

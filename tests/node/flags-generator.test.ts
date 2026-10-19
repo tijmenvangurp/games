@@ -175,7 +175,7 @@ describe("flag rounds", () => {
     for (const level of FLAG_LEVELS) {
       const round = createRound("wereld", level, 11);
       for (const question of round.questions) {
-        const expected = level === "makkelijk" ? 3 : 4;
+        const expected = level === "makkelijk" ? 3 : level === "gemiddeld" ? 4 : 12;
         expect(question.choices).toHaveLength(expected);
         expect(new Set(question.choices.map((choice) => choice.code)).size).toBe(expected);
         expect(question.choices.some((choice) => choice.code === question.subject.code)).toBe(true);
@@ -246,7 +246,8 @@ describe("flag rounds", () => {
     expect(new Set(round.questions.map((question) => question.subject.code)).size).toBe(10);
     for (const question of round.questions) {
       expect(question.subject.region).toBe("nederland");
-      expect(question.choices).toHaveLength(4);
+      // The hardest level asks with all twelve provinces.
+      expect(question.choices).toHaveLength(12);
       for (const choice of question.choices) {
         expect(choice.region).toBe("nederland");
       }
@@ -254,6 +255,16 @@ describe("flag rounds", () => {
 
     const directions = new Set(round.questions.map((question) => question.direction));
     expect(directions).toEqual(new Set(["vlag-naar-land", "land-naar-vlag"]));
+  });
+
+  it("keeps four choices for the provinces on lower levels", () => {
+    for (const level of ["makkelijk", "gemiddeld"] as const) {
+      const round = createRound("nederland", level, 7);
+      const expected = level === "makkelijk" ? 3 : 4;
+      for (const question of round.questions) {
+        expect(question.choices).toHaveLength(expected);
+      }
+    }
   });
 
   it("explains the answer with the subject, its region and its capital", () => {
