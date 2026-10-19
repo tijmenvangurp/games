@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { COUNTRIES, createPuzzleRound, puzzleMap, worldShapeCodes } from "@entities/geography";
+import {
+  COUNTRIES,
+  countryShapeCodes,
+  createPuzzleRound,
+  provinceMap,
+  provincePuzzleMap,
+  provinceShapeCodes,
+  puzzleMap,
+  worldShapeCodes,
+} from "@entities/geography";
 
 const WIDTH = 360;
 const HEIGHT = 280;
@@ -14,19 +23,19 @@ describe("puzzle rounds", () => {
   });
 
   it("only picks countries with an outline from the chosen scope", async () => {
-    const codes = await worldShapeCodes();
+    const codes = await countryShapeCodes();
     const round = createPuzzleRound("europa", "gemiddeld", codes, 3);
 
     expect(round.questions).toHaveLength(8);
-    expect(new Set(round.questions.map((question) => question.country.code)).size).toBe(8);
+    expect(new Set(round.questions.map((question) => question.subject.code)).size).toBe(8);
     for (const question of round.questions) {
-      expect(question.country.region).toBe("europa");
-      expect(codes.has(question.country.numeric)).toBe(true);
+      expect(question.subject.region).toBe("europa");
+      expect(codes.has(question.subject.code)).toBe(true);
     }
   });
 
   it("is deterministic for a seed and varies across seeds", async () => {
-    const codes = await worldShapeCodes();
+    const codes = await countryShapeCodes();
     const first = createPuzzleRound("afrika", "makkelijk", codes, 9);
     const again = createPuzzleRound("afrika", "makkelijk", codes, 9);
     const other = createPuzzleRound("afrika", "makkelijk", codes, 10);
@@ -36,14 +45,26 @@ describe("puzzle rounds", () => {
   });
 
   it("shrinks the round when a continent has fewer outlines", async () => {
-    const codes = await worldShapeCodes();
+    const codes = await countryShapeCodes();
     const round = createPuzzleRound("oceanie", "makkelijk", codes, 1);
 
     expect(round.questions).toHaveLength(6);
   });
 
-  it("has no puzzle for the provinces without a province map", async () => {
-    const codes = await worldShapeCodes();
+  it("plays the twelve provinces as pieces", async () => {
+    const codes = await provinceShapeCodes();
+    expect(codes.size).toBe(12);
+
+    const round = createPuzzleRound("nederland", "moeilijk", codes, 5);
+
+    expect(round.questions).toHaveLength(8);
+    for (const question of round.questions) {
+      expect(question.subject.region).toBe("nederland");
+    }
+  });
+
+  it("refuses a scope without shapes", async () => {
+    const codes = await countryShapeCodes();
 
     expect(() => createPuzzleRound("nederland", "makkelijk", codes, 1)).toThrow();
   });
@@ -51,15 +72,15 @@ describe("puzzle rounds", () => {
 
 describe("puzzle map", () => {
   it("draws the board and a piece for every selected country", async () => {
-    const codes = await worldShapeCodes();
+    const codes = await countryShapeCodes();
     const round = createPuzzleRound("zuid-amerika", "makkelijk", codes, 4);
     const map = await puzzleMap(
-      round.questions.map((question) => question.country),
+      round.questions.map((question) => question.subject),
       WIDTH,
       HEIGHT,
     );
 
-    expect(map.countries.length).toBeGreaterThan(150);
+    expect(map.areas.length).toBeGreaterThan(150);
     expect(map.pieces).toHaveLength(8);
 
     for (const piece of map.pieces) {
@@ -69,29 +90,46 @@ describe("puzzle map", () => {
       expect(piece.height).toBe(84);
     }
 
-    const board = new Set(map.countries.map((country) => country.code));
+    const board = new Set(map.areas.map((area) => area.code));
     for (const question of round.questions) {
-      expect(board.has(question.country.code)).toBe(true);
+      expect(board.has(question.subject.code)).toBe(true);
     }
   });
 
   it("keeps every selected country's centre inside the board", async () => {
-    const codes = await worldShapeCodes();
+    const codes = await countryShapeCodes();
     const round = createPuzzleRound("wereld", "moeilijk", codes, 11);
     const map = await puzzleMap(
-      round.questions.map((question) => question.country),
+      round.questions.map((question) => question.subject),
       WIDTH,
       HEIGHT,
     );
-    const board = new Map(map.countries.map((country) => [country.code, country]));
+    const board = new Map(map.areas.map((area) => [area.code, area]));
 
     for (const question of round.questions) {
-      const country = board.get(question.country.code);
-      expect(country).toBeDefined();
-      expect(country?.x).toBeGreaterThanOrEqual(0);
-      expect(country?.x).toBeLessThanOrEqual(WIDTH);
-      expect(country?.y).toBeGreaterThanOrEqual(0);
-      expect(country?.y).toBeLessThanOrEqual(HEIGHT);
+      const area = board.get(question.subject.code);
+      expect(area).toBeDefined();
+      expect(area?.x).toBeGreaterThanOrEqual(0);
+      expect(area?.x).toBeLessThanOrEqual(WIDTH);
+      expect(area?.y).toBeGreaterThanOrEqual(0);
+      expect(area?.y).toBeLessThanOrEqual(HEIGHT);
+    }
+  });
+
+  it("draws the province puzzle from the twelve province shapes", async () => {
+    const codes = await provinceShapeCodes();
+    const round = createPuzzleRound("nederland", "gemiddeld", codes, 7);
+    const map = await provincePuzzleMap(
+      round.questions.map((question) => question.subject),
+      WIDTH,
+      HEIGHT,
+    );
+
+    expect(map.areas).toHaveLength(12);
+    expect(map.pieces).toHaveLength(8);
+    for (const piece of map.pieces) {
+      expect(piece.path.startsWith("M")).toBe(true);
+      expect(piece.path).not.toContain("NaN");
     }
   });
 
@@ -107,5 +145,15 @@ describe("puzzle map", () => {
     expect(piece).toBeDefined();
     // More than one subpath: the piece is not just the largest island.
     expect(piece?.path.match(/M/g)?.length ?? 0).toBeGreaterThan(1);
+  });
+
+  it("highlights one province on the province map", async () => {
+    const map = await provinceMap("nl-dr", WIDTH, HEIGHT);
+
+    expect(map.land.startsWith("M")).toBe(true);
+    expect(map.highlight.startsWith("M")).toBe(true);
+    expect(map.highlight).not.toBe(map.land);
+    expect(Number.isFinite(map.marker.x)).toBe(true);
+    expect(Number.isFinite(map.marker.y)).toBe(true);
   });
 });

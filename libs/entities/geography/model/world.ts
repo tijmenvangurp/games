@@ -3,7 +3,8 @@ import type { Feature, FeatureCollection, Geometry, Polygon } from "geojson";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
 import { COUNTRIES } from "./countries";
-import type { Country } from "./types";
+import { PROVINCES } from "./provinces";
+import type { FlagSubject } from "./types";
 
 /**
  * Degrees of longitude a map shows at least, so that small states and island
@@ -19,6 +20,9 @@ export interface WorldMap {
   highlight: string;
   /** Screen position of the subject's centre; always available. */
   marker: { x: number; y: number };
+  /** Size of the drawing area, so the SVG can use the right viewBox. */
+  width: number;
+  height: number;
 }
 
 /** What a map needs to know about a place. */
@@ -127,6 +131,8 @@ export async function worldMap(place: MapPlace, width: number, height: number): 
     land: path(atlas.land) ?? "",
     highlight: target?.geometry ? (path(target) ?? "") : "",
     marker: { x: point[0], y: point[1] },
+    width,
+    height,
   };
 }
 
@@ -136,13 +142,16 @@ const PIECE_SIZE = 84;
 /** How far (in degrees) a polygon may lie from the mainland to join its piece. */
 const PIECE_RADIUS = 30;
 
-/** Breathing room around the selected countries on the puzzle map. */
+/** Breathing room around the selected shapes on the puzzle map. */
 const MAP_PADDING = 22;
 
-export interface PuzzleMapCountry {
+/** Breathing room around the Netherlands on the province map. */
+const PROVINCE_MAP_PADDING = 10;
+
+export interface PuzzleMapArea {
   code: string;
   path: string;
-  /** Centre of the country in map coordinates, used as a drop hint. */
+  /** Centre of the area in map coordinates, used as a drop hint. */
   x: number;
   y: number;
 }
@@ -155,10 +164,17 @@ export interface PuzzlePiece {
 }
 
 export interface PuzzleMap {
-  /** Every country with an outline, drawn as the board. */
-  countries: readonly PuzzleMapCountry[];
-  /** One normalized shape per selected country. */
+  /** Every shape that can be placed, drawn as the board. */
+  areas: readonly PuzzleMapArea[];
+  /** One normalized shape per selected area. */
   pieces: readonly PuzzlePiece[];
+}
+
+/** A drawable shape with the centre used for zooming and hints. */
+interface MapEntry {
+  code: string;
+  latitude: number;
+  longitude: number;
 }
 
 /** The ISO numeric codes that the world atlas has an outline for. */
@@ -168,8 +184,51 @@ export async function worldShapeCodes(): Promise<ReadonlySet<string>> {
   return new Set(atlas.countries.features.map((entry) => String(entry.id).padStart(3, "0")));
 }
 
-function featuresByNumeric(features: readonly Feature[]): ReadonlyMap<string, Feature> {
+/** Country codes with an outline, ready for the puzzle. */
+export async function countryShapeCodes(): Promise<ReadonlySet<string>> {
+  const numerics = await worldShapeCodes();
+
+  return new Set(
+    COUNTRIES.filter((country) => numerics.has(country.numeric)).map((country) => country.code),
+  );
+}
+
+let provinceFeaturesPromise: Promise<ReadonlyMap<string, Feature>> | undefined;
+
+/** Natural Earth 1:10m province shapes, keyed by ISO 3166-2 code. */
+function loadProvinceFeatures(): Promise<ReadonlyMap<string, Feature>> {
+  provinceFeaturesPromise ??= import("./provinces-10m.json?raw").then((module) => {
+    const collection = JSON.parse(module.default) as FeatureCollection;
+
+    return new Map(
+      collection.features.flatMap((entry) => {
+        const code = (entry.properties as { code?: unknown } | null)?.code;
+
+        return typeof code === "string" ? [[code, entry] as const] : [];
+      }),
+    );
+  });
+
+  return provinceFeaturesPromise;
+}
+
+/** Province codes with a shape, ready for the puzzle. */
+export async function provinceShapeCodes(): Promise<ReadonlySet<string>> {
+  return new Set((await loadProvinceFeatures()).keys());
+}
+
+function byNumeric(features: readonly Feature[]): ReadonlyMap<string, Feature> {
   return new Map(features.map((entry) => [String(entry.id).padStart(3, "0"), entry] as const));
+}
+
+function countryShapes(byCode: ReadonlyMap<string, Feature>): ReadonlyMap<string, Feature> {
+  return new Map(
+    COUNTRIES.flatMap((country) => {
+      const shape = byCode.get(country.numeric);
+
+      return shape ? [[country.code, shape] as const] : [];
+    }),
+  );
 }
 
 /** Distance in degrees, also correct across the antimeridian. */
@@ -204,7 +263,7 @@ function withinPiece(polygon: Polygon, centerLon: number, centerLat: number): bo
 }
 
 /**
- * The polygons that belong to the country itself, without far-away overseas
+ * The polygons that belong to the shape itself, without far-away overseas
  * parts: everything within `PIECE_RADIUS` degrees of the largest polygon.
  * Archipelagos keep their islands; French Guiana does not join France.
  */
@@ -249,45 +308,14 @@ function pieceFor(code: string, geometry: Geometry): PuzzlePiece | undefined {
   };
 }
 
-function mapCountry(
-  country: Country,
-  features: ReadonlyMap<string, Feature>,
-  path: ReturnType<typeof geoPath>,
-  projection: ReturnType<typeof geoMercator>,
-): PuzzleMapCountry | undefined {
-  const outline = features.get(country.numeric);
-  const center = projection([country.longitude, country.latitude]);
-  if (!outline || !center) {
-    return undefined;
-  }
-
-  return { code: country.code, path: path(outline) ?? "", x: center[0], y: center[1] };
-}
-
-function mapPiece(
-  country: Country,
-  features: ReadonlyMap<string, Feature>,
-): PuzzlePiece | undefined {
-  const outline = features.get(country.numeric);
-
-  return outline?.geometry ? pieceFor(country.code, outline.geometry) : undefined;
-}
-
-/**
- * Builds the puzzle board: every country with an outline as context, and a
- * normalized piece for each selected country. The view is fitted to the
- * selected countries' centres, so this round's pieces are always in frame.
- */
-export async function puzzleMap(
-  selected: readonly Country[],
+function buildPuzzleMap(
+  shapes: ReadonlyMap<string, Feature>,
+  entries: readonly MapEntry[],
+  selected: readonly MapEntry[],
   width: number,
   height: number,
-): Promise<PuzzleMap> {
-  const atlas = await loadAtlas();
-  const features = featuresByNumeric(atlas.countries.features);
-  const centers = selected.map(
-    (country) => [country.longitude, country.latitude] as [number, number],
-  );
+): PuzzleMap {
+  const centers = selected.map((entry) => [entry.longitude, entry.latitude] as [number, number]);
   const projection = geoMercator()
     .fitExtent(
       [
@@ -302,16 +330,85 @@ export async function puzzleMap(
     ]);
   const path = geoPath(projection);
 
-  const countries = COUNTRIES.flatMap((country) => {
-    const mapped = mapCountry(country, features, path, projection);
+  const areas = entries.flatMap((entry) => {
+    const shape = shapes.get(entry.code);
+    const center = shape ? projection([entry.longitude, entry.latitude]) : undefined;
 
-    return mapped ? [mapped] : [];
+    return shape && center
+      ? [{ code: entry.code, path: path(shape) ?? "", x: center[0], y: center[1] }]
+      : [];
   });
-  const pieces = selected.flatMap((country) => {
-    const piece = mapPiece(country, features);
+
+  const pieces = selected.flatMap((entry) => {
+    const shape = shapes.get(entry.code);
+    const piece = shape?.geometry ? pieceFor(entry.code, shape.geometry) : undefined;
 
     return piece ? [piece] : [];
   });
 
-  return { countries, pieces };
+  return { areas, pieces };
+}
+
+/**
+ * Builds the country puzzle board: every country with an outline as context,
+ * and a normalized piece for each selected country. The view is fitted to the
+ * selected countries' centres, so this round's pieces are always in frame.
+ */
+export async function puzzleMap(
+  selected: readonly FlagSubject[],
+  width: number,
+  height: number,
+): Promise<PuzzleMap> {
+  const atlas = await loadAtlas();
+
+  return buildPuzzleMap(
+    countryShapes(byNumeric(atlas.countries.features)),
+    COUNTRIES,
+    selected,
+    width,
+    height,
+  );
+}
+
+/** The same puzzle board, drawn from the twelve province shapes. */
+export async function provincePuzzleMap(
+  selected: readonly FlagSubject[],
+  width: number,
+  height: number,
+): Promise<PuzzleMap> {
+  return buildPuzzleMap(await loadProvinceFeatures(), PROVINCES, selected, width, height);
+}
+
+/**
+ * Draws the Netherlands with one province highlighted. Used in the flag quiz
+ * when the subject is a province: the world map would put every province on
+ * the same dot.
+ */
+export async function provinceMap(code: string, width: number, height: number): Promise<WorldMap> {
+  const features = await loadProvinceFeatures();
+  const shapes = [...features.values()];
+  const projection = geoMercator()
+    .fitExtent(
+      [
+        [PROVINCE_MAP_PADDING, PROVINCE_MAP_PADDING],
+        [width - PROVINCE_MAP_PADDING, height - PROVINCE_MAP_PADDING],
+      ],
+      { type: "FeatureCollection", features: shapes },
+    )
+    .clipExtent([
+      [0, 0],
+      [width, height],
+    ]);
+  const path = geoPath(projection);
+  const target = features.get(code);
+  const center = target ? geoCentroid(target) : ([5.3, 52.2] as [number, number]);
+  const marker = projection(center) ?? [width / 2, height / 2];
+
+  return {
+    land: shapes.map((shape) => path(shape) ?? "").join(" "),
+    highlight: target ? (path(target) ?? "") : "",
+    marker: { x: marker[0], y: marker[1] },
+    width,
+    height,
+  };
 }

@@ -12,8 +12,16 @@ export {
 export { createRound, explanationFor } from "./model/generator";
 export { createPuzzleRound } from "./model/puzzle";
 export type { PuzzleRound } from "./model/puzzle";
-export { puzzleMap, worldMap, worldShapeCodes } from "./model/world";
-export type { MapPlace, PuzzleMap, PuzzleMapCountry, PuzzlePiece, WorldMap } from "./model/world";
+export {
+  countryShapeCodes,
+  provinceMap,
+  provincePuzzleMap,
+  provinceShapeCodes,
+  puzzleMap,
+  worldMap,
+  worldShapeCodes,
+} from "./model/world";
+export type { PuzzleMap, PuzzleMapArea, PuzzlePiece, WorldMap } from "./model/world";
 export { CONTINENTS, FLAG_LEVELS, FLAG_SCOPES } from "./model/types";
 export type {
   Country,
