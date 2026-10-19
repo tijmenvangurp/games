@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { createRound, type FlagLevel, type FlagRound, type FlagScope } from "@entities/flag";
+import { createRound, type FlagLevel, type FlagRound, type FlagScope } from "@entities/geography";
 import { playHaptic, playSound } from "@shared/lib";
 import { bestKey, type FlagSettings } from "./settings";
 import { loadFlagState, saveFlagState } from "./storage";
@@ -68,7 +68,7 @@ function answerQuestion(set: StoreSet, get: StoreGet, code: string): void {
     return;
   }
 
-  if (code === question.country.code) {
+  if (code === question.subject.code) {
     const firstTry = wrongChoices.length === 0;
     set({
       answered: true,

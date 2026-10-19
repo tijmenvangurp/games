@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-flag", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-geography", "shared-lib", "shared-ui"]
 }

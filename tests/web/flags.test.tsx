@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { FLAG_COUNTRIES, type FlagQuestion } from "@entities/flag";
+import { COUNTRIES, PROVINCES, type FlagQuestion } from "@entities/geography";
 import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-quiz";
 
 const STORAGE_KEY = "games.vlaggen.v1";
@@ -36,11 +36,11 @@ function renderApp(path = "/vlaggen") {
 }
 
 function nameFor(code: string): string {
-  const country = FLAG_COUNTRIES.find((candidate) => candidate.code === code);
-  if (!country) {
-    throw new Error(`Onbekend land ${code}`);
+  const subject = [...COUNTRIES, ...PROVINCES].find((candidate) => candidate.code === code);
+  if (!subject) {
+    throw new Error(`Onbekend onderwerp ${code}`);
   }
-  return country.name;
+  return subject.name;
 }
 
 function currentQuestion(): FlagQuestion {
@@ -61,7 +61,7 @@ function clickChoice(code: string) {
 
 function answerCurrentCorrectly() {
   const question = currentQuestion();
-  clickChoice(question.country.code);
+  clickChoice(question.subject.code);
   expect(useFlagStore.getState().answered).toBe(true);
 
   const lastQuestion =
@@ -119,7 +119,7 @@ describe("flag game", () => {
         seenFlagQuestion = true;
       } else {
         expect(screen.getByText("Welke vlag hoort bij dit land?")).toBeTruthy();
-        expect(screen.getByText(question.country.name)).toBeTruthy();
+        expect(screen.getByText(question.subject.name)).toBeTruthy();
         seenNameQuestion = true;
       }
       answerCurrentCorrectly();
@@ -134,7 +134,7 @@ describe("flag game", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Spelen" }));
 
     const question = currentQuestion();
-    const wrong = question.choices.filter((choice) => choice.code !== question.country.code);
+    const wrong = question.choices.filter((choice) => choice.code !== question.subject.code);
 
     clickChoice(wrong[0]!.code);
     expect(useFlagStore.getState().wrongChoices).toHaveLength(1);
@@ -147,9 +147,10 @@ describe("flag game", () => {
 
     const expected =
       question.direction === "vlag-naar-land"
-        ? `Het juiste antwoord is ${question.country.name}.`
-        : `De juiste vlag is de vlag van ${question.country.name}.`;
+        ? `Het juiste antwoord is ${question.subject.name}.`
+        : `De juiste vlag is de vlag van ${question.subject.name}.`;
     expect(screen.getByText(expected)).toBeTruthy();
+    expect(await screen.findByTestId("place-map")).toBeTruthy();
   });
 
   it("plays only the chosen continent", async () => {
@@ -167,7 +168,33 @@ describe("flag game", () => {
     }
     expect(round.scope).toBe("azie");
     expect(round.level).toBe("moeilijk");
-    expect(round.questions.every((question) => question.country.continent === "azie")).toBe(true);
+    expect(round.questions.every((question) => question.subject.region === "azie")).toBe(true);
+  });
+
+  it("plays a round with the Dutch provinces", async () => {
+    renderApp();
+
+    fireEvent.click(await screen.findByRole("button", { name: /Nederland/ }));
+    expect(screen.getByText("12 provincies")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+
+    const round = useFlagStore.getState().round;
+    if (!round) {
+      throw new Error("Geen ronde");
+    }
+    expect(round.scope).toBe("nederland");
+    expect(round.questions).toHaveLength(10);
+    expect(round.questions.every((question) => question.subject.region === "nederland")).toBe(true);
+
+    const question = currentQuestion();
+    clickChoice(question.subject.code);
+    expect(useFlagStore.getState().answered).toBe(true);
+
+    expect(await screen.findByText(/ligt in Nederland/)).toBeTruthy();
+    expect(await screen.findByTestId("place-map")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Volgende" }));
   });
 
   it("can choose another continent after a round and return to the menu", async () => {

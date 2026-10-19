@@ -45,6 +45,38 @@ test.describe("vlaggen op een telefoon", () => {
     expect(overflows).toBe(false);
   });
 
+  test("speelt een ronde met de Nederlandse provincies en toont de kaart", async ({ page }) => {
+    await page.goto("/vlaggen");
+    await page.getByRole("button", { name: /Nederland/ }).click();
+    await expect(page.getByText("12 provincies")).toBeVisible();
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    await expect(page.getByText(/Vraag 1 van 10/)).toBeVisible();
+    await expect(
+      page.getByText(/Welke (provincie|vlag) hoort bij deze (vlag|provincie)\?/),
+    ).toBeVisible();
+
+    const choices = page
+      .getByRole("group", { name: "Kies het juiste antwoord" })
+      .getByRole("button");
+    for (const choice of await choices.all()) {
+      if (await choice.isEnabled()) {
+        await choice.click();
+      }
+      if ((await page.getByRole("button", { name: /Volgende|Klaar/ }).count()) > 0) {
+        break;
+      }
+    }
+
+    // The world map is a separate chunk; answering is what loads it.
+    await expect(page.getByTestId("place-map")).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
   test("wisselt beide richtingen af binnen één ronde", async ({ page }) => {
     await page.goto("/vlaggen");
     await page.getByRole("button", { name: /Europa/ }).click();
