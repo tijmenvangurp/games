@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-flag-quiz",
+  "projectType": "library",
+  "sourceRoot": "libs/features/flag-quiz",
+  "tags": ["layer:features", "scope:flags", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/flag-quiz"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-flag", "shared-lib", "shared-ui"]
+}
