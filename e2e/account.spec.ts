@@ -30,6 +30,7 @@ interface ApiModeSignedIn {
 }
 
 type ApiMode = ApiModeDisabled | ApiModeGuest | ApiModeSignedIn;
+type EnabledApiMode = ApiModeGuest | ApiModeSignedIn;
 
 interface Probe {
   /** Non-http or same-origin requests never count as leaked connectivity. */
@@ -104,7 +105,7 @@ async function fulfillProjection(route: Route, status: number, body: unknown): P
   });
 }
 
-async function handleAuthRoute(route: Route, path: string, mode: ApiMode): Promise<boolean> {
+async function handleAuthRoute(route: Route, path: string, mode: EnabledApiMode): Promise<boolean> {
   if (path === "/api/auth/get-session") {
     if (mode.kind === "signed-in") {
       await fulfillProjection(route, 200, {
