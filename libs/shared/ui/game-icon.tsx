@@ -3,6 +3,7 @@ import {
   BookOpenText,
   Calculator,
   Cards,
+  Chalkboard,
   Crown,
   MagnifyingGlass,
   PuzzlePiece,
@@ -26,6 +27,7 @@ const GAME_ICONS = {
   "chess-puzzles": Target,
   "french-listening": Translate,
   "french-lesson": BookOpenText,
+  letters: Chalkboard,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;
