@@ -11,7 +11,7 @@
     "scripts/check-ts-only.ts",
     "scripts/generate-app-icons.ts",
     "scripts/generate-chess-puzzles.ts",
-    "scripts/generate-flags.ts",
+    "scripts/generate-geography.ts",
     "scripts/generate-french-audio.ts",
     "scripts/generate-sounds.ts",
     "scripts/run-playwright.ts",
@@ -34,6 +34,13 @@
         "maxCrap": 650,
         "maxUnitSize": 110,
         "reason": "Dev-only WAV-parser voor het klankprototype; geen runtime-code en nog geen unit-tests."
+      },
+      {
+        "files": ["scripts/generate-geography.ts"],
+        "maxCyclomatic": 12,
+        "maxCognitive": 12,
+        "maxCrap": 150,
+        "reason": "Eenmalig generatiescript: het parseert externe data (Wikidata, Wikimedia Commons, TopoJSON) en heeft geen unit-coverage. De uitvoer wordt bewaakt door tests/node/flags-generator.test.ts en pnpm run geography:check."
       }
     ]
   },

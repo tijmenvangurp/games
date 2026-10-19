@@ -1,13 +1,13 @@
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
-import { continentLabel, countriesFor, lookalikeCodes } from "./config";
+import { lookalikeCodes, regionLabel, subjectsFor } from "./config";
 import {
   FLAG_DIRECTIONS,
-  type FlagCountry,
   type FlagDirection,
   type FlagLevel,
   type FlagQuestion,
   type FlagRound,
   type FlagScope,
+  type FlagSubject,
 } from "./types";
 
 const ROUND_SIZE = 10;
@@ -22,44 +22,46 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
   return shuffledIndexes(items.length, random).map((index) => items[index] as T);
 }
 
-function withoutCode(countries: readonly FlagCountry[], code: string): FlagCountry[] {
-  return countries.filter((country) => country.code !== code);
+function withoutCode(subjects: readonly FlagSubject[], code: string): FlagSubject[] {
+  return subjects.filter((subject) => subject.code !== code);
 }
 
 /**
  * Ordered groups of candidates for the wrong answers. Each level walks the
  * groups from left to right, so a level always gets its preferred kind of
- * distractor and only falls back when the scope is too small.
+ * distractor and only falls back when the scope is too small. In a scope
+ * without other regions (the Dutch provinces) the "other regions" group is
+ * empty, so every level ends up inside the scope.
  */
 function distractorTiers(
-  answer: FlagCountry,
+  answer: FlagSubject,
   level: FlagLevel,
-  pool: readonly FlagCountry[],
-): readonly (readonly FlagCountry[])[] {
+  pool: readonly FlagSubject[],
+): readonly (readonly FlagSubject[])[] {
   const others = withoutCode(pool, answer.code);
-  const sameContinent = others.filter((country) => country.continent === answer.continent);
-  const otherContinents = others.filter((country) => country.continent !== answer.continent);
+  const sameRegion = others.filter((subject) => subject.region === answer.region);
+  const otherRegions = others.filter((subject) => subject.region !== answer.region);
   const lookalikeCodesSet = new Set(lookalikeCodes(answer.code));
-  const lookalikes = others.filter((country) => lookalikeCodesSet.has(country.code));
+  const lookalikes = others.filter((subject) => lookalikeCodesSet.has(subject.code));
 
   switch (level) {
     case "makkelijk":
-      return [otherContinents, sameContinent];
+      return [otherRegions, sameRegion];
     case "gemiddeld":
-      return [sameContinent, otherContinents];
+      return [sameRegion, otherRegions];
     case "moeilijk":
-      return [lookalikes, sameContinent, otherContinents];
+      return [lookalikes, sameRegion, otherRegions];
   }
 }
 
 function distractorChoices(
-  answer: FlagCountry,
+  answer: FlagSubject,
   level: FlagLevel,
-  pool: readonly FlagCountry[],
+  pool: readonly FlagSubject[],
   random: () => number,
-): FlagCountry[] {
+): FlagSubject[] {
   const needed = CHOICE_COUNT[level] - 1;
-  const picked: FlagCountry[] = [];
+  const picked: FlagSubject[] = [];
   const pickedCodes = new Set([answer.code]);
 
   for (const tier of distractorTiers(answer, level, pool)) {
@@ -79,16 +81,16 @@ function distractorChoices(
   }
 
   if (picked.length < needed) {
-    throw new Error(`Te weinig landen om ${level} te spelen`);
+    throw new Error(`Te weinig onderwerpen om ${level} te spelen`);
   }
 
   return picked;
 }
 
 /**
- * Half of the questions show a flag and ask for the country name, the other
- * half show a country name and ask for the flag. Shuffled, so both directions
- * alternate unpredictably inside one round.
+ * Half of the questions show a flag and ask for the name, the other half show a
+ * name and ask for the flag. Shuffled, so both directions alternate
+ * unpredictably inside one round.
  */
 function directionsFor(random: () => number): FlagDirection[] {
   const perDirection = Math.floor(ROUND_SIZE / FLAG_DIRECTIONS.length);
@@ -105,23 +107,23 @@ export function createRound(
   seed: number = createSeed(),
 ): FlagRound {
   const random = mulberry32(seed);
-  const pool = countriesFor(scope);
+  const pool = subjectsFor(scope);
   const needed = CHOICE_COUNT[level] - 1;
 
   if (pool.length < needed + 1) {
-    throw new Error(`Te weinig landen voor ${scope}`);
+    throw new Error(`Te weinig onderwerpen voor ${scope}`);
   }
 
   const chosen = shuffle(pool, random).slice(0, Math.min(ROUND_SIZE, pool.length));
   const directions = directionsFor(random);
 
-  const questions: FlagQuestion[] = chosen.map((country, index) => {
-    const choices = shuffle([country, ...distractorChoices(country, level, pool, random)], random);
+  const questions: FlagQuestion[] = chosen.map((subject, index) => {
+    const choices = shuffle([subject, ...distractorChoices(subject, level, pool, random)], random);
 
     return {
       id: index,
       direction: directions[index] ?? FLAG_DIRECTIONS[0],
-      country,
+      subject,
       choices,
     };
   });
@@ -129,13 +131,22 @@ export function createRound(
   return { scope, level, seed, questions };
 }
 
+function capitalSentence(subject: FlagSubject): string {
+  if (!subject.capital) {
+    return "";
+  }
+  // South Africa has three capitals; they are stored as "Bloemfontein, ...".
+  const plural = subject.capital.includes(",");
+  return ` De ${plural ? "hoofdsteden zijn" : "hoofdstad is"} ${subject.capital}.`;
+}
+
 export function explanationFor(question: FlagQuestion): string {
-  const { country, direction } = question;
-  const continent = continentLabel(country.continent);
+  const { subject, direction } = question;
+  const region = regionLabel(subject.region);
 
   if (direction === "vlag-naar-land") {
-    return `Dit is de vlag van ${country.name}. ${country.name} ligt in ${continent}.`;
+    return `Dit is de vlag van ${subject.name}. ${subject.name} ligt in ${region}.${capitalSentence(subject)}`;
   }
 
-  return `De vlag van ${country.name} is de juiste. ${country.name} ligt in ${continent}.`;
+  return `De vlag van ${subject.name} is de juiste. ${subject.name} ligt in ${region}.${capitalSentence(subject)}`;
 }

@@ -1,8 +1,8 @@
 {
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "name": "entities-flag",
+  "name": "entities-geography",
   "projectType": "library",
-  "sourceRoot": "libs/entities/flag",
+  "sourceRoot": "libs/entities/geography",
   "tags": ["layer:entities", "scope:flags", "type:model"],
   "targets": {
     "lint": {
@@ -10,7 +10,7 @@
       "cache": true,
       "options": {
         "command": "oxlint .",
-        "cwd": "libs/entities/flag"
+        "cwd": "libs/entities/geography"
       }
     }
   },
