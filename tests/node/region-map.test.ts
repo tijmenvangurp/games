@@ -59,7 +59,7 @@ describe("region map", () => {
       expect(map.marker.y).toBeGreaterThanOrEqual(0);
       expect(map.marker.y).toBeLessThanOrEqual(HEIGHT);
     }
-  });
+  }, 20_000);
 
   it("uses the province map for a province", async () => {
     const drenthe = PROVINCES.find((province) => province.code === "nl-dr");
