@@ -82,18 +82,21 @@ test.describe("vlaggen op een telefoon", () => {
     await page.getByRole("button", { name: /Kaartpuzzel/ }).click();
     await page.getByRole("button", { name: "Spelen" }).click();
 
-    await expect(page.getByTestId("puzzle-map")).toBeVisible();
+    const map = page.getByTestId("puzzle-map");
+    await expect(map).toBeVisible();
+    await map.scrollIntoViewIfNeeded();
     await expect(page.getByText(/van 8 geplaatst/)).toBeVisible();
 
     const pieces = page.getByRole("button", { name: /\(stuk\)$/ });
     await expect(pieces).toHaveCount(8);
 
-    const targets = page.locator('[data-country][role="button"]');
-    await expect(targets).toHaveCount(8);
+    // De hintstippen liggen in het land zelf; het midden van een concave
+    // landvorm kan buiten de vorm vallen en dan klikt Playwright mis.
+    const hint = () => page.locator('svg[data-testid="puzzle-map"] circle').first();
 
-    // Slepen: het eerste stuk naar het eerste lege vlak.
+    // Slepen: het eerste stuk naar de eerste hintstip.
     const source = await pieces.first().boundingBox();
-    const destination = await targets.first().boundingBox();
+    const destination = await hint().boundingBox();
     if (!source || !destination) {
       throw new Error("Geen stuk of doelvlak");
     }
@@ -108,10 +111,14 @@ test.describe("vlaggen op een telefoon", () => {
 
     await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
 
-    // Tikken: stuk kiezen en daarna een vlak aantikken.
+    // Tikken: stuk kiezen en daarna op een hintstip tikken.
     await page.waitForTimeout(500);
     await pieces.nth(2).click();
-    await targets.nth(1).click();
+    const target = await hint().boundingBox();
+    if (!target) {
+      throw new Error("Geen hintstip");
+    }
+    await page.mouse.click(target.x + target.width / 2, target.y + target.height / 2);
 
     await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
 
