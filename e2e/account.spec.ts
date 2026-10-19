@@ -37,6 +37,8 @@ interface Probe {
   readonly crossOriginUrls: readonly string[];
   /** Console errors and uncaught page errors, in order. */
   readonly consoleErrors: readonly string[];
+  /** Uncaught exceptions only; intentional 4xx/5xx responses never land here. */
+  readonly pageErrors: readonly string[];
   /** Every mocked `/api` request that the page made, as `${method} ${path}`. */
   readonly apiCalls: readonly string[];
   /** Mock-internal helper to record a call; test code only reads `apiCalls`. */
@@ -62,6 +64,7 @@ const E2E_PLAYER: SessionPlayerRow = {
 function attachProbe(page: Page): Probe {
   const crossOriginUrls: string[] = [];
   const consoleErrors: string[] = [];
+  const pageErrors: string[] = [];
   const apiCalls: string[] = [];
 
   page.on("request", (request) => {
@@ -78,7 +81,7 @@ function attachProbe(page: Page): Probe {
   });
 
   page.on("pageerror", (error) => {
-    consoleErrors.push(String(error));
+    pageErrors.push(String(error));
   });
 
   return {
@@ -87,6 +90,9 @@ function attachProbe(page: Page): Probe {
     },
     get consoleErrors() {
       return consoleErrors;
+    },
+    get pageErrors() {
+      return pageErrors;
     },
     get apiCalls() {
       return apiCalls;
@@ -249,7 +255,12 @@ test.describe("accountveld en feature-flag op de preview", () => {
     await expect(page.getByRole("button", { name: /Inloggen met Google/i })).toHaveCount(0);
 
     expect(probe.crossOriginUrls).toEqual([]);
-    expect(probe.consoleErrors).toEqual([]);
+    expect(probe.pageErrors).toEqual([]);
+    // The flag-off API intentionally answers 503; Chromium logs those resource
+    // loads. No other console error is allowed.
+    expect(
+      probe.consoleErrors.every((message) => message.includes("503 (Service Unavailable)")),
+    ).toBe(true);
   });
 
   test("zonder sessie toont de accountpagina alleen de passkey-keuze", async ({ page }) => {
@@ -288,7 +299,7 @@ test.describe("accountveld en feature-flag op de preview", () => {
 
     await page.goto("/account");
     await expect(page.getByRole("heading", { name: "Ouderaccount" })).toBeVisible();
-    await expect(page.getByText("Ouder")).toBeVisible();
+    await expect(page.getByText("Ouder", { exact: true })).toBeVisible();
 
     const syncPanel = page.getByRole("heading", { name: "Voortgang synchroniseren" });
     await expect(syncPanel).toBeVisible();
