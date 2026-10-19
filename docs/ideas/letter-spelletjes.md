@@ -1,7 +1,7 @@
 # Ideeën: letter-spelletjes voor groep 1–3
 
 - **Datum:** 2026-10-18
-- **Status:** MVP-prototype gebouwd met twee lessen (Letterronde en Woordlezen); zie [ADR 0017](../adr/0017-letterklanken-en-audio.md) voor de audio-keuze
+- **Status:** MVP-prototype met twee lessen (Letterronde en Woordlezen). De TTS-klankset met Nathalie is gekozen (36 klankeenheden; de lessen gebruiken de 10 startletters). Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md).
 - **Kader:** de regels uit `AGENTS.md` en [ADR 0001](../adr/0001-publieke-statische-spellen-app.md): publiek, statisch, alleen TypeScript, geen externe requests, geen backend, strikte CSP, mobile-first en touch-targets van minimaal 44 px.
 - **Onderbouwing:** [methodiek](../research/2026-10-18-letters-leren-basisschool.md) en [didactiek en spelletjes](../research/2026-10-18-letterdidactiek-en-spelletjes.md).
 
@@ -231,12 +231,13 @@ Letter {
 
 ### Audio
 
+- **Huidige set:** TTS van Piper Nathalie (CC0), per klank gekozen. `f, l, m, s, v, z` zijn 100 ms knips uit een woord; `ng` en `ch` zijn hele woorden. De 15 woordopnames zijn ook met Nathalie gegenereerd. Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md). De volledige 36-klankbibliotheek staat in `apps/games/public/audio/letters/v2/sounds/`; de woorden in `v2/words/`.
 - **Menselijke opnames of gecontroleerde TTS**, geen runtime-TTS.
 - **Per letter één korte klank**, zonder schwa ("muh", "suh").
 - **Per woord één opname** voor Klankvanger en Woordtrein.
 - **Eén stem, één volume, geen achtergrondmuziek** tijdens klanktaken.
 - **Grote replay-knop** (44 px); autoplay alleen na een tik.
-- **Versiemap** `public/audio/letters/v1/`, zodat een nieuwe stem geen oude cache oplevert.
+- **Versiemap** `public/audio/letters/v2/`, zodat een nieuwe stem geen oude cache oplevert.
 - **Laat de set door een leesspecialist beluisteren.** Dit is de grootste inhoudelijke risicofactor.
 
 #### Open audiobronnen

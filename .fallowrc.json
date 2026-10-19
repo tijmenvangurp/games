@@ -12,6 +12,7 @@
     "scripts/generate-app-icons.ts",
     "scripts/generate-chess-puzzles.ts",
     "scripts/generate-french-audio.ts",
+    "scripts/generate-sounds.ts",
     "scripts/run-playwright.ts",
     "scripts/hooks/commit-msg.ts",
     "scripts/hooks/pre-commit.ts",
@@ -19,6 +20,21 @@
   ],
   "rules": {
     "css-selector-complexity": "error"
+  },
+  "duplicates": {
+    "ignore": ["scripts/generate-sounds.ts"]
+  },
+  "health": {
+    "thresholdOverrides": [
+      {
+        "files": ["scripts/wav.ts"],
+        "maxCyclomatic": 25,
+        "maxCognitive": 32,
+        "maxCrap": 650,
+        "maxUnitSize": 110,
+        "reason": "Dev-only WAV-parser voor het klankprototype; geen runtime-code en nog geen unit-tests."
+      }
+    ]
   },
   "boundaries": {
     "zones": [

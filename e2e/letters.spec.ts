@@ -16,7 +16,7 @@ test.describe("letterpret op een telefoon", () => {
     // De eerste vraag is Klank & Letter: een losse klank, geen letternaam of woord.
     await expect(page.locator("audio").first()).toHaveAttribute(
       "src",
-      /\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/,
+      /\/audio\/letters\/v2\/sounds\/[a-z]+\.(mp3|wav)$/,
     );
 
     const overflows = (await page.evaluate(
@@ -38,7 +38,7 @@ test.describe("letterpret op een telefoon", () => {
 
     await expect(page.locator("audio").first()).toHaveAttribute(
       "src",
-      /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
+      /\/audio\/letters\/v2\/words\/[a-z]+\.wav$/,
     );
   });
 });

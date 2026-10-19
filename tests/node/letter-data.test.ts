@@ -28,14 +28,16 @@ describe("letter data", () => {
     expect(new Set(WORDS.map((word) => word.word)).size).toBe(WORDS.length);
 
     for (const word of WORDS) {
-      expect(word.audio).toBe(`/audio/letters/v1/words/${word.id}.wav`);
+      expect(word.audio).toBe(`/audio/letters/v2/words/${word.id}.wav`);
       expect(word.letters.length).toBeGreaterThanOrEqual(2);
     }
   });
 
   it("koppelt elke letter aan een losse klank", () => {
     for (const letter of LETTERS) {
-      expect(letter.sound).toBe(`/audio/letters/v1/sounds/${letter.id}.wav`);
+      expect(letter.sound).toMatch(
+        new RegExp(`^/audio/letters/v2/sounds/${letter.id}\\.(wav|mp3)$`),
+      );
     }
   });
 

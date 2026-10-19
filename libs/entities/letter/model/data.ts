@@ -6,8 +6,9 @@ import {
   type LetterWord,
 } from "./types";
 
-const sound = (id: string) => `/audio/letters/v1/sounds/${id}.wav`;
-const audio = (id: string) => `/audio/letters/v1/words/${id}.wav`;
+const sound = (id: string, extension: "wav" | "mp3" = "wav") =>
+  `/audio/letters/v2/sounds/${id}.${extension}`;
+const audio = (id: string) => `/audio/letters/v2/words/${id}.wav`;
 
 /**
  * Alle lessen van Letterpret. Ze delen hetzelfde spelkaartje op het
@@ -27,16 +28,16 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
 ];
 
 export const LETTERS: readonly Letter[] = [
-  { id: "i", glyph: "i", kind: "vowel", sound: sound("i") },
-  { id: "k", glyph: "k", kind: "consonant", sound: sound("k") },
+  { id: "i", glyph: "i", kind: "vowel", sound: sound("i", "mp3") },
+  { id: "k", glyph: "k", kind: "consonant", sound: sound("k", "mp3") },
   { id: "m", glyph: "m", kind: "consonant", sound: sound("m") },
   { id: "s", glyph: "s", kind: "consonant", sound: sound("s") },
-  { id: "p", glyph: "p", kind: "consonant", sound: sound("p") },
+  { id: "p", glyph: "p", kind: "consonant", sound: sound("p", "mp3") },
   { id: "v", glyph: "v", kind: "consonant", sound: sound("v") },
-  { id: "e", glyph: "e", kind: "vowel", sound: sound("e") },
-  { id: "n", glyph: "n", kind: "consonant", sound: sound("n") },
-  { id: "t", glyph: "t", kind: "consonant", sound: sound("t") },
-  { id: "a", glyph: "a", kind: "vowel", sound: sound("a") },
+  { id: "e", glyph: "e", kind: "vowel", sound: sound("e", "mp3") },
+  { id: "n", glyph: "n", kind: "consonant", sound: sound("n", "mp3") },
+  { id: "t", glyph: "t", kind: "consonant", sound: sound("t", "mp3") },
+  { id: "a", glyph: "a", kind: "vowel", sound: sound("a", "mp3") },
 ];
 
 export const LETTER_BY_ID: Readonly<Record<LetterId, Letter>> = Object.fromEntries(

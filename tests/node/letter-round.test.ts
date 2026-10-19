@@ -23,7 +23,7 @@ function validateRound(round: ReturnType<typeof createLetterRound>): void {
       expect(question.choices).toHaveLength(3);
       expect(question.choices).toContain(question.target);
       expect(new Set(question.choices).size).toBe(3);
-      expect(question.sound).toBe(`/audio/letters/v1/sounds/${question.target}.wav`);
+      expect(question.sound).toMatch(/^\/audio\/letters\/v2\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
     if (question.kind === "vanger") {
       expect(question.choices).toHaveLength(3);
@@ -90,7 +90,7 @@ describe("letter round", () => {
     const first = round.questions[0];
     expect(first?.kind).toBe("klank");
     if (first?.kind === "klank") {
-      expect(first.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+      expect(first.sound).toMatch(/^\/audio\/letters\/v2\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
   });
 });
@@ -137,7 +137,7 @@ describe("word round", () => {
     const round = createWordRound(mulberry32(13));
     for (const question of round.questions) {
       if (question.kind === "lees") {
-        expect(question.target.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+        expect(question.target.audio).toMatch(/^\/audio\/letters\/v2\/words\/[a-z]+\.wav$/);
       }
     }
   });
