@@ -1,7 +1,9 @@
-import { geoArea, geoBounds, geoMercator, geoPath } from "d3-geo";
+import { geoArea, geoBounds, geoCentroid, geoMercator, geoPath } from "d3-geo";
 import type { Feature, FeatureCollection, Geometry, Polygon } from "geojson";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
+import { COUNTRIES } from "./countries";
+import type { Country } from "./types";
 
 /**
  * Degrees of longitude a map shows at least, so that small states and island
@@ -126,4 +128,190 @@ export async function worldMap(place: MapPlace, width: number, height: number): 
     highlight: target?.geometry ? (path(target) ?? "") : "",
     marker: { x: point[0], y: point[1] },
   };
+}
+
+/** Piece box in SVG units; the tray scales it with CSS. */
+const PIECE_SIZE = 84;
+
+/** How far (in degrees) a polygon may lie from the mainland to join its piece. */
+const PIECE_RADIUS = 30;
+
+/** Breathing room around the selected countries on the puzzle map. */
+const MAP_PADDING = 22;
+
+export interface PuzzleMapCountry {
+  code: string;
+  path: string;
+  /** Centre of the country in map coordinates, used as a drop hint. */
+  x: number;
+  y: number;
+}
+
+export interface PuzzlePiece {
+  code: string;
+  path: string;
+  width: number;
+  height: number;
+}
+
+export interface PuzzleMap {
+  /** Every country with an outline, drawn as the board. */
+  countries: readonly PuzzleMapCountry[];
+  /** One normalized shape per selected country. */
+  pieces: readonly PuzzlePiece[];
+}
+
+/** The ISO numeric codes that the world atlas has an outline for. */
+export async function worldShapeCodes(): Promise<ReadonlySet<string>> {
+  const atlas = await loadAtlas();
+
+  return new Set(atlas.countries.features.map((entry) => String(entry.id).padStart(3, "0")));
+}
+
+function featuresByNumeric(features: readonly Feature[]): ReadonlyMap<string, Feature> {
+  return new Map(features.map((entry) => [String(entry.id).padStart(3, "0"), entry] as const));
+}
+
+/** Distance in degrees, also correct across the antimeridian. */
+function wrappedDistance(left: number, right: number): number {
+  const difference = Math.abs(left - right);
+
+  return Math.min(difference, 360 - difference);
+}
+
+function toPolygons(geometry: Geometry): Polygon[] {
+  if (geometry.type === "Polygon") {
+    return [geometry];
+  }
+
+  const coordinates = geometry.type === "MultiPolygon" ? geometry.coordinates : [];
+
+  return coordinates.map((rings) => ({ type: "Polygon", coordinates: rings }));
+}
+
+function largestOf(polygons: readonly Polygon[]): Polygon {
+  return polygons.reduce((largest, polygon) =>
+    geoArea(polygon) > geoArea(largest) ? polygon : largest,
+  );
+}
+
+function withinPiece(polygon: Polygon, centerLon: number, centerLat: number): boolean {
+  const [lon, lat] = geoCentroid(polygon);
+
+  return (
+    wrappedDistance(lon, centerLon) <= PIECE_RADIUS && Math.abs(lat - centerLat) <= PIECE_RADIUS
+  );
+}
+
+/**
+ * The polygons that belong to the country itself, without far-away overseas
+ * parts: everything within `PIECE_RADIUS` degrees of the largest polygon.
+ * Archipelagos keep their islands; French Guiana does not join France.
+ */
+function piecePolygons(geometry: Geometry): Polygon[] {
+  const polygons = toPolygons(geometry);
+  if (polygons.length === 0) {
+    return [];
+  }
+
+  const [centerLon, centerLat] = geoCentroid(largestOf(polygons));
+
+  return polygons.filter((polygon) => withinPiece(polygon, centerLon, centerLat));
+}
+
+function pieceFor(code: string, geometry: Geometry): PuzzlePiece | undefined {
+  const polygons = piecePolygons(geometry);
+  if (polygons.length === 0) {
+    return undefined;
+  }
+
+  const shape: FeatureCollection = {
+    type: "FeatureCollection",
+    features: polygons.map((polygon) => ({
+      type: "Feature",
+      properties: {},
+      geometry: polygon,
+    })),
+  };
+  const projection = geoMercator().fitExtent(
+    [
+      [3, 3],
+      [PIECE_SIZE - 3, PIECE_SIZE - 3],
+    ],
+    shape,
+  );
+
+  return {
+    code,
+    path: geoPath(projection)(shape) ?? "",
+    width: PIECE_SIZE,
+    height: PIECE_SIZE,
+  };
+}
+
+function mapCountry(
+  country: Country,
+  features: ReadonlyMap<string, Feature>,
+  path: ReturnType<typeof geoPath>,
+  projection: ReturnType<typeof geoMercator>,
+): PuzzleMapCountry | undefined {
+  const outline = features.get(country.numeric);
+  const center = projection([country.longitude, country.latitude]);
+  if (!outline || !center) {
+    return undefined;
+  }
+
+  return { code: country.code, path: path(outline) ?? "", x: center[0], y: center[1] };
+}
+
+function mapPiece(
+  country: Country,
+  features: ReadonlyMap<string, Feature>,
+): PuzzlePiece | undefined {
+  const outline = features.get(country.numeric);
+
+  return outline?.geometry ? pieceFor(country.code, outline.geometry) : undefined;
+}
+
+/**
+ * Builds the puzzle board: every country with an outline as context, and a
+ * normalized piece for each selected country. The view is fitted to the
+ * selected countries' centres, so this round's pieces are always in frame.
+ */
+export async function puzzleMap(
+  selected: readonly Country[],
+  width: number,
+  height: number,
+): Promise<PuzzleMap> {
+  const atlas = await loadAtlas();
+  const features = featuresByNumeric(atlas.countries.features);
+  const centers = selected.map(
+    (country) => [country.longitude, country.latitude] as [number, number],
+  );
+  const projection = geoMercator()
+    .fitExtent(
+      [
+        [MAP_PADDING, MAP_PADDING],
+        [width - MAP_PADDING, height - MAP_PADDING],
+      ],
+      { type: "MultiPoint", coordinates: centers },
+    )
+    .clipExtent([
+      [0, 0],
+      [width, height],
+    ]);
+  const path = geoPath(projection);
+
+  const countries = COUNTRIES.flatMap((country) => {
+    const mapped = mapCountry(country, features, path, projection);
+
+    return mapped ? [mapped] : [];
+  });
+  const pieces = selected.flatMap((country) => {
+    const piece = mapPiece(country, features);
+
+    return piece ? [piece] : [];
+  });
+
+  return { countries, pieces };
 }

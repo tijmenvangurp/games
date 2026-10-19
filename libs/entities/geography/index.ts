@@ -10,8 +10,10 @@ export {
   subjectsFor,
 } from "./model/config";
 export { createRound, explanationFor } from "./model/generator";
-export { worldMap } from "./model/world";
-export type { MapPlace, WorldMap } from "./model/world";
+export { createPuzzleRound } from "./model/puzzle";
+export type { PuzzleRound } from "./model/puzzle";
+export { puzzleMap, worldMap, worldShapeCodes } from "./model/world";
+export type { MapPlace, PuzzleMap, PuzzleMapCountry, PuzzlePiece, WorldMap } from "./model/world";
 export { CONTINENTS, FLAG_LEVELS, FLAG_SCOPES } from "./model/types";
 export type {
   Country,
