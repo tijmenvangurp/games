@@ -11,6 +11,7 @@
     "scripts/check-ts-only.ts",
     "scripts/generate-app-icons.ts",
     "scripts/generate-chess-puzzles.ts",
+    "scripts/generate-flags.ts",
     "scripts/generate-french-audio.ts",
     "scripts/run-playwright.ts",
     "scripts/hooks/commit-msg.ts",
