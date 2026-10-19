@@ -8,7 +8,6 @@ import {
   type LetterLesson,
   type LetterQuestion,
   type LetterWord,
-  type TreinQuestion,
   type VangerQuestion,
 } from "@entities/letter";
 import { Button } from "@shared/ui";
@@ -16,6 +15,7 @@ import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
 import { PlekView } from "./plek-view";
+import { TrainView } from "./train-view";
 import { WordTile } from "./word-tile";
 import { ZoomView } from "./zoom-view";
 
@@ -214,70 +214,6 @@ function LeesView({
   );
 }
 
-function TreinView({
-  question,
-  answered,
-  filled,
-  wrongLetters,
-}: {
-  question: TreinQuestion;
-  answered: boolean;
-  filled: readonly LetterId[];
-  wrongLetters: readonly LetterId[];
-}) {
-  const expected = question.word.letters[filled.length];
-  const hinted = wrongLetters.length >= 2 && expected !== undefined;
-
-  return (
-    <>
-      <LetterAudio
-        autoPlay
-        label={`Luister naar ${question.word.word}`}
-        src={question.word.audio}
-      />
-      <div className="mt-3">
-        <Prompt>Bouw het woord. Welke letter komt erbij?</Prompt>
-      </div>
-
-      <div className="mt-4 flex justify-center gap-2" aria-label="Woordvakken">
-        {question.word.letters.map((letter, index) => (
-          <span
-            key={`${letter}-${index}`}
-            aria-label={`Vak ${index + 1}${filled[index] ? `: ${filled[index]}` : ""}`}
-            className="flex size-16 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/40 text-3xl font-black"
-          >
-            {filled[index] ?? ""}
-          </span>
-        ))}
-      </div>
-
-      <div aria-label="Kies letters" className="mt-4 grid grid-cols-4 gap-2" role="group">
-        {question.tiles.map((letter, index) => (
-          <LetterTile
-            key={`${letter}-${index}`}
-            disabled={answered || filled.includes(letter)}
-            letter={letter}
-            state={
-              filled.includes(letter)
-                ? "muted"
-                : hinted && letter === expected
-                  ? "correct"
-                  : "default"
-            }
-            onClick={() => useLetterStore.getState().submitTrain(letter)}
-          />
-        ))}
-      </div>
-
-      {hinted ? (
-        <p className="mt-3 text-center text-sm font-bold text-success" aria-live="polite">
-          De volgende letter is {expected}.
-        </p>
-      ) : null}
-    </>
-  );
-}
-
 function successMessage(question: LetterQuestion): string {
   switch (question.kind) {
     case "klank":
@@ -401,7 +337,7 @@ function QuestionView({
       return <ZoomView answered={answered} filled={filled} question={question} />;
     case "trein":
       return (
-        <TreinView
+        <TrainView
           answered={answered}
           filled={filled}
           question={question}
