@@ -368,7 +368,14 @@ function renderSection(
   voices: readonly ManifestVoice[],
   voiceHeaders: string,
 ): string {
-  const rows = sound.variants.map((variant) => renderRow(variant, voices)).join("");
+  const rows = sound.variants
+    .filter((variant) => Object.keys(variant.files).length > 0)
+    .map((variant) => renderRow(variant, voices))
+    .join("");
+  if (rows.length === 0) {
+    return "";
+  }
+
   return `<section>
   <h2>${escapeHtml(sound.teken)} <small>${escapeHtml(sound.type)}</small></h2>
   <table>
@@ -390,6 +397,7 @@ function renderPage(manifest: Manifest): string {
     .join("");
   const sections = Object.values(manifest.sounds)
     .map((sound) => renderSection(sound, voices, voiceHeaders))
+    .filter((section) => section.length > 0)
     .join("\n");
 
   return `<!doctype html>
@@ -417,6 +425,7 @@ function renderPage(manifest: Manifest): string {
   <p class="note">Beluister per klank de varianten en per stem. Noteer de variantnaam en de stem die het beste werken.</p>
   <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
   ${sections}
+  <p class="note">Prototype. Stemmen: nathalie (CC0) en mls-0 (CC BY 4.0). Zie <a href="./LICENSES.md">LICENSES.md</a>.</p>
 </body>
 </html>
 `;

@@ -91,6 +91,8 @@ corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
 
 Open daarna `http://localhost:4174/`. De pagina toont per klank alle varianten en stemmen.
 
+Na merge dept de voorbeeldpagina mee naar de deployment op `/audio/letters/prototype/`. Daar staan de tien huidige letters met de stemmen `nathalie` en `mls-0`; de volledige set blijft lokaal in `prototype/sounds/`.
+
 ## Kort
 
 | Doel                     | Commando                                              |

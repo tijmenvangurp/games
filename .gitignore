@@ -20,7 +20,7 @@ test-results
 .wrangler/
 
 # Prototype-audio (lokaal gegenereerd, niet committen)
-prototype/
+/prototype/
 
 # Editor directories and files
 .vscode/*

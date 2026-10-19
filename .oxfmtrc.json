@@ -1,1 +1,6 @@
-{}
+{
+  "ignorePatterns": [
+    "apps/games/public/audio/letters/prototype/index.html",
+    "apps/games/public/audio/letters/prototype/sounds.json"
+  ]
+}
