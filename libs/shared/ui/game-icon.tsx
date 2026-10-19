@@ -5,6 +5,7 @@ import {
   Cards,
   Chalkboard,
   Crown,
+  Flag,
   MagnifyingGlass,
   PuzzlePiece,
   Question,
@@ -28,6 +29,7 @@ const GAME_ICONS = {
   "french-listening": Translate,
   "french-lesson": BookOpenText,
   letters: Chalkboard,
+  flags: Flag,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;
