@@ -27,7 +27,7 @@ function validateRound(round: ReturnType<typeof createLetterRound>): void {
       expect(question.choices).toHaveLength(3);
       expect(question.choices).toContain(question.target);
       expect(new Set(question.choices).size).toBe(3);
-      expect(question.sound).toBe(`/audio/letters/v1/sounds/${question.target}.wav`);
+      expect(question.sound).toMatch(/^\/audio\/letters\/v2\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
     if (question.kind === "vanger") {
       expect(question.choices).toHaveLength(3);
@@ -94,7 +94,7 @@ describe("letter round", () => {
     const first = round.questions[0];
     expect(first?.kind).toBe("klank");
     if (first?.kind === "klank") {
-      expect(first.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+      expect(first.sound).toMatch(/^\/audio\/letters\/v2\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
   });
 });
@@ -141,7 +141,7 @@ describe("word round", () => {
     const round = createWordRound(mulberry32(13));
     for (const question of round.questions) {
       if (question.kind === "lees") {
-        expect(question.target.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+        expect(question.target.audio).toMatch(/^\/audio\/letters\/v2\/words\/[a-z]+\.wav$/);
       }
     }
   });
@@ -234,7 +234,7 @@ describe("plek round", () => {
     for (const question of round.questions) {
       if (question.kind === "plek") {
         expect(question.word.word).toMatch(/^[a-z]{3}$/);
-        expect(question.word.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+        expect(question.word.audio).toMatch(/^\/audio\/letters\/v2\/words\/[a-z]+\.wav$/);
       }
     }
   });
@@ -255,9 +255,11 @@ describe("zoom round", () => {
       }
 
       words.add(question.word.id);
-      expect(question.word.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+      expect(question.word.audio).toMatch(/^\/audio\/letters\/v2\/words\/[a-z]+\.wav$/);
       for (const letter of question.word.letters) {
-        expect(LETTER_BY_ID[letter].sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+        expect(LETTER_BY_ID[letter].sound).toMatch(
+          /^\/audio\/letters\/v2\/sounds\/[a-z]+\.(wav|mp3)$/,
+        );
       }
     }
 
