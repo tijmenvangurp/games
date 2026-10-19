@@ -121,6 +121,8 @@ describe("alchemy rules", () => {
     expect(findRecipesFor("steam").length).toBeGreaterThanOrEqual(2);
     expect(findRecipesFor("metal").length).toBeGreaterThanOrEqual(2);
     expect(findRecipesFor("magic").length).toBeGreaterThanOrEqual(2);
+    expect(findRecipesFor("stone").length).toBeGreaterThanOrEqual(2);
+    expect(combine("lava", "water")).toBe("stone");
     expect(recipesUsing("fire").length).toBeGreaterThan(0);
     expect(recipesUsing("onbekend")).toEqual([]);
   });

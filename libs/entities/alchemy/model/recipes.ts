@@ -100,6 +100,7 @@ export const RECIPES: readonly Recipe[] = [
   { a: "ice", b: "fire", result: "steam" },
   { a: "lightning", b: "dust", result: "glass" },
   { a: "lava", b: "stone", result: "metal" },
+  { a: "lava", b: "water", result: "stone" },
   { a: "sea", b: "energy", result: "life" },
   { a: "metal", b: "sea", result: "boat" },
   { a: "earth", b: "stone", result: "mountain" },
