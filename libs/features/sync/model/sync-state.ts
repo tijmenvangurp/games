@@ -23,6 +23,11 @@ export interface SyncState {
   readonly players: Readonly<Record<string, PlayerLink>>;
   /** Revision and last local timestamp per `profileId:gameId`. */
   readonly progress: Readonly<Record<string, ProgressMeta>>;
+  /**
+   * Explicit per-profile sync opt-in (`profileId -> true`). Missing entries
+   * are off: nothing syncs before the parent turns it on.
+   */
+  readonly syncEnabled: Readonly<Record<string, boolean>>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -99,6 +104,24 @@ function readProgress(value: unknown): Record<string, ProgressMeta> | null {
   return progress;
 }
 
+/**
+ * Reads the opt-in flags. Old states without the field (and states with a
+ * broken field) still load: unknown keys and non-`true` values are dropped.
+ */
+function readSyncEnabled(value: unknown): Record<string, boolean> {
+  if (!isRecord(value)) {
+    return {};
+  }
+
+  const enabled: Record<string, boolean> = {};
+  for (const [profileId, candidate] of Object.entries(value)) {
+    if (PROFILE_ID_PATTERN.test(profileId) && candidate === true) {
+      enabled[profileId] = true;
+    }
+  }
+  return enabled;
+}
+
 function readState(value: unknown): SyncState | null {
   if (!isRecord(value) || value.version !== SYNC_STATE_VERSION) {
     return null;
@@ -109,7 +132,12 @@ function readState(value: unknown): SyncState | null {
   if (!players || !progress) {
     return null;
   }
-  return { version: SYNC_STATE_VERSION, players, progress };
+  return {
+    version: SYNC_STATE_VERSION,
+    players,
+    progress,
+    syncEnabled: readSyncEnabled(value.syncEnabled),
+  };
 }
 
 export function loadSyncState(): SyncState {
@@ -118,8 +146,38 @@ export function loadSyncState(): SyncState {
       version: SYNC_STATE_VERSION,
       players: {},
       progress: {},
+      syncEnabled: {},
     }
   );
+}
+
+/** Whether the parent explicitly turned sync on for this profile. */
+export function getProfileSyncEnabled(state: SyncState, profileId: string): boolean {
+  return state.syncEnabled[profileId] === true;
+}
+
+/**
+ * Pure toggle for one profile. Disabling removes the flag instead of storing
+ * `false`, so absent entries stay the default and the state never grows.
+ */
+export function setProfileSyncEnabledState(
+  state: SyncState,
+  profileId: string,
+  enabled: boolean,
+): SyncState {
+  if (!PROFILE_ID_PATTERN.test(profileId) || getProfileSyncEnabled(state, profileId) === enabled) {
+    return state;
+  }
+
+  if (enabled) {
+    return {
+      ...state,
+      syncEnabled: { ...state.syncEnabled, [profileId]: true },
+    };
+  }
+  const syncEnabled = { ...state.syncEnabled };
+  delete syncEnabled[profileId];
+  return { ...state, syncEnabled };
 }
 
 export function saveSyncState(state: SyncState): void {

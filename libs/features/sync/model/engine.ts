@@ -27,13 +27,16 @@ import {
   findOutboxEntry,
   readOutbox,
   removeOutboxEntry,
+  removeOutboxForProfile,
   replaceOutboxEntry,
   type OutboxEntry,
 } from "./outbox";
 import {
+  getProfileSyncEnabled,
   loadSyncState,
   progressKey,
   saveSyncState,
+  setProfileSyncEnabledState,
   type PlayerLink,
   type ProgressMeta,
   type SyncState,
@@ -126,6 +129,14 @@ function activeProfileId(): string {
   return isProfileId(profileId) ? profileId : "p1";
 }
 
+/**
+ * The explicit opt-in flag. Absent (default) counts as off, so a fresh
+ * account syncs nothing until the parent turns a profile on.
+ */
+function isSyncEnabled(profileId: string): boolean {
+  return getProfileSyncEnabled(loadSyncState(), profileId);
+}
+
 function writeMeta(
   profileId: string,
   gameId: SyncGameId,
@@ -152,11 +163,24 @@ function applyLocal(profileId: string, gameId: SyncGameId, data: SyncableProgres
 
 async function ensurePlayerLinks(profiles: readonly Profile[]): Promise<SyncState> {
   const state = loadSyncState();
+  // Explicit opt-in: without an enabled profile the API is never touched and
+  // no server player is created, so a fresh account really starts empty.
+  const syncable = profiles.filter((profile) => isSyncEnabled(profile.id));
+  if (syncable.length === 0) {
+    return state;
+  }
+
   const players = await config.api.listPlayers();
   const bySlot = new Map(players.map((player) => [player.slot, player] as const));
+  const existing = new Set(profiles.map((profile) => profile.id));
   const links: Record<string, PlayerLink> = {};
+  for (const [profileId, link] of Object.entries(state.players)) {
+    if (existing.has(profileId)) {
+      links[profileId] = link;
+    }
+  }
 
-  for (const profile of profiles) {
+  for (const profile of syncable) {
     const slot = slotForProfile(profile.id);
     if (slot === null) {
       continue;
@@ -177,7 +201,12 @@ async function ensurePlayerLinks(profiles: readonly Profile[]): Promise<SyncStat
     }
   }
 
-  const next: SyncState = { version: state.version, players: links, progress: state.progress };
+  const next: SyncState = {
+    version: state.version,
+    players: links,
+    progress: state.progress,
+    syncEnabled: state.syncEnabled,
+  };
   saveSyncState(next);
   return next;
 }
@@ -254,6 +283,9 @@ async function runHydration(): Promise<void> {
     const state = await ensurePlayerLinks(profiles);
 
     for (const profile of profiles) {
+      if (!isSyncEnabled(profile.id)) {
+        continue;
+      }
       const link = state.players[profile.id];
       if (!link) {
         continue;
@@ -413,6 +445,11 @@ async function runFlush(options: { readonly keepalive?: boolean }): Promise<void
     sessionActive = true;
 
     for (const entry of readOutbox()) {
+      // Defensive second gate on the opt-in flag: an entry a race left behind
+      // must never upload silently after the parent turned sync off.
+      if (!isSyncEnabled(entry.profileId)) {
+        continue;
+      }
       const outcome = await pushOne(entry, options);
       if (outcome === "stop") {
         return;
@@ -510,11 +547,11 @@ function noteLocalProgressChange(gameId: string): void {
   const key = progressKey(profileId, gameId);
   const now = config.now().toISOString();
   const meta = loadSyncState().progress[key];
-  // Remember the timestamp even without a session, so a later login can tell
-  // whether the local setting is newer than the server copy.
+  // Remember the timestamp even without a session or opt-in, so a later
+  // enable can tell whether the local setting is newer than the server copy.
   writeMeta(profileId, gameId, meta ? meta.revision : 0, now);
 
-  if (!sessionActive) {
+  if (!sessionActive || !isSyncEnabled(profileId)) {
     return;
   }
 
@@ -580,6 +617,45 @@ function onAccountChanged(): void {
 function onProfilesChanged(): void {
   lastHydrateAttempt = 0;
   void hydrateProgress();
+}
+
+/**
+ * The explicit opt-in flag for one profile, read from the persisted sync
+ * state. The account page uses it to render the current toggle; absent
+ * counts as off.
+ */
+export function isProfileSyncEnabled(profileId: string): boolean {
+  return isSyncEnabled(profileId);
+}
+
+/**
+ * Explicit per-profile opt-in. Enabling persists the flag and hydrates
+ * immediately, which may create the server player for that slot, pull the
+ * server state and queue the merged result. Disabling removes the flag
+ * together with everything that could still upload for that profile, so a
+ * turned-off profile never syncs again. Without a session the toggle still
+ * persists locally and the games keep working unchanged.
+ */
+export function setProfileSyncEnabled(profileId: string, enabled: boolean): Promise<void> {
+  if (!isProfileId(profileId)) {
+    return Promise.resolve();
+  }
+
+  const state = loadSyncState();
+  saveSyncState(setProfileSyncEnabledState(state, profileId, enabled));
+
+  if (!enabled) {
+    removeOutboxForProfile(profileId);
+    for (const [key, change] of [...pending]) {
+      if (change.profileId === profileId) {
+        pending.delete(key);
+      }
+    }
+    return Promise.resolve();
+  }
+
+  lastHydrateAttempt = 0;
+  return hydrateProgress();
 }
 
 /**
