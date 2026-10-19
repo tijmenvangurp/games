@@ -52,23 +52,23 @@ export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
   ui: "letter",
   b: "fonetisch",
   d: "fonetisch",
-  f: "lang4",
+  f: "fonetisch",
   g: "fonetisch",
   h: "fonetisch",
   j: "fonetisch",
   k: "fonetisch",
-  l: "letter",
-  m: "letter",
-  n: "letter",
+  l: "fonetisch",
+  m: "fonetisch",
+  n: "fonetisch",
   p: "fonetisch",
   r: "fonetisch",
-  s: "letter",
+  s: "fonetisch",
   t: "fonetisch",
-  v: "lang4",
-  w: "lang4",
-  z: "lang4",
-  ng: "woord",
-  ch: "chaos",
+  v: "fonetisch",
+  w: "fonetisch",
+  z: "fonetisch",
+  ng: "fonetisch",
+  ch: "fonetisch",
 };
 
 function withExtraVariants(klank: KlankMapping, extra: readonly KlankVariant[]): KlankMapping {
@@ -202,7 +202,7 @@ export const KLANKEN: readonly KlankMapping[] = [
   // Medeklinkers
   consonant("b", "buh", "bal", "b"),
   consonant("d", "duh", "das", "d"),
-  withExtraVariants(consonant("f", "fff", "fee", "f"), [
+  withExtraVariants(consonant("f", "fuh", "fee", "f"), [
     { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "ffff" },
     { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "ffffff" },
     { id: "ellipsis", label: "Met ellips", ttsPrompt: "fff..." },
@@ -214,14 +214,14 @@ export const KLANKEN: readonly KlankMapping[] = [
   consonant("h", "huh", "huis", "h"),
   consonant("j", "juh", "jas", "j"),
   consonant("k", "kuh", "kip", "k"),
-  consonant("l", "lll", "lam", "l"),
-  consonant("m", "mmm", "mat", "m"),
-  consonant("n", "nnn", "net", "n"),
+  consonant("l", "luh", "lam", "l"),
+  consonant("m", "muh", "mat", "m"),
+  consonant("n", "nuh", "net", "n"),
   consonant("p", "puh", "pen", "p"),
   consonant("r", "ruh", "rat", "r"),
-  consonant("s", "sss", "sap", "s"),
+  consonant("s", "suh", "sap", "s"),
   consonant("t", "tuh", "tak", "t"),
-  withExtraVariants(consonant("v", "vvv", "vis", "v"), [
+  withExtraVariants(consonant("v", "vuh", "vis", "v"), [
     { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "vvvv" },
     { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "vvvvvv" },
     { id: "ellipsis", label: "Met ellips", ttsPrompt: "vvv..." },
@@ -235,7 +235,7 @@ export const KLANKEN: readonly KlankMapping[] = [
     { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "w", speed: 0.5 },
     { id: "water", label: "Woord: water (knip zelf)", ttsPrompt: "water" },
   ]),
-  withExtraVariants(consonant("z", "zzz", "zon", "z"), [
+  withExtraVariants(consonant("z", "zuh", "zon", "z"), [
     { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "zzzz" },
     { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "zzzzzz" },
     { id: "ellipsis", label: "Met ellips", ttsPrompt: "zzz..." },
@@ -244,16 +244,15 @@ export const KLANKEN: readonly KlankMapping[] = [
   ]),
 
   // Medeklinkerdigrafen
-  withExtraVariants(consonantDigraph("ng", "ng", "lang", "ŋ"), [
+  withExtraVariants(consonantDigraph("ng", "nguh", "lang", "ŋ"), [
     { id: "bang", label: "Woord: bang (laatste klank)", ttsPrompt: "bang" },
     { id: "ring", label: "Woord: ring (laatste klank)", ttsPrompt: "ring" },
     { id: "eng", label: "Woord: eng (laatste klank)", ttsPrompt: "eng" },
   ]),
-  withExtraVariants(consonantDigraph("ch", "ch", "lach", "x"), [
+  withExtraVariants(consonantDigraph("ch", "guh", "lach", "x"), [
     { id: "acht", label: "Woord: acht (klank in het midden)", ttsPrompt: "acht" },
     { id: "chaos", label: "Woord: chaos (eerste klank)", ttsPrompt: "chaos" },
     { id: "g", label: "Losse letter g", ttsPrompt: "g" },
-    { id: "guh", label: "Fonetisch (guh)", ttsPrompt: "guh" },
     { id: "geel", label: "Woord: geel (eerste klank)", ttsPrompt: "geel" },
   ]),
 ];

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T08:16:56.078Z",
+  "generatedAt": "2026-10-19T08:18:46.205Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -945,7 +945,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "fff",
+          "prompt": "fuh",
           "files": {
             "nathalie": "./nathalie/f/fonetisch.mp3"
           }
@@ -1243,7 +1243,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "lll",
+          "prompt": "luh",
           "files": {
             "nathalie": "./nathalie/l/fonetisch.mp3"
           }
@@ -1293,7 +1293,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "mmm",
+          "prompt": "muh",
           "files": {
             "nathalie": "./nathalie/m/fonetisch.mp3"
           }
@@ -1343,7 +1343,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "nnn",
+          "prompt": "nuh",
           "files": {
             "nathalie": "./nathalie/n/fonetisch.mp3"
           }
@@ -1493,7 +1493,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "sss",
+          "prompt": "suh",
           "files": {
             "nathalie": "./nathalie/s/fonetisch.mp3"
           }
@@ -1593,7 +1593,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "vvv",
+          "prompt": "vuh",
           "files": {
             "nathalie": "./nathalie/v/fonetisch.mp3"
           }
@@ -1773,7 +1773,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "zzz",
+          "prompt": "zuh",
           "files": {
             "nathalie": "./nathalie/z/fonetisch.mp3"
           }
@@ -1863,7 +1863,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "ng",
+          "prompt": "nguh",
           "files": {
             "nathalie": "./nathalie/ng/fonetisch.mp3"
           }
@@ -1929,7 +1929,7 @@
         {
           "id": "fonetisch",
           "label": "Fonetische spelling",
-          "prompt": "ch",
+          "prompt": "guh",
           "files": {
             "nathalie": "./nathalie/ch/fonetisch.mp3"
           }
@@ -1976,14 +1976,6 @@
           "prompt": "g",
           "files": {
             "nathalie": "./nathalie/ch/g.mp3"
-          }
-        },
-        {
-          "id": "guh",
-          "label": "Fonetisch (guh)",
-          "prompt": "guh",
-          "files": {
-            "nathalie": "./nathalie/ch/guh.mp3"
           }
         },
         {
