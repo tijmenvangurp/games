@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef } from "react";
+import type { Color } from "chess.js";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
 import { Button, Check, LayoutGrid, Lightbulb, Play, RotateCcw } from "@shared/ui";
@@ -75,7 +76,7 @@ function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHead
 function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
   return (
     <div
-      aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Sleep een stuk of tik erop."
+      aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten."
       className="mx-auto w-full max-w-lg"
       role="group"
     >
@@ -89,10 +90,18 @@ function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
 interface PuzzleStatusProps {
   readonly feedback: PuzzleFeedback;
   readonly kind: PuzzleKind;
+  readonly playerColor: Color;
+  readonly selectedColor: Color | null;
   readonly status: PuzzleStatus;
 }
 
-function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleStatus): string {
+function statusText(
+  feedback: PuzzleFeedback,
+  kind: PuzzleKind,
+  status: PuzzleStatus,
+  playerColor: Color,
+  selectedColor: Color | null,
+): string {
   if (status === "solved") {
     switch (kind) {
       case "mate":
@@ -112,10 +121,20 @@ function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleSt
     return "Goed zo! De tegenstander heeft geantwoord. Jij mag weer.";
   }
 
-  return "Sleep een stuk of tik erop. Groene stippen zijn legale zetten.";
+  if (selectedColor && selectedColor !== playerColor) {
+    return "Kijk! Dit stuk is van de tegenstander. Sleep je eigen stuk om te zetten.";
+  }
+
+  return "Tik op een stuk om te kijken waar het heen kan. Sleep je stuk naar een groene stip.";
 }
 
-function PuzzleStatusBanner({ feedback, kind, status }: PuzzleStatusProps) {
+function PuzzleStatusBanner({
+  feedback,
+  kind,
+  playerColor,
+  selectedColor,
+  status,
+}: PuzzleStatusProps) {
   return (
     <div
       aria-live="polite"
@@ -131,7 +150,7 @@ function PuzzleStatusBanner({ feedback, kind, status }: PuzzleStatusProps) {
       )}
     >
       {status === "solved" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      <span>{statusText(feedback, kind, status)}</span>
+      <span>{statusText(feedback, kind, status, playerColor, selectedColor)}</span>
     </div>
   );
 }
@@ -236,6 +255,8 @@ export function PuzzlePlay({
       <PuzzleStatusBanner
         feedback={puzzleState.feedback}
         kind={puzzle.kind}
+        playerColor={puzzleState.playerColor}
+        selectedColor={puzzleState.selectedColor}
         status={puzzleState.status}
       />
       <PuzzleActions

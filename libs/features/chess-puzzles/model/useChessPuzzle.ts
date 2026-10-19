@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { playHaptic, resolveSquareClick, selectionForAction } from "@shared/lib";
+import { pieceColorAt, playHaptic, selectionAfterClick } from "@shared/lib";
 import {
   attemptPuzzleMove,
   createPuzzleState,
@@ -71,7 +71,9 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
         return;
       }
 
-      const action = resolveSquareClick(
+      playHaptic("tap");
+
+      const selection = selectionAfterClick(
         {
           selectedSquare: state.selectedSquare,
           legalTargets: state.legalTargets,
@@ -80,26 +82,14 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
         (candidate) => legalPuzzleMoves(state, candidate),
       );
 
-      if (action.kind !== "attempt") {
-        playHaptic("tap");
-        setState({
-          ...state,
-          ...selectionForAction(action),
-          feedback: "idle",
-        });
-        return;
-      }
-
-      const attempt = attemptPuzzleMove(state, action.from, action.to);
-
-      if (!attempt.ok) {
-        playHaptic("wrong");
-        setState(wrongState(state));
-        return;
-      }
-
-      playHaptic(attempt.solved ? "win" : "select");
-      setState(stateAfterAttempt(state, attempt));
+      // Een tik selecteert alleen, ook een stuk van de tegenstander. De zet
+      // zelf volgt pas bij slepen en neerzetten.
+      setState({
+        ...state,
+        ...selection,
+        hintMove: null,
+        feedback: "idle",
+      });
     },
     [state],
   );
@@ -125,6 +115,7 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
     playerColor: state.playerColor,
     lastMove: state.lastMove,
     selectedSquare: state.selectedSquare,
+    selectedColor: state.selectedSquare ? pieceColorAt(state.fen, state.selectedSquare) : null,
     legalTargets: state.legalTargets,
     hintMove: state.hintMove,
     status: state.status,

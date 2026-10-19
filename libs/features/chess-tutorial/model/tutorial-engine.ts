@@ -1,5 +1,5 @@
 import { Chess, type Move, type PieceSymbol, type Square } from "chess.js";
-import { isChessSquare } from "@shared/lib";
+import { isChessSquare, movesForPiece } from "@shared/lib";
 import type {
   TutorialGoal,
   TutorialHint,
@@ -182,23 +182,13 @@ function rankIndex(square: Square): number {
   return Number(square[1]) - 1;
 }
 
-export function legalMovesFor(
-  level: TutorialLevel,
-  fen: string,
-  square: string,
-): readonly Square[] {
-  if (!isChessSquare(square)) {
-    return [];
-  }
-
-  const chess = createTutorialChess(fen);
-  const piece = chess.get(square);
-
-  if (!piece || piece.color !== "w" || piece.type !== level.playerPiece) {
-    return [];
-  }
-
-  return chess.moves({ square, verbose: true }).map((move) => move.to);
+/**
+ * Geeft de zetten van het stuk op dit veld, ongeacht kleur. Zo kan het kind
+ * ook de zwarte stukken aantikken om te zien waar die heen kunnen; alleen
+ * slepen en neerzetten levert een echte zet op.
+ */
+export function legalMovesFor(fen: string, square: string): readonly Square[] {
+  return movesForPiece(fen, square, { skipValidation: true });
 }
 
 export function playTutorialMove(

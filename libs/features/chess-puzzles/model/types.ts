@@ -57,6 +57,7 @@ export interface UseChessPuzzleResult {
   readonly playerColor: Color;
   readonly lastMove: PuzzleMove | null;
   readonly selectedSquare: Square | null;
+  readonly selectedColor: Color | null;
   readonly legalTargets: readonly Square[];
   readonly hintMove: { readonly from: Square; readonly to: Square } | null;
   readonly status: PuzzleStatus;

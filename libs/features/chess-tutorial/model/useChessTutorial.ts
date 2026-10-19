@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { isChessSquare, playHaptic, resolveSquareClick, selectionForAction } from "@shared/lib";
+import { isChessSquare, pieceColorAt, playHaptic, selectionAfterClick } from "@shared/lib";
 import { levelFor } from "./levels";
 import { hintFor, legalMovesFor, playTutorialMove, previewFor } from "./tutorial-engine";
 import {
@@ -53,7 +53,7 @@ function movedState(
  * kind niet kan zien.
  */
 function illegalState(state: TutorialState, from: string): TutorialState {
-  const legalTargets = legalMovesFor(state.level, state.fen, from);
+  const legalTargets = legalMovesFor(state.fen, from);
   const selectedSquare = isChessSquare(from) ? from : null;
 
   if (legalTargets.length > 0) {
@@ -152,69 +152,34 @@ export function useChessTutorial({
         return;
       }
 
-      const preview = state.preview;
-      if (preview) {
-        if (square === preview.square) {
-          playHaptic("tap");
-          setState({
-            ...state,
-            preview: null,
-            selectedSquare: preview.square,
-            legalTargets: preview.targets,
-            hintMove: null,
-            feedback: "idle",
-          });
-          return;
-        }
+      playHaptic("tap");
 
-        if (isChessSquare(square) && preview.targets.includes(square)) {
-          attemptMove(preview.square, square);
-          return;
-        }
-
-        if (isChessSquare(square) && square === state.level.targetSquare) {
-          playHaptic("almost");
-          setState({
-            ...state,
-            feedback: "blocked",
-          });
-          return;
-        }
-
-        // Een tik naast de blauwe stippen laat de preview staan; het kind kan
-        // rustig kijken zonder de uitleg per ongeluk weg te tikken.
-        return;
-      }
-
-      const action = resolveSquareClick(
+      const selection = selectionAfterClick(
         {
           selectedSquare: state.selectedSquare,
           legalTargets: state.legalTargets,
         },
         square,
-        (candidate) => legalMovesFor(state.level, state.fen, candidate),
+        (candidate) => legalMovesFor(state.fen, candidate),
       );
 
-      if (action.kind !== "attempt") {
-        playHaptic("tap");
-        setState({
-          ...state,
-          ...selectionForAction(action),
-          hintMove: null,
-          preview: null,
-          feedback: "idle",
-        });
-        return;
-      }
-
-      attemptMove(action.from, action.to);
+      // Elke tik selecteert alleen, ook bij een zwart stuk. Een zet volgt pas
+      // na slepen en neerzetten, nooit na één tik. Een actieve kijk-preview
+      // blijft staan als de tik niets selecteert.
+      setState({
+        ...state,
+        ...selection,
+        hintMove: null,
+        preview: selection.selectedSquare ? null : state.preview,
+        feedback: "idle",
+      });
     },
-    [attemptMove, state],
+    [state],
   );
 
   const getLegalMoves = useCallback(
-    (square: string) => legalMovesFor(state.level, state.fen, square),
-    [state.level, state.fen],
+    (square: string) => legalMovesFor(state.fen, square),
+    [state.fen],
   );
 
   const showHint = useCallback(() => {
@@ -252,7 +217,7 @@ export function useChessTutorial({
         selectedSquare: null,
         legalTargets: [],
         hintMove: null,
-        feedback: state.feedback === "blocked" ? "idle" : state.feedback,
+        feedback: state.feedback,
       });
       return;
     }
@@ -276,6 +241,9 @@ export function useChessTutorial({
     level: state.level,
     fen: state.fen,
     selectedSquare: state.selectedSquare,
+    selectedColor: state.selectedSquare
+      ? pieceColorAt(state.fen, state.selectedSquare, { skipValidation: true })
+      : null,
     legalTargets: state.legalTargets,
     lastMove: state.lastMove,
     hintMove: state.hintMove,

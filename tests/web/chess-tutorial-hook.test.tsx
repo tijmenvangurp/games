@@ -40,19 +40,29 @@ describe("useChessTutorial", () => {
     expect(result.current.preview?.square).toBe("h1");
   });
 
-  it("moves when the child taps a preview target", () => {
+  it("never turns a tap on a preview target into a move", () => {
     const { result } = renderHook(() => useChessTutorial({ initialLevelId: "rook-train" }));
+    const before = result.current.fen;
 
     act(() => {
       result.current.onSquareClick("e1");
     });
 
     expect(result.current.status).toBe("playing");
+    expect(result.current.moveCount).toBe(0);
+    expect(result.current.fen).toBe(before);
+    expect(result.current.preview?.square).toBe("h1");
+    expect(result.current.selectedSquare).toBeNull();
+
+    act(() => {
+      result.current.onPieceDrop("h1", "e1");
+    });
+
     expect(result.current.moveCount).toBe(1);
     expect(result.current.lastMove?.san).toBe("Re1");
 
     act(() => {
-      result.current.onSquareClick("e5");
+      result.current.onPieceDrop("e1", "e5");
     });
 
     expect(result.current.status).toBe("completed");
@@ -70,15 +80,18 @@ describe("useChessTutorial", () => {
     expect(result.current.selectedSquare).toBeNull();
   });
 
-  it("nudges when the child taps the star before it is reachable", () => {
+  it("does not give feedback when the child taps the star", () => {
     const { result } = renderHook(() => useChessTutorial({ initialLevelId: "queen-dance" }));
+    const before = result.current.fen;
 
     act(() => {
       result.current.onSquareClick("e5");
     });
 
-    expect(result.current.feedback).toBe("blocked");
+    expect(result.current.feedback).toBe("idle");
     expect(result.current.preview?.square).toBe("d1");
+    expect(result.current.moveCount).toBe(0);
+    expect(result.current.fen).toBe(before);
   });
 
   it("shows the new preview after a multi-step move", () => {
@@ -168,7 +181,7 @@ describe("useChessTutorial", () => {
     expect(result.current.selectedSquare).toBeNull();
   });
 
-  it("selects a piece and moves by tapping a legal target", () => {
+  it("selects a piece by tapping and moves only after a drop", () => {
     const { result } = renderHook(() => useChessTutorial({ initialLevelId: "knight-jump" }));
 
     act(() => {
@@ -182,6 +195,13 @@ describe("useChessTutorial", () => {
       result.current.onSquareClick("a3");
     });
 
+    expect(result.current.moveCount).toBe(0);
+    expect(result.current.selectedSquare).toBeNull();
+
+    act(() => {
+      result.current.onPieceDrop("b1", "a3");
+    });
+
     expect(result.current.status).toBe("playing");
     expect(result.current.moveCount).toBe(1);
 
@@ -189,9 +209,34 @@ describe("useChessTutorial", () => {
       result.current.onSquareClick("c4");
     });
 
+    expect(result.current.status).toBe("playing");
+    expect(result.current.moveCount).toBe(1);
+
+    act(() => {
+      result.current.onPieceDrop("a3", "c4");
+    });
+
     expect(result.current.status).toBe("completed");
     expect(result.current.moveCount).toBe(2);
     expect(result.current.fen).toContain("2N5");
+  });
+
+  it("shows where an opponent piece can go when the child taps it", () => {
+    const { result } = renderHook(() => useChessTutorial({ initialLevelId: "check" }));
+    const before = result.current.fen;
+
+    act(() => {
+      result.current.onSquareClick("e8");
+    });
+
+    expect(result.current.selectedSquare).toBe("e8");
+    expect(result.current.selectedColor).toBe("b");
+    expect(result.current.legalTargets).toEqual(
+      expect.arrayContaining(["d8", "d7", "e7", "f8", "f7"]),
+    );
+    expect(result.current.moveCount).toBe(0);
+    expect(result.current.fen).toBe(before);
+    expect(result.current.feedback).toBe("idle");
   });
 
   it("gives haptic feedback for selection, an illegal move and completion", () => {

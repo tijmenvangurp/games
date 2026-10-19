@@ -68,7 +68,7 @@ describe("tutorial levels", () => {
 
   it("blocks the pawn's forward move so the child cannot get stuck", () => {
     const level = levelFor("pawn-crossing");
-    expect(legalMovesFor(level, level.initialFen, "e2")).toEqual(["d3"]);
+    expect(legalMovesFor(level.initialFen, "e2")).toEqual(["d3"]);
   });
 
   it("hints a legal next move for every level", () => {
@@ -126,9 +126,7 @@ describe("tutorial levels", () => {
       if (!preview) throw new Error(`No preview for ${levelId}`);
 
       expect(preview.targets.length, levelId).toBeGreaterThan(0);
-      expect(preview.targets, levelId).toEqual(
-        legalMovesFor(level, level.initialFen, preview.square),
-      );
+      expect(preview.targets, levelId).toEqual(legalMovesFor(level.initialFen, preview.square));
     }
   });
 
@@ -159,13 +157,18 @@ describe("rearmWhite", () => {
 });
 
 describe("tutorial engine", () => {
-  it("only exposes legal moves of the lesson piece", () => {
+  it("exposes legal moves of every piece, also for the opponent", () => {
     const level = levelFor("rook-train");
-    expect(legalMovesFor(level, level.initialFen, "h1")).toEqual(
+    expect(legalMovesFor(level.initialFen, "h1")).toEqual(
       expect.arrayContaining(["h2", "h8", "e1", "a1"]),
     );
-    expect(legalMovesFor(level, level.initialFen, "e5")).toEqual([]);
-    expect(legalMovesFor(level, level.initialFen, "z9")).toEqual([]);
+    expect(legalMovesFor(level.initialFen, "e5")).toEqual([]);
+    expect(legalMovesFor(level.initialFen, "z9")).toEqual([]);
+
+    const check = levelFor("check");
+    expect(legalMovesFor(check.initialFen, "e8")).toEqual(
+      expect.arrayContaining(["d8", "d7", "e7", "f8", "f7"]),
+    );
   });
 
   it("plays the rook to the star in two moves", () => {
