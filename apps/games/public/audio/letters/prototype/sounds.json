@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T08:14:52.476Z",
+  "generatedAt": "2026-10-19T08:16:56.078Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -977,6 +977,54 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"f\">f</phoneme>",
           "files": {}
+        },
+        {
+          "id": "lang4",
+          "label": "Verlengd (4 tekens)",
+          "prompt": "ffff",
+          "files": {
+            "nathalie": "./nathalie/f/lang4.mp3"
+          }
+        },
+        {
+          "id": "lang6",
+          "label": "Verlengd (6 tekens)",
+          "prompt": "ffffff",
+          "files": {
+            "nathalie": "./nathalie/f/lang6.mp3"
+          }
+        },
+        {
+          "id": "ellipsis",
+          "label": "Met ellips",
+          "prompt": "fff...",
+          "files": {
+            "nathalie": "./nathalie/f/ellipsis.mp3"
+          }
+        },
+        {
+          "id": "traag",
+          "label": "Losse letter, langzaam",
+          "prompt": "f",
+          "files": {
+            "nathalie": "./nathalie/f/traag.mp3"
+          }
+        },
+        {
+          "id": "fiets",
+          "label": "Woord: fiets (knip zelf)",
+          "prompt": "fiets",
+          "files": {
+            "nathalie": "./nathalie/f/fiets.mp3"
+          }
+        },
+        {
+          "id": "fles",
+          "label": "Woord: fles (knip zelf)",
+          "prompt": "fles",
+          "files": {
+            "nathalie": "./nathalie/f/fles.mp3"
+          }
         }
       ]
     },
