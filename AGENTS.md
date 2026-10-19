@@ -36,10 +36,19 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 - Draai `fallow` en Nx-taken niet parallel: Fallow schrijft `.fallow/` en kan de Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
-- Nooit direct naar `main` pushen. Maak een branch, open een pull request en merge pas als alle CI-checks groen zijn.
+- Nooit direct naar `main` pushen. Maak een branch en open een pull request; zie **Mergen** hieronder.
 - Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.
 - Na een wijziging aan het spel: test op mobiel (390 px) en tablet (1024 px). Behoud veilige marges (`env(safe-area-inset-*)`) en touch-targets van minimaal 44 px.
 - Dokumenteer architectuur-, privacy- of deploymentbeslissingen in `docs/adr/`.
+
+## Mergen
+
+- **De agent merget nooit zelfstandig.** Een pull request blijft open tot de eigenaar expliciet zegt dat hij gemerged mag worden. Geldige signalen zijn de letterlijke tekst _"merge mag"_, een GitHub-review met **Approve**, of het label `merge`.
+- **Groene CI is nodig, maar geen toestemming.** "De checks zijn groen" of "het is klaar" is géén mandaat om te mergen. Vraag altijd om bevestiging en wacht daarop.
+- **Nooit direct naar `main` pushen.** Altijd via een branch en een pull request — ook voor een wijziging aan deze regel zelf.
+- Laat een pull request liever open met een korte status ("klaar, wacht op jouw akkoord") dan hem zelf af te ronden.
+- Na expliciete toestemming: squash-merge (zoals de bestaande historie) en verwijder de branch.
+- Twijfel je of je toestemming hebt? Niet mergen en het vragen.
 
 ## Deployment
 
