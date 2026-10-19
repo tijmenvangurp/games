@@ -7,8 +7,8 @@ import {
 } from "./types";
 
 const sound = (id: string, extension: "wav" | "mp3" = "wav") =>
-  `/audio/letters/v1/sounds/${id}.${extension}`;
-const audio = (id: string) => `/audio/letters/v1/words/${id}.wav`;
+  `/audio/letters/v2/sounds/${id}.${extension}`;
+const audio = (id: string) => `/audio/letters/v2/words/${id}.wav`;
 
 /**
  * Alle lessen van Letterpret. Ze delen hetzelfde spelkaartje op het

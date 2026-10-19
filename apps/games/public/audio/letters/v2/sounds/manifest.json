@@ -12,7 +12,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "ah",
-      "file": "/audio/letters/v1/sounds/a.mp3"
+      "file": "/audio/letters/v2/sounds/a.mp3"
     },
     "e": {
       "teken": "e",
@@ -20,7 +20,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "eh",
-      "file": "/audio/letters/v1/sounds/e.mp3"
+      "file": "/audio/letters/v2/sounds/e.mp3"
     },
     "i": {
       "teken": "i",
@@ -28,7 +28,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "ih",
-      "file": "/audio/letters/v1/sounds/i.mp3"
+      "file": "/audio/letters/v2/sounds/i.mp3"
     },
     "o": {
       "teken": "o",
@@ -36,7 +36,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "oh",
-      "file": "/audio/letters/v1/sounds/o.mp3"
+      "file": "/audio/letters/v2/sounds/o.mp3"
     },
     "u": {
       "teken": "u",
@@ -44,7 +44,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "uh",
-      "file": "/audio/letters/v1/sounds/u.mp3"
+      "file": "/audio/letters/v2/sounds/u.mp3"
     },
     "aa": {
       "teken": "aa",
@@ -52,7 +52,7 @@
       "variant": "letter",
       "label": "Losse letter",
       "prompt": "aa",
-      "file": "/audio/letters/v1/sounds/aa.mp3"
+      "file": "/audio/letters/v2/sounds/aa.mp3"
     },
     "ee": {
       "teken": "ee",
@@ -60,7 +60,7 @@
       "variant": "letter",
       "label": "Losse letter",
       "prompt": "ee",
-      "file": "/audio/letters/v1/sounds/ee.mp3"
+      "file": "/audio/letters/v2/sounds/ee.mp3"
     },
     "oo": {
       "teken": "oo",
@@ -68,7 +68,7 @@
       "variant": "letter",
       "label": "Losse letter",
       "prompt": "oo",
-      "file": "/audio/letters/v1/sounds/oo.mp3"
+      "file": "/audio/letters/v2/sounds/oo.mp3"
     },
     "uu": {
       "teken": "uu",
@@ -76,7 +76,7 @@
       "variant": "letter",
       "label": "Losse letter",
       "prompt": "uu",
-      "file": "/audio/letters/v1/sounds/uu.mp3"
+      "file": "/audio/letters/v2/sounds/uu.mp3"
     },
     "oe": {
       "teken": "oe",
@@ -84,7 +84,7 @@
       "variant": "oeh",
       "label": "Fonetisch (oeh)",
       "prompt": "oeh",
-      "file": "/audio/letters/v1/sounds/oe.mp3"
+      "file": "/audio/letters/v2/sounds/oe.mp3"
     },
     "ie": {
       "teken": "ie",
@@ -92,7 +92,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "ie",
-      "file": "/audio/letters/v1/sounds/ie.mp3"
+      "file": "/audio/letters/v2/sounds/ie.mp3"
     },
     "ij": {
       "teken": "ij",
@@ -100,7 +100,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "ij",
-      "file": "/audio/letters/v1/sounds/ij.mp3"
+      "file": "/audio/letters/v2/sounds/ij.mp3"
     },
     "ei": {
       "teken": "ei",
@@ -108,7 +108,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "ei",
-      "file": "/audio/letters/v1/sounds/ei.mp3"
+      "file": "/audio/letters/v2/sounds/ei.mp3"
     },
     "au": {
       "teken": "au",
@@ -116,7 +116,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "au",
-      "file": "/audio/letters/v1/sounds/au.mp3"
+      "file": "/audio/letters/v2/sounds/au.mp3"
     },
     "ou": {
       "teken": "ou",
@@ -124,7 +124,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "ou",
-      "file": "/audio/letters/v1/sounds/ou.mp3"
+      "file": "/audio/letters/v2/sounds/ou.mp3"
     },
     "eu": {
       "teken": "eu",
@@ -132,7 +132,7 @@
       "variant": "euh",
       "label": "Fonetisch (euh)",
       "prompt": "euh",
-      "file": "/audio/letters/v1/sounds/eu.mp3"
+      "file": "/audio/letters/v2/sounds/eu.mp3"
     },
     "ui": {
       "teken": "ui",
@@ -140,7 +140,7 @@
       "variant": "letter",
       "label": "Losse letters",
       "prompt": "ui",
-      "file": "/audio/letters/v1/sounds/ui.mp3"
+      "file": "/audio/letters/v2/sounds/ui.mp3"
     },
     "b": {
       "teken": "b",
@@ -148,7 +148,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "buh",
-      "file": "/audio/letters/v1/sounds/b.mp3"
+      "file": "/audio/letters/v2/sounds/b.mp3"
     },
     "d": {
       "teken": "d",
@@ -156,7 +156,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "duh",
-      "file": "/audio/letters/v1/sounds/d.mp3"
+      "file": "/audio/letters/v2/sounds/d.mp3"
     },
     "f": {
       "teken": "f",
@@ -164,7 +164,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'fiets' (begin) 100 ms",
       "prompt": "fiets",
-      "file": "/audio/letters/v1/sounds/f.wav",
+      "file": "/audio/letters/v2/sounds/f.wav",
       "cut": {
         "word": "fiets",
         "from": "start",
@@ -177,7 +177,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "guh",
-      "file": "/audio/letters/v1/sounds/g.mp3"
+      "file": "/audio/letters/v2/sounds/g.mp3"
     },
     "h": {
       "teken": "h",
@@ -185,7 +185,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "huh",
-      "file": "/audio/letters/v1/sounds/h.mp3"
+      "file": "/audio/letters/v2/sounds/h.mp3"
     },
     "j": {
       "teken": "j",
@@ -193,7 +193,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "juh",
-      "file": "/audio/letters/v1/sounds/j.mp3"
+      "file": "/audio/letters/v2/sounds/j.mp3"
     },
     "k": {
       "teken": "k",
@@ -201,7 +201,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "kuh",
-      "file": "/audio/letters/v1/sounds/k.mp3"
+      "file": "/audio/letters/v2/sounds/k.mp3"
     },
     "l": {
       "teken": "l",
@@ -209,7 +209,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'lam' (begin) 100 ms",
       "prompt": "lam",
-      "file": "/audio/letters/v1/sounds/l.wav",
+      "file": "/audio/letters/v2/sounds/l.wav",
       "cut": {
         "word": "lam",
         "from": "start",
@@ -222,7 +222,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'mat' (begin) 100 ms",
       "prompt": "mat",
-      "file": "/audio/letters/v1/sounds/m.wav",
+      "file": "/audio/letters/v2/sounds/m.wav",
       "cut": {
         "word": "mat",
         "from": "start",
@@ -235,7 +235,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "nuh",
-      "file": "/audio/letters/v1/sounds/n.mp3"
+      "file": "/audio/letters/v2/sounds/n.mp3"
     },
     "p": {
       "teken": "p",
@@ -243,7 +243,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "puh",
-      "file": "/audio/letters/v1/sounds/p.mp3"
+      "file": "/audio/letters/v2/sounds/p.mp3"
     },
     "r": {
       "teken": "r",
@@ -251,7 +251,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "ruh",
-      "file": "/audio/letters/v1/sounds/r.mp3"
+      "file": "/audio/letters/v2/sounds/r.mp3"
     },
     "s": {
       "teken": "s",
@@ -259,7 +259,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'sap' (begin) 100 ms",
       "prompt": "sap",
-      "file": "/audio/letters/v1/sounds/s.wav",
+      "file": "/audio/letters/v2/sounds/s.wav",
       "cut": {
         "word": "sap",
         "from": "start",
@@ -272,7 +272,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "tuh",
-      "file": "/audio/letters/v1/sounds/t.mp3"
+      "file": "/audio/letters/v2/sounds/t.mp3"
     },
     "v": {
       "teken": "v",
@@ -280,7 +280,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'vis' (begin) 100 ms",
       "prompt": "vis",
-      "file": "/audio/letters/v1/sounds/v.wav",
+      "file": "/audio/letters/v2/sounds/v.wav",
       "cut": {
         "word": "vis",
         "from": "start",
@@ -293,7 +293,7 @@
       "variant": "fonetisch",
       "label": "Fonetische spelling",
       "prompt": "wuh",
-      "file": "/audio/letters/v1/sounds/w.mp3"
+      "file": "/audio/letters/v2/sounds/w.mp3"
     },
     "z": {
       "teken": "z",
@@ -301,7 +301,7 @@
       "variant": "knip-100",
       "label": "Knip uit 'zon' (begin) 100 ms",
       "prompt": "zon",
-      "file": "/audio/letters/v1/sounds/z.wav",
+      "file": "/audio/letters/v2/sounds/z.wav",
       "cut": {
         "word": "zon",
         "from": "start",
@@ -314,7 +314,7 @@
       "variant": "woord",
       "label": "Woord: lang (klank achteraan)",
       "prompt": "lang",
-      "file": "/audio/letters/v1/sounds/ng.mp3"
+      "file": "/audio/letters/v2/sounds/ng.mp3"
     },
     "ch": {
       "teken": "ch",
@@ -322,7 +322,7 @@
       "variant": "woord",
       "label": "Woord: lach (klank achteraan)",
       "prompt": "lach",
-      "file": "/audio/letters/v1/sounds/ch.mp3"
+      "file": "/audio/letters/v2/sounds/ch.mp3"
     }
   }
 }

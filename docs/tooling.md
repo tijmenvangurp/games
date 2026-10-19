@@ -72,7 +72,7 @@ corepack pnpm run e2e
 
 ## Klankprototype voor TTS
 
-`scripts/generate-sounds.ts` genereert tijdelijke MP3's voor losse klanken in `prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de variant en stem, en zet pas daarna de gekozen bestanden in `apps/games/public/audio/letters/v1/sounds/`.
+`scripts/generate-sounds.ts` genereert tijdelijke MP3's voor losse klanken in `prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de variant en stem, en zet pas daarna de gekozen bestanden in `apps/games/public/audio/letters/v2/sounds/`.
 
 Gebruik de private TTS-helper uit de skill `generate-game-audio`; die vult de endpoint en sleutel in. Zet die waarden nooit in de repo.
 
@@ -91,7 +91,14 @@ corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
 
 Open daarna `http://localhost:4174/`. De pagina toont per klank alle varianten en stemmen.
 
-De definitieve set staat in `apps/games/public/audio/letters/v1/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De prototypepagina wordt niet gedeployed.
+De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De 15 woordopnames staan in `apps/games/public/audio/letters/v2/words/` en zijn met dezelfde stem gegenereerd:
+
+```sh
+<private-helper> -- --generator=scripts/generate-sounds.ts --words \
+  --model=speaches-ai/piper-nl_BE-nathalie-medium --voice=nathalie
+```
+
+De prototypepagina wordt niet gedeployed.
 
 ## Kort
 

@@ -9,7 +9,8 @@ import {
   type KlankType,
   type KlankVariant,
 } from "./sounds-data.ts";
-import { trimWav } from "./wav.ts";
+import { WORDS } from "../libs/entities/letter/model/data.ts";
+import { looksLikeWav, trimWav } from "./wav.ts";
 
 /**
  * Genereert prototype-audio voor losse Nederlandse klanken.
@@ -72,6 +73,7 @@ interface Options {
   help: boolean;
   serve: boolean;
   serveOnly: boolean;
+  words: boolean;
   port: number;
   model?: string;
   voice?: string;
@@ -89,6 +91,7 @@ interface VoiceChoice {
 const DEFAULT_MODEL = "speaches-ai/piper-nl_BE-nathalie-medium";
 const DEFAULT_VOICE = "nathalie";
 const DEFAULT_OUT = join("prototype", "sounds");
+const DEFAULT_WORDS_OUT = join("apps", "games", "public", "audio", "letters", "v2", "words");
 const DEFAULT_PORT = 4174;
 
 function readFlag(name: string): string | undefined {
@@ -148,6 +151,7 @@ function readOptions(): Options {
     help: args.has("--help"),
     serve: args.has("--serve"),
     serveOnly: args.has("--serve-only"),
+    words: args.has("--words"),
     port: readPort(),
     model: readFlag("model"),
     voice: readFlag("voice"),
@@ -530,6 +534,7 @@ Opties:
   --force              Bestaande bestanden overschrijven
   --dry-run            Alleen tonen wat er gegenereerd zou worden
   --list-models        Beschikbare TTS-modellen tonen
+  --words              Genereer de 15 woordopnames in plaats van klanken
   --serve              Na het genereren een lokale beluisterpagina starten
   --serve-only         Alleen de beluisterpagina serveren (geen TTS)
   --port=<getal>       Poort voor --serve (standaard ${DEFAULT_PORT})
@@ -656,6 +661,62 @@ async function saveOutput(manifest: Manifest, outputDirectory: string): Promise<
   console.log(`Beluisterpagina: ${indexPath}`);
 }
 
+type LetterWord = (typeof WORDS)[number];
+
+async function writeWord(
+  config: Config,
+  word: LetterWord,
+  outputDirectory: string,
+  force: boolean,
+): Promise<void> {
+  const outputPath = join(outputDirectory, `${word.id}.wav`);
+  if (!force && existsSync(outputPath)) {
+    console.log(`skip ${word.id}.wav (bestaat al)`);
+    return;
+  }
+
+  const bytes = await requestSpeech(config, word.word, config.speed, "wav");
+  if (!looksLikeWav(bytes)) {
+    throw new Error(`TTS gaf geen WAV voor ${word.id} (${bytes.byteLength} bytes).`);
+  }
+
+  await mkdir(outputDirectory, { recursive: true });
+  await writeFile(outputPath, bytes);
+  console.log(`-> ${word.id}.wav (${bytes.byteLength} bytes)`);
+}
+
+function selectWords(options: Options): readonly LetterWord[] {
+  const selected = WORDS.filter((word) => !options.only || options.only.has(word.id));
+  if (selected.length === 0) {
+    console.error("Geen woorden geselecteerd.");
+    process.exit(1);
+  }
+  return selected;
+}
+
+function wordsOutput(options: Options): string {
+  return options.out === DEFAULT_OUT ? DEFAULT_WORDS_OUT : options.out;
+}
+
+async function generateWords(options: Options): Promise<void> {
+  const selected = selectWords(options);
+  if (options.dryRun) {
+    for (const word of selected) {
+      console.log(`dry-run ${word.id}.wav: ${word.word}`);
+    }
+    return;
+  }
+
+  const voice = resolveVoice(options);
+  const config = readConfig(options, voice.model, voice.voice);
+  const outputDirectory = wordsOutput(options);
+  await mkdir(outputDirectory, { recursive: true });
+  for (const word of selected) {
+    await writeWord(config, word, outputDirectory, options.force);
+  }
+  console.log(`\n${selected.length} woorden in ${outputDirectory}`);
+}
+
 async function generate(options: Options): Promise<void> {
   const voice = resolveVoice(options);
   const selected = selectKlanken(options);
@@ -682,6 +743,11 @@ async function listModelsCommand(options: Options): Promise<void> {
 }
 
 async function runGenerate(options: Options): Promise<void> {
+  if (options.words) {
+    await generateWords(options);
+    return;
+  }
+
   await generate(options);
   if (options.serve) {
     serveOutput(options);

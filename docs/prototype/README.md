@@ -18,7 +18,7 @@ Open daarna de URL die het script noemt. `index.html` rechtstreeks openen kan oo
 ## Bron en reproductie
 
 - Generator en keuzes: `scripts/sounds-data.ts`, `scripts/generate-sounds.ts`, `scripts/wav.ts` en `scripts/finalize-sounds.ts`.
-- Definitieve set: `apps/games/public/audio/letters/v1/sounds/` met `manifest.json`.
+- Definitieve set: `apps/games/public/audio/letters/v2/sounds/` met `manifest.json`; de woordopnames staan in `v2/words/`.
 - De gebruikte stem is Piper `speaches-ai/piper-nl_BE-nathalie-medium`; de stemdataset is CC0 1.0. Zie `LICENSES.md` in het archief.
 - De woordopnames in de app blijven afkomstig van Wikimedia Commons; zie [ADR 0017](../adr/0017-letterklanken-en-audio.md).
 

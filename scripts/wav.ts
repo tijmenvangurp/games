@@ -13,6 +13,10 @@ export interface WavCut {
   fadeMs?: number;
 }
 
+export function looksLikeWav(bytes: Uint8Array): boolean {
+  return bytes.length >= 12 && ascii(bytes, 0, 4) === "RIFF" && ascii(bytes, 8, 4) === "WAVE";
+}
+
 function ascii(bytes: Uint8Array, offset: number, length: number): string {
   let value = "";
   for (let index = 0; index < length; index += 1) {

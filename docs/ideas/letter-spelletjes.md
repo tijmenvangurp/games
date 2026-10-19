@@ -231,13 +231,13 @@ Letter {
 
 ### Audio
 
-- **Huidige set:** TTS van Piper Nathalie (CC0), per klank gekozen. `f, l, m, s, v, z` zijn 100 ms knips uit een woord; `ng` en `ch` zijn hele woorden. Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md). De volledige 36-klankbibliotheek staat in `apps/games/public/audio/letters/v1/sounds/`.
+- **Huidige set:** TTS van Piper Nathalie (CC0), per klank gekozen. `f, l, m, s, v, z` zijn 100 ms knips uit een woord; `ng` en `ch` zijn hele woorden. De 15 woordopnames zijn ook met Nathalie gegenereerd. Zie [ADR 0017](../adr/0017-letterklanken-en-audio.md). De volledige 36-klankbibliotheek staat in `apps/games/public/audio/letters/v2/sounds/`; de woorden in `v2/words/`.
 - **Menselijke opnames of gecontroleerde TTS**, geen runtime-TTS.
 - **Per letter één korte klank**, zonder schwa ("muh", "suh").
 - **Per woord één opname** voor Klankvanger en Woordtrein.
 - **Eén stem, één volume, geen achtergrondmuziek** tijdens klanktaken.
 - **Grote replay-knop** (44 px); autoplay alleen na een tik.
-- **Versiemap** `public/audio/letters/v1/`, zodat een nieuwe stem geen oude cache oplevert.
+- **Versiemap** `public/audio/letters/v2/`, zodat een nieuwe stem geen oude cache oplevert.
 - **Laat de set door een leesspecialist beluisteren.** Dit is de grootste inhoudelijke risicofactor.
 
 #### Open audiobronnen
