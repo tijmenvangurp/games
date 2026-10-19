@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-flag-game",
+  "projectType": "library",
+  "sourceRoot": "libs/features/flag-game",
+  "tags": ["layer:features", "scope:flags", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/flag-game"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-geography", "shared-lib", "shared-ui"]
+}

@@ -65,6 +65,7 @@
     "pages-seek",
     "pages-pokemon-quiz",
     "pages-french",
+    "pages-flags",
     "pages-letter",
     "widgets-game-menu",
     "widgets-game-shell",
@@ -76,6 +77,7 @@
     "features-seek-and-find",
     "features-pokemon-quiz",
     "features-french-listening",
+    "features-flag-game",
     "features-letter-game",
     "entities-game",
     "entities-french",
@@ -84,6 +86,7 @@
     "entities-memory",
     "entities-hidden-object",
     "entities-pokedex",
+    "entities-geography",
     "entities-letter",
     "shared-lib",
     "shared-ui"

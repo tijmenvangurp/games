@@ -1,7 +1,7 @@
 # Spelideeën
 
-- **Datum:** 2026-10-18
-- **Status:** Woordzoeker en Tafel Topper zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Datum:** 2026-10-19
+- **Status:** Woordzoeker, Tafel Topper en Vlaggenreis zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
 - **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
 - **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
 
@@ -18,22 +18,23 @@
 | Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
 | Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
+| Vlaggenreis          | `/vlaggen`     | Vlaggen van landen per continent én van de Nederlandse provincies               |
 
-De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken**. De grootste gaten zijn nu **wereldoriëntatie en computationeel denken**.
+De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken en wereldoriëntatie**. Het grootste gat is nu **computationeel denken**.
 
 ## Overzicht
 
-| Prioriteit | Idee             | Domein                | Effort      | Kern                                                     |
-| ---------- | ---------------- | --------------------- | ----------- | -------------------------------------------------------- |
-| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0011 en het richtingenonderzoek |
-| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                            |
-| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                        |
-| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen           |
-| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen    |
-| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Provincies en hoofdsteden van Nederland                  |
-| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                    |
-| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                             |
-| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden     |
+| Prioriteit | Idee             | Domein                | Effort      | Kern                                                                   |
+| ---------- | ---------------- | --------------------- | ----------- | ---------------------------------------------------------------------- |
+| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0011 en het richtingenonderzoek               |
+| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                                          |
+| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                                      |
+| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen                         |
+| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen                  |
+| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Kaartspel met provincies; vlaggen en hoofdsteden zijn klaar (ADR 0018) |
+| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                                  |
+| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                                           |
+| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden                   |
 
 ## 1. Woordzoeker
 
@@ -101,7 +102,7 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken*
 
 **Vorm:** een vereenvoudigde, zelfgetekende SVG-kaart van Nederland. Modi: "Waar ligt Friesland?", "Wat is de hoofdstad van Gelderland?" en "Sleep de provincie naar de juiste plek". De kaart is het middelpunt; de vragen zijn kort.
 
-**Waarom:** wereldoriëntatie ontbreekt nog volledig. Het is een klassiek onderwerp voor groep 5 tot en met 8.
+**Waarom:** wereldoriëntatie is met Vlaggenreis (/vlaggen, ADR 0015) begonnen. De provincievlaggen, namen en hoofdsteden zitten daar nu in; wat nog ontbreekt is de kaart: waar ligt elke provincie? Dat is een klassiek onderwerp voor groep 5 tot en met 8.
 
 **Techniek:** `entities/netherlands` met provincies, hoofdsteden en posities, `features/province-quiz` met de UI. Een zorgvuldige, originele SVG-kaart is het grootste werk. Geen externe kaart of API.
 
