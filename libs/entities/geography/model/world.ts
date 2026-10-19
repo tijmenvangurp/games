@@ -161,12 +161,26 @@ export async function worldShapeCodes(): Promise<ReadonlySet<string>> {
   return new Set(atlas.countries.features.map((entry) => String(entry.id).padStart(3, "0")));
 }
 
-/** Country codes with an outline, ready for the puzzle. */
+/**
+ * Country codes with a usable outline for the puzzle. Shapes on the
+ * antimeridian (Russia, Fiji) are left out: a piece that is cut off at the
+ * edge is not a fair puzzle.
+ */
 export async function countryShapeCodes(): Promise<ReadonlySet<string>> {
-  const numerics = await worldShapeCodes();
+  const atlas = await loadAtlas();
+  const numerics = new Set(
+    atlas.countries.features.map((entry) => String(entry.id).padStart(3, "0")),
+  );
+  const crossing = new Set(
+    atlas.countries.features
+      .filter((entry) => entry.geometry && crossesAntimeridian(entry.geometry))
+      .map((entry) => String(entry.id).padStart(3, "0")),
+  );
 
   return new Set(
-    COUNTRIES.filter((country) => numerics.has(country.numeric)).map((country) => country.code),
+    COUNTRIES.filter(
+      (country) => numerics.has(country.numeric) && !crossing.has(country.numeric),
+    ).map((country) => country.code),
   );
 }
 
@@ -291,10 +305,22 @@ function polygonsAsGeometry(polygons: readonly Polygon[]): Geometry {
     : { type: "MultiPolygon", coordinates: polygons.map((polygon) => polygon.coordinates) };
 }
 
+/** True when the country's own shape spans the antimeridian (Russia, Fiji). */
+function crossesAntimeridian(geometry: Geometry): boolean {
+  const polygons = piecePolygons(geometry);
+  if (polygons.length === 0) {
+    return false;
+  }
+  const [[west], [east]] = geoBounds(polygonsAsGeometry(polygons));
+
+  return west > east;
+}
+
 /**
  * The shapes the map should fit on. Land shapes are used as they are; a shape
- * that crosses the antimeridian (Russia, Fiji) would make the fit span the
- * whole world, so only its centre joins the fit.
+ * that crosses the antimeridian (Russia, Fiji) is left out, because it would
+ * stretch the fit to the whole world. The answer map still adds the subject
+ * itself, so a Russian answer stays visible.
  */
 function fitFeatures(
   shapes: ReadonlyMap<string, Feature>,
@@ -310,13 +336,11 @@ function fitFeatures(
       return [];
     }
     const geometry = polygonsAsGeometry(polygons);
-    const [[west], [east]] = geoBounds(geometry);
-    const fitGeometry =
-      west > east
-        ? ({ type: "Point", coordinates: [entry.longitude, entry.latitude] } as Geometry)
-        : geometry;
+    if (crossesAntimeridian(geometry)) {
+      return [];
+    }
 
-    return [{ type: "Feature" as const, properties: {}, geometry: fitGeometry }];
+    return [{ type: "Feature" as const, properties: {}, geometry }];
   });
 }
 

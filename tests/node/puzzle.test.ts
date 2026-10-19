@@ -48,7 +48,8 @@ describe("puzzle rounds", () => {
     const codes = await countryShapeCodes();
     const round = createPuzzleRound("oceanie", "makkelijk", codes, 1);
 
-    expect(round.questions).toHaveLength(6);
+    // Fiji valt af: die vorm kruist de antimeridiaan en zou afgeknipt worden.
+    expect(round.questions).toHaveLength(5);
   });
 
   it("plays the twelve provinces as pieces", async () => {
