@@ -1,8 +1,8 @@
 import { FLAG_LEVELS, FLAG_SCOPES, type FlagLevel, type FlagScope } from "@entities/flag";
-import { GAME_STORAGE_KEYS, profileStorageKey, readStoredJson } from "@shared/lib";
+import { readStoredJson, writeStoredJson } from "@shared/lib";
 import { DEFAULT_FLAG_SETTINGS, type FlagSettings } from "./settings";
 
-const STORAGE_KEY = GAME_STORAGE_KEYS.flags;
+const STORAGE_KEY = "games.vlaggen.v1";
 const MAX_STARS = 10;
 
 export interface FlagState {
@@ -50,7 +50,7 @@ function isBest(value: unknown): value is Record<string, number> {
 }
 
 export function loadFlagState(): FlagState {
-  const parsed = readStoredJson(profileStorageKey(STORAGE_KEY));
+  const parsed = readStoredJson(STORAGE_KEY);
   if (!isRecord(parsed)) {
     return FALLBACK;
   }
@@ -62,12 +62,5 @@ export function loadFlagState(): FlagState {
 }
 
 export function saveFlagState(state: FlagState): void {
-  try {
-    if (typeof localStorage === "undefined") {
-      return;
-    }
-    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(state));
-  } catch {
-    // Storage may be unavailable; the in-memory game still works.
-  }
+  writeStoredJson(STORAGE_KEY, state);
 }

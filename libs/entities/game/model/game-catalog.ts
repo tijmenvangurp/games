@@ -19,7 +19,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/puzzels"
           | "/woordzoeker"
           | "/frans"
-          | "/letters";
+          | "/letters"
+          | "/vlaggen";
         thumbnail: string;
       }
     | { status: "coming-soon" }
@@ -97,6 +98,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/puzzels",
     thumbnail: "/thumbnails/chess-puzzles-d7f67a74.jpg",
+  },
+  {
+    id: "flags",
+    name: "Vlaggenreis",
+    description: "Leer vlaggen van landen en van de Nederlandse provincies.",
+    status: "available",
+    to: "/vlaggen",
+    thumbnail: "/thumbnails/flags-00000000.jpg",
   },
   {
     id: "french-listening",
