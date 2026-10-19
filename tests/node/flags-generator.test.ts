@@ -175,7 +175,7 @@ describe("flag rounds", () => {
     for (const level of FLAG_LEVELS) {
       const round = createRound("wereld", level, 11);
       for (const question of round.questions) {
-        const expected = level === "makkelijk" ? 3 : 4;
+        const expected = level === "makkelijk" ? 3 : level === "gemiddeld" ? 4 : 12;
         expect(question.choices).toHaveLength(expected);
         expect(new Set(question.choices.map((choice) => choice.code)).size).toBe(expected);
         expect(question.choices.some((choice) => choice.code === question.subject.code)).toBe(true);

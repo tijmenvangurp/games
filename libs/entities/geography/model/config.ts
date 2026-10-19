@@ -64,10 +64,13 @@ interface LevelInfo {
   hint: string;
 }
 
+/** How many options the hardest level offers, per scope. */
+export const HARD_LEVEL_CHOICES = 12;
+
 export const FLAG_LEVEL_INFO: Record<FlagLevel, LevelInfo> = {
   makkelijk: { label: "Makkelijk", hint: "3 keuzes" },
   gemiddeld: { label: "Gemiddeld", hint: "4 keuzes" },
-  moeilijk: { label: "Moeilijk", hint: "4 keuzes die op elkaar lijken" },
+  moeilijk: { label: "Moeilijk", hint: `${HARD_LEVEL_CHOICES} keuzes, lookalikes eerst` },
 };
 
 /**
@@ -186,11 +189,16 @@ export function regionLabel(region: Region): string {
   return REGION_INFO[region].label;
 }
 
-/** The level hint, which changes when a scope has few enough subjects. */
+/** The level hint, which changes with the scope and its number of subjects. */
 export function levelHint(level: FlagLevel, scope: FlagScope): string {
-  if (level === "moeilijk" && scope === "nederland") {
+  if (level !== "moeilijk") {
+    return FLAG_LEVEL_INFO[level].hint;
+  }
+  if (scope === "nederland") {
     return `Alle ${PROVINCES.length} provincies`;
   }
 
-  return FLAG_LEVEL_INFO[level].hint;
+  return scope === "wereld"
+    ? `${HARD_LEVEL_CHOICES} keuzes uit de hele wereld`
+    : `${HARD_LEVEL_CHOICES} keuzes uit hetzelfde continent`;
 }

@@ -1,5 +1,5 @@
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
-import { lookalikeCodes, regionLabel, subjectsFor } from "./config";
+import { HARD_LEVEL_CHOICES, lookalikeCodes, regionLabel, subjectsFor } from "./config";
 import {
   FLAG_DIRECTIONS,
   type FlagDirection,
@@ -102,9 +102,9 @@ function directionsFor(random: () => number): FlagDirection[] {
 }
 
 function choiceCountFor(scope: FlagScope, level: FlagLevel, poolSize: number): number {
-  // Twelve provinces fit as the hardest multiple choice; 197 countries do not.
-  if (scope === "nederland" && level === "moeilijk") {
-    return poolSize;
+  // The hardest level asks for twelve options; a smaller scope offers all it has.
+  if (level === "moeilijk") {
+    return Math.min(HARD_LEVEL_CHOICES, poolSize);
   }
 
   return CHOICE_COUNT[level];
