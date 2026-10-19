@@ -32,6 +32,49 @@ export interface KlankMapping {
   variants: readonly KlankVariant[];
 }
 
+export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
+  a: "fonetisch",
+  e: "fonetisch",
+  i: "fonetisch",
+  o: "fonetisch",
+  u: "fonetisch",
+  aa: "letter",
+  ee: "letter",
+  oo: "letter",
+  uu: "letter",
+  oe: "oeh",
+  ie: "letter",
+  ij: "letter",
+  ei: "letter",
+  au: "letter",
+  ou: "letter",
+  eu: "euh",
+  ui: "letter",
+  b: "fonetisch",
+  d: "fonetisch",
+  f: "letter",
+  g: "fonetisch",
+  h: "fonetisch",
+  j: "fonetisch",
+  k: "fonetisch",
+  l: "letter",
+  m: "letter",
+  n: "letter",
+  p: "fonetisch",
+  r: "fonetisch",
+  s: "letter",
+  t: "fonetisch",
+  v: "letter",
+  w: "letter",
+  z: "letter",
+  ng: "letter",
+  ch: "letter",
+};
+
+function withExtraVariants(klank: KlankMapping, extra: readonly KlankVariant[]): KlankMapping {
+  return { ...klank, variants: [...klank.variants, ...extra] };
+}
+
 function vowel(
   id: string,
   type: "kort" | "lang",
@@ -136,13 +179,24 @@ export const KLANKEN: readonly KlankMapping[] = [
   vowel("uu", "lang", "uu", "uur", "yː"),
 
   // Tweetekenklinkers en diftongen
-  digraph("oe", "oe", "oever", "u"),
+  withExtraVariants(digraph("oe", "oe", "oever", "u"), [
+    { id: "oeh", label: "Fonetisch (oeh)", ttsPrompt: "oeh" },
+    { id: "oeh-langzaam", label: "Fonetisch (oeh), langzaam", ttsPrompt: "oeh", speed: 0.7 },
+    { id: "boek", label: "Woord: boek (knip zelf)", ttsPrompt: "boek" },
+    { id: "doek", label: "Woord: doek (knip zelf)", ttsPrompt: "doek" },
+  ]),
   digraph("ie", "ie", "iets", "i"),
   digraph("ij", "ij", "ijs", "ɛi"),
   digraph("ei", "ei", "ei", "ɛi"),
   digraph("au", "au", "auto", "ɑu"),
   digraph("ou", "ou", "oud", "ɑu"),
-  digraph("eu", "eu", "Europa", "øː"),
+  withExtraVariants(digraph("eu", "eu", "Europa", "øː"), [
+    { id: "euh", label: "Fonetisch (euh)", ttsPrompt: "euh" },
+    { id: "euh-langzaam", label: "Fonetisch (euh), langzaam", ttsPrompt: "euh", speed: 0.7 },
+    { id: "neus", label: "Woord: neus (knip zelf)", ttsPrompt: "neus" },
+    { id: "deur", label: "Woord: deur (knip zelf)", ttsPrompt: "deur" },
+    { id: "reus", label: "Woord: reus (knip zelf)", ttsPrompt: "reus" },
+  ]),
   digraph("ui", "ui", "uit", "œy"),
 
   // Medeklinkers

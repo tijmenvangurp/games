@@ -2,7 +2,13 @@ import { existsSync } from "node:fs";
 import { createServer, type ServerResponse } from "node:http";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, extname, join, resolve, sep } from "node:path";
-import { KLANKEN, type KlankMapping, type KlankType, type KlankVariant } from "./sounds-data.ts";
+import {
+  AANBEVOLEN_VARIANTEN,
+  KLANKEN,
+  type KlankMapping,
+  type KlankType,
+  type KlankVariant,
+} from "./sounds-data.ts";
 
 /**
  * Genereert prototype-audio voor losse Nederlandse klanken.
@@ -349,7 +355,11 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function renderRow(variant: ManifestVariant, voices: readonly ManifestVoice[]): string {
+function renderRow(
+  variant: ManifestVariant,
+  voices: readonly ManifestVoice[],
+  recommended: boolean,
+): string {
   const cells = voices
     .map((voice) => {
       const file = variant.files[voice.slug];
@@ -358,7 +368,10 @@ function renderRow(variant: ManifestVariant, voices: readonly ManifestVoice[]): 
         : "<td>—</td>";
     })
     .join("");
-  return `<tr><td>${escapeHtml(variant.label)}</td><td><code>${escapeHtml(
+  const label = `${escapeHtml(variant.label)}${
+    recommended ? ' <span class="badge">aanbevolen</span>' : ""
+  }`;
+  return `<tr class="${recommended ? "recommended" : ""}"><td>${label}</td><td><code>${escapeHtml(
     variant.prompt,
   )}</code></td>${cells}</tr>`;
 }
@@ -368,9 +381,10 @@ function renderSection(
   voices: readonly ManifestVoice[],
   voiceHeaders: string,
 ): string {
+  const recommendedId = AANBEVOLEN_VARIANTEN[sound.teken];
   const rows = sound.variants
     .filter((variant) => Object.keys(variant.files).length > 0)
-    .map((variant) => renderRow(variant, voices))
+    .map((variant) => renderRow(variant, voices, variant.id === recommendedId))
     .join("");
   if (rows.length === 0) {
     return "";
@@ -418,11 +432,14 @@ function renderPage(manifest: Manifest): string {
     code { background: #f3f3f3; padding: .1rem .3rem; border-radius: .25rem; }
     audio { width: 180px; }
     .note { color: #555; }
+    tr.recommended td { background: #e8f5e9; border-color: #2e7d32; }
+    tr.recommended td:first-child { font-weight: 700; }
+    .badge { display: inline-block; margin-left: .35rem; border-radius: .25rem; background: #2e7d32; color: #fff; padding: 0 .35rem; font-size: .7rem; vertical-align: middle; }
   </style>
 </head>
 <body>
   <h1>Klankprototype</h1>
-  <p class="note">Beluister per klank de varianten en per stem. Noteer de variantnaam en de stem die het beste werken.</p>
+  <p class="note">Beluister per klank de varianten en per stem. De groene rij is onze aanbevolen keuze; geef alleen door waar die niet klopt.</p>
   <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
   ${sections}
   <p class="note">Prototype. Zie <a href="./LICENSES.md">LICENSES.md</a> voor de herkomst en licenties van de stemmen.</p>

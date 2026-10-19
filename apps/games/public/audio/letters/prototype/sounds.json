@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T07:57:58.753Z",
+  "generatedAt": "2026-10-19T08:07:16.517Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -447,6 +447,38 @@
           "label": "IPA-teken (experiment)",
           "prompt": "/u/",
           "files": {}
+        },
+        {
+          "id": "oeh",
+          "label": "Fonetisch (oeh)",
+          "prompt": "oeh",
+          "files": {
+            "nathalie": "./nathalie/oe/oeh.mp3"
+          }
+        },
+        {
+          "id": "oeh-langzaam",
+          "label": "Fonetisch (oeh), langzaam",
+          "prompt": "oeh",
+          "files": {
+            "nathalie": "./nathalie/oe/oeh-langzaam.mp3"
+          }
+        },
+        {
+          "id": "boek",
+          "label": "Woord: boek (knip zelf)",
+          "prompt": "boek",
+          "files": {
+            "nathalie": "./nathalie/oe/boek.mp3"
+          }
+        },
+        {
+          "id": "doek",
+          "label": "Woord: doek (knip zelf)",
+          "prompt": "doek",
+          "files": {
+            "nathalie": "./nathalie/oe/doek.mp3"
+          }
         }
       ]
     },
@@ -711,6 +743,46 @@
           "label": "IPA-teken (experiment)",
           "prompt": "/øː/",
           "files": {}
+        },
+        {
+          "id": "euh",
+          "label": "Fonetisch (euh)",
+          "prompt": "euh",
+          "files": {
+            "nathalie": "./nathalie/eu/euh.mp3"
+          }
+        },
+        {
+          "id": "euh-langzaam",
+          "label": "Fonetisch (euh), langzaam",
+          "prompt": "euh",
+          "files": {
+            "nathalie": "./nathalie/eu/euh-langzaam.mp3"
+          }
+        },
+        {
+          "id": "neus",
+          "label": "Woord: neus (knip zelf)",
+          "prompt": "neus",
+          "files": {
+            "nathalie": "./nathalie/eu/neus.mp3"
+          }
+        },
+        {
+          "id": "deur",
+          "label": "Woord: deur (knip zelf)",
+          "prompt": "deur",
+          "files": {
+            "nathalie": "./nathalie/eu/deur.mp3"
+          }
+        },
+        {
+          "id": "reus",
+          "label": "Woord: reus (knip zelf)",
+          "prompt": "reus",
+          "files": {
+            "nathalie": "./nathalie/eu/reus.mp3"
+          }
         }
       ]
     },
