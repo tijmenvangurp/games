@@ -5,11 +5,9 @@ interface LetterAudioProps {
   src: string;
   label: string;
   autoPlay?: boolean;
-  /** Alleen het luidspreker-icoon; handig naast een losse letter. */
-  compact?: boolean;
 }
 
-export function LetterAudio({ src, label, autoPlay = true, compact = false }: LetterAudioProps) {
+export function LetterAudio({ src, label, autoPlay = true }: LetterAudioProps) {
   const ref = useRef<HTMLAudioElement>(null);
 
   const play = () => {
@@ -40,9 +38,9 @@ export function LetterAudio({ src, label, autoPlay = true, compact = false }: Le
   return (
     <div className="flex flex-col items-center gap-2">
       <audio ref={ref} preload="auto" src={src} />
-      <Button aria-label={label} size={compact ? "icon" : "lg"} variant="outline" onClick={play}>
+      <Button aria-label={label} size="lg" variant="outline" onClick={play}>
         <Volume2 aria-hidden="true" className="size-5" />
-        {compact ? null : "Luister"}
+        Luister
       </Button>
     </div>
   );

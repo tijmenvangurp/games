@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { createEmptyProgressMap, KLANK_POSITION_LABELS } from "@entities/letter";
+import { createEmptyProgressMap } from "@entities/letter";
 import { loadLetterProgress, useLetterStore } from "@features/letter-game";
 
 beforeEach(() => {
@@ -138,9 +138,8 @@ describe("letter game", () => {
         throw new Error("Geen klankplekvraag");
       }
 
-      fireEvent.click(
-        screen.getByRole("button", { name: KLANK_POSITION_LABELS[question.position] }),
-      );
+      const box = question.position === "begin" ? 1 : question.position === "midden" ? 2 : 3;
+      fireEvent.click(screen.getByRole("button", { name: `Vak ${box}` }));
       expect(useLetterStore.getState().answered).toBe(true);
 
       const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";

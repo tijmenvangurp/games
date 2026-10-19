@@ -1,17 +1,13 @@
 import {
-  KLANK_POSITION_LABELS,
   KLANK_POSITION_PHRASES,
-  KLANK_POSITIONS,
   LETTER_BY_ID,
   type JachtQuestion,
-  type KlankPosition,
   type KlankQuestion,
   type LeesQuestion,
   type LetterId,
   type LetterLesson,
   type LetterQuestion,
   type LetterWord,
-  type PlekQuestion,
   type TreinQuestion,
   type VangerQuestion,
 } from "@entities/letter";
@@ -19,7 +15,7 @@ import { Button } from "@shared/ui";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
-import { PositionTile } from "./position-tile";
+import { PlekView } from "./plek-view";
 import { WordTile } from "./word-tile";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
@@ -65,24 +61,6 @@ function wordChoiceState(
     return "correct";
   }
   if (!answered && wrongChoices.includes(word.id)) {
-    return "wrong";
-  }
-  if (answered) {
-    return "muted";
-  }
-  return "default";
-}
-
-function plekChoiceState(
-  position: KlankPosition,
-  target: KlankPosition,
-  answered: boolean,
-  wrongChoices: readonly string[],
-): ChoiceState {
-  if (answered && position === target) {
-    return "correct";
-  }
-  if (!answered && wrongChoices.includes(position)) {
     return "wrong";
   }
   if (answered) {
@@ -228,70 +206,6 @@ function LeesView({
           />
         ))}
       </div>
-    </>
-  );
-}
-
-function PlekView({
-  question,
-  answered,
-  wrongChoices,
-}: {
-  question: PlekQuestion;
-  answered: boolean;
-  wrongChoices: readonly string[];
-}) {
-  return (
-    <>
-      <LetterAudio
-        autoPlay
-        label={`Luister naar ${question.word.word}`}
-        src={question.word.audio}
-      />
-      <div className="mt-3 text-center">
-        <Prompt>Waar hoor je deze klank?</Prompt>
-        <div className="mt-1 flex items-center justify-center gap-2">
-          <p className="text-6xl font-black text-primary">{question.target}</p>
-          <LetterAudio
-            autoPlay={false}
-            compact
-            label={`Luister naar de klank ${question.target}`}
-            src={LETTER_BY_ID[question.target].sound}
-          />
-        </div>
-      </div>
-
-      <div
-        aria-label="Kies de plek van de klank"
-        className="mt-4 grid grid-cols-3 gap-2"
-        role="group"
-      >
-        {KLANK_POSITIONS.map((position) => (
-          <PositionTile
-            key={position}
-            disabled={answered || wrongChoices.includes(position)}
-            label={KLANK_POSITION_LABELS[position]}
-            state={plekChoiceState(position, question.position, answered, wrongChoices)}
-            onClick={() => useLetterStore.getState().choose(position)}
-          />
-        ))}
-      </div>
-
-      {answered ? (
-        <p
-          aria-label={`Woord ${question.word.word}`}
-          className="mt-3 flex justify-center gap-1 text-3xl font-black"
-        >
-          {question.word.letters.map((letter, index) => (
-            <span
-              key={`${letter}-${index}`}
-              className={letter === question.target ? "text-primary" : "text-muted-foreground"}
-            >
-              {letter}
-            </span>
-          ))}
-        </p>
-      ) : null}
     </>
   );
 }

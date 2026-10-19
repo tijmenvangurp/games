@@ -67,8 +67,9 @@ test.describe("letterpret op een telefoon", () => {
     await page.getByRole("button", { name: /klankplek/i }).click();
 
     await expect(page.getByText("Klank 1 van 6")).toBeVisible();
-    const positions = page.getByRole("group", { name: "Kies de plek van de klank" });
-    await expect(positions.getByRole("button")).toHaveCount(3);
+    const boxes = page.getByRole("group", { name: "Kies het vak" });
+    await expect(boxes.getByRole("button")).toHaveCount(3);
+    await expect(page.getByRole("button", { name: /^Letter [a-z]$/ })).toBeVisible();
 
     await expect(page.locator("audio").first()).toHaveAttribute(
       "src",

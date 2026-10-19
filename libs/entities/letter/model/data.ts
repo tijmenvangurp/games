@@ -33,17 +33,11 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
   {
     id: "klankplek",
     title: "Klankplek",
-    description: "Waar hoor je de klank? Vooraan, in het midden of achteraan. Zes woorden.",
+    description: "Waar hoor je de klank? Sleep de letter naar het juiste vakje. Zes woorden.",
   },
 ];
 
 export const KLANK_POSITIONS: readonly KlankPosition[] = ["begin", "midden", "eind"];
-
-export const KLANK_POSITION_LABELS: Readonly<Record<KlankPosition, string>> = {
-  begin: "Vooraan",
-  midden: "In het midden",
-  eind: "Achteraan",
-};
 
 export const KLANK_POSITION_PHRASES: Readonly<Record<KlankPosition, string>> = {
   begin: "vooraan in",

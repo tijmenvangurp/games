@@ -88,12 +88,12 @@ De scheduler kiest de letters: eerst wat bijna vergeten is, dan de nieuwe letter
 **Pitch:** "Waar hoor je de klank? Vooraan, in het midden of achteraan?"
 
 - **Doel:** auditieve analyse: een klank in een gesproken woord herkennen en de positie bepalen.
-- **Hoe het werkt:** het kind hoort een woord en ziet de doelklank (met een replay-knop). Het kiest uit drie posities: vooraan, in het midden of achteraan. Na het antwoord verschijnt het woord, met de doelletter uitgelicht.
+- **Hoe het werkt:** het kind hoort een woord en ziet de doelletter als een sleepbare tegel. Het sleept de tegel naar het juiste vakje van het woord, of tikt op een vakje. De vakjes zijn leeg tot het antwoord; daarna verschijnt het woord, met de doelletter in het gekozen vakje. Tikken op de lettertegel speelt de klank opnieuw af.
 - **Didactiek:** Klankvanger oefent alleen de beginletter; Klankplek maakt de stap naar midden en eind. Dat is moeilijker, omdat het kind niet op de eerste letter van het woord kan leunen. Auditieve analyse is een must in de onderzoekslijn.
 - **Feedback:** "Ja! De m zit vooraan in mis." of "De m zit in het midden van mis." Het woord is daarna opnieuw te beluisteren.
 - **Content:** alleen woorden van drie letters met unieke letters, zodat de plek van elke klank eenduidig is. Per ronde komen begin, midden en eind elk twee keer aan bod.
 - **Voortgang:** Klankplek is oefenen en raakt de lettervoortgang niet aan; de les meet analyse, niet de beheersing van een losse letter.
-- **Let op:** toon het geschreven woord pas na het antwoord, anders kan het kind de positie visueel aflezen.
+- **Let op:** toon het geschreven woord pas na het antwoord, anders kan het kind de positie visueel aflezen. Drag is nooit de enige route: tikken op een vakje werkt altijd (WCAG 2.5.7).
 
 ### 3. Letterjacht (must)
 
