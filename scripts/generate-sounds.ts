@@ -440,6 +440,7 @@ function renderPage(manifest: Manifest): string {
 <body>
   <h1>Klankprototype</h1>
   <p class="note">Beluister per klank de varianten en per stem. De groene rij is onze aanbevolen keuze; geef alleen door waar die niet klopt.</p>
+  <p class="note">Voor continuanten (l, m, s, v, z) is een aangehouden klank het didactische doel; voor ng en ch is een heel woord de beste context.</p>
   <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
   ${sections}
   <p class="note">Prototype. Zie <a href="./LICENSES.md">LICENSES.md</a> voor de herkomst en licenties van de stemmen.</p>
