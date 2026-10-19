@@ -413,4 +413,55 @@ test.describe("pokémon quiz op een telefoon", () => {
     )) as boolean;
     expect(overflows).toBe(false);
   });
+
+  test("kiest een plaatje bij het geluid", async ({ page }) => {
+    await page.goto("/raad");
+    await page.getByRole("button", { name: /Geluid raden/ }).click();
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const options = page.getByRole("group", { name: "Kies het juiste plaatje" });
+    await expect(options.getByRole("button")).toHaveCount(4);
+    await expect(page.getByRole("button", { name: "Speel het geluid opnieuw" })).toBeVisible();
+
+    await options.getByRole("button").first().click();
+    await expect(page.getByRole("button", { name: /Volgende Pokémon/ })).toBeVisible();
+    await expect(page.locator('[data-answer-state="correct"]')).toHaveCount(1);
+    await expect(
+      page.locator('[data-answer-state="wrong"], [data-answer-state="muted"]'),
+    ).toHaveCount(3);
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
+  test("kiest een geluid bij het plaatje", async ({ page }) => {
+    await page.goto("/raad");
+    await page.getByRole("button", { name: /Geluid kiezen/ }).click();
+    const setupOverflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(setupOverflows).toBe(false);
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const options = page.getByRole("group", { name: "Kies het juiste geluid" });
+    await expect(options.locator("[data-pokemon-id]")).toHaveCount(4);
+    await expect(page.locator("img[data-revealed]")).toBeVisible();
+
+    await page.getByRole("button", { name: "Beluister geluid A" }).click();
+    await expect(page.getByRole("button", { name: /Volgende Pokémon/ })).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Kies geluid A" }).click();
+    await expect(page.getByRole("button", { name: /Volgende Pokémon/ })).toBeVisible();
+    await expect(page.locator('[data-answer-state="correct"]')).toHaveCount(1);
+    await expect(
+      page.locator('[data-answer-state="wrong"], [data-answer-state="muted"]'),
+    ).toHaveCount(3);
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
 });

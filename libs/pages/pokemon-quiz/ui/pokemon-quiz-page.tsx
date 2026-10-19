@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import {
-  PokemonQuizPlay,
-  PokemonQuizSetup,
-  createQuizQuestion,
-  usePokemonQuizStore,
-} from "@features/pokemon-quiz";
+import { PokemonQuizPlay, PokemonQuizSetup, usePokemonQuizStore } from "@features/pokemon-quiz";
 import { GameShell } from "@widgets/game-shell";
 
 export function PokemonQuizPage() {
@@ -17,17 +12,21 @@ export function PokemonQuizPage() {
   const setupVisible = showSetup || !question;
 
   const startGame = () => {
-    usePokemonQuizStore.getState().start(createQuizQuestion(settings.difficulty));
+    usePokemonQuizStore.getState().startNewGame();
     setShowSetup(false);
   };
+
+  const subtitle = question
+    ? `${question.difficulty} · ${question.optionIds.length} ${
+        question.mode === "geluid" ? "plaatjes" : question.mode === "plaatje" ? "geluiden" : "namen"
+      }`
+    : "Kies je spel";
 
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={question ? () => setShowSetup(true) : undefined}
-      subtitle={
-        question ? `${question.difficulty} · ${question.optionIds.length} namen` : "Kies je spel"
-      }
+      subtitle={subtitle}
       title="Wie is deze Pokémon?"
       titleClassName="text-xl sm:text-2xl"
     >
@@ -40,6 +39,7 @@ export function PokemonQuizPage() {
             onDifficultyChange={(difficulty) =>
               usePokemonQuizStore.getState().chooseDifficulty(difficulty)
             }
+            onModeChange={(mode) => usePokemonQuizStore.getState().chooseMode(mode)}
             onStart={startGame}
           />
         </div>

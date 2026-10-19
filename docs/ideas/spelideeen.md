@@ -15,7 +15,7 @@
 | Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                     |
 | Tafel Topper         | `/rekenen`     | Plus, min, keer en delen; getallenlijn en groepjes als uitleg                   |
 | Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                 |
-| Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
+| Wie is deze Pokémon? | `/raad`        | Herkenning, lezen en luisteren; naam, plaatje of geluid kiezen                  |
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
 | Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
 | Vlaggenreis          | `/vlaggen`     | Vlaggen van landen per continent én van de Nederlandse provincies               |

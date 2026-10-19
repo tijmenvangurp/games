@@ -1,6 +1,7 @@
 export { DEFAULT_POKEMON_QUIZ_SETTINGS } from "./model/settings";
 export {
   QUIZ_DIFFICULTIES,
+  QUIZ_MODES,
   QUIZ_OPTION_COUNT,
   createQuizQuestion,
   isFragmentDifficulty,

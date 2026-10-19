@@ -6,6 +6,10 @@ export const QUIZ_DIFFICULTIES = ["makkelijk", "gemiddeld", "moeilijk", "meester
 
 export type QuizDifficulty = (typeof QUIZ_DIFFICULTIES)[number];
 
+export const QUIZ_MODES = ["naam", "geluid", "plaatje"] as const;
+
+export type QuizMode = (typeof QUIZ_MODES)[number];
+
 export const QUIZ_OPTION_COUNT: Record<QuizDifficulty, number> = {
   makkelijk: 3,
   gemiddeld: 4,
@@ -31,7 +35,12 @@ function usesLookalikeDistractors(difficulty: QuizDifficulty): boolean {
 export interface QuizQuestion {
   seed: number;
   difficulty: QuizDifficulty;
-  /** The Pokémon shown in the artwork. */
+  /**
+   * "naam" shows the artwork and name options, "geluid" plays the cry with
+   * picture options, "plaatje" shows the artwork with cry options.
+   */
+  mode: QuizMode;
+  /** The Pokémon shown in the artwork or heard in the cry. */
   targetId: number;
   /** Three, four or five Pokémon IDs, including the target, already shuffled. */
   optionIds: number[];
@@ -70,7 +79,8 @@ function pickDistractors(
 }
 
 /**
- * Builds one round: a target Pokémon and 3, 4 or 5 shuffled name options.
+ * Builds one round: a target Pokémon and 3, 4 or 5 shuffled name or picture
+ * options.
  *
  * The target is always included exactly once and the distractors are unique.
  * Harder levels draw their distractors from the target's lookalike group.
@@ -78,6 +88,7 @@ function pickDistractors(
 export function createQuizQuestion(
   difficulty: QuizDifficulty,
   seed: number = createSeed(),
+  mode: QuizMode = "naam",
 ): QuizQuestion {
   const random = mulberry32(seed);
   const optionCount = QUIZ_OPTION_COUNT[difficulty];
@@ -93,5 +104,5 @@ export function createQuizQuestion(
     optionIds[swapWith] = current;
   }
 
-  return { seed, difficulty, targetId, optionIds };
+  return { seed, difficulty, mode, targetId, optionIds };
 }

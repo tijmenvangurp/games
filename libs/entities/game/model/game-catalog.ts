@@ -78,7 +78,8 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   {
     id: "pokemon-quiz",
     name: "Wie is deze Pokémon?",
-    description: "Kies de juiste naam bij het plaatje. 3, 4 of 5 namen.",
+    description:
+      "Kies de naam bij het plaatje, het plaatje bij het geluid of het geluid bij het plaatje.",
     status: "available",
     to: "/raad",
     thumbnail: "/thumbnails/pokemon-quiz-0327a69d.jpg",

@@ -23,6 +23,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
   Reflect.deleteProperty(navigator, "vibrate");
 });
 
@@ -85,6 +86,22 @@ async function startGame(): Promise<void> {
   expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
   expect(await screen.findByRole("group", { name: "Kies de juiste naam" })).toBeTruthy();
+}
+
+async function startSoundGame(): Promise<void> {
+  renderApp();
+  expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Geluid raden/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+  expect(await screen.findByRole("group", { name: "Kies het juiste plaatje" })).toBeTruthy();
+}
+
+async function startPictureGame(): Promise<void> {
+  renderApp();
+  expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Geluid kiezen/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+  expect(await screen.findByRole("group", { name: "Kies het juiste geluid" })).toBeTruthy();
 }
 
 describe("wie is deze pokémon", () => {
@@ -176,6 +193,7 @@ describe("wie is deze pokémon", () => {
     expect(usePokemonQuizStore.getState().question?.optionIds).toHaveLength(5);
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toEqual({
       difficulty: "moeilijk",
+      mode: "naam",
     });
   });
 
@@ -241,6 +259,92 @@ describe("wie is deze pokémon", () => {
     expect(artworkImage().getAttribute("data-fragment")).toBe("false");
     expect(artworkImage().getAttribute("alt")).toBe(name);
     expect(usePokemonQuizStore.getState().correctCount).toBe(1);
+  });
+
+  it("plays the cry and shows picture options in sound mode", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play");
+    await startSoundGame();
+
+    expect(play).toHaveBeenCalled();
+
+    const question = currentQuestion();
+    const group = screen.getByRole("group", { name: "Kies het juiste plaatje" });
+    expect(question.mode).toBe("geluid");
+    expect(within(group).getAllByRole("button")).toHaveLength(4);
+    expect(screen.getByRole("button", { name: "Speel het geluid opnieuw" })).toBeTruthy();
+    expect(screen.getByText("Welke Pokémon hoor je?")).toBeTruthy();
+    expect(document.querySelector("img[data-revealed]")).toBeNull();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toEqual({
+      difficulty: "gemiddeld",
+      mode: "geluid",
+    });
+
+    const targetButton = group.querySelector<HTMLButtonElement>(
+      `[data-pokemon-id="${question.targetId}"]`,
+    );
+    if (!targetButton) {
+      throw new Error("No target picture found");
+    }
+    fireEvent.click(targetButton);
+
+    expect(usePokemonQuizStore.getState().answered).toBe(true);
+    expect(usePokemonQuizStore.getState().correctCount).toBe(1);
+    expect(screen.getByRole("img", { name: targetName() })).toBeTruthy();
+    expect(screen.getByText(`${targetName()} is goed!`)).toBeTruthy();
+    expect(targetButton.getAttribute("data-answer-state")).toBe("correct");
+  });
+
+  it("reveals the target picture after a wrong sound answer", async () => {
+    await startSoundGame();
+
+    const question = currentQuestion();
+    const group = screen.getByRole("group", { name: "Kies het juiste plaatje" });
+    const wrongButton = Array.from(
+      group.querySelectorAll<HTMLButtonElement>("[data-pokemon-id]"),
+    ).find((button) => button.dataset.pokemonId !== String(question.targetId));
+    if (!wrongButton) {
+      throw new Error("No wrong picture found");
+    }
+
+    fireEvent.click(wrongButton);
+
+    expect(usePokemonQuizStore.getState().correctCount).toBe(0);
+    expect(screen.getByText("Bijna!")).toBeTruthy();
+    expect(screen.getByText(`Het juiste antwoord is ${targetName()}.`)).toBeTruthy();
+    expect(screen.getByRole("img", { name: targetName() })).toBeTruthy();
+    expect(wrongButton.getAttribute("data-answer-state")).toBe("wrong");
+    expect(group.querySelector('[data-answer-state="correct"]')).toBeTruthy();
+  });
+
+  it("shows the artwork and lets the player preview and choose a cry", async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play");
+    await startPictureGame();
+
+    const question = currentQuestion();
+    const name = targetName();
+    expect(question.mode).toBe("plaatje");
+    expect(artworkImage().getAttribute("data-revealed")).toBe("true");
+    expect(artworkImage().getAttribute("alt")).toBe("");
+
+    const group = screen.getByRole("group", { name: "Kies het juiste geluid" });
+    expect(group.querySelectorAll("[data-pokemon-id]")).toHaveLength(4);
+    expect(play).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Beluister geluid A" }));
+    expect(play).toHaveBeenCalled();
+    expect(usePokemonQuizStore.getState().answered).toBe(false);
+
+    const targetIndex = question.optionIds.indexOf(question.targetId);
+    const letter = "ABCDE"[targetIndex];
+    fireEvent.click(screen.getByRole("button", { name: `Kies geluid ${letter}` }));
+
+    expect(usePokemonQuizStore.getState().correctCount).toBe(1);
+    expect(screen.getByText(`${name} is goed!`)).toBeTruthy();
+    expect(
+      group
+        .querySelector(`[data-pokemon-id="${question.targetId}"]`)
+        ?.getAttribute("data-answer-state"),
+    ).toBe("correct");
   });
 
   it("returns to the setup without losing the score", async () => {

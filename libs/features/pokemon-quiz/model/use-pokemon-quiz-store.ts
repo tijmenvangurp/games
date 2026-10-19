@@ -1,5 +1,6 @@
 import { create } from "zustand";
-import { createQuizQuestion, type QuizDifficulty, type QuizQuestion } from "./quiz";
+import { createSeed } from "@shared/lib";
+import { createQuizQuestion, type QuizDifficulty, type QuizMode, type QuizQuestion } from "./quiz";
 import { loadPokemonQuizSettings, savePokemonQuizSettings } from "./storage";
 import type { PokemonQuizSettings } from "./settings";
 
@@ -11,9 +12,15 @@ interface PokemonQuizStore {
   rounds: number;
   settings: PokemonQuizSettings;
   start: (question: QuizQuestion) => void;
+  startNewGame: () => void;
   newQuestion: () => void;
   answer: (pokemonId: number) => void;
   chooseDifficulty: (difficulty: QuizDifficulty) => void;
+  chooseMode: (mode: QuizMode) => void;
+}
+
+function nextQuestion(settings: PokemonQuizSettings): QuizQuestion {
+  return createQuizQuestion(settings.difficulty, createSeed(), settings.mode);
 }
 
 export const usePokemonQuizStore = create<PokemonQuizStore>((set, get) => ({
@@ -33,10 +40,12 @@ export const usePokemonQuizStore = create<PokemonQuizStore>((set, get) => ({
       rounds: 0,
     }),
 
+  startNewGame: () => get().start(nextQuestion(get().settings)),
+
   newQuestion: () => {
     const { settings } = get();
     set({
-      question: createQuizQuestion(settings.difficulty),
+      question: nextQuestion(settings),
       selectedId: null,
       answered: false,
     });
@@ -57,7 +66,13 @@ export const usePokemonQuizStore = create<PokemonQuizStore>((set, get) => ({
     }),
 
   chooseDifficulty: (difficulty) => {
-    const settings = { difficulty };
+    const settings = { ...get().settings, difficulty };
+    set({ settings });
+    savePokemonQuizSettings(settings);
+  },
+
+  chooseMode: (mode) => {
+    const settings = { ...get().settings, mode };
     set({ settings });
     savePokemonQuizSettings(settings);
   },

@@ -82,4 +82,36 @@ describe("pokémon quiz generator", () => {
     expect(QUIZ_DIFFICULTIES.filter(isFragmentDifficulty)).toEqual(["meester"]);
     expect(QUIZ_DIFFICULTIES.filter(isSilhouetteDifficulty)).toEqual(["moeilijk", "meester"]);
   });
+
+  it("defaults to name mode and stores the chosen mode per question", () => {
+    expect(createQuizQuestion("gemiddeld", 5).mode).toBe("naam");
+    expect(createQuizQuestion("gemiddeld", 5, "geluid").mode).toBe("geluid");
+    expect(createQuizQuestion("gemiddeld", 5, "plaatje").mode).toBe("plaatje");
+  });
+
+  it("uses the same option rules in sound mode", () => {
+    for (let seed = 0; seed < 25; seed += 1) {
+      const question = createQuizQuestion("moeilijk", seed, "geluid");
+      const group = lookalikeIdsFor(question.targetId);
+
+      expect(question.optionIds).toHaveLength(5);
+      expect(question.optionIds).toContain(question.targetId);
+      for (const id of question.optionIds) {
+        expect(group).toContain(id);
+      }
+    }
+  });
+
+  it("uses the same option rules when choosing a sound for a picture", () => {
+    for (let seed = 0; seed < 25; seed += 1) {
+      const question = createQuizQuestion("meester", seed, "plaatje");
+      const group = lookalikeIdsFor(question.targetId);
+
+      expect(question.optionIds).toHaveLength(5);
+      expect(question.optionIds).toContain(question.targetId);
+      for (const id of question.optionIds) {
+        expect(group).toContain(id);
+      }
+    }
+  });
 });

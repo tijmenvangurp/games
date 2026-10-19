@@ -1,4 +1,4 @@
-import { QUIZ_DIFFICULTIES, type QuizDifficulty } from "./quiz";
+import { QUIZ_DIFFICULTIES, QUIZ_MODES, type QuizDifficulty, type QuizMode } from "./quiz";
 import { DEFAULT_POKEMON_QUIZ_SETTINGS, type PokemonQuizSettings } from "./settings";
 
 const STORAGE_KEY = "games.pokemon-quiz.v1";
@@ -11,6 +11,10 @@ function isDifficulty(value: unknown): value is QuizDifficulty {
   return typeof value === "string" && (QUIZ_DIFFICULTIES as readonly string[]).includes(value);
 }
 
+function isMode(value: unknown): value is QuizMode {
+  return typeof value === "string" && (QUIZ_MODES as readonly string[]).includes(value);
+}
+
 export function loadPokemonQuizSettings(): PokemonQuizSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -21,7 +25,11 @@ export function loadPokemonQuizSettings(): PokemonQuizSettings {
     if (!isRecord(parsed) || !isDifficulty(parsed.difficulty)) {
       return DEFAULT_POKEMON_QUIZ_SETTINGS;
     }
-    return { difficulty: parsed.difficulty };
+    // Settings saved before the sound variant have no mode; default to names.
+    return {
+      difficulty: parsed.difficulty,
+      mode: isMode(parsed.mode) ? parsed.mode : DEFAULT_POKEMON_QUIZ_SETTINGS.mode,
+    };
   } catch {
     return DEFAULT_POKEMON_QUIZ_SETTINGS;
   }

@@ -1,10 +1,7 @@
 import type { Pokemon } from "@entities/pokedex";
 import { Check, X } from "@shared/ui";
 import { cn } from "@shared/lib";
-
-const OPTION_LETTERS = ["A", "B", "C", "D", "E"] as const;
-
-type AnswerState = "idle" | "correct" | "wrong" | "muted";
+import { OPTION_LETTERS, answerState, type AnswerState } from "../model/answer-state";
 
 const OPTION_CLASSES: Record<AnswerState, string> = {
   idle: "border-border bg-card hover:bg-muted/60",
@@ -19,16 +16,6 @@ const BADGE_CLASSES: Record<AnswerState, string> = {
   wrong: "bg-danger text-white",
   muted: "bg-muted text-muted-foreground",
 };
-
-function answerState(answered: boolean, isCorrect: boolean, isSelected: boolean): AnswerState {
-  if (!answered) {
-    return "idle";
-  }
-  if (isCorrect) {
-    return "correct";
-  }
-  return isSelected ? "wrong" : "muted";
-}
 
 interface QuizOptionProps {
   option: Pokemon;
