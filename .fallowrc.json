@@ -2,6 +2,7 @@
   "$schema": "./node_modules/fallow/schema.json",
   "entry": [
     "apps/games/src/app/main.tsx",
+    "apps/api/src/index.ts",
     "steiger.config.ts",
     "commitlint.config.ts",
     "vitest.config.ts",
@@ -23,6 +24,7 @@
   "boundaries": {
     "zones": [
       { "name": "app", "patterns": ["apps/games/src/app/**"] },
+      { "name": "api", "patterns": ["apps/api/**"] },
       { "name": "pages", "patterns": ["libs/pages/**"] },
       { "name": "widgets", "patterns": ["libs/widgets/**"] },
       { "name": "features", "patterns": ["libs/features/**"] },
@@ -31,6 +33,7 @@
     ],
     "rules": [
       { "from": "app", "allow": ["pages", "widgets", "features", "entities", "shared"] },
+      { "from": "api", "allow": ["entities", "shared"] },
       { "from": "pages", "allow": ["widgets", "features", "entities", "shared"] },
       { "from": "widgets", "allow": ["features", "entities", "shared"] },
       { "from": "features", "allow": ["entities", "shared"] },

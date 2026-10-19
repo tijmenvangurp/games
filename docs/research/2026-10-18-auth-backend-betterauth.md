@@ -11,7 +11,7 @@
 
 - De app is vandaag 100% statisch en dat is een feature, geen tekortkoming. Alle voortgang staat in `localStorage`; meerdere kinderen op één apparaat kunnen met lokale profielen zonder account, zonder server en zonder gegevens die de app naar buiten stuurt.
 - Als er toch een backend komt: **Better Auth 1.7.10 in dezelfde Cloudflare Worker, met D1 in de EU en een ouderaccount op basis van een passkey**. Geen kindlogin, geen kind-e-mailadressen en geen profielnamen op de server. Het kind blijft lokaal spelen; sync is optioneel.
-- **Geen magic link of OAuth in fase 1.** Magic link vereist e-mailverzending via een externe dienst en OAuth vereist een redirect naar een derde partij. Beide botsen met de regel "geen externe requests", ook al grijpt de browser-CSP er niet altijd op in.
+- **Geen magic link.** Magic link vereist e-mailverzending via een externe dienst. **Google OAuth is de expliciete uitzondering**: de ouder krijgt een gewone "Inloggen met Google"-knop naast passkey. Latere OAuth-providers, bijvoorbeeld GitHub, zijn extra knoppen. De browser-CSP blokkeert top-level navigatie niet, maar de Worker doet voor de tokenuitwisseling wel een externe request; dat is bewust geaccepteerd en in ADR 0013 vastgelegd.
 - Sync in fase 1 beperkt zich tot **instellingen, beste scores en grove voortgang**. Sync geen actieve sudoku-borden, zoekrondes of SRS-toestand: dat geeft conflictgedrag zonder duidelijke winst.
 - De technische minimale wijziging is: `wrangler.jsonc` krijgt een `main` en `run_worker_first: ["/api/*"]`, de CSP krijgt `connect-src 'self'`, en er komt een D1-binding. Dat is genoeg voor same-origin `/api/auth/*` en `/api/progress/*`.
 - **Dit mag niet zonder ADR.** ADR 0001 zegt expliciet dat accounts, gedeelde scores en multiplayer een nieuwe ADR met privacy- en beveiligingsontwerp vereisen. Reken op minimaal twee ADR's: één voor auth/backend en één voor privacy/gegevensverwerking.
@@ -261,10 +261,12 @@ De doelgroep is 6–12 jaar. Dat verandert de vraag: niet "welke login is handig
 
 ### 3.4 OAuth/social
 
-- **Hoe:** `socialProviders` met client-ID en secret; redirect naar de provider en terug ([OAuth](https://better-auth.com/docs/concepts/oauth)).
-- **Waarom niet:** de browser verlaat de site, de provider ziet het bezoek, sommige providers hebben leeftijdsgrenzen, en je krijgt een derde partij in de keten. De CSP blokkeert top-level navigatie niet per se, maar het is wel een externe request en een privacyrelatie die je moet uitleggen.
-- **Voor kinderen:** ongeschikt. Een Google- of Apple-account is geen kindvriendelijke identiteit en de ouder moet hem beheren.
-- **Conclusie:** niet doen in fase 1. Als de ouder later per se "Inloggen met Google" wil, is dat een aparte ADR met een goede reden.
+- **Hoe:** `socialProviders` met client-ID en secret; de client opent `/api/auth/sign-in/social`, de Worker stuurt een redirect naar Google en wisselt de code server-side in. Daarna gaat de browser terug naar de app ([OAuth](https://better-auth.com/docs/concepts/oauth)).
+- **Waarom:** de ouder kent Google en hoeft geen wachtwoord of passkey te beheren. Het is één knop naast de passkey-login.
+- **Nadelen:** de browser verlaat de site, Google ziet het bezoek, Google is een verwerker en de Worker doet een externe tokenuitwisseling. Voor kinderen is dit ongeschikt; alleen de ouder logt in.
+- **Afspraken:** geen remote avatar renderen; alleen de standaardscopes `openid`, `email` en `profile`; de callback-URL staat exact in de Google-console; `trustedOrigins` is per origin ingesteld; DPA, register en privacyverklaring staan in [ADR 0013](../adr/0013-privacy-optionele-accounts.md).
+- **Later:** GitHub of een andere provider is een extra knop en een extra verwerker. Per provider zijn een DPA, callback en privacyregel nodig.
+- **Conclusie:** Google OAuth is gekozen als expliciete uitzondering, naast passkey. Geen OAuth voor kinderen.
 
 ### 3.5 Anonymous/guest
 
@@ -564,6 +566,35 @@ Waarom:
 - Zonder backend voegt Query alleen bundle-grootte en een extra provider toe. De spellen laden nu synchroon uit `localStorage`; dat moet zo blijven.
 - TanStack Router en Query werken goed samen, maar de huidige routes gebruiken geen loaders. Voeg `ensureQueryData` pas toe als een route echt serverdata nodig heeft; de games mogen nooit op een query wachten om te starten.
 
+### 5.9 Branchpreviews en testen
+
+Cloudflare **Workers Previews** geven elke branch een geïsoleerde, productie-achtige omgeving met eigen variabelen, secrets en bindings. Een preview-build draait standaard `npx wrangler preview` en gebruikt de configuratie uit de `previews`-sectie van `wrangler.jsonc` ([Previews](https://developers.cloudflare.com/workers/previews/), [configuratie](https://developers.cloudflare.com/workers/previews/configuration/)).
+
+Wat je op een branch kunt voorbereiden:
+
+- De Worker-entry, `/api/auth/*` en `/api/progress/*`, achter een feature-flag.
+- Het D1-schema en de migraties op een **aparte preview-database** in de EU.
+- Preview-secrets (`BETTER_AUTH_SECRET`) en variabelen (`BETTER_AUTH_URL`, `ACCOUNTS_ENABLED`).
+- CSP, cookies en e2e-tests tegen de preview-URL.
+- Een Google OAuth-testclient met de preview-callback erin. Google is de gekozen methode; de preview-callback moet exact zijn toegestaan.
+
+Wat je niet op een branch kunt testen:
+
+- **Passkeys:** die zijn domeingebonden. Een passkey die op de preview-URL is geregistreerd, werkt niet op het productiedomein. Test de flow op de preview en registreer op productie opnieuw.
+- **Productie-secrets en echte gezinsdata.** Gebruik synthetische accounts.
+- **Het definitieve domein, DNS en productieverkeer.** Een preview lijkt op productie, maar is het niet.
+- **De exacte `main`-deploy.** Die volgt pas na de merge; de preview dekt wel dezelfde code en configuratie.
+
+Aandachtspunten:
+
+- Previews erven **geen** productie-instellingen. Zonder `previews`-blok ontbreken variabelen, secrets en de D1-binding.
+- Wijs een aparte preview-D1 aan. Anders test je in de productiedatabase.
+- Draai de migraties op de preview-database vóór de preview-deploy.
+- Preview-URL's zijn openbaar. Gebruik alleen testdata en ruim de preview-database en testaccounts daarna op.
+- Preview-builds tellen mee voor de 3.000 gratis bouwminuten per maand.
+
+Aanbevolen volgorde: **lokaal** (`wrangler dev` met lokale D1) → **preview-branch** met aparte D1 en preview-secrets → **productie** met de flag uit → flag aan voor de eigenaar → brede uitrol.
+
 ## 6. Privacy en compliance
 
 Dit is geen juridisch advies. De conclusies hieronder zijn ontwerpkeuzes; de eigenaar moet ze met de Autoriteit Persoonsgegevens, een jurist of in ieder geval met het eigen verwerkingsregister laten toetsen.
@@ -666,8 +697,8 @@ Toelichting:
 | 0    | Nu: statisch                                          | Geen                 | Geen                      | Lokaal                            | Geen                            | Ongewijzigd                                | Geen                 | Bestaand                       | n.v.t.                              |
 | 0.5  | Lokale profielen + export/import                      | Geen                 | Geen                      | Lokaal, per profiel               | Geen (wel docs)                 | Ongewijzigd                                | Geen                 | Storage/migratie/export        | Oude key blijft leesbaar            |
 | 1    | Optioneel ouderaccount + sync van instellingen/scores | Worker + D1          | Ouder-passkey (of e-mail) | `player`, `progress`              | 0012 auth/backend, 0013 privacy | `connect-src 'self'`                       | `BETTER_AUTH_SECRET` | Auth, sync, offline, CSRF      | Flag uit, `main` weg, CSP terug     |
-| 2    | Volledige voortgang + ouder-dashboard                 | Zelfde               | Zelfde                    | Uitgebreide `progress`, `consent` | 0014 sync/datamodel             | Ongewijzigd                                | Zelfde               | Merge, retentie, export/delete | Sync-endpoints uit, data exporteren |
-| 3    | Multiplayer                                           | D1 + Durable Objects | Zelfde                    | DO per room, D1 voor profielen    | 0015 multiplayer                | `connect-src 'self'` (+ same-origin `wss`) | Zelfde               | Realtime, reconnect, misbruik  | Rooms uit, DO-binding weg           |
+| 2    | Volledige voortgang + ouder-dashboard                 | Zelfde               | Zelfde                    | Uitgebreide `progress`, `consent` | 0015 sync/datamodel             | Ongewijzigd                                | Zelfde               | Merge, retentie, export/delete | Sync-endpoints uit, data exporteren |
+| 3    | Multiplayer                                           | D1 + Durable Objects | Zelfde                    | DO per room, D1 voor profielen    | 0016 multiplayer                | `connect-src 'self'` (+ same-origin `wss`) | Zelfde               | Realtime, reconnect, misbruik  | Rooms uit, DO-binding weg           |
 
 ### Fase 0 — nu (statisch)
 
@@ -697,7 +728,7 @@ Toelichting:
 
 ### Fase 2 — volledige voortgang en ouder-dashboard
 
-- **ADR 0014:** datamodel, merge-regels, retentie en dashboardtoegang.
+- **ADR 0015:** datamodel, merge-regels, retentie en dashboardtoegang.
 - **Data:** SRS/franse voortgang per item, achievements, grove statistieken. Gebruik per-item merge of een event-log als LWW aantoonbaar verkeerd gaat.
 - **Dashboard:** alleen voor de ouder/verzorger; geen publieke profielen, geen ranglijst, geen chat. Toon voortgang per slot, niet per kindnaam.
 - **Privacy:** consent-record, export, delete, retention-job (Cron Trigger of handmatige beheerstaak). D1 Time Travel blijft een aandachtspunt.
@@ -706,7 +737,7 @@ Toelichting:
 
 ### Fase 3 — multiplayer
 
-- **ADR 0015:** realtime-architectuur, rooms, autoritatieve state, misbruikpreventie, kosten.
+- **ADR 0016:** realtime-architectuur, rooms, autoritatieve state, misbruikpreventie, kosten.
 - **Techniek:** Durable Objects per room/sessie; D1 voor profielen en persistente voortgang; WebSockets met hibernation. D1 is niet geschikt als realtime spelserver ([D1-limieten](https://developers.cloudflare.com/d1/platform/limits/), [DO-pricing](https://developers.cloudflare.com/durable-objects/platform/pricing/)).
 - **Veiligheid:** alleen spelen met bekenden (code/link), geen publieke matchmaking, geen chat, geen user-generated content, geen namen van kinderen. Dit is een product- en veiligheidsbeslissing, niet alleen een technische.
 - **CSP:** `connect-src 'self'` blijft; voeg alleen same-origin `wss` toe als de browser dat expliciet eist.
@@ -730,19 +761,19 @@ Toelichting:
 
 **Beste optie nu:** fase 0.5. Bouw lokale profielen en export/import, zonder backend, zonder accounts en zonder CSP-wijziging. Daarmee lost de app de meest voorkomende situatie op en blijft de huidige belofte intact.
 
-**Beste optie als cross-device sync echt nodig is:** fase 1 met Better Auth 1.7.10 in dezelfde Worker, D1 in de EU, en een ouderaccount met passkey. Sync alleen instellingen, beste scores en grove voortgang. Geen kindlogin, geen kind-e-mail, geen magic link of OAuth in fase 1.
+**Beste optie als cross-device sync echt nodig is:** fase 1 met Better Auth 1.7.10 in dezelfde Worker, D1 in de EU, en een ouderaccount met passkey plus een "Inloggen met Google"-knop. Sync alleen instellingen, beste scores en grove voortgang. Geen kindlogin, geen kind-e-mail en geen magic link. Google OAuth is de expliciete uitzondering op "geen externe requests".
 
 De eigenaar moet dan expliciet het volgende beslissen:
 
 1. **ADR 0012 goedkeuren:** auth- en backendontwerp, zelfde origin, D1, `run_worker_first`, CSP-wijziging, secrets en rollback.
 2. **ADR 0013 goedkeuren:** privacy en gegevensverwerking, inclusief verwerkingsverantwoordelijke, grondslag, bewaartermijn, verwerkers (Cloudflare, eventueel e-mail), ouderlijke toestemming en verwijdering.
 3. **Auth-methode kiezen:** passkey (aanbevolen) of e-mail/wachtwoord. Als het e-mail wordt: keur dan ook de e-mailprovider en de DPA goed.
-4. **Sync-scope kiezen:** alleen instellingen en scores, of ook actieve borden en SRS. Elke uitbreiding vraagt een aparte ADR of een expliciete wijziging van ADR 0014.
+4. **Sync-scope kiezen:** alleen instellingen en scores, of ook actieve borden en SRS. Elke uitbreiding vraagt een aparte ADR of een expliciete wijziging van ADR 0015.
 5. **Bewaartermijn en verwijderprocedure vaststellen:** 12 maanden inactiviteit is een voorstel, geen wet. Leg uit hoe een ouder exporteert en verwijdert.
 6. **CPU en plankeuze:** meet de CPU van de gekozen auth-methode; het gratis plan volstaat als die onder 10 ms blijft, anders is Workers Paid (US$ 5/maand) nodig.
 7. **D1 `database_id` en previews beleid kiezen:** wat komt in de publieke repo, en is auth op previews uit of apart?
 
-**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0014 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0015 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
+**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0015 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0016 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
 
 ## Bronnen
 

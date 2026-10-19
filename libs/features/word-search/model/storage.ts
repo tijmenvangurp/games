@@ -8,10 +8,10 @@ import {
   type WordSearchPuzzle,
   type WordSearchTheme,
 } from "@entities/word-search";
-import { readStoredJson, writeStoredJson } from "@shared/lib";
+import { GAME_STORAGE_KEYS, profileStorageKey, readStoredJson } from "@shared/lib";
 import { DEFAULT_WORD_SEARCH_SETTINGS, type WordSearchSettings } from "./settings";
 
-const STORAGE_KEY = "games.word-search.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.wordSearch;
 
 export interface StoredWordSearchState {
   settings: WordSearchSettings;
@@ -152,7 +152,7 @@ function isPuzzle(value: unknown): value is WordSearchPuzzle {
 }
 
 export function loadWordSearchState(): StoredWordSearchState {
-  const parsed = readStoredJson(STORAGE_KEY);
+  const parsed = readStoredJson(profileStorageKey(STORAGE_KEY));
   if (!isRecord(parsed)) {
     return FALLBACK;
   }
@@ -176,5 +176,12 @@ export function loadWordSearchState(): StoredWordSearchState {
 }
 
 export function saveWordSearchState(state: StoredWordSearchState): void {
-  writeStoredJson(STORAGE_KEY, state);
+  try {
+    if (typeof localStorage === "undefined") {
+      return;
+    }
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(state));
+  } catch {
+    // Storage may be unavailable; the in-memory game still works.
+  }
 }

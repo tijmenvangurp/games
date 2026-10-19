@@ -1,7 +1,14 @@
 import { create } from "zustand";
 import { createRound, type MathLevel, type MathMode, type MathRound } from "@entities/math";
-import { playHaptic, playSound } from "@shared/lib";
-import { loadMathState, saveMathState } from "./storage";
+import { parseSyncableProgress } from "@entities/progress";
+import {
+  playHaptic,
+  playSound,
+  readActiveProfileId,
+  registerProgressAdapter,
+  withSuppressedProgressEvents,
+} from "@shared/lib";
+import { isMathLevel, isMathMode, loadMathState, MAX_MATH_STARS, saveMathState } from "./storage";
 import { bestKey, type MathSettings } from "./settings";
 
 interface MathStore {
@@ -140,3 +147,52 @@ export const useMathStore = create<MathStore>((set, get) => ({
   chooseAnswer: (choice) => answerQuestion(set, get, choice),
   next: () => nextQuestion(set, get),
 }));
+
+function syncedBest(value: Readonly<Record<string, number>>): Record<string, number> {
+  const best: Record<string, number> = {};
+  for (const [key, score] of Object.entries(value)) {
+    const [mode, level] = key.split(":");
+    if (
+      isMathMode(mode) &&
+      isMathLevel(level) &&
+      Number.isInteger(score) &&
+      score >= 0 &&
+      score <= MAX_MATH_STARS
+    ) {
+      best[key] = score;
+    }
+  }
+  return best;
+}
+
+registerProgressAdapter("math", {
+  read: (profileId) => {
+    const state = loadMathState(profileId);
+    return {
+      settings: { mode: state.settings.mode, level: state.settings.level },
+      best: state.best,
+    };
+  },
+  apply: (profileId, value) => {
+    const parsed = parseSyncableProgress(value);
+    if (!parsed) {
+      return;
+    }
+
+    const current = loadMathState(profileId);
+    const mode = parsed.settings?.mode;
+    const level = parsed.settings?.level;
+    const settings: MathSettings = {
+      mode: isMathMode(mode) ? mode : current.settings.mode,
+      level: isMathLevel(level) ? level : current.settings.level,
+    };
+    const best = parsed.best ? syncedBest(parsed.best) : current.best;
+
+    withSuppressedProgressEvents(() => {
+      if (profileId === readActiveProfileId()) {
+        useMathStore.setState({ settings, best });
+      }
+      saveMathState({ settings, best }, profileId);
+    });
+  },
+});

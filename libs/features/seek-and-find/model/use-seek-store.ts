@@ -5,7 +5,13 @@ import {
   type SeekScene,
   type SeekTheme,
 } from "@entities/hidden-object";
-import { loadSeekSettings, saveSeekSettings } from "./storage";
+import { parseSyncableProgress } from "@entities/progress";
+import {
+  readActiveProfileId,
+  registerProgressAdapter,
+  withSuppressedProgressEvents,
+} from "@shared/lib";
+import { isSeekDifficulty, isSeekTheme, loadSeekSettings, saveSeekSettings } from "./storage";
 import type { SeekSettings } from "./settings";
 
 interface SeekStore {
@@ -72,3 +78,26 @@ export const useSeekStore = create<SeekStore>((set, get) => ({
     saveSeekSettings(settings);
   },
 }));
+
+registerProgressAdapter("seek", {
+  read: (profileId) => {
+    const settings = loadSeekSettings(profileId);
+    return { settings: { difficulty: settings.difficulty, theme: settings.theme } };
+  },
+  apply: (profileId, value) => {
+    const parsed = parseSyncableProgress(value);
+    const current = loadSeekSettings(profileId);
+    const difficulty = parsed?.settings?.difficulty;
+    const theme = parsed?.settings?.theme;
+    const settings = {
+      difficulty: isSeekDifficulty(difficulty) ? difficulty : current.difficulty,
+      theme: isSeekTheme(theme) ? theme : current.theme,
+    };
+    withSuppressedProgressEvents(() => {
+      if (profileId === readActiveProfileId()) {
+        useSeekStore.setState({ settings });
+      }
+      saveSeekSettings(settings, profileId);
+    });
+  },
+});

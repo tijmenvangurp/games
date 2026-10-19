@@ -6,6 +6,7 @@ import {
   type RouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
+import { AccountPage } from "@pages/account";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
@@ -34,6 +35,7 @@ export function createAppRouter(history?: RouterHistory) {
 
   const routeTree = rootRoute.addChildren([
     gameRoute("/", HomePage),
+    gameRoute("/account", AccountPage),
     gameRoute("/sudoku", SudokuPage),
     gameRoute("/pijlen", ArrowsPage),
     gameRoute("/rekenen", MathPage),

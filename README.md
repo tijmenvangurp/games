@@ -35,6 +35,10 @@ corepack pnpm affected         # gerichte checks voor de huidige branch
 
 Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet geen externe requests.
 
+## Lokale profielen
+
+Op één toestel kunnen maximaal vier lokale profielen naast elkaar bestaan, zonder account of server. Profiel 1 gebruikt de bestaande `games.<spel>.v1`-sleutels; extra profielen krijgen een eigen `games.p<id>.<spel>.v1`-namespace. Op de homepagina kan de gebruiker wisselen, profielen aanmaken of verwijderen en alle profielen als één JSON-bestand exporteren of importeren. Formaat, migratie en validatie staan in [docs/local-profiles.md](docs/local-profiles.md).
+
 ## Pokémon-assets
 
 De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork, cries en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
@@ -56,5 +60,7 @@ Eenmalig in Cloudflare instellen via **Workers & Pages → `games` → Settings 
 | Buildvariabele `PNPM_VERSION` | `12.9.1`              |
 
 De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.workers.dev/>.
+
+Sinds #42 heeft de Worker ook een `/api/*`-route en een D1-binding. Workers Builds voert geen `wrangler d1 migrations apply` uit; migreer de database vóór de deploy. Zie [docs/api-worker.md](docs/api-worker.md) voor de health-route, de preview-database en de placeholders die de eigenaar moet invullen.
 
 GitHub Actions draait de Quality-gate; de deploy-workflow is verwijderd zodat er één deploypad is. `pnpm deploy` blijft beschikbaar voor een handmatige deploy vanaf een machine met Cloudflare-toegang.

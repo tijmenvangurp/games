@@ -1,7 +1,8 @@
 import { isSudokuSize, type Difficulty, type PlayState, type SudokuPuzzle } from "@entities/sudoku";
+import { GAME_STORAGE_KEYS, profileStorageKey } from "@shared/lib";
 import { DEFAULT_SETTINGS, type SudokuSettings } from "./settings";
 
-const STORAGE_KEY = "games.sudoku.v1";
+const STORAGE_KEY = GAME_STORAGE_KEYS.sudoku;
 
 export interface PersistedSudokuState {
   play: PlayState | null;
@@ -108,7 +109,7 @@ function readSettings(value: unknown): SudokuSettings | null {
 
 export function loadSudokuState(): PersistedSudokuState | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(profileStorageKey(STORAGE_KEY));
     if (!raw) {
       return null;
     }
@@ -127,7 +128,7 @@ export function loadSudokuState(): PersistedSudokuState | null {
 
 export function saveSudokuState(state: PersistedSudokuState): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(profileStorageKey(STORAGE_KEY), JSON.stringify(state));
   } catch {
     // Storage may be unavailable (private mode); playing still works.
   }

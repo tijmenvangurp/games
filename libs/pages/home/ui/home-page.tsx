@@ -1,3 +1,4 @@
+import { ProfileSwitcher } from "@features/profile-switcher";
 import { GameMenu } from "@widgets/game-menu";
 
 export function HomePage() {
@@ -6,6 +7,8 @@ export function HomePage() {
       <header className="border-b border-border pb-4">
         <h1 className="font-display text-4xl font-normal tracking-tight">Spellen</h1>
       </header>
+
+      <ProfileSwitcher />
 
       <GameMenu />
     </main>

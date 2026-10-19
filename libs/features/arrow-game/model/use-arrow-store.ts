@@ -9,6 +9,12 @@ import {
   type MazeArrow,
   type MazeLevel,
 } from "@entities/arrow";
+import { parseSyncableProgress } from "@entities/progress";
+import {
+  readActiveProfileId,
+  registerProgressAdapter,
+  withSuppressedProgressEvents,
+} from "@shared/lib";
 import { loadArrowsProgress, saveArrowsProgress } from "./storage";
 
 type ArrowsStatus = "playing" | "won" | "lost";
@@ -155,3 +161,29 @@ export const useArrowsStore = create<ArrowsStore>((set, get) => ({
   restart: () => set({ ...emptyBoard }),
   nextLevel: () => nextLevelAction(set, get),
 }));
+
+registerProgressAdapter("arrows", {
+  read: (profileId) => ({ unlocked: loadArrowsProgress(profileId).unlocked }),
+  apply: (profileId, value) => {
+    const parsed = parseSyncableProgress(value);
+    if (typeof parsed?.unlocked !== "number") {
+      return;
+    }
+    const unlocked = Math.min(LEVEL_COUNT, Math.max(1, Math.floor(parsed.unlocked)));
+    const progress = loadArrowsProgress(profileId);
+    const current = Math.min(progress.current, unlocked - 1);
+
+    withSuppressedProgressEvents(() => {
+      if (profileId === readActiveProfileId()) {
+        const state = useArrowsStore.getState();
+        const levelIndex = Math.min(state.levelIndex, unlocked - 1);
+        useArrowsStore.setState({
+          unlocked,
+          levelIndex,
+          level: levelIndex === state.levelIndex ? state.level : levelAt(levelIndex),
+        });
+      }
+      saveArrowsProgress({ unlocked, current }, profileId);
+    });
+  },
+});
