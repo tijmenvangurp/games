@@ -31,7 +31,7 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken en
 | 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                                      |
 | 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen                         |
 | 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen                  |
-| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Kaartspel met provincies; vlaggen en hoofdsteden zijn klaar (ADR 0015) |
+| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Kaartspel met provincies; vlaggen en hoofdsteden zijn klaar (ADR 0018) |
 | 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                                  |
 | 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                                           |
 | 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden                   |

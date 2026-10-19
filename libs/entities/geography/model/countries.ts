@@ -7,7 +7,7 @@ import type { Country } from "./types";
  * Gegenereerd door `scripts/generate-geography.ts`; niet met de hand aanpassen.
  * Bronnen: flag-icons 7.6.0 (MIT) voor het continent en de
  * vlaggen, Wikidata (CC0) voor de namen, hoofdsteden, numeric-codes en
- * coördinaten. Zie docs/adr/0015-vlaggenspel.md en docs/adr/0016-wereldkaart.md.
+ * coördinaten. Zie docs/adr/0018-vlaggenspel.md en docs/adr/0019-wereldkaart.md.
  */
 export const COUNTRIES: readonly Country[] = [
   {

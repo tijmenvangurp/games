@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
  * Generates the geography data, the local flag assets and the world atlas that
  * together form the foundation of the app.
  *
- * Sources (see docs/adr/0015-vlaggenspel.md and docs/adr/0016-wereldkaart.md):
+ * Sources (see docs/adr/0018-vlaggenspel.md and docs/adr/0019-wereldkaart.md):
  * - flag-icons (MIT) for the country flags and the continent of every country;
  * - Wikimedia Commons (public domain) for the twelve Dutch province flags;
  * - Wikidata (CC0) for the Dutch names, capitals, ISO codes and coordinates,
@@ -512,7 +512,7 @@ function renderCountryData(countries: readonly Country[]): string {
  * Gegenereerd door \`scripts/generate-geography.ts\`; niet met de hand aanpassen.
  * Bronnen: flag-icons ${FLAG_ICONS_VERSION} (MIT) voor het continent en de
  * vlaggen, Wikidata (CC0) voor de namen, hoofdsteden, numeric-codes en
- * coördinaten. Zie docs/adr/0015-vlaggenspel.md en docs/adr/0016-wereldkaart.md.
+ * coördinaten. Zie docs/adr/0018-vlaggenspel.md en docs/adr/0019-wereldkaart.md.
  */
 export const COUNTRIES: readonly Country[] = [
 ${entries}
@@ -544,7 +544,7 @@ function renderProvinceData(provinces: readonly Province[]): string {
  * Gegenereerd door \`scripts/generate-geography.ts\`; niet met de hand aanpassen.
  * Bronnen: Wikidata (CC0) voor de namen, hoofdsteden, codes en coördinaten,
  * Wikimedia Commons (publiek domein) voor de vlaggen. Zie
- * docs/adr/0015-vlaggenspel.md.
+ * docs/adr/0018-vlaggenspel.md.
  */
 export const PROVINCES: readonly Province[] = [
 ${entries}
