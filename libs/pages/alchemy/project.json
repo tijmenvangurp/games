@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-alchemy",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/alchemy",
+  "tags": ["layer:pages", "scope:alchemy", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/alchemy"
+      }
+    }
+  },
+  "implicitDependencies": ["widgets-game-shell", "features-alchemy-lab"]
+}

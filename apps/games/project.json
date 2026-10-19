@@ -76,6 +76,7 @@
     "pages-flags",
     "pages-word-search",
     "pages-letter",
+    "pages-alchemy",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -90,6 +91,7 @@
     "features-flag-game",
     "features-word-search",
     "features-letter-game",
+    "features-alchemy-lab",
     "entities-game",
     "entities-french",
     "entities-sudoku",
@@ -101,6 +103,7 @@
     "entities-geography",
     "entities-word-search",
     "entities-letter",
+    "entities-alchemy",
     "shared-lib",
     "shared-ui"
   ]

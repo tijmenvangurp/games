@@ -67,6 +67,7 @@
     "pages-french",
     "pages-flags",
     "pages-letter",
+    "pages-alchemy",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -79,6 +80,7 @@
     "features-french-listening",
     "features-flag-game",
     "features-letter-game",
+    "features-alchemy-lab",
     "entities-game",
     "entities-french",
     "entities-sudoku",
@@ -88,6 +90,7 @@
     "entities-pokedex",
     "entities-geography",
     "entities-letter",
+    "entities-alchemy",
     "shared-lib",
     "shared-ui"
   ]
