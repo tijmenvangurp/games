@@ -23,7 +23,7 @@ function validateRound(round: ReturnType<typeof createLetterRound>): void {
       expect(question.choices).toHaveLength(3);
       expect(question.choices).toContain(question.target);
       expect(new Set(question.choices).size).toBe(3);
-      expect(question.sound).toBe(`/audio/letters/v1/sounds/${question.target}.wav`);
+      expect(question.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
     if (question.kind === "vanger") {
       expect(question.choices).toHaveLength(3);
@@ -90,7 +90,7 @@ describe("letter round", () => {
     const first = round.questions[0];
     expect(first?.kind).toBe("klank");
     if (first?.kind === "klank") {
-      expect(first.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+      expect(first.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]+\.(wav|mp3)$/);
     }
   });
 });

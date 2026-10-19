@@ -1,0 +1,328 @@
+{
+  "version": 1,
+  "voice": {
+    "model": "speaches-ai/piper-nl_BE-nathalie-medium",
+    "label": "nathalie",
+    "license": "CC0 1.0"
+  },
+  "sounds": {
+    "a": {
+      "teken": "a",
+      "type": "kort",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "ah",
+      "file": "/audio/letters/v1/sounds/a.mp3"
+    },
+    "e": {
+      "teken": "e",
+      "type": "kort",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "eh",
+      "file": "/audio/letters/v1/sounds/e.mp3"
+    },
+    "i": {
+      "teken": "i",
+      "type": "kort",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "ih",
+      "file": "/audio/letters/v1/sounds/i.mp3"
+    },
+    "o": {
+      "teken": "o",
+      "type": "kort",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "oh",
+      "file": "/audio/letters/v1/sounds/o.mp3"
+    },
+    "u": {
+      "teken": "u",
+      "type": "kort",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "uh",
+      "file": "/audio/letters/v1/sounds/u.mp3"
+    },
+    "aa": {
+      "teken": "aa",
+      "type": "lang",
+      "variant": "letter",
+      "label": "Losse letter",
+      "prompt": "aa",
+      "file": "/audio/letters/v1/sounds/aa.mp3"
+    },
+    "ee": {
+      "teken": "ee",
+      "type": "lang",
+      "variant": "letter",
+      "label": "Losse letter",
+      "prompt": "ee",
+      "file": "/audio/letters/v1/sounds/ee.mp3"
+    },
+    "oo": {
+      "teken": "oo",
+      "type": "lang",
+      "variant": "letter",
+      "label": "Losse letter",
+      "prompt": "oo",
+      "file": "/audio/letters/v1/sounds/oo.mp3"
+    },
+    "uu": {
+      "teken": "uu",
+      "type": "lang",
+      "variant": "letter",
+      "label": "Losse letter",
+      "prompt": "uu",
+      "file": "/audio/letters/v1/sounds/uu.mp3"
+    },
+    "oe": {
+      "teken": "oe",
+      "type": "tweeteken",
+      "variant": "oeh",
+      "label": "Fonetisch (oeh)",
+      "prompt": "oeh",
+      "file": "/audio/letters/v1/sounds/oe.mp3"
+    },
+    "ie": {
+      "teken": "ie",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "ie",
+      "file": "/audio/letters/v1/sounds/ie.mp3"
+    },
+    "ij": {
+      "teken": "ij",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "ij",
+      "file": "/audio/letters/v1/sounds/ij.mp3"
+    },
+    "ei": {
+      "teken": "ei",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "ei",
+      "file": "/audio/letters/v1/sounds/ei.mp3"
+    },
+    "au": {
+      "teken": "au",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "au",
+      "file": "/audio/letters/v1/sounds/au.mp3"
+    },
+    "ou": {
+      "teken": "ou",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "ou",
+      "file": "/audio/letters/v1/sounds/ou.mp3"
+    },
+    "eu": {
+      "teken": "eu",
+      "type": "tweeteken",
+      "variant": "euh",
+      "label": "Fonetisch (euh)",
+      "prompt": "euh",
+      "file": "/audio/letters/v1/sounds/eu.mp3"
+    },
+    "ui": {
+      "teken": "ui",
+      "type": "tweeteken",
+      "variant": "letter",
+      "label": "Losse letters",
+      "prompt": "ui",
+      "file": "/audio/letters/v1/sounds/ui.mp3"
+    },
+    "b": {
+      "teken": "b",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "buh",
+      "file": "/audio/letters/v1/sounds/b.mp3"
+    },
+    "d": {
+      "teken": "d",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "duh",
+      "file": "/audio/letters/v1/sounds/d.mp3"
+    },
+    "f": {
+      "teken": "f",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'fiets' (begin) 100 ms",
+      "prompt": "fiets",
+      "file": "/audio/letters/v1/sounds/f.wav",
+      "cut": {
+        "word": "fiets",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "g": {
+      "teken": "g",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "guh",
+      "file": "/audio/letters/v1/sounds/g.mp3"
+    },
+    "h": {
+      "teken": "h",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "huh",
+      "file": "/audio/letters/v1/sounds/h.mp3"
+    },
+    "j": {
+      "teken": "j",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "juh",
+      "file": "/audio/letters/v1/sounds/j.mp3"
+    },
+    "k": {
+      "teken": "k",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "kuh",
+      "file": "/audio/letters/v1/sounds/k.mp3"
+    },
+    "l": {
+      "teken": "l",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'lam' (begin) 100 ms",
+      "prompt": "lam",
+      "file": "/audio/letters/v1/sounds/l.wav",
+      "cut": {
+        "word": "lam",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "m": {
+      "teken": "m",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'mat' (begin) 100 ms",
+      "prompt": "mat",
+      "file": "/audio/letters/v1/sounds/m.wav",
+      "cut": {
+        "word": "mat",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "n": {
+      "teken": "n",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "nuh",
+      "file": "/audio/letters/v1/sounds/n.mp3"
+    },
+    "p": {
+      "teken": "p",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "puh",
+      "file": "/audio/letters/v1/sounds/p.mp3"
+    },
+    "r": {
+      "teken": "r",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "ruh",
+      "file": "/audio/letters/v1/sounds/r.mp3"
+    },
+    "s": {
+      "teken": "s",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'sap' (begin) 100 ms",
+      "prompt": "sap",
+      "file": "/audio/letters/v1/sounds/s.wav",
+      "cut": {
+        "word": "sap",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "t": {
+      "teken": "t",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "tuh",
+      "file": "/audio/letters/v1/sounds/t.mp3"
+    },
+    "v": {
+      "teken": "v",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'vis' (begin) 100 ms",
+      "prompt": "vis",
+      "file": "/audio/letters/v1/sounds/v.wav",
+      "cut": {
+        "word": "vis",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "w": {
+      "teken": "w",
+      "type": "medeklinker",
+      "variant": "fonetisch",
+      "label": "Fonetische spelling",
+      "prompt": "wuh",
+      "file": "/audio/letters/v1/sounds/w.mp3"
+    },
+    "z": {
+      "teken": "z",
+      "type": "medeklinker",
+      "variant": "knip-100",
+      "label": "Knip uit 'zon' (begin) 100 ms",
+      "prompt": "zon",
+      "file": "/audio/letters/v1/sounds/z.wav",
+      "cut": {
+        "word": "zon",
+        "from": "start",
+        "durationMs": 100
+      }
+    },
+    "ng": {
+      "teken": "ng",
+      "type": "medeklinker",
+      "variant": "woord",
+      "label": "Woord: lang (klank achteraan)",
+      "prompt": "lang",
+      "file": "/audio/letters/v1/sounds/ng.mp3"
+    },
+    "ch": {
+      "teken": "ch",
+      "type": "medeklinker",
+      "variant": "woord",
+      "label": "Woord: lach (klank achteraan)",
+      "prompt": "lach",
+      "file": "/audio/letters/v1/sounds/ch.mp3"
+    }
+  }
+}

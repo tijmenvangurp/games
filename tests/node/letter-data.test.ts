@@ -35,7 +35,9 @@ describe("letter data", () => {
 
   it("koppelt elke letter aan een losse klank", () => {
     for (const letter of LETTERS) {
-      expect(letter.sound).toBe(`/audio/letters/v1/sounds/${letter.id}.wav`);
+      expect(letter.sound).toMatch(
+        new RegExp(`^/audio/letters/v1/sounds/${letter.id}\\.(wav|mp3)$`),
+      );
     }
   });
 

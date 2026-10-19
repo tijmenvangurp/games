@@ -80,8 +80,8 @@ export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
   v: "knip-100",
   w: "fonetisch",
   z: "knip-100",
-  ng: "knip-100",
-  ch: "knip-100",
+  ng: "woord",
+  ch: "woord",
 };
 
 function withExtraVariants(klank: KlankMapping, extra: readonly KlankVariant[]): KlankMapping {

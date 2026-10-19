@@ -13,6 +13,7 @@
     "scripts/generate-chess-puzzles.ts",
     "scripts/generate-french-audio.ts",
     "scripts/generate-sounds.ts",
+    "scripts/finalize-sounds.ts",
     "scripts/run-playwright.ts",
     "scripts/hooks/commit-msg.ts",
     "scripts/hooks/pre-commit.ts",
