@@ -52,7 +52,7 @@ interface BodyProps {
 function Body({ setupVisible, mode, ...setup }: BodyProps) {
   if (setupVisible) {
     return (
-      <div className="mx-auto w-full max-w-xl">
+      <div className="mx-auto my-auto w-full max-w-2xl">
         <FlagsSetup {...setup} />
       </div>
     );

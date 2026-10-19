@@ -184,7 +184,7 @@ export function PuzzlePlay() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+    <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
       <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
         <p className="text-sm font-black text-muted-foreground">
           {placed.length} van {total} geplaatst
@@ -195,46 +195,48 @@ export function PuzzlePlay() {
         </div>
       </header>
 
-      <section className="rounded-3xl border bg-card p-3 shadow-sm">
-        <PuzzleMap
-          areas={map.areas}
-          level={round.level}
-          names={names}
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.5fr_1fr] lg:items-start">
+        <section className="rounded-3xl border bg-card p-3 shadow-sm">
+          <PuzzleMap
+            areas={map.areas}
+            level={round.level}
+            names={names}
+            placed={placedSet}
+            height={map.height}
+            selected={selected}
+            svgRef={svgRef}
+            total={total}
+            width={map.width}
+            onPlace={placeOnMap}
+          />
+
+          <p
+            aria-live="polite"
+            className={cn(
+              "mt-2 text-center text-sm font-semibold",
+              feedback?.kind === "correct" || feedback?.kind === "revealed"
+                ? "text-emerald-700"
+                : feedback?.kind === "wrong"
+                  ? "text-rose-600"
+                  : "text-muted-foreground",
+            )}
+          >
+            {feedbackText}
+          </p>
+        </section>
+
+        <PuzzleTray
+          pieces={pieces}
           placed={placedSet}
-          height={map.height}
+          subjects={round.questions.map((question) => question.subject)}
           selected={selected}
-          svgRef={svgRef}
-          total={total}
-          width={map.width}
-          onPlace={placeOnMap}
+          onGrab={startDrag}
+          onKeyboardSelect={(code) => {
+            useFlagStore.getState().selectPiece(code);
+            focusFirstTarget();
+          }}
         />
-
-        <p
-          aria-live="polite"
-          className={cn(
-            "mt-2 text-center text-sm font-semibold",
-            feedback?.kind === "correct" || feedback?.kind === "revealed"
-              ? "text-emerald-700"
-              : feedback?.kind === "wrong"
-                ? "text-rose-600"
-                : "text-muted-foreground",
-          )}
-        >
-          {feedbackText}
-        </p>
-      </section>
-
-      <PuzzleTray
-        pieces={pieces}
-        placed={placedSet}
-        subjects={round.questions.map((question) => question.subject)}
-        selected={selected}
-        onGrab={startDrag}
-        onKeyboardSelect={(code) => {
-          useFlagStore.getState().selectPiece(code);
-          focusFirstTarget();
-        }}
-      />
+      </div>
 
       {ghost ? <DragGhost ghost={ghost} piece={pieces.get(ghost.code)} /> : null}
     </div>

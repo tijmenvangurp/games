@@ -51,7 +51,7 @@ export function PlaceMap({ subject }: { subject: FlagSubject }) {
   return (
     <svg
       aria-hidden="true"
-      className="mx-auto h-auto w-full max-w-xs rounded-2xl border bg-sky-50"
+      className="mx-auto h-auto w-full rounded-2xl border bg-sky-50"
       data-testid="place-map"
       focusable="false"
       viewBox={`0 0 ${map.width} ${map.height}`}

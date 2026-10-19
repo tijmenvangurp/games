@@ -39,7 +39,7 @@ export function PuzzleTray({
   return (
     <section className="rounded-3xl border bg-card p-3 shadow-sm">
       <p className="sr-only">Puzzelstukken</p>
-      <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+      <div className="grid grid-cols-4 gap-2">
         {subjects.map((country) => {
           const isPlaced = placed.has(country.code);
           const isSelected = selected === country.code;

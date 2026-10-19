@@ -189,38 +189,42 @@ function QuestionCard({
 
   return (
     <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
-      <p className="text-center text-sm font-bold text-muted-foreground">
-        {directionPrompt(question.direction, scope)}
-      </p>
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
+        <div>
+          <p className="text-center text-sm font-bold text-muted-foreground">
+            {directionPrompt(question.direction, scope)}
+          </p>
 
-      {showsFlag ? (
-        <div className="mx-auto mt-3 max-w-xs">
-          <FlagPicture className="bg-white" code={question.subject.code} />
+          {showsFlag ? (
+            <div className="mx-auto mt-3 max-w-sm">
+              <FlagPicture className="bg-white" code={question.subject.code} />
+            </div>
+          ) : (
+            <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
+              {question.subject.name}
+            </p>
+          )}
+
+          <div className="mt-4">
+            <FlagChoices answered={answered} question={question} wrongChoices={wrongChoices} />
+          </div>
         </div>
-      ) : (
-        <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
-          {question.subject.name}
-        </p>
-      )}
 
-      <div className="mt-4">
-        <FlagChoices answered={answered} question={question} wrongChoices={wrongChoices} />
+        <div className="mt-4 lg:mt-0">
+          <FlagFeedback answered={answered} correct={correct} question={question} />
+
+          {answered ? (
+            <Button
+              className="mt-4 w-full"
+              size="lg"
+              variant="success"
+              onClick={() => useFlagStore.getState().next()}
+            >
+              {isLast ? "Klaar" : "Volgende"}
+            </Button>
+          ) : null}
+        </div>
       </div>
-
-      <div className="mt-4">
-        <FlagFeedback answered={answered} correct={correct} question={question} />
-      </div>
-
-      {answered ? (
-        <Button
-          className="mt-4 w-full"
-          size="lg"
-          variant="success"
-          onClick={() => useFlagStore.getState().next()}
-        >
-          {isLast ? "Klaar" : "Volgende"}
-        </Button>
-      ) : null}
     </section>
   );
 }
@@ -237,7 +241,7 @@ export function FlagsPlay() {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
+    <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
       <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
         <p className="text-sm font-black text-muted-foreground">
           Vraag {questionIndex + 1} van {round.questions.length}
