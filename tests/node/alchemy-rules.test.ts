@@ -8,11 +8,13 @@ import {
   createRecipeIndex,
   elementName,
   findRecipeFor,
+  findRecipesFor,
   getHint,
   getElement,
   isElementId,
   pairKey,
   reachableElementIds,
+  recipesUsing,
   RECIPES,
   tierOf,
   totalElements,
@@ -102,9 +104,9 @@ describe("alchemy rules", () => {
   });
 
   it("keeps the element tree at a readable size", () => {
-    expect(ELEMENTS.length).toBeGreaterThanOrEqual(60);
-    expect(ELEMENTS.length).toBeLessThanOrEqual(80);
-    expect(RECIPES.length).toBeGreaterThanOrEqual(60);
+    expect(ELEMENTS.length).toBeGreaterThanOrEqual(90);
+    expect(ELEMENTS.length).toBeLessThanOrEqual(120);
+    expect(RECIPES.length).toBeGreaterThanOrEqual(90);
   });
 
   it("supports combining two copies of the same element", () => {
@@ -112,6 +114,15 @@ describe("alchemy rules", () => {
     expect(combine("water", "water")).toBe("sea");
     expect(combine("stone", "stone")).toBe("mountain");
     expect(combine("house", "house")).toBe("village");
+    expect(combine("star", "star")).toBe("galaxy");
+  });
+
+  it("offers alternate routes to the same element", () => {
+    expect(findRecipesFor("steam").length).toBeGreaterThanOrEqual(2);
+    expect(findRecipesFor("metal").length).toBeGreaterThanOrEqual(2);
+    expect(findRecipesFor("magic").length).toBeGreaterThanOrEqual(2);
+    expect(recipesUsing("fire").length).toBeGreaterThan(0);
+    expect(recipesUsing("onbekend")).toEqual([]);
   });
 
   it("handles unreachable ingredients in custom recipe sets", () => {

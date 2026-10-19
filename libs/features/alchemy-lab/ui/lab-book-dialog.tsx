@@ -1,6 +1,10 @@
+import { useState } from "react";
+import { ELEMENTS, getElement, type AlchemyElement, type ElementId } from "@entities/alchemy";
 import { Button, X } from "@shared/ui";
-import { ELEMENTS } from "@entities/alchemy";
+import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
 import { useAlchemyStore } from "../model/use-alchemy-store";
+import { ElementDetail } from "./element-detail";
+import { ElementFilters } from "./element-filters";
 import { ElementToken } from "./element-token";
 
 interface LabBookDialogProps {
@@ -10,13 +14,29 @@ interface LabBookDialogProps {
 
 export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
   const discovered = useAlchemyStore((state) => state.discovered);
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [sort, setSort] = useState<ElementSort>("new");
+  const [selectedId, setSelectedId] = useState<ElementId | null>(null);
 
   if (!open) {
     return null;
   }
 
   const found = new Set(discovered);
+  const orderedElements = [
+    ...discovered
+      .map((id) => getElement(id))
+      .filter((element): element is AlchemyElement => element !== undefined),
+    ...ELEMENTS.filter((element) => !found.has(element.id)),
+  ];
+  const visibleElements = filterAndSortElements(orderedElements, category, sort);
+  const selectedElement = selectedId ? getElement(selectedId) : undefined;
   const progress = Math.round((discovered.length / ELEMENTS.length) * 100);
+
+  const close = () => {
+    setSelectedId(null);
+    onClose();
+  };
 
   return (
     <div
@@ -24,11 +44,11 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
       role="dialog"
-      onClick={onClose}
+      onClick={close}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           event.preventDefault();
-          onClose();
+          close();
         }
       }}
     >
@@ -45,7 +65,7 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
               {discovered.length} van {ELEMENTS.length} elementen ontdekt
             </p>
           </div>
-          <Button aria-label="Sluit labboek" size="icon" variant="ghost" onClick={onClose}>
+          <Button aria-label="Sluit labboek" size="icon" variant="ghost" onClick={close}>
             <X aria-hidden="true" className="size-5" />
           </Button>
         </div>
@@ -59,24 +79,57 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
 
         <p className="mt-2 text-xs text-muted-foreground">Iconen: Microsoft Fluent Emoji · MIT</p>
 
-        <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
-          {ELEMENTS.map((element) =>
-            found.has(element.id) ? (
-              <div key={element.id} className="flex justify-center">
-                <ElementToken element={element} />
-              </div>
-            ) : (
-              <div key={element.id} className="flex flex-col items-center gap-1">
-                <ElementToken element={element} undiscovered />
-                <span className="text-xs font-bold text-muted-foreground">Onbekend</span>
-              </div>
-            ),
-          )}
-        </div>
+        {selectedElement ? (
+          <div className="mt-4">
+            <ElementDetail
+              discovered={found}
+              element={selectedElement}
+              onBack={() => setSelectedId(null)}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="mt-3">
+              <ElementFilters
+                category={category}
+                sort={sort}
+                onCategoryChange={setCategory}
+                onSortChange={setSort}
+              />
+            </div>
 
-        <Button className="mt-5 w-full" size="lg" onClick={onClose}>
-          Terug naar de werkbank
-        </Button>
+            <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
+              {visibleElements.map((element) =>
+                found.has(element.id) ? (
+                  <button
+                    key={element.id}
+                    aria-label={`Bekijk ${element.name}`}
+                    className="flex justify-center rounded-2xl p-1 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+                    type="button"
+                    onClick={() => setSelectedId(element.id)}
+                  >
+                    <ElementToken element={element} />
+                  </button>
+                ) : (
+                  <div key={element.id} className="flex flex-col items-center gap-1">
+                    <ElementToken element={element} undiscovered />
+                    <span className="text-xs font-bold text-muted-foreground">Onbekend</span>
+                  </div>
+                ),
+              )}
+            </div>
+
+            {visibleElements.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                Geen elementen in deze categorie.
+              </p>
+            ) : null}
+
+            <Button className="mt-5 w-full" size="lg" onClick={close}>
+              Terug naar de werkbank
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

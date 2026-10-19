@@ -58,8 +58,9 @@ test.describe("mengelmoes slepen op een tablet", () => {
     await page.getByRole("button", { name: "Vuur op de werkbank leggen" }).click();
     await page.getByRole("button", { name: "Vuur, geselecteerd" }).click();
 
-    const water = page.getByRole("button", { name: "Water", exact: true });
-    const fire = page.getByRole("button", { name: "Vuur", exact: true });
+    const board = page.getByRole("group", { name: "Werkbank" });
+    const water = board.getByRole("button", { name: "Water", exact: true });
+    const fire = board.getByRole("button", { name: "Vuur", exact: true });
     const waterBox = await water.boundingBox();
     const fireBox = await fire.boundingBox();
     if (!waterBox || !fireBox) {

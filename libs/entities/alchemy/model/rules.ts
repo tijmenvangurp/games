@@ -67,8 +67,16 @@ export function tierOf(id: ElementId, recipes: readonly Recipe[] = RECIPES): num
   return tiers.get(id) ?? Number.POSITIVE_INFINITY;
 }
 
+export function findRecipesFor(result: ElementId, recipes: readonly Recipe[] = RECIPES): Recipe[] {
+  return recipes.filter((recipe) => recipe.result === result);
+}
+
 export function findRecipeFor(result: ElementId): Recipe | undefined {
-  return RECIPES.find((recipe) => recipe.result === result);
+  return findRecipesFor(result)[0];
+}
+
+export function recipesUsing(elementId: ElementId, recipes: readonly Recipe[] = RECIPES): Recipe[] {
+  return recipes.filter((recipe) => recipe.a === elementId || recipe.b === elementId);
 }
 
 export function elementName(id: ElementId): string {

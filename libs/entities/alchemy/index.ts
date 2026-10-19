@@ -5,10 +5,13 @@ export {
   createRecipeIndex,
   elementName,
   findRecipeFor,
+  findRecipesFor,
   getHint,
   pairKey,
   reachableElementIds,
+  recipesUsing,
   tierOf,
   totalElements,
 } from "./model/rules";
+export { ELEMENT_CATEGORIES, ELEMENT_CATEGORY_LABELS } from "./model/types";
 export type { AlchemyElement, ElementCategory, ElementId, Hint } from "./model/types";

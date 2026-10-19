@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { ELEMENTS, getElement, type AlchemyElement } from "@entities/alchemy";
 import { cn } from "@shared/lib";
+import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import { shelfItemId } from "./dnd-ids";
+import { ElementFilters } from "./element-filters";
 import { ElementToken } from "./element-token";
 
 function ShelfToken({ element }: { element: AlchemyElement }) {
@@ -58,9 +60,12 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
 export function AlchemyShelf() {
   const discovered = useAlchemyStore((state) => state.discovered);
   const selected = useAlchemyStore((state) => state.selected);
+  const [category, setCategory] = useState<CategoryFilter>("all");
+  const [sort, setSort] = useState<ElementSort>("new");
   const elements = discovered
     .map((id) => getElement(id))
     .filter((element): element is AlchemyElement => element !== undefined);
+  const visibleElements = filterAndSortElements(elements, category, sort);
 
   return (
     <section
@@ -79,11 +84,28 @@ export function AlchemyShelf() {
         </p>
       </div>
 
-      <div className="grid grid-cols-4 gap-1 sm:grid-cols-6 sm:gap-2">
-        {elements.map((element) => (
-          <ShelfToken key={element.id} element={element} />
-        ))}
-      </div>
+      {elements.length > 8 ? (
+        <div className="mb-2">
+          <ElementFilters
+            category={category}
+            sort={sort}
+            onCategoryChange={setCategory}
+            onSortChange={setSort}
+          />
+        </div>
+      ) : null}
+
+      {visibleElements.length === 0 ? (
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          Nog geen elementen in deze categorie.
+        </p>
+      ) : (
+        <div className="grid grid-cols-4 gap-1 sm:grid-cols-6 sm:gap-2">
+          {visibleElements.map((element) => (
+            <ShelfToken key={element.id} element={element} />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

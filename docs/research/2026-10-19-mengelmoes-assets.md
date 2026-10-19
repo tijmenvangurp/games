@@ -268,7 +268,7 @@ De kwaliteit zit in de data, niet in de UI. Voeg tests toe die controleren:
 ### Eerste slice
 
 - 4 basislementen: water, vuur, aarde, lucht.
-- 71 elementen en 67 recepten, met eigen Nederlandse namen en Fluent Emoji Flat-iconen.
+- 96 elementen en 103 recepten, met eigen Nederlandse namen en Fluent Emoji Flat-iconen.
 - Een vrije werkbank met sleep- en tik-tik-mengen.
 - Labboek, hints en lokale opslag.
 - Ontdekkingsanimatie en de bestaande geluiden.
