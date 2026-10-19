@@ -195,7 +195,7 @@ export function PuzzlePlay() {
         </div>
       </header>
 
-      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[1.5fr_1fr] lg:items-start">
+      <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start">
         <section className="rounded-3xl border bg-card p-3 shadow-sm">
           <PuzzleMap
             areas={map.areas}
