@@ -5,6 +5,7 @@ import {
   parseSyncableProgress,
   progressDataEquals,
   PROGRESS_SCHEMA_VERSION,
+  type PlayerRecord,
   type ProgressDocument,
   type ProgressVersion,
   type SyncableProgress,
@@ -161,6 +162,65 @@ function applyLocal(profileId: string, gameId: SyncGameId, data: SyncableProgres
   withSuppressedProgressEvents(() => adapter.apply(profileId, data));
 }
 
+/**
+ * Keeps the stored links of profiles that still exist and returns them; the
+ * caller fills in or recreates links per enabled profile.
+ */
+function carryOverLinks(
+  state: SyncState,
+  profiles: readonly Profile[],
+): Record<string, PlayerLink> {
+  const links: Record<string, PlayerLink> = {};
+  const known = new Set(profiles.map((profile) => profile.id));
+  for (const [profileId, link] of Object.entries(state.players)) {
+    if (known.has(profileId)) {
+      links[profileId] = link;
+    }
+  }
+  return links;
+}
+
+async function createLinkForProfile(
+  profile: Profile,
+  state: SyncState,
+  players: readonly PlayerRecord[],
+): Promise<PlayerLink | null> {
+  const slot = slotForProfile(profile.id);
+  if (slot === null) {
+    return null;
+  }
+
+  const created = await config.api.createPlayer({ slot, avatar: profile.avatar });
+  if (created) {
+    return { playerId: created.id, slot: created.slot, avatar: created.avatar };
+  }
+
+  const previous = state.players[profile.id];
+  const usable = Boolean(
+    previous && players.some((candidate) => candidate.id === previous.playerId),
+  );
+  return usable && previous ? previous : null;
+}
+
+async function resolveLinkForProfile(
+  profile: Profile,
+  state: SyncState,
+  bySlot: ReadonlyMap<number, PlayerRecord>,
+  players: readonly PlayerRecord[],
+): Promise<PlayerLink | null> {
+  const slot = slotForProfile(profile.id);
+  if (slot === null) {
+    return null;
+  }
+
+  const player = bySlot.get(slot);
+  if (player) {
+    return { playerId: player.id, slot: player.slot, avatar: player.avatar };
+  }
+
+  return createLinkForProfile(profile, state, players);
+}
+
 async function ensurePlayerLinks(profiles: readonly Profile[]): Promise<SyncState> {
   const state = loadSyncState();
   // Explicit opt-in: without an enabled profile the API is never touched and
@@ -172,32 +232,12 @@ async function ensurePlayerLinks(profiles: readonly Profile[]): Promise<SyncStat
 
   const players = await config.api.listPlayers();
   const bySlot = new Map(players.map((player) => [player.slot, player] as const));
-  const existing = new Set(profiles.map((profile) => profile.id));
-  const links: Record<string, PlayerLink> = {};
-  for (const [profileId, link] of Object.entries(state.players)) {
-    if (existing.has(profileId)) {
-      links[profileId] = link;
-    }
-  }
+  const links = carryOverLinks(state, profiles);
 
   for (const profile of syncable) {
-    const slot = slotForProfile(profile.id);
-    if (slot === null) {
-      continue;
-    }
-
-    const player = bySlot.get(slot);
-    if (player) {
-      links[profile.id] = { playerId: player.id, slot: player.slot, avatar: player.avatar };
-      continue;
-    }
-
-    const previous = state.players[profile.id];
-    const created = await config.api.createPlayer({ slot, avatar: profile.avatar });
-    if (created) {
-      links[profile.id] = { playerId: created.id, slot: created.slot, avatar: created.avatar };
-    } else if (previous && players.some((candidate) => candidate.id === previous.playerId)) {
-      links[profile.id] = previous;
+    const link = await resolveLinkForProfile(profile, state, bySlot, players);
+    if (link) {
+      links[profile.id] = link;
     }
   }
 
@@ -271,42 +311,53 @@ function applyRemoteDocument(
   writeMeta(profileId, gameId, document.revision, latestTimestamp(meta, document.clientUpdatedAt));
 }
 
+function markSessionLost(error: unknown): void {
+  if (error instanceof ProgressApiError && error.status === 401) {
+    sessionActive = false;
+  }
+}
+
+/** Fetches and applies the server state of one enabled, linked profile. */
+async function hydrateProfile(profileId: string, link: PlayerLink): Promise<void> {
+  try {
+    const documents = await config.api.fetchProgress(link.playerId);
+    for (const document of documents) {
+      applyRemoteDocument(profileId, link.playerId, document);
+    }
+  } catch (error) {
+    markSessionLost(error);
+  }
+}
+
+async function hydrateEnabledProfiles(
+  profiles: readonly Profile[],
+  state: SyncState,
+): Promise<void> {
+  const syncable = profiles.filter((profile) => isSyncEnabled(profile.id));
+  for (const profile of syncable) {
+    const link = state.players[profile.id];
+    if (link) {
+      await hydrateProfile(profile.id, link);
+    }
+  }
+}
+
+async function startHydration(): Promise<void> {
+  if (!(await config.api.hasSession())) {
+    sessionActive = false;
+    return;
+  }
+  sessionActive = true;
+
+  const profiles = localProfiles();
+  const state = await ensurePlayerLinks(profiles);
+  await hydrateEnabledProfiles(profiles, state);
+  await flushProgressOutbox();
+}
+
 async function runHydration(): Promise<void> {
   try {
-    if (!(await config.api.hasSession())) {
-      sessionActive = false;
-      return;
-    }
-    sessionActive = true;
-
-    const profiles = localProfiles();
-    const state = await ensurePlayerLinks(profiles);
-
-    for (const profile of profiles) {
-      if (!isSyncEnabled(profile.id)) {
-        continue;
-      }
-      const link = state.players[profile.id];
-      if (!link) {
-        continue;
-      }
-
-      let documents: readonly ProgressDocument[];
-      try {
-        documents = await config.api.fetchProgress(link.playerId);
-      } catch (error) {
-        if (error instanceof ProgressApiError && error.status === 401) {
-          sessionActive = false;
-        }
-        continue;
-      }
-
-      for (const document of documents) {
-        applyRemoteDocument(profile.id, link.playerId, document);
-      }
-    }
-
-    await flushProgressOutbox();
+    await startHydration();
   } catch {
     // Offline, an unavailable Worker or a missing D1 table must never block
     // the local game. The outbox keeps pending work for the next attempt.
@@ -529,6 +580,61 @@ function flushPendingNow(): void {
   commitPending();
 }
 
+function scheduleDebounce(): void {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null;
+    commitPending();
+  }, config.debounceMs);
+}
+
+function mergeableLocalData(
+  previous: PendingChange | undefined,
+  parsed: SyncableProgress,
+  clientUpdatedAt: string,
+): SyncableProgress {
+  if (!previous) {
+    return parsed;
+  }
+  return mergeProgressData(
+    {
+      schemaVersion: PROGRESS_SCHEMA_VERSION,
+      revision: 0,
+      clientUpdatedAt: previous.clientUpdatedAt,
+      data: previous.data,
+    },
+    {
+      schemaVersion: PROGRESS_SCHEMA_VERSION,
+      revision: 0,
+      clientUpdatedAt,
+      data: parsed,
+    },
+  );
+}
+
+function rememberLocalMeta(profileId: string, gameId: SyncGameId): void {
+  const key = progressKey(profileId, gameId);
+  const now = config.now().toISOString();
+  const meta = loadSyncState().progress[key];
+  // Remember the timestamp even without a session or opt-in, so a later
+  // enable can tell whether the local setting is newer than the server copy.
+  writeMeta(profileId, gameId, meta ? meta.revision : 0, now);
+}
+
+function queueLocalChange(profileId: string, gameId: SyncGameId, parsed: SyncableProgress): void {
+  if (!sessionActive || !isSyncEnabled(profileId)) {
+    return;
+  }
+
+  const key = progressKey(profileId, gameId);
+  const now = config.now().toISOString();
+  const data = mergeableLocalData(pending.get(key), parsed, now);
+  pending.set(key, { profileId, gameId, data, clientUpdatedAt: now });
+  scheduleDebounce();
+}
+
 function noteLocalProgressChange(gameId: string): void {
   if (!started || !isSyncGameId(gameId)) {
     return;
@@ -544,44 +650,8 @@ function noteLocalProgressChange(gameId: string): void {
     return;
   }
 
-  const key = progressKey(profileId, gameId);
-  const now = config.now().toISOString();
-  const meta = loadSyncState().progress[key];
-  // Remember the timestamp even without a session or opt-in, so a later
-  // enable can tell whether the local setting is newer than the server copy.
-  writeMeta(profileId, gameId, meta ? meta.revision : 0, now);
-
-  if (!sessionActive || !isSyncEnabled(profileId)) {
-    return;
-  }
-
-  const previous = pending.get(key);
-  const data = previous
-    ? mergeProgressData(
-        {
-          schemaVersion: PROGRESS_SCHEMA_VERSION,
-          revision: 0,
-          clientUpdatedAt: previous.clientUpdatedAt,
-          data: previous.data,
-        },
-        {
-          schemaVersion: PROGRESS_SCHEMA_VERSION,
-          revision: 0,
-          clientUpdatedAt: now,
-          data: parsed,
-        },
-      )
-    : parsed;
-
-  pending.set(key, { profileId, gameId, data, clientUpdatedAt: now });
-
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-  }
-  debounceTimer = setTimeout(() => {
-    debounceTimer = null;
-    commitPending();
-  }, config.debounceMs);
+  rememberLocalMeta(profileId, gameId);
+  queueLocalChange(profileId, gameId, parsed);
 }
 
 function onVisibilityChange(): void {
