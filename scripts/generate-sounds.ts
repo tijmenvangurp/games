@@ -9,6 +9,7 @@ import {
   type KlankType,
   type KlankVariant,
 } from "./sounds-data.ts";
+import { trimWav } from "./wav.ts";
 
 /**
  * Genereert prototype-audio voor losse Nederlandse klanken.
@@ -228,7 +229,7 @@ function resolveVoice(options: Options): VoiceChoice {
 }
 
 function relativeFile(slug: string, klank: KlankMapping, variant: KlankVariant): string {
-  return `${slug}/${klank.id}/${variant.id}.mp3`;
+  return `${slug}/${klank.id}/${variant.id}.${variant.cut ? "wav" : "mp3"}`;
 }
 
 function isId3Tag(bytes: Uint8Array): boolean {
@@ -250,30 +251,40 @@ function speechHeaders(config: Config): Record<string, string> {
   };
 }
 
-function speechBody(config: Config, input: string, speed: number): string {
+function speechBody(config: Config, input: string, speed: number, format: "mp3" | "wav"): string {
   return JSON.stringify({
     model: config.model,
     voice: config.voice,
     input,
-    response_format: "mp3",
+    response_format: format,
     speed,
   });
 }
 
-async function postSpeech(config: Config, input: string, speed: number): Promise<Response> {
+async function postSpeech(
+  config: Config,
+  input: string,
+  speed: number,
+  format: "mp3" | "wav",
+): Promise<Response> {
   try {
     return await fetch(`${config.baseUrl}/audio/speech`, {
       method: "POST",
       headers: speechHeaders(config),
-      body: speechBody(config, input, speed),
+      body: speechBody(config, input, speed, format),
     });
   } catch {
     throw new Error("TTS-verzoek mislukt (netwerk).");
   }
 }
 
-async function requestSpeech(config: Config, input: string, speed: number): Promise<Uint8Array> {
-  const response = await postSpeech(config, input, speed);
+async function requestSpeech(
+  config: Config,
+  input: string,
+  speed: number,
+  format: "mp3" | "wav" = "mp3",
+): Promise<Uint8Array> {
+  const response = await postSpeech(config, input, speed, format);
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
     throw new Error(`TTS gaf ${response.status}: ${detail.slice(0, 200)}`);
@@ -440,8 +451,7 @@ function renderPage(manifest: Manifest): string {
 <body>
   <h1>Klankprototype</h1>
   <p class="note">Beluister per klank de varianten en per stem. De groene rij is onze aanbevolen keuze; geef alleen door waar die niet klopt.</p>
-  <p class="note">Voor continuanten (l, m, s, v, z) is een aangehouden klank het didactische doel; voor ng en ch is een heel woord de beste context.</p>
-  <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
+  <p class="note">"Knip" is een fragment uit een woord; luister of de klank schoon genoeg is. De aangehouden en schwa-varianten staan ernaast ter vergelijking.</p>  <p class="note">Gegenereerd op ${escapeHtml(manifest.generatedAt)}.</p>
   ${sections}
   <p class="note">Prototype. Zie <a href="./LICENSES.md">LICENSES.md</a> voor de herkomst en licenties van de stemmen.</p>
 </body>
@@ -553,16 +563,38 @@ function skipExisting(options: Options, outputPath: string): boolean {
   return !options.force && existsSync(outputPath);
 }
 
+const wavCache = new Map<string, Uint8Array>();
+
+async function wavForWord(config: Config, word: string): Promise<Uint8Array> {
+  const key = `${config.model}|${config.voice}|${word}`;
+  const cached = wavCache.get(key);
+  if (cached) {
+    return cached;
+  }
+  const wav = await requestSpeech(config, word, config.speed, "wav");
+  wavCache.set(key, wav);
+  return wav;
+}
+
+async function variantBytes(config: Config, variant: KlankVariant): Promise<Uint8Array> {
+  if (variant.cut) {
+    return trimWav(await wavForWord(config, variant.cut.word), variant.cut);
+  }
+
+  const bytes = await requestSpeech(config, variant.ttsPrompt, variant.speed ?? config.speed);
+  if (!looksLikeMp3(bytes)) {
+    throw new Error(`TTS gaf geen MP3 voor ${variant.id} (${bytes.byteLength} bytes).`);
+  }
+  return bytes;
+}
+
 async function writeVariant(
   config: Config,
   variant: KlankVariant,
   outputPath: string,
   file: string,
 ): Promise<void> {
-  const bytes = await requestSpeech(config, variant.ttsPrompt, variant.speed ?? config.speed);
-  if (!looksLikeMp3(bytes)) {
-    throw new Error(`TTS gaf geen MP3 voor ${file} (${bytes.byteLength} bytes).`);
-  }
+  const bytes = await variantBytes(config, variant);
 
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, bytes);

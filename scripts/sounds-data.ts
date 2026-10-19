@@ -12,6 +12,17 @@
 
 export type KlankType = "kort" | "lang" | "tweeteken" | "medeklinker";
 
+export interface KlankCut {
+  /** Woord waaruit de klank komt. */
+  word: string;
+  /** Aan het begin of einde van het woord. */
+  from: "start" | "end";
+  /** Lengte van het fragment in milliseconden. */
+  durationMs: number;
+  /** Fade aan de binnenkant, standaard 10 ms. */
+  fadeMs?: number;
+}
+
 export interface KlankVariant {
   /** Korte id voor bestandsnamen en filters. */
   id: string;
@@ -21,6 +32,8 @@ export interface KlankVariant {
   ttsPrompt: string;
   /** Optionele afwijkende snelheid; standaard 1. */
   speed?: number;
+  /** Knip deze variant uit een woord in plaats van losse TTS. */
+  cut?: KlankCut;
 }
 
 export interface KlankMapping {
@@ -52,27 +65,36 @@ export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
   ui: "letter",
   b: "fonetisch",
   d: "fonetisch",
-  f: "fonetisch",
+  f: "knip-100",
   g: "fonetisch",
   h: "fonetisch",
   j: "fonetisch",
   k: "fonetisch",
-  l: "aangehouden",
-  m: "aangehouden",
+  l: "knip-100",
+  m: "knip-100",
   n: "fonetisch",
   p: "fonetisch",
   r: "fonetisch",
-  s: "aangehouden",
+  s: "knip-100",
   t: "fonetisch",
-  v: "aangehouden",
+  v: "knip-100",
   w: "fonetisch",
-  z: "aangehouden",
-  ng: "woord",
-  ch: "woord",
+  z: "knip-100",
+  ng: "knip-100",
+  ch: "knip-100",
 };
 
 function withExtraVariants(klank: KlankMapping, extra: readonly KlankVariant[]): KlankMapping {
   return { ...klank, variants: [...klank.variants, ...extra] };
+}
+
+function cutVariants(word: string, from: "start" | "end", label: string): KlankVariant[] {
+  return [60, 80, 100, 120].map((durationMs) => ({
+    id: `knip-${durationMs}`,
+    label: `${label} ${durationMs} ms`,
+    ttsPrompt: word,
+    cut: { word, from, durationMs, fadeMs: 10 },
+  }));
 }
 
 function vowel(
@@ -209,17 +231,27 @@ export const KLANKEN: readonly KlankMapping[] = [
     { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "f", speed: 0.5 },
     { id: "fiets", label: "Woord: fiets (knip zelf)", ttsPrompt: "fiets" },
     { id: "fles", label: "Woord: fles (knip zelf)", ttsPrompt: "fles" },
+    ...cutVariants("fiets", "start", "Knip uit 'fiets' (begin)"),
   ]),
   consonant("g", "guh", "geel", "x"),
   consonant("h", "huh", "huis", "h"),
   consonant("j", "juh", "jas", "j"),
   consonant("k", "kuh", "kip", "k"),
-  consonant("l", "luh", "lam", "l"),
-  consonant("m", "muh", "mat", "m"),
+  withExtraVariants(
+    consonant("l", "luh", "lam", "l"),
+    cutVariants("lam", "start", "Knip uit 'lam' (begin)"),
+  ),
+  withExtraVariants(
+    consonant("m", "muh", "mat", "m"),
+    cutVariants("mat", "start", "Knip uit 'mat' (begin)"),
+  ),
   consonant("n", "nuh", "net", "n"),
   consonant("p", "puh", "pen", "p"),
   consonant("r", "ruh", "rat", "r"),
-  consonant("s", "suh", "sap", "s"),
+  withExtraVariants(
+    consonant("s", "suh", "sap", "s"),
+    cutVariants("sap", "start", "Knip uit 'sap' (begin)"),
+  ),
   consonant("t", "tuh", "tak", "t"),
   withExtraVariants(consonant("v", "vuh", "vis", "v"), [
     { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "vvvv" },
@@ -227,6 +259,7 @@ export const KLANKEN: readonly KlankMapping[] = [
     { id: "ellipsis", label: "Met ellips", ttsPrompt: "vvv..." },
     { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "v", speed: 0.5 },
     { id: "veel", label: "Woord: veel (knip zelf)", ttsPrompt: "veel" },
+    ...cutVariants("vis", "start", "Knip uit 'vis' (begin)"),
   ]),
   withExtraVariants(consonant("w", "wuh", "wip", "ʋ"), [
     { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "wwww" },
@@ -241,6 +274,7 @@ export const KLANKEN: readonly KlankMapping[] = [
     { id: "ellipsis", label: "Met ellips", ttsPrompt: "zzz..." },
     { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "z", speed: 0.5 },
     { id: "zee", label: "Woord: zee (knip zelf)", ttsPrompt: "zee" },
+    ...cutVariants("zon", "start", "Knip uit 'zon' (begin)"),
   ]),
 
   // Medeklinkerdigrafen
@@ -248,11 +282,13 @@ export const KLANKEN: readonly KlankMapping[] = [
     { id: "bang", label: "Woord: bang (laatste klank)", ttsPrompt: "bang" },
     { id: "ring", label: "Woord: ring (laatste klank)", ttsPrompt: "ring" },
     { id: "eng", label: "Woord: eng (laatste klank)", ttsPrompt: "eng" },
+    ...cutVariants("lang", "end", "Knip uit 'lang' (einde)"),
   ]),
   withExtraVariants(consonantDigraph("ch", "guh", "lach", "x"), [
     { id: "acht", label: "Woord: acht (klank in het midden)", ttsPrompt: "acht" },
     { id: "chaos", label: "Woord: chaos (eerste klank)", ttsPrompt: "chaos" },
     { id: "g", label: "Losse letter g", ttsPrompt: "g" },
     { id: "geel", label: "Woord: geel (eerste klank)", ttsPrompt: "geel" },
+    ...cutVariants("lach", "end", "Knip uit 'lach' (einde)"),
   ]),
 ];

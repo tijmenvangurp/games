@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T08:29:07.764Z",
+  "generatedAt": "2026-10-19T08:38:02.184Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -1025,6 +1025,38 @@
           "files": {
             "nathalie": "./nathalie/f/fles.mp3"
           }
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'fiets' (begin) 60 ms",
+          "prompt": "fiets",
+          "files": {
+            "nathalie": "./nathalie/f/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'fiets' (begin) 80 ms",
+          "prompt": "fiets",
+          "files": {
+            "nathalie": "./nathalie/f/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'fiets' (begin) 100 ms",
+          "prompt": "fiets",
+          "files": {
+            "nathalie": "./nathalie/f/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'fiets' (begin) 120 ms",
+          "prompt": "fiets",
+          "files": {
+            "nathalie": "./nathalie/f/knip-120.wav"
+          }
         }
       ]
     },
@@ -1275,6 +1307,38 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"l\">l</phoneme>",
           "files": {}
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'lam' (begin) 60 ms",
+          "prompt": "lam",
+          "files": {
+            "nathalie": "./nathalie/l/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'lam' (begin) 80 ms",
+          "prompt": "lam",
+          "files": {
+            "nathalie": "./nathalie/l/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'lam' (begin) 100 ms",
+          "prompt": "lam",
+          "files": {
+            "nathalie": "./nathalie/l/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'lam' (begin) 120 ms",
+          "prompt": "lam",
+          "files": {
+            "nathalie": "./nathalie/l/knip-120.wav"
+          }
         }
       ]
     },
@@ -1325,6 +1389,38 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"m\">m</phoneme>",
           "files": {}
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'mat' (begin) 60 ms",
+          "prompt": "mat",
+          "files": {
+            "nathalie": "./nathalie/m/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'mat' (begin) 80 ms",
+          "prompt": "mat",
+          "files": {
+            "nathalie": "./nathalie/m/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'mat' (begin) 100 ms",
+          "prompt": "mat",
+          "files": {
+            "nathalie": "./nathalie/m/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'mat' (begin) 120 ms",
+          "prompt": "mat",
+          "files": {
+            "nathalie": "./nathalie/m/knip-120.wav"
+          }
         }
       ]
     },
@@ -1525,6 +1621,38 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"s\">s</phoneme>",
           "files": {}
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'sap' (begin) 60 ms",
+          "prompt": "sap",
+          "files": {
+            "nathalie": "./nathalie/s/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'sap' (begin) 80 ms",
+          "prompt": "sap",
+          "files": {
+            "nathalie": "./nathalie/s/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'sap' (begin) 100 ms",
+          "prompt": "sap",
+          "files": {
+            "nathalie": "./nathalie/s/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'sap' (begin) 120 ms",
+          "prompt": "sap",
+          "files": {
+            "nathalie": "./nathalie/s/knip-120.wav"
+          }
         }
       ]
     },
@@ -1664,6 +1792,38 @@
           "prompt": "veel",
           "files": {
             "nathalie": "./nathalie/v/veel.mp3"
+          }
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'vis' (begin) 60 ms",
+          "prompt": "vis",
+          "files": {
+            "nathalie": "./nathalie/v/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'vis' (begin) 80 ms",
+          "prompt": "vis",
+          "files": {
+            "nathalie": "./nathalie/v/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'vis' (begin) 100 ms",
+          "prompt": "vis",
+          "files": {
+            "nathalie": "./nathalie/v/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'vis' (begin) 120 ms",
+          "prompt": "vis",
+          "files": {
+            "nathalie": "./nathalie/v/knip-120.wav"
           }
         }
       ]
@@ -1845,6 +2005,38 @@
           "files": {
             "nathalie": "./nathalie/z/zee.mp3"
           }
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'zon' (begin) 60 ms",
+          "prompt": "zon",
+          "files": {
+            "nathalie": "./nathalie/z/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'zon' (begin) 80 ms",
+          "prompt": "zon",
+          "files": {
+            "nathalie": "./nathalie/z/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'zon' (begin) 100 ms",
+          "prompt": "zon",
+          "files": {
+            "nathalie": "./nathalie/z/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'zon' (begin) 120 ms",
+          "prompt": "zon",
+          "files": {
+            "nathalie": "./nathalie/z/knip-120.wav"
+          }
         }
       ]
     },
@@ -1910,6 +2102,38 @@
           "prompt": "eng",
           "files": {
             "nathalie": "./nathalie/ng/eng.mp3"
+          }
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'lang' (einde) 60 ms",
+          "prompt": "lang",
+          "files": {
+            "nathalie": "./nathalie/ng/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'lang' (einde) 80 ms",
+          "prompt": "lang",
+          "files": {
+            "nathalie": "./nathalie/ng/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'lang' (einde) 100 ms",
+          "prompt": "lang",
+          "files": {
+            "nathalie": "./nathalie/ng/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'lang' (einde) 120 ms",
+          "prompt": "lang",
+          "files": {
+            "nathalie": "./nathalie/ng/knip-120.wav"
           }
         }
       ]
@@ -1984,6 +2208,38 @@
           "prompt": "geel",
           "files": {
             "nathalie": "./nathalie/ch/geel.mp3"
+          }
+        },
+        {
+          "id": "knip-60",
+          "label": "Knip uit 'lach' (einde) 60 ms",
+          "prompt": "lach",
+          "files": {
+            "nathalie": "./nathalie/ch/knip-60.wav"
+          }
+        },
+        {
+          "id": "knip-80",
+          "label": "Knip uit 'lach' (einde) 80 ms",
+          "prompt": "lach",
+          "files": {
+            "nathalie": "./nathalie/ch/knip-80.wav"
+          }
+        },
+        {
+          "id": "knip-100",
+          "label": "Knip uit 'lach' (einde) 100 ms",
+          "prompt": "lach",
+          "files": {
+            "nathalie": "./nathalie/ch/knip-100.wav"
+          }
+        },
+        {
+          "id": "knip-120",
+          "label": "Knip uit 'lach' (einde) 120 ms",
+          "prompt": "lach",
+          "files": {
+            "nathalie": "./nathalie/ch/knip-120.wav"
           }
         }
       ]
