@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T07:49:16.242Z",
+  "generatedAt": "2026-10-19T07:57:58.753Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -142,6 +142,922 @@
         }
       ]
     },
+    "o": {
+      "teken": "o",
+      "type": "kort",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "o",
+          "files": {
+            "nathalie": "./nathalie/o/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "oh",
+          "files": {
+            "nathalie": "./nathalie/o/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "oh",
+          "files": {
+            "nathalie": "./nathalie/o/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: pot (knip zelf)",
+          "prompt": "pot",
+          "files": {
+            "nathalie": "./nathalie/o/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ɔ/",
+          "files": {}
+        }
+      ]
+    },
+    "u": {
+      "teken": "u",
+      "type": "kort",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "u",
+          "files": {
+            "nathalie": "./nathalie/u/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "uh",
+          "files": {
+            "nathalie": "./nathalie/u/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "uh",
+          "files": {
+            "nathalie": "./nathalie/u/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: bus (knip zelf)",
+          "prompt": "bus",
+          "files": {
+            "nathalie": "./nathalie/u/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ʏ/",
+          "files": {}
+        }
+      ]
+    },
+    "aa": {
+      "teken": "aa",
+      "type": "lang",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "aa",
+          "files": {
+            "nathalie": "./nathalie/aa/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "aa",
+          "files": {
+            "nathalie": "./nathalie/aa/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "aa",
+          "files": {
+            "nathalie": "./nathalie/aa/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: aap (knip zelf)",
+          "prompt": "aap",
+          "files": {
+            "nathalie": "./nathalie/aa/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/aː/",
+          "files": {}
+        }
+      ]
+    },
+    "ee": {
+      "teken": "ee",
+      "type": "lang",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "ee",
+          "files": {
+            "nathalie": "./nathalie/ee/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ee",
+          "files": {
+            "nathalie": "./nathalie/ee/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ee",
+          "files": {
+            "nathalie": "./nathalie/ee/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: eet (knip zelf)",
+          "prompt": "eet",
+          "files": {
+            "nathalie": "./nathalie/ee/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/eː/",
+          "files": {}
+        }
+      ]
+    },
+    "oo": {
+      "teken": "oo",
+      "type": "lang",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "oo",
+          "files": {
+            "nathalie": "./nathalie/oo/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "oo",
+          "files": {
+            "nathalie": "./nathalie/oo/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "oo",
+          "files": {
+            "nathalie": "./nathalie/oo/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: oom (knip zelf)",
+          "prompt": "oom",
+          "files": {
+            "nathalie": "./nathalie/oo/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/oː/",
+          "files": {}
+        }
+      ]
+    },
+    "uu": {
+      "teken": "uu",
+      "type": "lang",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "uu",
+          "files": {
+            "nathalie": "./nathalie/uu/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "uu",
+          "files": {
+            "nathalie": "./nathalie/uu/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "uu",
+          "files": {
+            "nathalie": "./nathalie/uu/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: uur (knip zelf)",
+          "prompt": "uur",
+          "files": {
+            "nathalie": "./nathalie/uu/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/yː/",
+          "files": {}
+        }
+      ]
+    },
+    "oe": {
+      "teken": "oe",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "oe",
+          "files": {
+            "nathalie": "./nathalie/oe/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "oe",
+          "files": {
+            "nathalie": "./nathalie/oe/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "oe",
+          "files": {
+            "nathalie": "./nathalie/oe/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: oever (knip zelf)",
+          "prompt": "oever",
+          "files": {
+            "nathalie": "./nathalie/oe/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/u/",
+          "files": {}
+        }
+      ]
+    },
+    "ie": {
+      "teken": "ie",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ie",
+          "files": {
+            "nathalie": "./nathalie/ie/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ie",
+          "files": {
+            "nathalie": "./nathalie/ie/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ie",
+          "files": {
+            "nathalie": "./nathalie/ie/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: iets (knip zelf)",
+          "prompt": "iets",
+          "files": {
+            "nathalie": "./nathalie/ie/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/i/",
+          "files": {}
+        }
+      ]
+    },
+    "ij": {
+      "teken": "ij",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ij",
+          "files": {
+            "nathalie": "./nathalie/ij/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ij",
+          "files": {
+            "nathalie": "./nathalie/ij/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ij",
+          "files": {
+            "nathalie": "./nathalie/ij/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: ijs (knip zelf)",
+          "prompt": "ijs",
+          "files": {
+            "nathalie": "./nathalie/ij/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ɛi/",
+          "files": {}
+        }
+      ]
+    },
+    "ei": {
+      "teken": "ei",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ei",
+          "files": {
+            "nathalie": "./nathalie/ei/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ei",
+          "files": {
+            "nathalie": "./nathalie/ei/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ei",
+          "files": {
+            "nathalie": "./nathalie/ei/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: ei (knip zelf)",
+          "prompt": "ei",
+          "files": {
+            "nathalie": "./nathalie/ei/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ɛi/",
+          "files": {}
+        }
+      ]
+    },
+    "au": {
+      "teken": "au",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "au",
+          "files": {
+            "nathalie": "./nathalie/au/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "au",
+          "files": {
+            "nathalie": "./nathalie/au/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "au",
+          "files": {
+            "nathalie": "./nathalie/au/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: auto (knip zelf)",
+          "prompt": "auto",
+          "files": {
+            "nathalie": "./nathalie/au/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ɑu/",
+          "files": {}
+        }
+      ]
+    },
+    "ou": {
+      "teken": "ou",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ou",
+          "files": {
+            "nathalie": "./nathalie/ou/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ou",
+          "files": {
+            "nathalie": "./nathalie/ou/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ou",
+          "files": {
+            "nathalie": "./nathalie/ou/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: oud (knip zelf)",
+          "prompt": "oud",
+          "files": {
+            "nathalie": "./nathalie/ou/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ɑu/",
+          "files": {}
+        }
+      ]
+    },
+    "eu": {
+      "teken": "eu",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "eu",
+          "files": {
+            "nathalie": "./nathalie/eu/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "eu",
+          "files": {
+            "nathalie": "./nathalie/eu/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "eu",
+          "files": {
+            "nathalie": "./nathalie/eu/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: Europa (knip zelf)",
+          "prompt": "Europa",
+          "files": {
+            "nathalie": "./nathalie/eu/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/øː/",
+          "files": {}
+        }
+      ]
+    },
+    "ui": {
+      "teken": "ui",
+      "type": "tweeteken",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ui",
+          "files": {
+            "nathalie": "./nathalie/ui/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ui",
+          "files": {
+            "nathalie": "./nathalie/ui/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "langzaam",
+          "label": "Fonetisch, langzaam",
+          "prompt": "ui",
+          "files": {
+            "nathalie": "./nathalie/ui/langzaam.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: uit (knip zelf)",
+          "prompt": "uit",
+          "files": {
+            "nathalie": "./nathalie/ui/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/œy/",
+          "files": {}
+        }
+      ]
+    },
+    "b": {
+      "teken": "b",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "b",
+          "files": {
+            "nathalie": "./nathalie/b/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "buh",
+          "files": {
+            "nathalie": "./nathalie/b/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "bbb",
+          "files": {
+            "nathalie": "./nathalie/b/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: bal (knip zelf)",
+          "prompt": "bal",
+          "files": {
+            "nathalie": "./nathalie/b/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/b/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"b\">b</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "d": {
+      "teken": "d",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "d",
+          "files": {
+            "nathalie": "./nathalie/d/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "duh",
+          "files": {
+            "nathalie": "./nathalie/d/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "ddd",
+          "files": {
+            "nathalie": "./nathalie/d/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: das (knip zelf)",
+          "prompt": "das",
+          "files": {
+            "nathalie": "./nathalie/d/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/d/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"d\">d</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "f": {
+      "teken": "f",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "f",
+          "files": {
+            "nathalie": "./nathalie/f/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "fff",
+          "files": {
+            "nathalie": "./nathalie/f/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "fff",
+          "files": {
+            "nathalie": "./nathalie/f/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: fee (knip zelf)",
+          "prompt": "fee",
+          "files": {
+            "nathalie": "./nathalie/f/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/f/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"f\">f</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "g": {
+      "teken": "g",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "g",
+          "files": {
+            "nathalie": "./nathalie/g/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "guh",
+          "files": {
+            "nathalie": "./nathalie/g/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "ggg",
+          "files": {
+            "nathalie": "./nathalie/g/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: geel (knip zelf)",
+          "prompt": "geel",
+          "files": {
+            "nathalie": "./nathalie/g/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/x/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"x\">g</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "h": {
+      "teken": "h",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "h",
+          "files": {
+            "nathalie": "./nathalie/h/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "huh",
+          "files": {
+            "nathalie": "./nathalie/h/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "hhh",
+          "files": {
+            "nathalie": "./nathalie/h/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: huis (knip zelf)",
+          "prompt": "huis",
+          "files": {
+            "nathalie": "./nathalie/h/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/h/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"h\">h</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "j": {
+      "teken": "j",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "j",
+          "files": {
+            "nathalie": "./nathalie/j/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "juh",
+          "files": {
+            "nathalie": "./nathalie/j/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "jjj",
+          "files": {
+            "nathalie": "./nathalie/j/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: jas (knip zelf)",
+          "prompt": "jas",
+          "files": {
+            "nathalie": "./nathalie/j/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/j/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"j\">j</phoneme>",
+          "files": {}
+        }
+      ]
+    },
     "k": {
       "teken": "k",
       "type": "medeklinker",
@@ -188,6 +1104,56 @@
           "id": "ssml",
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"k\">k</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "l": {
+      "teken": "l",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "l",
+          "files": {
+            "nathalie": "./nathalie/l/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "lll",
+          "files": {
+            "nathalie": "./nathalie/l/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "lll",
+          "files": {
+            "nathalie": "./nathalie/l/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: lam (knip zelf)",
+          "prompt": "lam",
+          "files": {
+            "nathalie": "./nathalie/l/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/l/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"l\">l</phoneme>",
           "files": {}
         }
       ]
@@ -342,6 +1308,56 @@
         }
       ]
     },
+    "r": {
+      "teken": "r",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "r",
+          "files": {
+            "nathalie": "./nathalie/r/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ruh",
+          "files": {
+            "nathalie": "./nathalie/r/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "rrr",
+          "files": {
+            "nathalie": "./nathalie/r/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: rat (knip zelf)",
+          "prompt": "rat",
+          "files": {
+            "nathalie": "./nathalie/r/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/r/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"r\">r</phoneme>",
+          "files": {}
+        }
+      ]
+    },
     "s": {
       "teken": "s",
       "type": "medeklinker",
@@ -488,6 +1504,190 @@
           "id": "ssml",
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"v\">v</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "w": {
+      "teken": "w",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "w",
+          "files": {
+            "nathalie": "./nathalie/w/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "wuh",
+          "files": {
+            "nathalie": "./nathalie/w/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "www",
+          "files": {
+            "nathalie": "./nathalie/w/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: wip (knip zelf)",
+          "prompt": "wip",
+          "files": {
+            "nathalie": "./nathalie/w/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ʋ/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"ʋ\">w</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "z": {
+      "teken": "z",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letter",
+          "prompt": "z",
+          "files": {
+            "nathalie": "./nathalie/z/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "zzz",
+          "files": {
+            "nathalie": "./nathalie/z/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "aangehouden",
+          "label": "Aangehouden / herhaald",
+          "prompt": "zzz",
+          "files": {
+            "nathalie": "./nathalie/z/aangehouden.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: zon (knip zelf)",
+          "prompt": "zon",
+          "files": {
+            "nathalie": "./nathalie/z/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/z/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"z\">z</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "ng": {
+      "teken": "ng",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ng",
+          "files": {
+            "nathalie": "./nathalie/ng/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ng",
+          "files": {
+            "nathalie": "./nathalie/ng/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: lang (klank achteraan)",
+          "prompt": "lang",
+          "files": {
+            "nathalie": "./nathalie/ng/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/ŋ/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"ŋ\">ng</phoneme>",
+          "files": {}
+        }
+      ]
+    },
+    "ch": {
+      "teken": "ch",
+      "type": "medeklinker",
+      "variants": [
+        {
+          "id": "letter",
+          "label": "Losse letters",
+          "prompt": "ch",
+          "files": {
+            "nathalie": "./nathalie/ch/letter.mp3"
+          }
+        },
+        {
+          "id": "fonetisch",
+          "label": "Fonetische spelling",
+          "prompt": "ch",
+          "files": {
+            "nathalie": "./nathalie/ch/fonetisch.mp3"
+          }
+        },
+        {
+          "id": "woord",
+          "label": "Woord: lach (klank achteraan)",
+          "prompt": "lach",
+          "files": {
+            "nathalie": "./nathalie/ch/woord.mp3"
+          }
+        },
+        {
+          "id": "ipa",
+          "label": "IPA-teken (experiment)",
+          "prompt": "/x/",
+          "files": {}
+        },
+        {
+          "id": "ssml",
+          "label": "SSML (experiment)",
+          "prompt": "<phoneme alphabet=\"ipa\" ph=\"x\">ch</phoneme>",
           "files": {}
         }
       ]
