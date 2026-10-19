@@ -9,7 +9,7 @@ describe("TutorialBoard", () => {
     const { container } = render(<TutorialBoard />);
 
     expect(screen.getByRole("heading", { name: "De Toren-trein" })).toBeTruthy();
-    expect(screen.getByText("Kijk! Zo rijdt de toren. Tik op een blauwe stip.")).toBeTruthy();
+    expect(screen.getByText("Kijk! Zo rijdt de toren. Tik op het stuk om te kijken.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Kijk" }).getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByRole("button", { name: "Toon zet" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Opnieuw" })).toBeTruthy();
@@ -29,7 +29,7 @@ describe("TutorialBoard", () => {
     expect(screen.getByRole("button", { name: "Kijk" }).getAttribute("aria-pressed")).toBe("false");
 
     fireEvent.click(screen.getByRole("button", { name: "Kijk" }));
-    expect(screen.getByText("Kijk! Zo rijdt de toren. Tik op een blauwe stip.")).toBeTruthy();
+    expect(screen.getByText("Kijk! Zo rijdt de toren. Tik op het stuk om te kijken.")).toBeTruthy();
   });
 
   it("lets the child pick another lesson without showing all titles at once", () => {
@@ -40,7 +40,7 @@ describe("TutorialBoard", () => {
 
     expect(screen.getByRole("heading", { name: "De Paardensprong" })).toBeTruthy();
     expect(
-      screen.getByText("Kijk! Het paard springt in een L. Tik op een blauwe stip."),
+      screen.getByText("Kijk! Het paard springt in een L. Tik op het stuk om te kijken."),
     ).toBeTruthy();
   });
 });

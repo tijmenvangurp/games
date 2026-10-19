@@ -1,6 +1,6 @@
 # ADR 0014: Schaaktutorial met één opdracht per scherm
 
-- **Status:** Accepted
+- **Status:** Accepted; de punten 9 en 10 zijn vervangen door [ADR 0022](0022-schaakbord-tikken-is-kijken.md).
 - **Datum:** 2026-10-18
 
 ## Context

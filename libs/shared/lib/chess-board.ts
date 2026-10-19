@@ -1,11 +1,70 @@
 import type { CSSProperties } from "react";
-import { SQUARES, type Color, type Square } from "chess.js";
+import { Chess, SQUARES, type Color, type Square } from "chess.js";
 import type { ChessboardOptions } from "react-chessboard";
 
 const SQUARE_NAMES: ReadonlySet<string> = new Set(SQUARES);
 
 export function isChessSquare(value: string): value is Square {
   return SQUARE_NAMES.has(value);
+}
+
+/**
+ * Zet de beurt in de FEN op de opgegeven kleur. Nodig om de zetten van een
+ * stuk van de tegenstander te kunnen tonen: chess.js genereert alleen zetten
+ * voor de partij die aan zet is.
+ */
+function fenWithTurn(fen: string, color: Color): string {
+  const parts = fen.split(" ");
+  parts[1] = color;
+  return parts.join(" ");
+}
+
+export interface MovesForPieceOptions {
+  /** Laat geïsoleerde lesstellingen zonder koningen toe. */
+  readonly skipValidation?: boolean;
+}
+
+/** De kleur van het stuk op dit veld, of null als het veld leeg is. */
+export function pieceColorAt(
+  fen: string,
+  square: string,
+  { skipValidation = false }: MovesForPieceOptions = {},
+): Color | null {
+  if (!isChessSquare(square)) {
+    return null;
+  }
+
+  const chess = new Chess(fen, { skipValidation });
+
+  return chess.get(square)?.color ?? null;
+}
+
+/**
+ * Geeft waar het stuk op dit veld heen kan, ongeacht welke kleur aan zet is.
+ * Dit is alleen voor het tonen van zetten bij een tik; een echte zet wordt
+ * altijd door de spellogica gevalideerd.
+ */
+export function movesForPiece(
+  fen: string,
+  square: string,
+  { skipValidation = false }: MovesForPieceOptions = {},
+): readonly Square[] {
+  if (!isChessSquare(square)) {
+    return [];
+  }
+
+  const chess = new Chess(fen, { skipValidation });
+  const piece = chess.get(square);
+
+  if (!piece) {
+    return [];
+  }
+
+  if (piece.color !== chess.turn()) {
+    chess.load(fenWithTurn(fen, piece.color), { skipValidation });
+  }
+
+  return chess.moves({ square, verbose: true }).map((move) => move.to);
 }
 
 export interface BoardMoveLike {
@@ -18,43 +77,25 @@ export interface BoardSelection {
   readonly legalTargets: readonly Square[];
 }
 
-export type SquareClickAction =
-  | { readonly kind: "clear" }
-  | { readonly kind: "attempt"; readonly from: Square; readonly to: Square }
-  | {
-      readonly kind: "select";
-      readonly square: Square;
-      readonly legalTargets: readonly Square[];
-    };
+const EMPTY_SELECTION: BoardSelection = { selectedSquare: null, legalTargets: [] };
 
-export function resolveSquareClick(
+/**
+ * Een tik is alleen bedoeld om te kijken: het aangetikte stuk wordt
+ * geselecteerd en toont waar het heen kan. Nog een tik op hetzelfde veld
+ * deselecteert. Een tik speelt nooit een zet; zetten gaan via slepen.
+ */
+export function selectionAfterClick(
   selection: BoardSelection,
   square: string,
   legalMovesFor: (square: Square) => readonly Square[],
-): SquareClickAction {
-  if (!isChessSquare(square)) {
-    return { kind: "clear" };
-  }
-
-  if (selection.selectedSquare === square) {
-    return { kind: "clear" };
-  }
-
-  if (selection.selectedSquare && selection.legalTargets.includes(square)) {
-    return { kind: "attempt", from: selection.selectedSquare, to: square };
+): BoardSelection {
+  if (!isChessSquare(square) || selection.selectedSquare === square) {
+    return EMPTY_SELECTION;
   }
 
   const legalTargets = legalMovesFor(square);
 
-  return legalTargets.length > 0 ? { kind: "select", square, legalTargets } : { kind: "clear" };
-}
-
-export function selectionForAction(
-  action: Exclude<SquareClickAction, { readonly kind: "attempt" }>,
-): BoardSelection {
-  return action.kind === "select"
-    ? { selectedSquare: action.square, legalTargets: action.legalTargets }
-    : { selectedSquare: null, legalTargets: [] };
+  return legalTargets.length > 0 ? { selectedSquare: square, legalTargets } : EMPTY_SELECTION;
 }
 
 export interface SquareStylesInput {

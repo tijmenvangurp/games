@@ -1,4 +1,4 @@
-import type { PieceSymbol, Square } from "chess.js";
+import type { Color, PieceSymbol, Square } from "chess.js";
 
 export const TUTORIAL_LEVEL_IDS = [
   "rook-train",
@@ -85,7 +85,7 @@ export type TutorialMoveResult =
     };
 
 export type TutorialStatus = "playing" | "completed" | "stuck";
-export type TutorialFeedback = "idle" | "illegal" | "moved" | "hint" | "blocked";
+export type TutorialFeedback = "idle" | "illegal" | "moved" | "hint";
 
 export interface TutorialState {
   readonly level: TutorialLevel;
@@ -109,6 +109,7 @@ export interface UseChessTutorialResult {
   readonly level: TutorialLevel;
   readonly fen: string;
   readonly selectedSquare: Square | null;
+  readonly selectedColor: Color | null;
   readonly legalTargets: readonly Square[];
   readonly lastMove: TutorialMove | null;
   readonly hintMove: TutorialHint | null;

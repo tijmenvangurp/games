@@ -23,6 +23,7 @@
 - `adr/0019-wereldkaart.md` — de kaartstack met d3-geo en Natural Earth, de lazy chunk en de marker-terugval.
 - `adr/0020-kaartpuzzel.md` — de kaartpuzzel als tweede speelwijze: acht stukken rond een ankergebied, slepen of tikken en de hintniveaus.
 - `adr/0021-provinciegeometrie.md` — de twaalf provincievormen uit Natural Earth, als lazy chunk voor de puzzel en de vlaggenquiz.
+- `adr/0022-schaakbord-tikken-is-kijken.md` — tikken toont zetten (ook van de tegenstander), slepen en neerzetten doet de zet.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

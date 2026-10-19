@@ -1,5 +1,5 @@
 import { useId, useMemo, useRef } from "react";
-import type { PieceSymbol } from "chess.js";
+import type { Color, PieceSymbol } from "chess.js";
 import { Chessboard, type ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
 import {
@@ -131,7 +131,7 @@ function BoardPanel({
 }) {
   return (
     <div
-      aria-label={`Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Sleep een stuk of tik erop. ${label}`}
+      aria-label={`Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten. ${label}`}
       className="mx-auto w-full max-w-lg"
       role="group"
     >
@@ -146,6 +146,7 @@ interface CoachBubbleProps {
   readonly feedback: TutorialFeedback;
   readonly level: TutorialLevel;
   readonly preview: TutorialPreview | null;
+  readonly selectedColor: Color | null;
   readonly selectedSquare: string | null;
   readonly status: TutorialStatus;
 }
@@ -164,11 +165,7 @@ function terminalCoachText(
   }
 
   if (feedback === "illegal") {
-    return "Die mag niet. Kies een groene stip.";
-  }
-
-  if (feedback === "blocked") {
-    return "Nog niet! Kies eerst een blauwe stip.";
+    return "Die mag niet. Sleep naar een groene stip.";
   }
 
   if (feedback === "hint") {
@@ -178,7 +175,14 @@ function terminalCoachText(
   return null;
 }
 
-function coachText({ feedback, level, preview, selectedSquare, status }: CoachBubbleProps): string {
+function coachText({
+  feedback,
+  level,
+  preview,
+  selectedColor,
+  selectedSquare,
+  status,
+}: CoachBubbleProps): string {
   const terminal = terminalCoachText(status, feedback, level);
   if (terminal) {
     return terminal;
@@ -192,11 +196,13 @@ function coachText({ feedback, level, preview, selectedSquare, status }: CoachBu
   }
 
   if (preview) {
-    return `${level.preview} Tik op een blauwe stip.`;
+    return `${level.preview} Tik op het stuk om te kijken.`;
   }
 
   if (selectedSquare) {
-    return "Tik op een groene stip.";
+    return selectedColor === "b"
+      ? "Kijk! Dit is een zwart stuk. Sleep je eigen stuk om te zetten."
+      : "Sleep naar een groene stip.";
   }
 
   return level.instruction;
@@ -217,10 +223,6 @@ function coachTone(
 
   if (feedback === "illegal") {
     return "bg-danger/10 text-danger";
-  }
-
-  if (feedback === "blocked") {
-    return "bg-warning/15 text-warning";
   }
 
   if (feedback === "hint") {
@@ -255,10 +257,6 @@ function coachIcon(
     return <X className="size-6" />;
   }
 
-  if (feedback === "blocked") {
-    return <ArrowRight className="size-6" />;
-  }
-
   if (feedback === "hint") {
     return <Lightbulb className="size-6" />;
   }
@@ -274,7 +272,14 @@ function coachIcon(
   return <ArrowRight className="size-6" />;
 }
 
-function CoachBubble({ feedback, level, preview, selectedSquare, status }: CoachBubbleProps) {
+function CoachBubble({
+  feedback,
+  level,
+  preview,
+  selectedColor,
+  selectedSquare,
+  status,
+}: CoachBubbleProps) {
   return (
     <div
       aria-atomic="true"
@@ -287,7 +292,7 @@ function CoachBubble({ feedback, level, preview, selectedSquare, status }: Coach
       <span aria-hidden="true" className="shrink-0">
         {coachIcon(status, feedback, preview)}
       </span>
-      <span>{coachText({ feedback, level, preview, selectedSquare, status })}</span>
+      <span>{coachText({ feedback, level, preview, selectedColor, selectedSquare, status })}</span>
     </div>
   );
 }
@@ -454,6 +459,7 @@ export function TutorialBoard({
         feedback={tutorial.feedback}
         level={tutorial.level}
         preview={tutorial.preview}
+        selectedColor={tutorial.selectedColor}
         selectedSquare={tutorial.selectedSquare}
         status={tutorial.status}
       />

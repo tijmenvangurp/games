@@ -2,8 +2,9 @@ export {
   chessBoardOptions,
   chessSquareStyles,
   isChessSquare,
-  resolveSquareClick,
-  selectionForAction,
+  movesForPiece,
+  pieceColorAt,
+  selectionAfterClick,
 } from "./chess-board";
 export { cn } from "./utils";
 export { playHaptic, vibrate } from "./haptics";

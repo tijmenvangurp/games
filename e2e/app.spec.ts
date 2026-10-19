@@ -1,4 +1,28 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+/**
+ * Schaakzetten gaan via slepen en neerzetten. Een tik is alleen kijken, dus
+ * elke e2e-zet moet echt gesleept worden.
+ */
+async function dragPiece(page: Page, board: Locator, from: string, to: string): Promise<void> {
+  await board.scrollIntoViewIfNeeded();
+  const fromBox = await board.locator(`[data-square="${from}"]`).boundingBox();
+  const toBox = await board.locator(`[data-square="${to}"]`).boundingBox();
+
+  if (!fromBox || !toBox) {
+    throw new Error(`Missing square ${from} or ${to}`);
+  }
+
+  await page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2, {
+    steps: 12,
+  });
+  await page.mouse.up();
+  // dnd-kit vangt de click vlak na een drag nog kort af. Wacht tot die
+  // listener weg is voordat de test op een knop klikt.
+  await page.waitForTimeout(80);
+}
 
 test.describe("op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -124,46 +148,36 @@ test.describe("schaaktutorial op een telefoon", () => {
     await page.goto("/schaken");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.scrollIntoViewIfNeeded();
-    const dragPiece = async (from: string, to: string) => {
-      const fromBox = await board.locator(`[data-square="${from}"]`).boundingBox();
-      const toBox = await board.locator(`[data-square="${to}"]`).boundingBox();
 
-      if (!fromBox || !toBox) {
-        throw new Error(`Missing square ${from} or ${to}`);
-      }
-
-      await page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2, {
-        steps: 12,
-      });
-      await page.mouse.up();
-    };
-
-    await dragPiece("h1", "e1");
+    await dragPiece(page, board, "h1", "e1");
     await expect(page.getByText("Goed! Nog één zet naar de ster.")).toBeVisible();
 
-    await dragPiece("e1", "e5");
+    await dragPiece(page, board, "e1", "e5");
     await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
   });
 
-  test("waarschuwt als de ster nog niet bereikbaar is", async ({ page }) => {
+  test("tikt op de ster zonder meteen een zet te doen", async ({ page }) => {
     await page.goto("/schaken");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="e5"]').click();
 
-    await expect(page.getByText("Nog niet! Kies eerst een blauwe stip.")).toBeVisible();
+    await expect(
+      page.getByText("Kijk! Zo rijdt de toren. Tik op het stuk om te kijken."),
+    ).toBeVisible();
+    await expect(page.getByText("Ster! De toren rijdt recht.")).toHaveCount(0);
+    await expect(page.getByText("Die mag niet. Sleep naar een groene stip.")).toHaveCount(0);
   });
 
-  test("speelt de torenles met tikken", async ({ page }) => {
+  test("tikt om te kijken en sleept om te zetten", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /schaakles/i }).click();
 
     await expect(page.getByRole("heading", { name: "Schaakles" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "De Toren-trein" })).toBeVisible();
-    await expect(page.getByText("Kijk! Zo rijdt de toren. Tik op een blauwe stip.")).toBeVisible();
+    await expect(
+      page.getByText("Kijk! Zo rijdt de toren. Tik op het stuk om te kijken."),
+    ).toBeVisible();
 
     const kijk = page.getByRole("button", { name: "Kijk" });
     await expect(kijk).toHaveAttribute("aria-pressed", "true");
@@ -176,10 +190,17 @@ test.describe("schaaktutorial op een telefoon", () => {
     await expect(board.getByText("1", { exact: true })).toBeVisible();
 
     await board.locator('[data-square="h1"]').click();
+    await expect(page.getByText("Sleep naar een groene stip.")).toBeVisible();
+
+    // Een tweede tik speelt nog steeds geen zet.
     await board.locator('[data-square="e1"]').click();
+    await expect(page.getByText("Rijd met de toren naar de ster.")).toBeVisible();
+    await expect(page.getByText("Goed! Nog één zet naar de ster.")).toHaveCount(0);
+
+    await dragPiece(page, board, "h1", "e1");
     await expect(page.getByText("Goed! Nog één zet naar de ster.")).toBeVisible();
 
-    await board.locator('[data-square="e5"]').click();
+    await dragPiece(page, board, "e1", "e5");
     await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Volgende les" })).toBeEnabled();
 
@@ -193,10 +214,12 @@ test.describe("schaaktutorial op een telefoon", () => {
     await page.goto("/schaken");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 7: Rokade" }).click();
+    await expect(page.getByRole("heading", { name: "Rokade" })).toBeVisible();
+    // De stukken animeren naar hun nieuwe plek; sleep pas daarna.
+    await page.waitForTimeout(200);
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="e1"]').click();
-    await board.locator('[data-square="g1"]').click();
+    await dragPiece(page, board, "e1", "g1");
 
     await expect(page.getByText("Rokade! Koning en toren zijn veilig.")).toBeVisible();
   });
@@ -205,10 +228,12 @@ test.describe("schaaktutorial op een telefoon", () => {
     await page.goto("/schaken");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 8: Schaak zetten" }).click();
+    await expect(page.getByRole("heading", { name: "Schaak zetten" })).toBeVisible();
+    // De stukken animeren naar hun nieuwe plek; sleep pas daarna.
+    await page.waitForTimeout(200);
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="a1"]').click();
-    await board.locator('[data-square="a8"]').click();
+    await dragPiece(page, board, "a1", "a8");
 
     await expect(page.getByText("Schaak! De koning wordt aangevallen.")).toBeVisible();
   });
@@ -217,10 +242,12 @@ test.describe("schaaktutorial op een telefoon", () => {
     await page.goto("/schaken");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 9: Schaakmat" }).click();
+    await expect(page.getByRole("heading", { name: "Schaakmat", exact: true })).toBeVisible();
+    // De stukken animeren naar hun nieuwe plek; sleep pas daarna.
+    await page.waitForTimeout(200);
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="g6"]').click();
-    await board.locator('[data-square="g7"]').click();
+    await dragPiece(page, board, "g6", "g7");
 
     await expect(page.getByText("Schaakmat! De koning kan nergens meer heen.")).toBeVisible();
   });
@@ -259,8 +286,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await expect(board.getByText("a", { exact: true })).toBeVisible();
-    await board.locator('[data-square="a1"]').click();
-    await board.locator('[data-square="a8"]').click();
+    await dragPiece(page, board, "a1", "a8");
 
     await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
     const next = page.getByRole("button", { name: "Volgende puzzel" });
@@ -280,8 +306,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="a1"]').click();
-    await board.locator('[data-square="a8"]').click();
+    await dragPiece(page, board, "a1", "a8");
     await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
 
     await page.getByRole("button", { name: "Overzicht" }).click();
@@ -303,8 +328,7 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await expect(page.getByText(/Puzzel 1 van 42/)).toBeVisible();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="h7"]').click();
-    await board.locator('[data-square="h8"]').click();
+    await dragPiece(page, board, "h7", "h8");
 
     await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
 
@@ -319,14 +343,36 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
 
     const board = page.getByRole("group", { name: /coördinaten/i });
-    await board.locator('[data-square="a1"]').click();
-    await board.locator('[data-square="a2"]').click();
+    await dragPiece(page, board, "a1", "a2");
 
     await expect(page.getByText(/Die zet is niet de beste/)).toBeVisible();
 
+    await dragPiece(page, board, "a1", "a8");
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+  });
+
+  test("tikt om te kijken en speelt daarmee geen zet", async ({ page }) => {
+    await page.goto("/puzzels");
+    await page.getByRole("button", { name: /^Puzzel 1,/ }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+
+    // Tik het eigen stuk en daarna het doelveld aan: dat is alleen kijken.
     await board.locator('[data-square="a1"]').click();
     await board.locator('[data-square="a8"]').click();
-    await expect(page.getByText("Schaakmat! Knap gedaan.")).toBeVisible();
+
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toHaveCount(0);
+    await expect(page.getByText(/Die zet is niet de beste/)).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Volgende puzzel" })).toBeDisabled();
+
+    // Ook een stuk van de tegenstander mag je aantikken om te kijken.
+    await board.locator('[data-square="d8"]').click();
+
+    await expect(
+      page.getByText("Kijk! Dit stuk is van de tegenstander. Sleep je eigen stuk om te zetten."),
+    ).toBeVisible();
+    await expect(page.getByText(/Die zet is niet de beste/)).toHaveCount(0);
+    await expect(page.getByText("Schaakmat! Knap gedaan.")).toHaveCount(0);
   });
 });
 

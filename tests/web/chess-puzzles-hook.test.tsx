@@ -119,7 +119,7 @@ describe("useChessPuzzle", () => {
     expect(vibrate).toHaveBeenLastCalledWith([20, 40, 20]);
   });
 
-  it("shows a hint, supports tapping and resets", () => {
+  it("shows a hint, previews by tapping and only moves after a drop", () => {
     const { result } = renderHook(() => useChessPuzzle(PUZZLES[0]));
     const initialFen = result.current.fen;
 
@@ -137,6 +137,14 @@ describe("useChessPuzzle", () => {
     act(() => {
       result.current.onSquareClick("a8");
     });
+
+    expect(result.current.status).toBe("playing");
+    expect(result.current.feedback).toBe("idle");
+    expect(result.current.fen).toBe(initialFen);
+
+    act(() => {
+      result.current.onPieceDrop("a1", "a8");
+    });
     expect(result.current.status).toBe("solved");
 
     act(() => {
@@ -147,5 +155,21 @@ describe("useChessPuzzle", () => {
     expect(result.current.feedback).toBe("idle");
     expect(result.current.hintMove).toBeNull();
     expect(result.current.fen).toBe(initialFen);
+  });
+
+  it("shows where an opponent piece can go without playing a move", () => {
+    const { result } = renderHook(() => useChessPuzzle(PUZZLES[0]));
+    const initialFen = result.current.fen;
+
+    act(() => {
+      result.current.onSquareClick("d8");
+    });
+
+    expect(result.current.selectedSquare).toBe("d8");
+    expect(result.current.selectedColor).toBe("b");
+    expect(result.current.legalTargets.length).toBeGreaterThan(0);
+    expect(result.current.fen).toBe(initialFen);
+    expect(result.current.feedback).toBe("idle");
+    expect(result.current.status).toBe("playing");
   });
 });
