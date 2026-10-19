@@ -5,7 +5,7 @@ import {
   FLAG_SCOPES,
   type FlagLevel,
   type FlagScope,
-} from "@entities/flag";
+} from "@entities/geography";
 
 export interface FlagSettings {
   scope: FlagScope;

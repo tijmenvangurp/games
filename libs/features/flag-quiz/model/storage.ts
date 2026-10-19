@@ -1,4 +1,4 @@
-import { FLAG_LEVELS, FLAG_SCOPES, type FlagLevel, type FlagScope } from "@entities/flag";
+import { FLAG_LEVELS, FLAG_SCOPES, type FlagLevel, type FlagScope } from "@entities/geography";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
 import { DEFAULT_FLAG_SETTINGS, type FlagSettings } from "./settings";
 

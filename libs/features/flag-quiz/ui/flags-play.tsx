@@ -1,7 +1,14 @@
-import { explanationFor, FLAG_DIRECTION_PROMPT, flagSrc, type FlagQuestion } from "@entities/flag";
+import {
+  directionPrompt,
+  explanationFor,
+  flagSrc,
+  type FlagQuestion,
+  type FlagScope,
+} from "@entities/geography";
 import { cn } from "@shared/lib";
 import { Button, Check, X } from "@shared/ui";
 import { useFlagStore } from "../model/use-flags-store";
+import { PlaceMap } from "./place-map";
 
 type ChoiceState = "default" | "wrong" | "correct" | "muted";
 
@@ -36,15 +43,15 @@ const CHOICE_CLASSES: Record<ChoiceState, string> = {
 };
 
 interface ChoiceProps {
-  country: { code: string; name: string };
+  subject: { code: string; name: string };
   state: ChoiceState;
   onSelect: () => void;
 }
 
-function NameChoice({ country, state, onSelect }: ChoiceProps) {
+function NameChoice({ subject, state, onSelect }: ChoiceProps) {
   return (
     <button
-      aria-label={country.name}
+      aria-label={subject.name}
       className={cn(
         "flex min-h-14 items-center justify-center gap-2 rounded-2xl border-2 px-3 text-base font-bold transition active:scale-95",
         CHOICE_CLASSES[state],
@@ -53,16 +60,16 @@ function NameChoice({ country, state, onSelect }: ChoiceProps) {
       type="button"
       onClick={onSelect}
     >
-      {country.name}
+      {subject.name}
       <ChoiceMark state={state} />
     </button>
   );
 }
 
-function FlagChoice({ country, state, onSelect }: ChoiceProps) {
+function FlagChoice({ subject, state, onSelect }: ChoiceProps) {
   return (
     <button
-      aria-label={country.name}
+      aria-label={subject.name}
       className={cn(
         "flex min-h-16 items-center justify-center gap-1 rounded-2xl border-2 p-2 transition active:scale-95",
         CHOICE_CLASSES[state],
@@ -71,7 +78,7 @@ function FlagChoice({ country, state, onSelect }: ChoiceProps) {
       type="button"
       onClick={onSelect}
     >
-      <FlagPicture code={country.code} />
+      <FlagPicture code={subject.code} />
       <ChoiceMark state={state} />
     </button>
   );
@@ -83,7 +90,7 @@ function choiceState(
   wrongChoices: readonly string[],
   answered: boolean,
 ): ChoiceState {
-  if (answered && code === question.country.code) {
+  if (answered && code === question.subject.code) {
     return "correct";
   }
   if (wrongChoices.includes(code)) {
@@ -110,14 +117,14 @@ function FlagChoices({
 
   return (
     <div aria-label="Kies het juiste antwoord" className={cn("grid gap-2", columns)} role="group">
-      {question.choices.map((country) => {
-        const state = choiceState(question, country.code, wrongChoices, answered);
-        const select = () => useFlagStore.getState().chooseAnswer(country.code);
+      {question.choices.map((subject) => {
+        const state = choiceState(question, subject.code, wrongChoices, answered);
+        const select = () => useFlagStore.getState().chooseAnswer(subject.code);
 
         return question.direction === "vlag-naar-land" ? (
-          <NameChoice key={country.code} country={country} state={state} onSelect={select} />
+          <NameChoice key={subject.code} subject={subject} state={state} onSelect={select} />
         ) : (
-          <FlagChoice key={country.code} country={country} state={state} onSelect={select} />
+          <FlagChoice key={subject.code} subject={subject} state={state} onSelect={select} />
         );
       })}
     </div>
@@ -144,11 +151,11 @@ function FlagFeedback({
   const message = correct
     ? "Goed zo!"
     : question.direction === "vlag-naar-land"
-      ? `Het juiste antwoord is ${question.country.name}.`
-      : `De juiste vlag is de vlag van ${question.country.name}.`;
+      ? `Het juiste antwoord is ${question.subject.name}.`
+      : `De juiste vlag is de vlag van ${question.subject.name}.`;
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <p
         aria-live="polite"
         className={cn(
@@ -161,11 +168,20 @@ function FlagFeedback({
       <p className="text-center text-sm font-semibold text-muted-foreground">
         {explanationFor(question)}
       </p>
+      <PlaceMap subject={question.subject} />
     </div>
   );
 }
 
-function QuestionCard({ question, isLast }: { question: FlagQuestion; isLast: boolean }) {
+function QuestionCard({
+  question,
+  isLast,
+  scope,
+}: {
+  question: FlagQuestion;
+  isLast: boolean;
+  scope: FlagScope;
+}) {
   const wrongChoices = useFlagStore((state) => state.wrongChoices);
   const answered = useFlagStore((state) => state.answered);
   const correct = useFlagStore((state) => state.correct);
@@ -174,16 +190,16 @@ function QuestionCard({ question, isLast }: { question: FlagQuestion; isLast: bo
   return (
     <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
       <p className="text-center text-sm font-bold text-muted-foreground">
-        {FLAG_DIRECTION_PROMPT[question.direction]}
+        {directionPrompt(question.direction, scope)}
       </p>
 
       {showsFlag ? (
         <div className="mx-auto mt-3 max-w-xs">
-          <FlagPicture className="bg-white" code={question.country.code} />
+          <FlagPicture className="bg-white" code={question.subject.code} />
         </div>
       ) : (
         <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
-          {question.country.name}
+          {question.subject.name}
         </p>
       )}
 
@@ -231,7 +247,11 @@ export function FlagsPlay() {
           {streak > 0 ? <span aria-label={`${streak} op een rij`}>🔥 {streak}</span> : null}
         </div>
       </header>
-      <QuestionCard isLast={questionIndex + 1 >= round.questions.length} question={question} />
+      <QuestionCard
+        isLast={questionIndex + 1 >= round.questions.length}
+        question={question}
+        scope={round.scope}
+      />
     </div>
   );
 }

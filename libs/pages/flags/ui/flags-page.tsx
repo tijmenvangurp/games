@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { FLAG_LEVEL_INFO, FLAG_SCOPE_INFO, type FlagRound } from "@entities/flag";
+import { FLAG_LEVEL_INFO, FLAG_SCOPE_INFO, type FlagRound } from "@entities/geography";
 import { FlagsPlay, FlagsSetup, useFlagStore } from "@features/flag-quiz";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
 
 function subtitleFor(round: FlagRound | null): string {
   if (!round) {
-    return "Kies een continent";
+    return "Kies een gebied";
   }
   return `${FLAG_SCOPE_INFO[round.scope].label} · ${FLAG_LEVEL_INFO[round.level].label}`;
 }

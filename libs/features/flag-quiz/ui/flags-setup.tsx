@@ -1,4 +1,4 @@
-import type { FlagLevel, FlagScope } from "@entities/flag";
+import type { FlagLevel, FlagScope } from "@entities/geography";
 import { cn } from "@shared/lib";
 import { OptionPicker, SetupActions } from "@shared/ui";
 import {
@@ -69,7 +69,7 @@ export function FlagsSetup({
       <div className="mb-5">
         <h2 className="text-xl font-black">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
-          Kies een continent en een niveau. Je krijgt vlaggen én landennamen te zien.
+          Kies een gebied en een niveau. Je krijgt vlaggen én namen te zien.
         </p>
       </div>
 
