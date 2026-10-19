@@ -5,7 +5,7 @@
 - **Vraag:** welke bestaande open-source webgames, game-engines, puzzelcollecties en spellendatasets kunnen we in deze app integreren (vendoren, porten of als dependency), en welke absoluut niet?
 - **Kader:** de regels uit [`AGENTS.md`](../../AGENTS.md) en [ADR 0001](../adr/0001-publieke-statische-spellen-app.md): publiek, statisch, alleen TypeScript, geen externe requests, geen backend, strikte CSP in [`apps/games/public/_headers`](../../apps/games/public/_headers). Voor de omgang met andermans materiaal is [ADR 0005](../adr/0005-pokemon-assets.md) de bestaande praktijk.
 - **Metingen:** de gemeten groottes en licentiescan zijn uitgevoerd op **2026-10-18 en 2026-10-19**. Bron-URL's staan in [Bronnen](#bronnen).
-- **Vervolg:** het vlaggenspel uit advies 1 is gebouwd als **Vlaggenreis** (`/vlaggen`); zie [ADR 0015](../adr/0015-vlaggenspel.md) voor de gemaakte keuzes.
+- **Vervolg:** het vlaggenspel uit advies 1 is gebouwd als **Vlaggenreis** (`/vlaggen`); zie [ADR 0018](../adr/0018-vlaggenspel.md) voor de gemaakte keuzes.
 
 ## Kort advies
 

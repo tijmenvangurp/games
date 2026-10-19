@@ -1,4 +1,4 @@
-# ADR 0015: Vlaggenspel met lokale vlaggen en landennamen
+# ADR 0018: Vlaggenspel met lokale vlaggen en landennamen
 
 - **Status:** Accepted
 - **Datum:** 2026-10-19
@@ -33,13 +33,13 @@ Vlaggen zijn vrijwel allemaal publiek domein, maar de keuze van de bestanden, de
 - **Vlaggen (SVG) en continentindeling:** [lipis/flag-icons](https://github.com/lipis/flag-icons) 7.6.0, licentie **MIT**. Bestanden uit `flags/4x3/<code>.svg` via `https://cdn.jsdelivr.net/npm/flag-icons@7.6.0/`. De vlaggen zelf zijn publiek domein; de repository levert de bestandsstructuur en de indeling per continent.
 - **Provincies en hun vlaggen:** codes, namen, hoofdsteden en coördinaten uit [Wikidata](https://www.wikidata.org) (**CC0**, `wdt:P31 wd:Q134390`); de twaalf vlaggen van [Wikimedia Commons](https://commons.wikimedia.org), allemaal **publiek domein**. Het generatiescript controleert de licentie per bestand en weigert iets anders dan publiek domein of CC0.
 - **Nederlandse landennamen en de selectie van soevereine staten:** [Wikidata](https://www.wikidata.org), licentie **CC0**. De query vraagt om staten (`wdt:P31/wdt:P279* wd:Q3624078`) met een ISO 3166-1 alpha-2-code (`wdt:P297`) en hun Nederlandse label.
-- **Wereldkaart en provincievlaggen:** zie [ADR 0016](0016-wereldkaart.md) voor de kaartstack, de Natural Earth-geometrie en de werkwijze rond de provincievlaggen.
+- **Wereldkaart en provincievlaggen:** zie [ADR 0019](0019-wereldkaart.md) voor de kaartstack, de Natural Earth-geometrie en de werkwijze rond de provincievlaggen.
 - **Motivatie en alternatieven:** `docs/research/2026-10-18-opensource-webgames.md` en `docs/research/2026-10-18-woordzoeker-libraries.md` (voor de afweging om geen package toe te voegen).
 
 De volgende kandidaten zijn onderzocht en afgevallen:
 
 - [`i18n-iso-countries`](https://www.npmjs.com/package/i18n-iso-countries) (MIT) heeft Nederlandse namen, maar de herkomst van die namen loopt via `iso-codes` met een andere licentie dan MIT. Wikidata levert dezelfde namen onder CC0 en houdt de licentieketen kort.
-- [ADR 0016](0016-wereldkaart.md) kiest `d3-geo`, `topojson-client` en Natural Earth voor kaarten; vlaggen zijn daar niet bij nodig, maar dezelfde bron levert de landengrenzen.
+- [ADR 0019](0019-wereldkaart.md) kiest `d3-geo`, `topojson-client` en Natural Earth voor kaarten; vlaggen zijn daar niet bij nodig, maar dezelfde bron levert de landengrenzen.
 - Een runtime-koppeling met een vlaggen-API of CDN is in strijd met ADR 0001 en de CSP.
 
 ## Gevolgen

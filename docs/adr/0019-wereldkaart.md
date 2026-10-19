@@ -1,12 +1,12 @@
-# ADR 0016: Wereldkaart met d3-geo en Natural Earth
+# ADR 0019: Wereldkaart met d3-geo en Natural Earth
 
 - **Status:** Accepted
 - **Datum:** 2026-10-19
-- **Bouwt voort op:** [ADR 0001](0001-publieke-statische-spellen-app.md), [ADR 0003](0003-originele-spelassets.md), [ADR 0015](0015-vlaggenspel.md)
+- **Bouwt voort op:** [ADR 0001](0001-publieke-statische-spellen-app.md), [ADR 0003](0003-originele-spelassets.md), [ADR 0018](0018-vlaggenspel.md)
 
 ## Context
 
-ADR 0015 bracht het vlaggenspel: vlaggen en landennamen, per continent. Wereldoriëntatie stopt daar niet. De eerstvolgende stappen zijn de Nederlandse provincies (met hun vlaggen) en later kaartspellen: waar ligt een land, waar liggen de provincies, waar stromen de rivieren. De bezwaren tegen een kaart zijn:
+ADR 0018 bracht het vlaggenspel: vlaggen en landennamen, per continent. Wereldoriëntatie stopt daar niet. De eerstvolgende stappen zijn de Nederlandse provincies (met hun vlaggen) en later kaartspellen: waar ligt een land, waar liggen de provincies, waar stromen de rivieren. De bezwaren tegen een kaart zijn:
 
 - De app is statisch en de CSP staat alleen `'self'` toe. Een kaartdienst of tegelserver is uitgesloten; de geometrie moet mee in de build of als eigen bestand worden geserveerd.
 - De repo is openbaar en de licentieketen moet kloppen.

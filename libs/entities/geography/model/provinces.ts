@@ -8,7 +8,7 @@ import type { Province } from "./types";
  * Gegenereerd door `scripts/generate-geography.ts`; niet met de hand aanpassen.
  * Bronnen: Wikidata (CC0) voor de namen, hoofdsteden, codes en coördinaten,
  * Wikimedia Commons (publiek domein) voor de vlaggen. Zie
- * docs/adr/0015-vlaggenspel.md.
+ * docs/adr/0018-vlaggenspel.md.
  */
 export const PROVINCES: readonly Province[] = [
   {
