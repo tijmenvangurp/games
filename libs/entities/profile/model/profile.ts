@@ -203,6 +203,36 @@ export function createProfile(
   };
 }
 
+export interface UpdateProfileInput {
+  readonly name: string;
+  readonly avatar: ProfileAvatarId;
+}
+
+/**
+ * Renames an existing profile and/or changes its avatar. The name stays local:
+ * like `createProfile`, this only touches the on-device profile state.
+ */
+export function updateProfile(
+  state: ProfileState,
+  id: string,
+  input: UpdateProfileInput,
+): ProfileState | null {
+  const name = normalizeProfileName(input.name);
+  if (!name || !isProfileAvatar(input.avatar)) {
+    return null;
+  }
+  if (!state.profiles.some((profile) => profile.id === id)) {
+    return null;
+  }
+
+  return {
+    ...state,
+    profiles: state.profiles.map((profile) =>
+      profile.id === id ? { ...profile, name, avatar: input.avatar } : profile,
+    ),
+  };
+}
+
 export function selectProfile(state: ProfileState, id: string): ProfileState | null {
   if (!state.profiles.some((profile) => profile.id === id)) {
     return null;

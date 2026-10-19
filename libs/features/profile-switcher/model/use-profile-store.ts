@@ -3,6 +3,7 @@ import {
   createProfile,
   removeProfile,
   selectProfile,
+  updateProfile,
   type ProfileAvatarId,
   type ProfileState,
 } from "@entities/profile";
@@ -20,6 +21,7 @@ export interface ProfileStore {
   error: string | null;
   switchProfile: (id: string) => boolean;
   addProfile: (name: string, avatar: ProfileAvatarId) => boolean;
+  updateProfile: (id: string, name: string, avatar: ProfileAvatarId) => boolean;
   deleteProfile: (id: string) => boolean;
   exportProfiles: () => string;
   importProfiles: (text: string) => boolean;
@@ -45,6 +47,18 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     const next = createProfile(get().state, { name, avatar });
     if (!next) {
       set({ error: "Dat profiel kon niet worden gemaakt." });
+      return false;
+    }
+    saveProfileState(next);
+    set({ state: next, error: null });
+    notifyProfilesChanged();
+    return true;
+  },
+
+  updateProfile: (id, name, avatar) => {
+    const next = updateProfile(get().state, id, { name, avatar });
+    if (!next) {
+      set({ error: "Dat profiel kon niet worden aangepast." });
       return false;
     }
     saveProfileState(next);

@@ -12,6 +12,7 @@ export {
   profileStateFromExport,
   removeProfile,
   selectProfile,
+  updateProfile,
   type ProfileAvatarId,
   type Profile,
   type ProfileExportFile,

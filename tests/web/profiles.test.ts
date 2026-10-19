@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   MAX_PROFILES,
+  PROFILE_NAME_MAX_LENGTH,
   createInitialProfileState,
   createProfile,
   parseProfileExport,
   parseProfileState,
   removeProfile,
+  updateProfile,
 } from "@entities/profile";
 import { createPlayState, generatePuzzle } from "@entities/sudoku";
 import { DEFAULT_MATH_SETTINGS, loadMathState, saveMathState } from "@features/math-trainer";
@@ -311,6 +313,29 @@ describe("profile model", () => {
 
     const third = createProfile(afterRemoval!, { name: "Noa", avatar: "panda" }, NOW);
     expect(third?.profiles[1]?.id).toBe("p3");
+  });
+
+  it("renames a profile and changes its avatar without touching the others", () => {
+    const { state } = twoProfiles();
+    const next = updateProfile(state, "p2", { name: "  Emma  ", avatar: "panda" });
+
+    expect(next).not.toBeNull();
+    expect(next?.activeProfileId).toBe("p2");
+    expect(next?.profiles[0]).toEqual(state.profiles[0]);
+    expect(next?.profiles[1]).toMatchObject({ id: "p2", name: "Emma", avatar: "panda" });
+  });
+
+  it("rejects an empty, too long or unknown profile update", () => {
+    const { state } = twoProfiles();
+
+    expect(updateProfile(state, "p2", { name: "   ", avatar: "fox" })).toBeNull();
+    expect(
+      updateProfile(state, "p2", {
+        name: "x".repeat(PROFILE_NAME_MAX_LENGTH + 1),
+        avatar: "fox",
+      }),
+    ).toBeNull();
+    expect(updateProfile(state, "p9", { name: "Emma", avatar: "fox" })).toBeNull();
   });
 
   it("rejects malformed state", () => {

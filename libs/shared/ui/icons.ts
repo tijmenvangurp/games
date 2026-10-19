@@ -14,6 +14,7 @@ export {
   Lightbulb,
   Lock,
   LogOut,
+  Pencil,
   Play,
   Plus,
   Puzzle,

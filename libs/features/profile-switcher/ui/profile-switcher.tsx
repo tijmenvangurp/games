@@ -5,10 +5,11 @@ import {
   PROFILE_AVATARS,
   PROFILE_NAME_MAX_LENGTH,
   avatarFor,
+  type Profile,
   type ProfileAvatarId,
 } from "@entities/profile";
 import { cn } from "@shared/lib";
-import { Button, Check, Download, Plus, Trash2, Upload, X } from "@shared/ui";
+import { Button, Check, Download, Pencil, Plus, Trash2, Upload, X } from "@shared/ui";
 import { useProfileStore } from "../model/use-profile-store";
 
 interface ProfileSwitcherProps {
@@ -16,12 +17,95 @@ interface ProfileSwitcherProps {
   onProfileChanged?: () => void;
 }
 
+interface ProfileFormProps {
+  readonly avatar: ProfileAvatarId;
+  readonly idPrefix: string;
+  readonly name: string;
+  readonly submitLabel: string;
+  readonly title: string;
+  readonly onAvatarChange: (avatar: ProfileAvatarId) => void;
+  readonly onCancel: () => void;
+  readonly onNameChange: (name: string) => void;
+  readonly onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}
+
+function ProfileForm({
+  avatar,
+  idPrefix,
+  name,
+  submitLabel,
+  title,
+  onAvatarChange,
+  onCancel,
+  onNameChange,
+  onSubmit,
+}: ProfileFormProps) {
+  const nameId = `${idPrefix}-naam`;
+  return (
+    <form className="mt-3 rounded-2xl border bg-muted/40 p-3" onSubmit={onSubmit}>
+      <p className="text-sm font-bold">{title}</p>
+      <label className="mt-2 block text-sm font-semibold" htmlFor={nameId}>
+        Naam
+      </label>
+      <input
+        autoFocus
+        className="mt-1 h-11 w-full rounded-xl border-2 border-border bg-card px-3 text-base font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+        id={nameId}
+        maxLength={PROFILE_NAME_MAX_LENGTH}
+        value={name}
+        onChange={(event) => onNameChange(event.target.value)}
+      />
+
+      <fieldset className="mt-3">
+        <legend className="text-sm font-semibold">Kies een plaatje</legend>
+        <div className="mt-1 flex flex-wrap gap-2">
+          {PROFILE_AVATARS.map((option) => (
+            <button
+              key={option.id}
+              aria-label={option.label}
+              aria-pressed={avatar === option.id}
+              className={cn(
+                "grid size-11 place-items-center rounded-xl border-2 text-2xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+                avatar === option.id
+                  ? "border-primary bg-primary/10"
+                  : "border-border bg-card hover:bg-muted",
+              )}
+              type="button"
+              onClick={() => onAvatarChange(option.id)}
+            >
+              <span aria-hidden="true">{option.emoji}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
+
+      <div className="mt-3 flex gap-2">
+        <Button className="min-h-11 flex-1" size="lg" type="submit">
+          {submitLabel}
+        </Button>
+        <Button
+          aria-label="Annuleren"
+          size="icon"
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+        >
+          <X aria-hidden="true" className="size-5" />
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 export function ProfileSwitcher({ onProfileChanged }: ProfileSwitcherProps) {
   const state = useProfileStore((store) => store.state);
   const error = useProfileStore((store) => store.error);
   const [adding, setAdding] = useState(false);
-  const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<ProfileAvatarId>(DEFAULT_PROFILE_AVATAR);
+  const [addName, setAddName] = useState("");
+  const [addAvatar, setAddAvatar] = useState<ProfileAvatarId>(DEFAULT_PROFILE_AVATAR);
+  const [editing, setEditing] = useState<Profile | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editAvatar, setEditAvatar] = useState<ProfileAvatarId>(DEFAULT_PROFILE_AVATAR);
   const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -44,8 +128,9 @@ export function ProfileSwitcher({ onProfileChanged }: ProfileSwitcherProps) {
 
   const startAdding = () => {
     useProfileStore.getState().clearError();
-    setName(`Speler ${state.nextProfileNumber}`);
-    setAvatar(DEFAULT_PROFILE_AVATAR);
+    setEditing(null);
+    setAddName(`Speler ${state.nextProfileNumber}`);
+    setAddAvatar(DEFAULT_PROFILE_AVATAR);
     setAdding(true);
   };
 
@@ -56,8 +141,29 @@ export function ProfileSwitcher({ onProfileChanged }: ProfileSwitcherProps) {
 
   const submitProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (useProfileStore.getState().addProfile(name, avatar)) {
+    if (useProfileStore.getState().addProfile(addName, addAvatar)) {
       setAdding(false);
+      notifyChange();
+    }
+  };
+
+  const startEditing = (profile: Profile) => {
+    useProfileStore.getState().clearError();
+    setAdding(false);
+    setEditing(profile);
+    setEditName(profile.name);
+    setEditAvatar(profile.avatar);
+  };
+
+  const cancelEditing = () => {
+    setEditing(null);
+    useProfileStore.getState().clearError();
+  };
+
+  const submitEdit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (editing && useProfileStore.getState().updateProfile(editing.id, editName, editAvatar)) {
+      setEditing(null);
       notifyChange();
     }
   };
@@ -158,57 +264,31 @@ export function ProfileSwitcher({ onProfileChanged }: ProfileSwitcherProps) {
       ) : null}
 
       {adding ? (
-        <form className="mt-3 rounded-2xl border bg-muted/40 p-3" onSubmit={submitProfile}>
-          <label className="text-sm font-semibold" htmlFor="profiel-naam">
-            Naam
-          </label>
-          <input
-            autoFocus
-            className="mt-1 h-11 w-full rounded-xl border-2 border-border bg-card px-3 text-base font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
-            id="profiel-naam"
-            maxLength={PROFILE_NAME_MAX_LENGTH}
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-          />
+        <ProfileForm
+          avatar={addAvatar}
+          idPrefix="profiel"
+          name={addName}
+          submitLabel="Profiel maken"
+          title="Nieuw profiel"
+          onAvatarChange={setAddAvatar}
+          onCancel={cancelAdding}
+          onNameChange={setAddName}
+          onSubmit={submitProfile}
+        />
+      ) : null}
 
-          <fieldset className="mt-3">
-            <legend className="text-sm font-semibold">Kies een plaatje</legend>
-            <div className="mt-1 flex flex-wrap gap-2">
-              {PROFILE_AVATARS.map((option) => (
-                <button
-                  key={option.id}
-                  aria-label={option.label}
-                  aria-pressed={avatar === option.id}
-                  className={cn(
-                    "grid size-11 place-items-center rounded-xl border-2 text-2xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
-                    avatar === option.id
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-card hover:bg-muted",
-                  )}
-                  type="button"
-                  onClick={() => setAvatar(option.id)}
-                >
-                  <span aria-hidden="true">{option.emoji}</span>
-                </button>
-              ))}
-            </div>
-          </fieldset>
-
-          <div className="mt-3 flex gap-2">
-            <Button className="min-h-11 flex-1" size="lg" type="submit">
-              Profiel maken
-            </Button>
-            <Button
-              aria-label="Annuleren"
-              size="icon"
-              type="button"
-              variant="outline"
-              onClick={cancelAdding}
-            >
-              <X aria-hidden="true" className="size-5" />
-            </Button>
-          </div>
-        </form>
+      {editing ? (
+        <ProfileForm
+          avatar={editAvatar}
+          idPrefix="profiel-wijzig"
+          name={editName}
+          submitLabel="Opslaan"
+          title={`${editing.name} wijzigen`}
+          onAvatarChange={setEditAvatar}
+          onCancel={cancelEditing}
+          onNameChange={setEditName}
+          onSubmit={submitEdit}
+        />
       ) : null}
 
       <details className="mt-2">
@@ -280,19 +360,30 @@ export function ProfileSwitcher({ onProfileChanged }: ProfileSwitcherProps) {
                     </Button>
                   </span>
                 ) : (
-                  <Button
-                    aria-label={`Verwijder profiel ${profile.name}`}
-                    disabled={state.profiles.length <= 1}
-                    size="icon"
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      useProfileStore.getState().clearError();
-                      setConfirmingDelete(profile.id);
-                    }}
-                  >
-                    <Trash2 aria-hidden="true" className="size-5" />
-                  </Button>
+                  <span className="flex gap-1">
+                    <Button
+                      aria-label={`Wijzig profiel ${profile.name}`}
+                      size="icon"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => startEditing(profile)}
+                    >
+                      <Pencil aria-hidden="true" className="size-5" />
+                    </Button>
+                    <Button
+                      aria-label={`Verwijder profiel ${profile.name}`}
+                      disabled={state.profiles.length <= 1}
+                      size="icon"
+                      type="button"
+                      variant="ghost"
+                      onClick={() => {
+                        useProfileStore.getState().clearError();
+                        setConfirmingDelete(profile.id);
+                      }}
+                    >
+                      <Trash2 aria-hidden="true" className="size-5" />
+                    </Button>
+                  </span>
                 )}
               </li>
             ))}

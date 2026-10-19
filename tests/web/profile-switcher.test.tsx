@@ -69,6 +69,32 @@ describe("profile switcher", () => {
     );
   });
 
+  it("renames an existing profile and changes its avatar", () => {
+    const onProfileChanged = renderSwitcher();
+
+    fireEvent.click(screen.getByText("Beheer"));
+    fireEvent.click(screen.getByRole("button", { name: "Wijzig profiel Speler 1" }));
+
+    const name = screen.getByLabelText("Naam") as HTMLInputElement;
+    expect(name.value).toBe("Speler 1");
+    fireEvent.change(name, { target: { value: "Emma" } });
+    fireEvent.click(screen.getByRole("button", { name: "Vos" }));
+    fireEvent.click(screen.getByRole("button", { name: "Opslaan" }));
+
+    expect(onProfileChanged).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("button", { name: "Emma" }).getAttribute("aria-pressed")).toBe("true");
+    expect(useProfileStore.getState().state.profiles[0]).toMatchObject({
+      id: "p1",
+      name: "Emma",
+      avatar: "fox",
+    });
+
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+    expect(JSON.parse(raw ?? "null")).toMatchObject({
+      profiles: [{ id: "p1", name: "Emma", avatar: "fox" }],
+    });
+  });
+
   it("deletes a profile after confirmation and keeps the last one", () => {
     const onProfileChanged = renderSwitcher();
 
