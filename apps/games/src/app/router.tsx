@@ -6,6 +6,7 @@ import {
   type RouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
+import { AlchemyPage } from "@pages/alchemy";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
 import { FlagsPage } from "@pages/flags";
@@ -45,6 +46,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/puzzels", PuzzlesPage),
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/vlaggen", FlagsPage),
+    gameRoute("/mengelmoes", AlchemyPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),

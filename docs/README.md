@@ -32,6 +32,7 @@
 - `research/2026-10-18-letterdidactiek-en-spelletjes.md` — didactische principes, klassenspelletjes, digitale letter-apps en concrete spelmodi voor een letter-spel.
 - `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
+- `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.
 - `ideas/spelideeen.md` — verzamelde educatieve spelideeën, prioriteiten en aandachtspunten.

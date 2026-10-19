@@ -18,6 +18,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/schaken"
           | "/puzzels"
           | "/woordzoeker"
+          | "/mengelmoes"
           | "/frans"
           | "/letters"
           | "/vlaggen";
@@ -66,6 +67,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/woordzoeker",
     thumbnail: "/thumbnails/word-search-bdb93413.jpg",
+  },
+  {
+    id: "alchemy",
+    name: "Mengelmoes",
+    description: "Sleep elementen op elkaar en ontdek wat er ontstaat.",
+    status: "available",
+    to: "/mengelmoes",
+    thumbnail: "/thumbnails/alchemy-0cda3400.jpg",
   },
   {
     id: "memory",

@@ -1,7 +1,7 @@
 # Spelideeën
 
 - **Datum:** 2026-10-19
-- **Status:** Woordzoeker, Tafel Topper en Vlaggenreis zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Status:** Woordzoeker, Tafel Topper, Vlaggenreis en Mengelmoes zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
 - **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
 - **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
 
@@ -19,8 +19,19 @@
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
 | Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
 | Vlaggenreis          | `/vlaggen`     | Vlaggen van landen per continent én van de Nederlandse provincies               |
+| Mengelmoes           | `/mengelmoes`  | Associëren, combineren en ontdekken; 22 elementen in de eerste verticale slice  |
 
-De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken en wereldoriëntatie**. Het grootste gat is nu **computationeel denken**.
+De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken, wereldoriëntatie en associëren**. Het grootste gat is nu **computationeel denken**.
+
+## Mengelmoes (verticale slice)
+
+**Leerdoel:** associëren, oorzaak-gevolg en nieuwsgierig experimenteren. Het kind sleept twee elementen op elkaar en ontdekt wat er ontstaat.
+
+**Vorm:** een vrije werkbank met een schap van ontdekte elementen. Water, vuur, aarde en lucht zijn het startpunt; de eerste slice heeft 22 elementen en 18 recepten. Een ongeldige combinatie is geen fout: de elementen wiebelen en blijven staan. Er is een hint, een labboek en lokale opslag.
+
+**Techniek:** `entities/alchemy` bevat de pure elementen, recepten en graafregels; `features/alchemy-lab` de Zustand-store, opslag en UI; `pages/alchemy` het scherm. Drag-and-drop gebruikt de al aanwezige `@dnd-kit/core` met een eigen collision-detector op middelpuntafstand. De iconen zijn lokale Fluent Emoji Flat SVG's (MIT). Zie [het onderzoek](../research/2026-10-19-mengelmoes-assets.md) voor de bronnen, licenties en de visuele richting.
+
+**Aandachtspunten:** de receptenboom is de grootste kostenpost. Elke nieuwe reeks moet kindvriendelijk, logisch en bereikbaar zijn. Geen timer, geen levens en geen straf bij een mislukte combinatie.
 
 ## Overzicht
 

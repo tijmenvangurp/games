@@ -33,6 +33,7 @@
     "icons": "pnpm exec tsx scripts/generate-app-icons.ts",
     "geography": "pnpm exec tsx scripts/generate-geography.ts",
     "geography:check": "pnpm exec tsx scripts/generate-geography.ts --check",
+    "elements": "pnpm exec tsx scripts/fetch-element-sprites.ts",
     "audio:french": "pnpm exec tsx scripts/generate-french-audio.ts",
     "audio:check:french": "pnpm exec tsx scripts/generate-french-audio.ts --check",
     "deploy": "wrangler deploy"

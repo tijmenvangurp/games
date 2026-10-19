@@ -28,6 +28,7 @@ corepack pnpm test:coverage    # Vitest met coverage-drempel
 corepack pnpm typecheck        # web- en node-config
 corepack pnpm lint             # alle Nx-projecten
 corepack pnpm fsd              # Steiger op libs en app
+corepack pnpm elements         # element-SVG's eenmalig verversen
 corepack pnpm quality          # volledige kwaliteitsgate
 corepack pnpm graph            # Nx-projectgraaf
 corepack pnpm affected         # gerichte checks voor de huidige branch
@@ -38,6 +39,10 @@ Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet
 ## Pokémon-assets
 
 De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork, cries en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
+
+## Element-assets
+
+**Mengelmoes** gebruikt lokale SVG's uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (Flat). Die vallen onder de MIT-licentie; de volledige tekst staat in [`LICENSES/fluent-emoji-MIT.txt`](LICENSES/fluent-emoji-MIT.txt). De bestanden staan in `apps/games/public/elements/` en worden niet tijdens het spelen bij een externe host opgehaald.
 
 ## Deployment
 
