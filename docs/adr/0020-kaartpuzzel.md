@@ -18,8 +18,8 @@ De uitdagingen:
 ## Beslissing
 
 1. **Twee speelwijzen op één pagina.** `FlagSettings` krijgt een `mode`: `vlaggen` of `kaartpuzzel`. De setup toont eerst "Wat wil je spelen?", daarna gebied en niveau. De bestaande score blijft onder de oude sleutel (`scope:level`); de puzzel krijgt `kaartpuzzel:scope:level`. Oude opslag zonder mode laadt als `vlaggen`.
-2. **Acht stukken per ronde, rond een ankeland.** De generator kiest een willekeurig ankeland en daarna de zeven dichtstbijzijnde landen (haversine op de coördinaten). Zo blijft de kaart op één regio gericht en blijven stukken en lege vlakken groot genoeg. Een continent met minder dan acht omtrekken (Oceanië: zes) speelt een kortere ronde; de sterren tellen per stuk.
-3. **Alleen landen met een omtrek.** De selectie filtert op de ISO numeric-codes die de atlas werkelijk heeft. De provinciescope is in deze modus uitgeschakeld (nog geen provinciegeometrie) en toont "Nog geen kaart".
+2. **Acht stukken per ronde, rond een ankergebied.** De generator kiest een willekeurig anker en daarna de zeven dichtstbijzijnde onderwerpen (haversine op de coördinaten). Zo blijft de kaart op één regio gericht en blijven stukken en lege vlakken groot genoeg. Een gebied met minder dan acht vormen (Oceanië: zes) speelt een kortere ronde; de sterren tellen per stuk.
+3. **Alleen vormen die er echt zijn.** De selectie filtert op de codes die de geometrie werkelijk heeft: landomtrekken uit de wereldatlas of de twaalf provincievormen uit [ADR 0021](0021-provinciegeometrie.md). Een continent met minder dan vier vormen kan geen puzzel starten.
 4. **Stukken zijn echte vormen, genormaliseerd naar 84 × 84.** Per land worden de polygonen genomen die binnen 30° van het grootste deel liggen: archipels houden hun eilanden, overzeese gebiedsdelen zoals Frans-Guyana horen niet bij het stuk. De kaart zelf houdt de ware vorm en positie.
 5. **De kaart kijkt naar de stukken van deze ronde.** Een Mercator-projectie wordt op de gekozen landen gefit (met marge), zodat de ronde altijd in beeld staat. Alle landen met een omtrek worden als context getekend; landen buiten beeld worden door de `clipExtent` afgekapt.
 6. **Sleep of tik.** Een stuk kan naar de kaart gesleept worden (pointer-events, met een zwevend stuk onder de vinger) of eerst aangetikt en daarna op een vlak getikt. De drop wordt bepaald met `document.elementFromPoint`; valt de vinger naast een land, dan telt het dichtstbijzijnde land binnen 26 kaarteenheden. Zo blijven ook kleine landen met een marker bereikbaar.
@@ -41,7 +41,8 @@ Afgevallen:
 ## Gevolgen
 
 - De feature heet nu `features/flag-game` in plaats van `features/flag-quiz`; dezelfde slice host de quiz, de puzzel en de gedeelde instellingen.
-- De puzzel gebruikt dezelfde atlas-chunk als de kaart in de quiz. Er komt dus geen extra download bij; wel wordt de chunk nu ook bij de start van een puzzel geladen in plaats van pas na een antwoord.
+- De puzzel gebruikt dezelfde atlas-chunk als de kaart in de quiz. Er komt dus geen extra download bij; wel wordt de chunk nu ook bij de start van een puzzel geladen in plaats van pas na een antwoord. Voor de provinciescope geldt hetzelfde met de provinciechunk uit ADR 0021.
 - De beste score van de puzzel staat naast die van de quiz in `games.vlaggen.v1`, met een eigen sleutel per gebied en niveau.
 - De puzzel is per definitie visueel; de tik-tik- en toetsenbordroute maken hem bruikbaar zonder slepen, maar de positie op de kaart blijft het leerdoel.
+- De provinciescope speelt op de provinciekaart uit [ADR 0021](0021-provinciegeometrie.md): twaalf vlakken, acht stukken en dezelfde regels.
 - Nieuwe tests: `tests/node/puzzle.test.ts` (selectie, determinisme, stukken, archipels), `tests/web/puzzle.test.tsx` (starten, goed/fout, onthullen, afronden en opslag) en een mobiele e2e-ronde met slepen én tikken.
