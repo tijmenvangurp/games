@@ -67,8 +67,8 @@ export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
   v: "lang4",
   w: "lang4",
   z: "lang4",
-  ng: "letter",
-  ch: "letter",
+  ng: "woord",
+  ch: "chaos",
 };
 
 function withExtraVariants(klank: KlankMapping, extra: readonly KlankVariant[]): KlankMapping {
@@ -237,6 +237,16 @@ export const KLANKEN: readonly KlankMapping[] = [
   ]),
 
   // Medeklinkerdigrafen
-  consonantDigraph("ng", "ng", "lang", "ŋ"),
-  consonantDigraph("ch", "ch", "lach", "x"),
+  withExtraVariants(consonantDigraph("ng", "ng", "lang", "ŋ"), [
+    { id: "bang", label: "Woord: bang (laatste klank)", ttsPrompt: "bang" },
+    { id: "ring", label: "Woord: ring (laatste klank)", ttsPrompt: "ring" },
+    { id: "eng", label: "Woord: eng (laatste klank)", ttsPrompt: "eng" },
+  ]),
+  withExtraVariants(consonantDigraph("ch", "ch", "lach", "x"), [
+    { id: "acht", label: "Woord: acht (klank in het midden)", ttsPrompt: "acht" },
+    { id: "chaos", label: "Woord: chaos (eerste klank)", ttsPrompt: "chaos" },
+    { id: "g", label: "Losse letter g", ttsPrompt: "g" },
+    { id: "guh", label: "Fonetisch (guh)", ttsPrompt: "guh" },
+    { id: "geel", label: "Woord: geel (eerste klank)", ttsPrompt: "geel" },
+  ]),
 ];

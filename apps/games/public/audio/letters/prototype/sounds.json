@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T08:12:38.547Z",
+  "generatedAt": "2026-10-19T08:14:52.476Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -1839,6 +1839,30 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"ŋ\">ng</phoneme>",
           "files": {}
+        },
+        {
+          "id": "bang",
+          "label": "Woord: bang (laatste klank)",
+          "prompt": "bang",
+          "files": {
+            "nathalie": "./nathalie/ng/bang.mp3"
+          }
+        },
+        {
+          "id": "ring",
+          "label": "Woord: ring (laatste klank)",
+          "prompt": "ring",
+          "files": {
+            "nathalie": "./nathalie/ng/ring.mp3"
+          }
+        },
+        {
+          "id": "eng",
+          "label": "Woord: eng (laatste klank)",
+          "prompt": "eng",
+          "files": {
+            "nathalie": "./nathalie/ng/eng.mp3"
+          }
         }
       ]
     },
@@ -1881,6 +1905,46 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"x\">ch</phoneme>",
           "files": {}
+        },
+        {
+          "id": "acht",
+          "label": "Woord: acht (klank in het midden)",
+          "prompt": "acht",
+          "files": {
+            "nathalie": "./nathalie/ch/acht.mp3"
+          }
+        },
+        {
+          "id": "chaos",
+          "label": "Woord: chaos (eerste klank)",
+          "prompt": "chaos",
+          "files": {
+            "nathalie": "./nathalie/ch/chaos.mp3"
+          }
+        },
+        {
+          "id": "g",
+          "label": "Losse letter g",
+          "prompt": "g",
+          "files": {
+            "nathalie": "./nathalie/ch/g.mp3"
+          }
+        },
+        {
+          "id": "guh",
+          "label": "Fonetisch (guh)",
+          "prompt": "guh",
+          "files": {
+            "nathalie": "./nathalie/ch/guh.mp3"
+          }
+        },
+        {
+          "id": "geel",
+          "label": "Woord: geel (eerste klank)",
+          "prompt": "geel",
+          "files": {
+            "nathalie": "./nathalie/ch/geel.mp3"
+          }
         }
       ]
     }
