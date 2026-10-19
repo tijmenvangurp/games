@@ -56,6 +56,14 @@ function artworkImage(): HTMLImageElement {
   return image;
 }
 
+function artworkLabel(): string {
+  const label = document.querySelector<HTMLElement>("[data-artwork-label]");
+  if (!label) {
+    throw new Error("No artwork label");
+  }
+  return label.textContent ?? "";
+}
+
 async function startHardGame(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -169,6 +177,19 @@ describe("wie is deze pokémon", () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toEqual({
       difficulty: "moeilijk",
     });
+  });
+
+  it("hides the name on the artwork until an answer is picked", async () => {
+    await startGame();
+
+    expect(artworkLabel()).toBe("Wie is deze Pokémon?");
+    expect(artworkImage().getAttribute("alt")).toBe("");
+
+    const name = targetName();
+    fireEvent.click(screen.getByRole("button", { name }));
+
+    expect(artworkLabel()).toBe(name);
+    expect(artworkImage().getAttribute("alt")).toBe(name);
   });
 
   it("shows only a silhouette on hard until an answer is picked", async () => {
