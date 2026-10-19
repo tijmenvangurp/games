@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { AccountScreen } from "@features/auth";
 import { PageHeader } from "@shared/ui";
+import { SyncConsentPanel } from "./sync-consent-panel";
 
 export function AccountPage() {
   const navigate = useNavigate();
@@ -14,6 +15,9 @@ export function AccountPage() {
       />
 
       <AccountScreen />
+
+      {/* Per-profile progress sync opt-in (ADR 0012): hidden for guests. */}
+      <SyncConsentPanel />
 
       <p className="mt-auto pt-6 text-center text-xs text-muted-foreground">
         Er is geen kindlogin. Kinderen spelen met een lokaal profiel.

@@ -14,5 +14,11 @@
       }
     }
   },
-  "implicitDependencies": ["features-auth", "shared-ui"]
+  "implicitDependencies": [
+    "entities-profile",
+    "features-auth",
+    "features-sync",
+    "shared-lib",
+    "shared-ui"
+  ]
 }

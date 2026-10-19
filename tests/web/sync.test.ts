@@ -334,7 +334,7 @@ describe("sync engine", () => {
     // Only the still-enabled profile uploads after the disable.
     expect(api.pushProgress).toHaveBeenCalledTimes(1);
     const input = vi.mocked(api.pushProgress).mock.calls[0]?.[0];
-    expect(input?.profileId).toBe("p2");
+    expect(input?.playerId).toBe(PLAYER_TWO.id);
     expect(readOutbox()).toEqual([]);
   });
 
