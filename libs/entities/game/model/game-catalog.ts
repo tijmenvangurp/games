@@ -105,7 +105,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Leer vlaggen van landen en van de Nederlandse provincies.",
     status: "available",
     to: "/vlaggen",
-    thumbnail: "/thumbnails/flags-00000000.jpg",
+    thumbnail: "/thumbnails/flags-bd19d257.jpg",
   },
   {
     id: "french-listening",
