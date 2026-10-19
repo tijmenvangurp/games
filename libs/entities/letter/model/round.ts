@@ -21,6 +21,7 @@ import type {
   PlekQuestion,
   TreinQuestion,
   VangerQuestion,
+  ZoemQuestion,
 } from "./types";
 
 const ROUND_SIZE = 6;
@@ -273,4 +274,23 @@ export function createPlekRound(random: () => number = Math.random): LetterRound
   }
 
   return { lesson: "klankplek", questions, newLetters: [] };
+}
+
+/**
+ * Bouwt een Zoemlees-ronde: zes woorden die het kind ziet en letter voor
+ * letter verklaakt. De letterklanken zijn het model; daarna klinkt het woord.
+ */
+export function createZoomRound(random: () => number = Math.random): LetterRound {
+  const words = shuffle(TRAIN_WORDS, random).slice(0, ROUND_SIZE);
+  const questions = words.map<ZoemQuestion>((word, index) => ({
+    kind: "zoem",
+    id: `q${index + 1}`,
+    word,
+  }));
+
+  if (questions.length !== ROUND_SIZE) {
+    throw new Error("Zoemlees heeft een onverwachte lengte");
+  }
+
+  return { lesson: "zoemlees", questions, newLetters: [] };
 }

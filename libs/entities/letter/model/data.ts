@@ -35,6 +35,11 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
     title: "Klankplek",
     description: "Waar hoor je de klank? Sleep de letter naar het juiste vakje. Zes woorden.",
   },
+  {
+    id: "zoemlees",
+    title: "Zoemlees",
+    description: "Lees het woord en tik de letters. Hoor hoe het klinkt. Zes woorden.",
+  },
 ];
 
 export const KLANK_POSITIONS: readonly KlankPosition[] = ["begin", "midden", "eind"];

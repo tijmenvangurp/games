@@ -26,6 +26,7 @@ export {
   createPlekRound,
   createTrainRound,
   createWordRound,
+  createZoomRound,
 } from "./model/round";
 export { LETTER_IDS } from "./model/types";
 export type {
@@ -43,4 +44,5 @@ export type {
   PlekQuestion,
   TreinQuestion,
   VangerQuestion,
+  ZoemQuestion,
 } from "./model/types";

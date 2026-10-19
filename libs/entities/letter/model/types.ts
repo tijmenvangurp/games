@@ -4,7 +4,7 @@ export type LetterId = (typeof LETTER_IDS)[number];
 
 export type LetterKind = "vowel" | "consonant";
 
-export type LetterLesson = "letters" | "woorden" | "trein" | "klankplek";
+export type LetterLesson = "letters" | "woorden" | "trein" | "klankplek" | "zoemlees";
 
 export interface LetterLessonInfo {
   id: LetterLesson;
@@ -90,13 +90,20 @@ export interface PlekQuestion {
   position: KlankPosition;
 }
 
+export interface ZoemQuestion {
+  kind: "zoem";
+  id: string;
+  word: LetterWord;
+}
+
 export type LetterQuestion =
   | KlankQuestion
   | VangerQuestion
   | JachtQuestion
   | TreinQuestion
   | LeesQuestion
-  | PlekQuestion;
+  | PlekQuestion
+  | ZoemQuestion;
 
 export interface LetterRound {
   lesson: LetterLesson;

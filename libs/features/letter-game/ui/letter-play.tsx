@@ -17,6 +17,7 @@ import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
 import { PlekView } from "./plek-view";
 import { WordTile } from "./word-tile";
+import { ZoomView } from "./zoom-view";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
 
@@ -29,6 +30,9 @@ function lessonHeader(lesson: LetterLesson): { unit: string; title: string } {
   }
   if (lesson === "klankplek") {
     return { unit: "Klank", title: "Klankplek" };
+  }
+  if (lesson === "zoemlees") {
+    return { unit: "Woord", title: "Zoemlees" };
   }
   return { unit: "Vraag", title: "Letterronde" };
 }
@@ -286,6 +290,8 @@ function successMessage(question: LetterQuestion): string {
       return `Ja! Dit is ${question.target.word}.`;
     case "plek":
       return `Ja! De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+    case "zoem":
+      return `Ja! Je las ${question.word.word}.`;
     case "trein":
       return `Goed gebouwd: ${question.word.word}.`;
   }
@@ -303,6 +309,8 @@ function retryMessage(question: LetterQuestion): string {
       return `Bijna. Dit woord is ${question.target.word}.`;
     case "plek":
       return `De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+    case "zoem":
+      return `Het woord is ${question.word.word}.`;
     case "trein":
       return `Het woord is ${question.word.word}.`;
   }
@@ -337,6 +345,9 @@ function Feedback({
       return question.target.audio;
     }
     if (question.kind === "plek") {
+      return question.word.audio;
+    }
+    if (question.kind === "zoem") {
       return question.word.audio;
     }
     if (question.kind === "vanger" || question.kind === "trein") {
@@ -386,6 +397,8 @@ function QuestionView({
       return <LeesView answered={answered} question={question} wrongChoices={wrongChoices} />;
     case "plek":
       return <PlekView answered={answered} question={question} wrongChoices={wrongChoices} />;
+    case "zoem":
+      return <ZoomView answered={answered} filled={filled} question={question} />;
     case "trein":
       return (
         <TreinView

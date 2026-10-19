@@ -4,6 +4,7 @@ import {
   createPlekRound,
   createTrainRound,
   createWordRound,
+  createZoomRound,
   recordLetterAnswer,
   type LetterId,
   type LetterLesson,
@@ -27,6 +28,7 @@ interface LetterStore {
   start: (lesson?: LetterLesson) => void;
   choose: (answer: string) => void;
   submitTrain: (letter: LetterId) => void;
+  submitZoom: (index: number) => void;
   next: () => void;
 }
 
@@ -56,6 +58,9 @@ function roundFor(lesson: LetterLesson, progress: LetterProgressMap): LetterRoun
   if (lesson === "klankplek") {
     return createPlekRound();
   }
+  if (lesson === "zoemlees") {
+    return createZoomRound();
+  }
   return createLetterRound(progress);
 }
 
@@ -79,17 +84,20 @@ function expectedAnswer(question: LetterQuestion): string {
   if (question.kind === "plek") {
     return question.position;
   }
+  if (question.kind === "zoem") {
+    return question.word.id;
+  }
   return question.kind === "lees" ? question.target.id : question.target;
 }
 
-/** Woordlezen en Klankplek zijn oefenen; alleen lettervragen werken de voortgang bij. */
+/** Woordlezen, Klankplek en Zoemlees zijn oefenen; alleen lettervragen werken de voortgang bij. */
 function applyChoiceProgress(
   set: StoreSet,
   get: StoreGet,
   question: LetterQuestion,
   correct: boolean,
 ): void {
-  if (question.kind === "lees" || question.kind === "plek") {
+  if (question.kind === "lees" || question.kind === "plek" || question.kind === "zoem") {
     return;
   }
   applyProgress(set, get, question.target, correct);
@@ -98,7 +106,7 @@ function applyChoiceProgress(
 function choose(set: StoreSet, get: StoreGet, answer: string): void {
   const question = currentQuestion(get);
   const { answered, wrongChoices } = get();
-  if (!question || question.kind === "trein" || answered) {
+  if (!question || question.kind === "trein" || question.kind === "zoem" || answered) {
     return;
   }
 
@@ -157,6 +165,30 @@ function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
   playHaptic("match");
 }
 
+function submitZoom(set: StoreSet, get: StoreGet, index: number): void {
+  const question = currentQuestion(get);
+  const { answered, filled } = get();
+  if (!question || question.kind !== "zoem" || answered) {
+    return;
+  }
+
+  const letter = question.word.letters[index];
+  if (index !== filled.length || !letter) {
+    return;
+  }
+
+  const nextFilled = [...filled, letter];
+  if (nextFilled.length < question.word.letters.length) {
+    set({ filled: nextFilled });
+    playHaptic("tap");
+    return;
+  }
+
+  set({ filled: nextFilled, answered: true, correct: true });
+  playSound("match");
+  playHaptic("match");
+}
+
 function nextQuestion(set: StoreSet, get: StoreGet): void {
   const { round, index, answered, finished } = get();
   if (!round || finished || !answered) {
@@ -197,5 +229,6 @@ export const useLetterStore = create<LetterStore>((set, get) => ({
   start: (lesson) => startRound(set, get, lesson),
   choose: (answer) => choose(set, get, answer),
   submitTrain: (letter) => submitTrain(set, get, letter),
+  submitZoom: (index) => submitZoom(set, get, index),
   next: () => nextQuestion(set, get),
 }));

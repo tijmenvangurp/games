@@ -5,6 +5,8 @@ import {
   createPlekRound,
   createTrainRound,
   createWordRound,
+  createZoomRound,
+  LETTER_BY_ID,
   WORDS,
 } from "@entities/letter";
 import { mulberry32 } from "@shared/lib";
@@ -235,5 +237,36 @@ describe("plek round", () => {
         expect(question.word.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
       }
     }
+  });
+});
+
+describe("zoom round", () => {
+  it("bouwt zes woorden met een klank per letter", () => {
+    const round = createZoomRound(mulberry32(41));
+    expect(round.lesson).toBe("zoemlees");
+    expect(round.newLetters).toEqual([]);
+    expect(round.questions).toHaveLength(6);
+
+    const words = new Set<string>();
+    for (const question of round.questions) {
+      expect(question.kind).toBe("zoem");
+      if (question.kind !== "zoem") {
+        continue;
+      }
+
+      words.add(question.word.id);
+      expect(question.word.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+      for (const letter of question.word.letters) {
+        expect(LETTER_BY_ID[letter].sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+      }
+    }
+
+    expect(words.size).toBe(6);
+  });
+
+  it("is deterministisch met dezelfde seed", () => {
+    const first = createZoomRound(mulberry32(42));
+    const second = createZoomRound(mulberry32(42));
+    expect(first).toEqual(second);
   });
 });

@@ -10,6 +10,7 @@ export {
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BookOpen,
   Check,
   Ear,
   Eraser,

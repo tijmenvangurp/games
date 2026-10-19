@@ -76,4 +76,21 @@ test.describe("letterpret op een telefoon", () => {
       /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
     );
   });
+
+  test("start zoemlees en leest een woord", async ({ page }) => {
+    await page.goto("/letters");
+
+    await expect(page.getByRole("heading", { name: "Kies je les" })).toBeVisible();
+    await page.getByRole("button", { name: /zoemlees/i }).click();
+
+    await expect(page.getByText("Woord 1 van 6")).toBeVisible();
+    const letters = page.getByRole("group", { name: "Lees het woord" }).getByRole("button");
+    expect(await letters.count()).toBeGreaterThanOrEqual(2);
+
+    await letters.first().click();
+    await expect(page.locator("audio").first()).toHaveAttribute(
+      "src",
+      /\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/,
+    );
+  });
 });

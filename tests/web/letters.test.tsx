@@ -53,7 +53,12 @@ describe("letter game", () => {
 
     for (let index = 0; index < round.questions.length; index += 1) {
       const question = round.questions[index];
-      if (!question || question.kind === "lees" || question.kind === "plek") {
+      if (
+        !question ||
+        question.kind === "lees" ||
+        question.kind === "plek" ||
+        question.kind === "zoem"
+      ) {
         throw new Error("Geen lettervraag");
       }
 
@@ -152,6 +157,33 @@ describe("letter game", () => {
     expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
   });
 
+  it("speelt een volledige zoemlees-ronde", async () => {
+    renderLetters();
+    const round = await startLesson(/zoemlees/i);
+    expect(round.lesson).toBe("zoemlees");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "zoem") {
+        throw new Error("Geen zoemvraag");
+      }
+
+      for (const letter of question.word.letters) {
+        fireEvent.click(screen.getByRole("button", { name: `Letter ${letter}` }));
+      }
+
+      expect(useLetterStore.getState().answered).toBe(true);
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap gelezen!" })).toBeTruthy();
+    // Zoemlees oefent lezen en raakt de lettervoortgang niet aan.
+    const progress = loadLetterProgress();
+    expect(Object.values(progress).every((item) => item.attempts === 0)).toBe(true);
+  });
+
   it("geeft na twee fouten het juiste antwoord", async () => {
     renderLetters();
     const round = await startLesson(/letterronde/i);
@@ -160,7 +192,8 @@ describe("letter game", () => {
       !question ||
       question.kind === "trein" ||
       question.kind === "lees" ||
-      question.kind === "plek"
+      question.kind === "plek" ||
+      question.kind === "zoem"
     ) {
       throw new Error("Eerste vraag is geen klankvraag");
     }
