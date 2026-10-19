@@ -1,9 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { knownLetters } from "@entities/letter";
+import { knownLetters, type LetterLesson, type LetterRound } from "@entities/letter";
 import { LetterPlay, LetterSetup, useLetterStore } from "@features/letter-game";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
+
+function subtitleFor(round: LetterRound | null): string {
+  if (!round) {
+    return "Hoor de klank en kies de letter";
+  }
+  return round.lesson === "woorden" ? "Woordlezen · 6 woorden" : "Letterronde · 6 vragen";
+}
+
+function celebrationFor(round: LetterRound | null, known: readonly string[]) {
+  if (round?.lesson === "woorden") {
+    return {
+      title: "Knap gelezen!",
+      description: "Je las zes woorden. Probeer het nog eens met andere woorden.",
+    };
+  }
+
+  return {
+    title: "Knap geoefend!",
+    description:
+      known.length > 0
+        ? `Deze letters ken je al: ${known.join(", ")}.`
+        : "Je oefende met de letters. Ze komen later terug.",
+  };
+}
 
 export function LettersPage() {
   const navigate = useNavigate();
@@ -14,10 +38,10 @@ export function LettersPage() {
 
   const setupVisible = showSetup || !round;
   const known = knownLetters(progress);
-  const subtitle = round ? "Letterronde · 6 vragen" : "Hoor de klank en kies de letter";
+  const celebration = celebrationFor(round, known);
 
-  const startGame = () => {
-    useLetterStore.getState().start();
+  const startGame = (lesson: LetterLesson) => {
+    useLetterStore.getState().start(lesson);
     setShowSetup(false);
   };
 
@@ -25,7 +49,7 @@ export function LettersPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={round ? () => setShowSetup(true) : undefined}
-      subtitle={subtitle}
+      subtitle={subtitleFor(round)}
       title="Letterpret"
     >
       {setupVisible ? <LetterSetup progress={progress} onStart={startGame} /> : <LetterPlay />}
@@ -35,13 +59,9 @@ export function LettersPage() {
           againLabel="Nog een ronde"
           chooseLabel="Naar de uitleg"
           confetti={false}
-          description={
-            known.length > 0
-              ? `Deze letters ken je al: ${known.join(", ")}.`
-              : "Je oefende met de letters. Ze komen later terug."
-          }
-          title="Knap geoefend!"
-          onAgain={() => useLetterStore.getState().start()}
+          description={celebration.description}
+          title={celebration.title}
+          onAgain={() => useLetterStore.getState().start(round?.lesson)}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}
         />

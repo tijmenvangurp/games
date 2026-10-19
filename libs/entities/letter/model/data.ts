@@ -1,7 +1,30 @@
-import { LETTER_IDS, type Letter, type LetterId, type LetterWord } from "./types";
+import {
+  LETTER_IDS,
+  type Letter,
+  type LetterId,
+  type LetterLessonInfo,
+  type LetterWord,
+} from "./types";
 
 const sound = (id: string) => `/audio/letters/v1/sounds/${id}.wav`;
 const audio = (id: string) => `/audio/letters/v1/words/${id}.wav`;
+
+/**
+ * Alle lessen van Letterpret. Ze delen hetzelfde spelkaartje op het
+ * homescherm en dezelfde pagina; de keuzelijst bepaalt welke ronde start.
+ */
+export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
+  {
+    id: "letters",
+    title: "Letterronde",
+    description: "Hoor de klank en kies de letter. Zes korte vragen.",
+  },
+  {
+    id: "woorden",
+    title: "Woordlezen",
+    description: "Luister naar een woord en kies het juiste woord. Zes woorden.",
+  },
+];
 
 export const LETTERS: readonly Letter[] = [
   { id: "i", glyph: "i", kind: "vowel", sound: sound("i") },

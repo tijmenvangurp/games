@@ -4,6 +4,14 @@ export type LetterId = (typeof LETTER_IDS)[number];
 
 export type LetterKind = "vowel" | "consonant";
 
+export type LetterLesson = "letters" | "woorden";
+
+export interface LetterLessonInfo {
+  id: LetterLesson;
+  title: string;
+  description: string;
+}
+
 export type LetterStage = "nieuw" | "oefenen" | "bijna" | "vast";
 
 export interface Letter {
@@ -64,9 +72,22 @@ export interface TreinQuestion {
   tiles: readonly LetterId[];
 }
 
-export type LetterQuestion = KlankQuestion | VangerQuestion | JachtQuestion | TreinQuestion;
+export interface LeesQuestion {
+  kind: "lees";
+  id: string;
+  target: LetterWord;
+  choices: readonly LetterWord[];
+}
+
+export type LetterQuestion =
+  | KlankQuestion
+  | VangerQuestion
+  | JachtQuestion
+  | TreinQuestion
+  | LeesQuestion;
 
 export interface LetterRound {
+  lesson: LetterLesson;
   questions: readonly LetterQuestion[];
   newLetters: readonly LetterId[];
 }

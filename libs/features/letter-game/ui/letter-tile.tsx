@@ -3,6 +3,8 @@ import { cn } from "@shared/lib";
 
 type TileState = "default" | "correct" | "wrong" | "muted";
 
+export type { TileState };
+
 interface LetterTileProps {
   letter: LetterId;
   state?: TileState;

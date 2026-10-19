@@ -2,8 +2,10 @@ import {
   LETTER_BY_ID,
   type JachtQuestion,
   type KlankQuestion,
+  type LeesQuestion,
   type LetterId,
   type LetterQuestion,
+  type LetterWord,
   type TreinQuestion,
   type VangerQuestion,
 } from "@entities/letter";
@@ -11,6 +13,7 @@ import { Button } from "@shared/ui";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
+import { WordTile } from "./word-tile";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
 
@@ -18,12 +21,30 @@ function choiceState(
   letter: LetterId,
   target: LetterId,
   answered: boolean,
-  wrongChoices: readonly LetterId[],
+  wrongChoices: readonly string[],
 ): ChoiceState {
   if (answered && letter === target) {
     return "correct";
   }
   if (!answered && wrongChoices.includes(letter)) {
+    return "wrong";
+  }
+  if (answered) {
+    return "muted";
+  }
+  return "default";
+}
+
+function wordChoiceState(
+  word: LetterWord,
+  target: LetterWord,
+  answered: boolean,
+  wrongChoices: readonly string[],
+): ChoiceState {
+  if (answered && word.id === target.id) {
+    return "correct";
+  }
+  if (!answered && wrongChoices.includes(word.id)) {
     return "wrong";
   }
   if (answered) {
@@ -43,7 +64,7 @@ function KlankView({
 }: {
   question: KlankQuestion;
   answered: boolean;
-  wrongChoices: readonly LetterId[];
+  wrongChoices: readonly string[];
 }) {
   return (
     <>
@@ -77,7 +98,7 @@ function VangerView({
 }: {
   question: VangerQuestion;
   answered: boolean;
-  wrongChoices: readonly LetterId[];
+  wrongChoices: readonly string[];
 }) {
   return (
     <>
@@ -111,7 +132,7 @@ function JachtView({
 }: {
   question: JachtQuestion;
   answered: boolean;
-  wrongChoices: readonly LetterId[];
+  wrongChoices: readonly string[];
 }) {
   return (
     <>
@@ -132,6 +153,40 @@ function JachtView({
             letter={letter}
             state={choiceState(letter, question.target, answered, wrongChoices)}
             onClick={() => useLetterStore.getState().choose(letter)}
+          />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function LeesView({
+  question,
+  answered,
+  wrongChoices,
+}: {
+  question: LeesQuestion;
+  answered: boolean;
+  wrongChoices: readonly string[];
+}) {
+  return (
+    <>
+      <LetterAudio
+        autoPlay
+        label={`Luister naar ${question.target.word}`}
+        src={question.target.audio}
+      />
+      <div className="mt-3">
+        <Prompt>Luister en lees. Welk woord hoor je?</Prompt>
+      </div>
+      <div aria-label="Kies het woord" className="mt-4 grid gap-2" role="group">
+        {question.choices.map((word) => (
+          <WordTile
+            key={word.id}
+            disabled={answered || wrongChoices.includes(word.id)}
+            state={wordChoiceState(word, question.target, answered, wrongChoices)}
+            word={word.word}
+            onClick={() => useLetterStore.getState().choose(word.id)}
           />
         ))}
       </div>
@@ -203,6 +258,36 @@ function TreinView({
   );
 }
 
+function successMessage(question: LetterQuestion): string {
+  switch (question.kind) {
+    case "klank":
+      return `Ja! Dit is de ${question.target}. Luister nog eens.`;
+    case "vanger":
+      return `Ja! ${question.word.word} begint met de ${question.target}.`;
+    case "jacht":
+      return `Ja, dit is de ${question.target}.`;
+    case "lees":
+      return `Ja! Dit is ${question.target.word}.`;
+    case "trein":
+      return `Goed gebouwd: ${question.word.word}.`;
+  }
+}
+
+function retryMessage(question: LetterQuestion): string {
+  switch (question.kind) {
+    case "klank":
+      return `Dit is de ${question.target}. Luister nog eens.`;
+    case "vanger":
+      return `Bijna. ${question.word.word} begint met de ${question.target}.`;
+    case "jacht":
+      return `Dit is de ${question.target}.`;
+    case "lees":
+      return `Bijna. Dit woord is ${question.target.word}.`;
+    case "trein":
+      return `Het woord is ${question.word.word}.`;
+  }
+}
+
 function Feedback({
   question,
   answered,
@@ -225,27 +310,17 @@ function Feedback({
     );
   }
 
-  const message = (() => {
-    if (question.kind === "klank") {
-      return correct
-        ? `Ja! Dit is de ${question.target}. Luister nog eens.`
-        : `Dit is de ${question.target}. Luister nog eens.`;
-    }
-    if (question.kind === "vanger") {
-      return correct
-        ? `Ja! ${question.word.word} begint met de ${question.target}.`
-        : `Bijna. ${question.word.word} begint met de ${question.target}.`;
-    }
-    if (question.kind === "jacht") {
-      return correct ? `Ja, dit is de ${question.target}.` : `Dit is de ${question.target}.`;
-    }
-    return correct ? `Goed gebouwd: ${question.word.word}.` : `Het woord is ${question.word.word}.`;
-  })();
+  const message = correct ? successMessage(question) : retryMessage(question);
 
-  const replaySrc =
-    question.kind === "vanger" || question.kind === "trein"
-      ? question.word.audio
-      : LETTER_BY_ID[question.target].sound;
+  const replaySrc = (() => {
+    if (question.kind === "lees") {
+      return question.target.audio;
+    }
+    if (question.kind === "vanger" || question.kind === "trein") {
+      return question.word.audio;
+    }
+    return LETTER_BY_ID[question.target].sound;
+  })();
 
   return (
     <div className="space-y-2">
@@ -276,7 +351,7 @@ function QuestionCard({
   question: LetterQuestion;
   answered: boolean;
   correct: boolean;
-  wrongChoices: readonly LetterId[];
+  wrongChoices: readonly string[];
   filled: readonly LetterId[];
   wrongLetters: readonly LetterId[];
   isLast: boolean;
@@ -291,6 +366,9 @@ function QuestionCard({
       ) : null}
       {question.kind === "jacht" ? (
         <JachtView answered={answered} question={question} wrongChoices={wrongChoices} />
+      ) : null}
+      {question.kind === "lees" ? (
+        <LeesView answered={answered} question={question} wrongChoices={wrongChoices} />
       ) : null}
       {question.kind === "trein" ? (
         <TreinView
@@ -342,13 +420,17 @@ export function LetterPlay() {
     return null;
   }
 
+  const isWordLesson = round.lesson === "woorden";
+
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <header className="game-panel flex items-center justify-between px-3 py-2">
         <p className="text-sm font-black text-muted-foreground">
-          Vraag {index + 1} van {round.questions.length}
+          {isWordLesson ? "Woord" : "Vraag"} {index + 1} van {round.questions.length}
         </p>
-        <span className="text-sm font-bold text-primary">Letterronde</span>
+        <span className="text-sm font-bold text-primary">
+          {isWordLesson ? "Woordlezen" : "Letterronde"}
+        </span>
       </header>
       <QuestionCard
         answered={answered}

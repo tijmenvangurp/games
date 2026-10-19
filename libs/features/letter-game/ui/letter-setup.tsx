@@ -1,9 +1,15 @@
-import { knownLetters, LETTERS, type LetterProgressMap } from "@entities/letter";
-import { Button, Play } from "@shared/ui";
+import {
+  knownLetters,
+  LETTER_LESSONS,
+  LETTERS,
+  type LetterLesson,
+  type LetterProgressMap,
+} from "@entities/letter";
+import { Button, Eye, Play } from "@shared/ui";
 
 interface LetterSetupProps {
   progress: LetterProgressMap;
-  onStart: () => void;
+  onStart: (lesson: LetterLesson) => void;
 }
 
 export function LetterSetup({ progress, onStart }: LetterSetupProps) {
@@ -12,13 +18,35 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
   return (
     <section className="game-panel mx-auto w-full max-w-xl p-4 sm:p-6">
       <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        10 letters · 6 vragen
+        10 letters · 6 vragen per les
       </p>
-      <h2 className="mt-1 text-2xl font-black tracking-tight">Hoor de klank. Kies de letter.</h2>
+      <h2 className="mt-1 text-2xl font-black tracking-tight">Kies je les</h2>
       <p className="mt-2 text-sm text-muted-foreground">
-        Je hoort een klank. Welke letter hoort erbij? Soms hoor je een woord en zoek je de
-        beginletter, soms zoek of bouw je een woord.
+        Hoor de klank en kies de letter, of lees hele woorden. Beide lessen gebruiken dezelfde
+        letters.
       </p>
+
+      <div className="mt-4 grid gap-2">
+        {LETTER_LESSONS.map((lesson) => (
+          <Button
+            key={lesson.id}
+            className="h-auto w-full flex-col items-start gap-1 whitespace-normal px-4 py-3 text-left"
+            size="lg"
+            variant={lesson.id === "letters" ? "default" : "outline"}
+            onClick={() => onStart(lesson.id)}
+          >
+            <span className="flex items-center gap-2 text-base font-black">
+              {lesson.id === "letters" ? (
+                <Play aria-hidden="true" className="size-5" />
+              ) : (
+                <Eye aria-hidden="true" className="size-5" />
+              )}
+              {lesson.title}
+            </span>
+            <span className="text-sm font-semibold opacity-80">{lesson.description}</span>
+          </Button>
+        ))}
+      </div>
 
       <div className="mt-4 grid grid-cols-5 gap-2">
         {LETTERS.map((letter) => (
@@ -37,16 +65,11 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
           : "We beginnen met i, k, m, s, p, v, e, n, t en a."}
       </p>
 
-      <Button className="mt-4 w-full" size="lg" onClick={onStart}>
-        <Play aria-hidden="true" className="size-5" />
-        Start de letterronde
-      </Button>
-
       <div className="mt-4 rounded-2xl bg-muted p-3 text-sm">
         <p className="font-bold">Tip voor ouders</p>
         <p className="mt-1 text-muted-foreground">
-          Laat je kind de letter na de ronde ook op papier schrijven. Dat helpt bij het onthouden
-          van de vorm.
+          Laat je kind na de ronde een letter op papier schrijven of een gelezen woord aanwijzen in
+          een boek. Dat helpt bij het onthouden.
         </p>
       </div>
     </section>

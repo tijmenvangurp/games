@@ -1,9 +1,17 @@
 import { shuffledIndexes } from "@shared/lib";
-import { CONFUSION_GROUPS, LETTER_BY_ID, LETTER_ORDER, TRAIN_WORDS, WORDS_BY_LETTER } from "./data";
+import {
+  CONFUSION_GROUPS,
+  LETTER_BY_ID,
+  LETTER_ORDER,
+  TRAIN_WORDS,
+  WORDS,
+  WORDS_BY_LETTER,
+} from "./data";
 import { createEmptyProgressMap, dueLetters, todayIso } from "./progress";
 import type {
   JachtQuestion,
   KlankQuestion,
+  LeesQuestion,
   LetterId,
   LetterProgressMap,
   LetterQuestion,
@@ -102,6 +110,36 @@ function buildTrein(id: string, word: LetterWord, random: () => number): TreinQu
 }
 
 /**
+ * Kiest leeswoorden voor een leesvraag. Afleiders beginnen bij voorkeur met
+ * een andere letter, zodat het kind niet alleen naar de beginletter kan gokken.
+ */
+function wordChoicesFor(
+  target: LetterWord,
+  count: number,
+  random: () => number,
+): readonly LetterWord[] {
+  const differentOnset = WORDS.filter(
+    (word) => word.id !== target.id && word.letter !== target.letter,
+  );
+  const pool =
+    differentOnset.length >= count - 1
+      ? differentOnset
+      : WORDS.filter((word) => word.id !== target.id);
+  const distractors = shuffle(pool, random).slice(0, count - 1);
+
+  return shuffle([target, ...distractors], random);
+}
+
+function buildLees(id: string, target: LetterWord, random: () => number): LeesQuestion {
+  return {
+    kind: "lees",
+    id,
+    target,
+    choices: wordChoicesFor(target, 3, random),
+  };
+}
+
+/**
  * Bouwt een korte Letterronde: twee nieuwe letters, daarna herhaling in
  * wisselende vormen. De woordtrein verschijnt alleen als alle letters van het
  * woord al zijn geïntroduceerd.
@@ -143,5 +181,22 @@ export function createLetterRound(
     throw new Error("Letterronde heeft een onverwachte lengte");
   }
 
-  return { questions, newLetters: focus };
+  return { lesson: "letters", questions, newLetters: focus };
+}
+
+/**
+ * Bouwt een Woordlezen-ronde: zes verschillende woorden, elk met drie
+ * geschreven opties. De leerkracht of ouder hoeft niets in te stellen.
+ */
+export function createWordRound(random: () => number = Math.random): LetterRound {
+  const targets = shuffle(WORDS, random).slice(0, ROUND_SIZE);
+  const questions = targets.map<LeesQuestion>((word, index) =>
+    buildLees(`q${index + 1}`, word, random),
+  );
+
+  if (questions.length !== ROUND_SIZE) {
+    throw new Error("Woordlezen heeft een onverwachte lengte");
+  }
+
+  return { lesson: "woorden", questions, newLetters: [] };
 }

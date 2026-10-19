@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createEmptyProgressMap, createLetterRound } from "@entities/letter";
+import {
+  createEmptyProgressMap,
+  createLetterRound,
+  createWordRound,
+  WORDS,
+} from "@entities/letter";
 import { mulberry32 } from "@shared/lib";
 
 function validateRound(round: ReturnType<typeof createLetterRound>): void {
@@ -44,6 +49,7 @@ function validateRound(round: ReturnType<typeof createLetterRound>): void {
 describe("letter round", () => {
   it("bouwt een vaste, gemengde ronde", () => {
     const round = createLetterRound(createEmptyProgressMap(), mulberry32(42), "2026-10-18");
+    expect(round.lesson).toBe("letters");
     expect(round.newLetters).toEqual(["i", "k"]);
     expect(round.questions.map((question) => question.kind)).toEqual([
       "klank",
@@ -85,6 +91,54 @@ describe("letter round", () => {
     expect(first?.kind).toBe("klank");
     if (first?.kind === "klank") {
       expect(first.sound).toMatch(/^\/audio\/letters\/v1\/sounds\/[a-z]\.wav$/);
+    }
+  });
+});
+
+describe("word round", () => {
+  it("bouwt zes leesvragen met drie geschreven woorden", () => {
+    const round = createWordRound(mulberry32(5));
+    expect(round.lesson).toBe("woorden");
+    expect(round.newLetters).toEqual([]);
+    expect(round.questions).toHaveLength(6);
+
+    const targets = new Set<string>();
+    for (const question of round.questions) {
+      expect(question.kind).toBe("lees");
+      if (question.kind !== "lees") {
+        continue;
+      }
+
+      targets.add(question.target.id);
+      expect(question.choices).toHaveLength(3);
+      expect(new Set(question.choices.map((word) => word.id)).size).toBe(3);
+      expect(question.choices.map((word) => word.id)).toContain(question.target.id);
+      expect(WORDS.map((word) => word.id)).toContain(question.target.id);
+
+      for (const choice of question.choices) {
+        if (choice.id !== question.target.id) {
+          // Afleiders beginnen met een andere letter, zodat de beginletter
+          // alleen niet genoeg is om het antwoord te raden.
+          expect(choice.letter).not.toBe(question.target.letter);
+        }
+      }
+    }
+
+    expect(targets.size).toBe(6);
+  });
+
+  it("is deterministisch met dezelfde seed", () => {
+    const first = createWordRound(mulberry32(9));
+    const second = createWordRound(mulberry32(9));
+    expect(first).toEqual(second);
+  });
+
+  it("gebruikt alleen woorden met een lokaal audiobestand", () => {
+    const round = createWordRound(mulberry32(13));
+    for (const question of round.questions) {
+      if (question.kind === "lees") {
+        expect(question.target.audio).toMatch(/^\/audio\/letters\/v1\/words\/[a-z]+\.wav$/);
+      }
     }
   });
 });
