@@ -7,10 +7,8 @@ test.describe("letterpret op een telefoon", () => {
     await page.goto("/");
     await page.getByRole("link", { name: /letterpret/i }).click();
 
-    await expect(
-      page.getByRole("heading", { name: "Hoor de klank. Kies de letter." }),
-    ).toBeVisible();
-    await page.getByRole("button", { name: "Start de letterronde" }).click();
+    await expect(page.getByRole("heading", { name: "Kies je les" })).toBeVisible();
+    await page.getByRole("button", { name: /letterronde/i }).click();
 
     await expect(page.getByText("Vraag 1 van 6")).toBeVisible();
     await expect(page.getByRole("button", { name: "Luister" })).toBeVisible();
@@ -25,5 +23,22 @@ test.describe("letterpret op een telefoon", () => {
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("start woordlezen en speelt een woord af", async ({ page }) => {
+    await page.goto("/letters");
+
+    await expect(page.getByRole("heading", { name: "Kies je les" })).toBeVisible();
+    await page.getByRole("button", { name: /woordlezen/i }).click();
+
+    await expect(page.getByText("Woord 1 van 6")).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Kies het woord" }).getByRole("button"),
+    ).toHaveCount(3);
+
+    await expect(page.locator("audio").first()).toHaveAttribute(
+      "src",
+      /\/audio\/letters\/v1\/words\/[a-z]+\.wav$/,
+    );
   });
 });

@@ -32,11 +32,11 @@ function renderLetters() {
   return router;
 }
 
-async function startRound() {
-  fireEvent.click(await screen.findByRole("button", { name: "Start de letterronde" }));
+async function startLesson(name: RegExp) {
+  fireEvent.click(await screen.findByRole("button", { name }));
   const round = useLetterStore.getState().round;
   if (!round) {
-    throw new Error("Geen letterronde");
+    throw new Error("Geen ronde");
   }
   return round;
 }
@@ -45,17 +45,16 @@ describe("letter game", () => {
   it("speelt een volledige letterronde", async () => {
     renderLetters();
 
-    expect(
-      await screen.findByRole("heading", { name: "Hoor de klank. Kies de letter." }),
-    ).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Kies je les" })).toBeTruthy();
 
-    const round = await startRound();
+    const round = await startLesson(/letterronde/i);
+    expect(round.lesson).toBe("letters");
     expect(round.questions).toHaveLength(6);
 
     for (let index = 0; index < round.questions.length; index += 1) {
       const question = round.questions[index];
-      if (!question) {
-        throw new Error("Geen vraag");
+      if (!question || question.kind === "lees") {
+        throw new Error("Geen lettervraag");
       }
 
       if (question.kind === "trein") {
@@ -76,11 +75,35 @@ describe("letter game", () => {
     expect(loadLetterProgress().k.attempts).toBeGreaterThan(0);
   });
 
+  it("speelt een volledige leesronde", async () => {
+    renderLetters();
+    const round = await startLesson(/woordlezen/i);
+    expect(round.lesson).toBe("woorden");
+    expect(round.questions).toHaveLength(6);
+
+    for (let index = 0; index < round.questions.length; index += 1) {
+      const question = round.questions[index];
+      if (!question || question.kind !== "lees") {
+        throw new Error("Geen leesvraag");
+      }
+
+      fireEvent.click(screen.getByRole("button", { name: `Woord ${question.target.word}` }));
+      expect(useLetterStore.getState().answered).toBe(true);
+
+      const nextLabel = index + 1 >= round.questions.length ? "Klaar" : "Volgende";
+      fireEvent.click(screen.getByRole("button", { name: nextLabel }));
+    }
+
+    expect(await screen.findByRole("heading", { name: "Knap gelezen!" })).toBeTruthy();
+    // Woordlezen oefent lezen en raakt de lettervoortgang niet aan.
+    expect(loadLetterProgress().i.attempts).toBe(0);
+  });
+
   it("geeft na twee fouten het juiste antwoord", async () => {
     renderLetters();
-    const round = await startRound();
+    const round = await startLesson(/letterronde/i);
     const question = round.questions[0];
-    if (!question || question.kind === "trein") {
+    if (!question || question.kind === "trein" || question.kind === "lees") {
       throw new Error("Eerste vraag is geen klankvraag");
     }
 

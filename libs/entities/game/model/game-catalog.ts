@@ -109,7 +109,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   {
     id: "letters",
     name: "Letterpret",
-    description: "Hoor de klank, zoek de letter en bouw woordjes.",
+    description: "Hoor de klank, zoek de letter, bouw en lees woordjes.",
     status: "available",
     to: "/letters",
     thumbnail: "/thumbnails/letters-6b90ec8a.jpg",

@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import {
   createLetterRound,
+  createWordRound,
   recordLetterAnswer,
   type LetterId,
+  type LetterLesson,
   type LetterProgressMap,
   type LetterQuestion,
   type LetterRound,
@@ -15,13 +17,13 @@ interface LetterStore {
   index: number;
   answered: boolean;
   correct: boolean;
-  wrongChoices: readonly LetterId[];
+  wrongChoices: readonly string[];
   filled: readonly LetterId[];
   wrongLetters: readonly LetterId[];
   progress: LetterProgressMap;
   finished: boolean;
-  start: () => void;
-  choose: (letter: LetterId) => void;
+  start: (lesson?: LetterLesson) => void;
+  choose: (answer: string) => void;
   submitTrain: (letter: LetterId) => void;
   next: () => void;
 }
@@ -42,9 +44,10 @@ function applyProgress(set: StoreSet, get: StoreGet, letter: LetterId, correct: 
   saveLetterProgress(progress);
 }
 
-function startRound(set: StoreSet, get: StoreGet): void {
+function startRound(set: StoreSet, get: StoreGet, lesson: LetterLesson = "letters"): void {
+  const round = lesson === "woorden" ? createWordRound() : createLetterRound(get().progress);
   set({
-    round: createLetterRound(get().progress),
+    round,
     index: 0,
     answered: false,
     correct: false,
@@ -57,27 +60,43 @@ function startRound(set: StoreSet, get: StoreGet): void {
   playHaptic("tap");
 }
 
-function choose(set: StoreSet, get: StoreGet, letter: LetterId): void {
+function expectedAnswer(question: LetterQuestion): string {
+  return question.kind === "lees" ? question.target.id : question.target;
+}
+
+/** Woordlezen is oefenen; alleen lettervragen werken de lettervoortgang bij. */
+function applyChoiceProgress(
+  set: StoreSet,
+  get: StoreGet,
+  question: LetterQuestion,
+  correct: boolean,
+): void {
+  if (question.kind === "lees") {
+    return;
+  }
+  applyProgress(set, get, question.target, correct);
+}
+
+function choose(set: StoreSet, get: StoreGet, answer: string): void {
   const question = currentQuestion(get);
   const { answered, wrongChoices } = get();
   if (!question || question.kind === "trein" || answered) {
     return;
   }
 
-  const firstTry = wrongChoices.length === 0;
-  if (letter === question.target) {
+  if (answer === expectedAnswer(question)) {
     set({ answered: true, correct: true });
-    applyProgress(set, get, question.target, firstTry);
+    applyChoiceProgress(set, get, question, wrongChoices.length === 0);
     playSound("match");
     playHaptic("match");
     return;
   }
 
-  const nextWrong = [...wrongChoices, letter];
+  const nextWrong = [...wrongChoices, answer];
   const revealed = nextWrong.length >= 2;
   set({ wrongChoices: nextWrong, answered: revealed, correct: false });
   if (revealed) {
-    applyProgress(set, get, question.target, false);
+    applyChoiceProgress(set, get, question, false);
   }
   playSound(revealed ? "almost" : "wrong");
   playHaptic(revealed ? "almost" : "wrong");
@@ -153,8 +172,8 @@ export const useLetterStore = create<LetterStore>((set, get) => ({
   wrongLetters: [],
   progress: initialProgress,
   finished: false,
-  start: () => startRound(set, get),
-  choose: (letter) => choose(set, get, letter),
+  start: (lesson) => startRound(set, get, lesson),
+  choose: (answer) => choose(set, get, answer),
   submitTrain: (letter) => submitTrain(set, get, letter),
   next: () => nextQuestion(set, get),
 }));

@@ -16,7 +16,7 @@ Er is geen kant-en-klare open set met zuivere Nederlandse letterklanken. De idee
 ## Beslissing
 
 1. **Losse klanken uit een CC0-corpus.** De tien klanken (`i, k, m, s, p, v, e, n, t, a`) komen uit [rhasspy/dataset-voice-nathalie](https://github.com/rhasspy/dataset-voice-nathalie) (CC0 1.0, één vrouwelijke Belgisch-Nederlandse spreker). Per letter is een **woordbeginnend** foneem uit de meegeleverde uitlijning geknipt, daarna ontdempt, genormaliseerd en voorzien van een korte fade. Resultaat: echte fonemen zonder schwa, opgeslagen als 48 kHz mono WAV in `apps/games/public/audio/letters/v1/sounds/`.
-2. **Prototype-woordaudio uit Wikimedia Commons.** Voor **Klankvanger** (woord → beginletter) en **Woordtrein** (woord bouwen) is per woord een bestaand `Nl-<woord>.ogg` van Wikimedia Commons gebruikt, ontdaan van stilte, genormaliseerd en omgezet naar 48 kHz mono WAV in `apps/games/public/audio/letters/v1/words/`.
+2. **Prototype-woordaudio uit Wikimedia Commons.** Voor **Klankvanger** (woord → beginletter), **Woordtrein** (woord bouwen) en **Woordlezen** (geschreven woord kiezen) zijn per woord bestaande `Nl-<woord>.ogg`-bestanden van Wikimedia Commons gebruikt, ontdaan van stilte, genormaliseerd en omgezet naar 48 kHz mono WAV in `apps/games/public/audio/letters/v1/words/`.
 3. **Alles lokaal, geen runtime-TTS en geen externe requests.** De paden zijn versiegebonden (`/audio/letters/v1/...`) zodat een nieuwe stem geen oude cache oplevert. De CSP blijft ongewijzigd; audio valt onder `default-src 'self'`.
 4. **De woordaudio is expliciet prototype.** Vóór publieke lancering wordt de hele set (klanken én woorden) vervangen door **eigen opnames met één stem**, beluisterd door een leerkracht of logopedist (route B). Dan vervalt de CC BY-SA-afhankelijkheid voor woorden en is er één consistent stemgeluid.
 5. **De klank is leidend, de letternaam is een hulplabel.** De UI toont kleine letters en speelt bij "Klank & Letter" en "Letterjacht" altijd de losse klank af, nooit een letternaam.
@@ -65,6 +65,7 @@ Bron: Wikimedia Commons. De bestanden zijn getrimd, genormaliseerd en naar WAV o
 ## Gevolgen
 
 - Het spel werkt volledig offline en zonder externe requests; de audio staat in de repository.
+- **Woordlezen** (luisteren → geschreven woord kiezen) hergebruikt dezelfde vijftien woordopnames; die les voegde geen nieuwe audiobestanden toe.
 - De klanken zijn echte fonemen. Bij stopletters (`k`, `p`, `t`) is de klank kort — dat is fonetisch correct, maar vraagt om een luistertest met een leesspecialist.
 - De klankstem (Belgisch-Nederlands, vrouwelijk) en de woordstemmen (diverse Nederlandse mannen) verschillen. Dat is een bewuste, tijdelijke prototype-beperking.
 - Zolang de Commons-woorden in gebruik zijn, geldt attributie en share-alike voor die bestanden. De app-code valt daar niet onder; een nieuwe opname-set maakt de repository volledig CC0/eigen werk.
