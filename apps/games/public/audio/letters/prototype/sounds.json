@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-19T08:07:16.517Z",
+  "generatedAt": "2026-10-19T08:12:38.547Z",
   "voices": [
     {
       "slug": "nathalie",
@@ -1577,6 +1577,46 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"v\">v</phoneme>",
           "files": {}
+        },
+        {
+          "id": "lang4",
+          "label": "Verlengd (4 tekens)",
+          "prompt": "vvvv",
+          "files": {
+            "nathalie": "./nathalie/v/lang4.mp3"
+          }
+        },
+        {
+          "id": "lang6",
+          "label": "Verlengd (6 tekens)",
+          "prompt": "vvvvvv",
+          "files": {
+            "nathalie": "./nathalie/v/lang6.mp3"
+          }
+        },
+        {
+          "id": "ellipsis",
+          "label": "Met ellips",
+          "prompt": "vvv...",
+          "files": {
+            "nathalie": "./nathalie/v/ellipsis.mp3"
+          }
+        },
+        {
+          "id": "traag",
+          "label": "Losse letter, langzaam",
+          "prompt": "v",
+          "files": {
+            "nathalie": "./nathalie/v/traag.mp3"
+          }
+        },
+        {
+          "id": "veel",
+          "label": "Woord: veel (knip zelf)",
+          "prompt": "veel",
+          "files": {
+            "nathalie": "./nathalie/v/veel.mp3"
+          }
         }
       ]
     },
@@ -1627,6 +1667,46 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"ʋ\">w</phoneme>",
           "files": {}
+        },
+        {
+          "id": "lang4",
+          "label": "Verlengd (4 tekens)",
+          "prompt": "wwww",
+          "files": {
+            "nathalie": "./nathalie/w/lang4.mp3"
+          }
+        },
+        {
+          "id": "lang6",
+          "label": "Verlengd (6 tekens)",
+          "prompt": "wwwwww",
+          "files": {
+            "nathalie": "./nathalie/w/lang6.mp3"
+          }
+        },
+        {
+          "id": "ellipsis",
+          "label": "Met ellips",
+          "prompt": "www...",
+          "files": {
+            "nathalie": "./nathalie/w/ellipsis.mp3"
+          }
+        },
+        {
+          "id": "traag",
+          "label": "Losse letter, langzaam",
+          "prompt": "w",
+          "files": {
+            "nathalie": "./nathalie/w/traag.mp3"
+          }
+        },
+        {
+          "id": "water",
+          "label": "Woord: water (knip zelf)",
+          "prompt": "water",
+          "files": {
+            "nathalie": "./nathalie/w/water.mp3"
+          }
         }
       ]
     },
@@ -1677,6 +1757,46 @@
           "label": "SSML (experiment)",
           "prompt": "<phoneme alphabet=\"ipa\" ph=\"z\">z</phoneme>",
           "files": {}
+        },
+        {
+          "id": "lang4",
+          "label": "Verlengd (4 tekens)",
+          "prompt": "zzzz",
+          "files": {
+            "nathalie": "./nathalie/z/lang4.mp3"
+          }
+        },
+        {
+          "id": "lang6",
+          "label": "Verlengd (6 tekens)",
+          "prompt": "zzzzzz",
+          "files": {
+            "nathalie": "./nathalie/z/lang6.mp3"
+          }
+        },
+        {
+          "id": "ellipsis",
+          "label": "Met ellips",
+          "prompt": "zzz...",
+          "files": {
+            "nathalie": "./nathalie/z/ellipsis.mp3"
+          }
+        },
+        {
+          "id": "traag",
+          "label": "Losse letter, langzaam",
+          "prompt": "z",
+          "files": {
+            "nathalie": "./nathalie/z/traag.mp3"
+          }
+        },
+        {
+          "id": "zee",
+          "label": "Woord: zee (knip zelf)",
+          "prompt": "zee",
+          "files": {
+            "nathalie": "./nathalie/z/zee.mp3"
+          }
         }
       ]
     },

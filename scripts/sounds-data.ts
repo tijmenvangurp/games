@@ -64,9 +64,9 @@ export const AANBEVOLEN_VARIANTEN: Readonly<Record<string, string>> = {
   r: "fonetisch",
   s: "letter",
   t: "fonetisch",
-  v: "letter",
-  w: "letter",
-  z: "letter",
+  v: "lang4",
+  w: "lang4",
+  z: "lang4",
   ng: "letter",
   ch: "letter",
 };
@@ -214,9 +214,27 @@ export const KLANKEN: readonly KlankMapping[] = [
   consonant("r", "ruh", "rat", "r"),
   consonant("s", "sss", "sap", "s"),
   consonant("t", "tuh", "tak", "t"),
-  consonant("v", "vvv", "vis", "v"),
-  consonant("w", "wuh", "wip", "ʋ"),
-  consonant("z", "zzz", "zon", "z"),
+  withExtraVariants(consonant("v", "vvv", "vis", "v"), [
+    { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "vvvv" },
+    { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "vvvvvv" },
+    { id: "ellipsis", label: "Met ellips", ttsPrompt: "vvv..." },
+    { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "v", speed: 0.5 },
+    { id: "veel", label: "Woord: veel (knip zelf)", ttsPrompt: "veel" },
+  ]),
+  withExtraVariants(consonant("w", "wuh", "wip", "ʋ"), [
+    { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "wwww" },
+    { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "wwwwww" },
+    { id: "ellipsis", label: "Met ellips", ttsPrompt: "www..." },
+    { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "w", speed: 0.5 },
+    { id: "water", label: "Woord: water (knip zelf)", ttsPrompt: "water" },
+  ]),
+  withExtraVariants(consonant("z", "zzz", "zon", "z"), [
+    { id: "lang4", label: "Verlengd (4 tekens)", ttsPrompt: "zzzz" },
+    { id: "lang6", label: "Verlengd (6 tekens)", ttsPrompt: "zzzzzz" },
+    { id: "ellipsis", label: "Met ellips", ttsPrompt: "zzz..." },
+    { id: "traag", label: "Losse letter, langzaam", ttsPrompt: "z", speed: 0.5 },
+    { id: "zee", label: "Woord: zee (knip zelf)", ttsPrompt: "zee" },
+  ]),
 
   // Medeklinkerdigrafen
   consonantDigraph("ng", "ng", "lang", "ŋ"),
