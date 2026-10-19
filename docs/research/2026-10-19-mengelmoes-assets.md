@@ -265,15 +265,15 @@ De kwaliteit zit in de data, niet in de UI. Voeg tests toe die controleren:
 - elk element opent minstens één nieuwe mogelijkheid, behalve de hoogste tier;
 - een hint verwijst nooit naar een element dat al ontdekt is.
 
-### Eerste verticale slice
+### Eerste slice
 
 - 4 basislementen: water, vuur, aarde, lucht.
-- 20 elementen en ongeveer 25 recepten, geselecteerd uit de MIT-dataset en vertaald.
+- 71 elementen en 67 recepten, met eigen Nederlandse namen en Fluent Emoji Flat-iconen.
 - Een vrije werkbank met sleep- en tik-tik-mengen.
-- Labboek en lokale opslag.
-- Eén ontdekkingsanimatie en de bestaande geluiden.
+- Labboek, hints en lokale opslag.
+- Ontdekkingsanimatie en de bestaande geluiden.
 
-Pas daarna uitbreiden naar 60–80 elementen. De receptenboom is de grootste kostenpost; hij moet logisch, Nederlands en verrassend zijn.
+De receptenboom is de grootste kostenpost; hij moet logisch, Nederlands en verrassend zijn. Verdere uitbreiding kan met nieuwe takken, zolang elk element bereikbaar blijft en er geen dubbele recepten ontstaan.
 
 ## 6. Risico's en open vragen
 

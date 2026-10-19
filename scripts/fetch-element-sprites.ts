@@ -14,7 +14,7 @@ const ICONIFY_BASE = "https://api.iconify.design/fluent-emoji-flat";
 const SPRITES: Record<string, string> = {
   water: "droplet",
   fire: "fire",
-  earth: "mountain",
+  earth: "globe-showing-europe-africa",
   air: "wind-face",
   mud: "brown-circle",
   steam: "dashing-away",
@@ -26,7 +26,7 @@ const SPRITES: Record<string, string> = {
   stone: "rock",
   cloud: "cloud",
   life: "dna",
-  metal: "gear",
+  metal: "nut-and-bolt",
   tree: "deciduous-tree",
   wood: "wood",
   house: "house",
@@ -34,25 +34,103 @@ const SPRITES: Record<string, string> = {
   bird: "bird",
   human: "bust-in-silhouette",
   dragon: "dragon",
+  wind: "leaf-fluttering-in-wind",
+  storm: "cloud-with-lightning",
+  snow: "snowflake",
+  ice: "ice",
+  snowman: "snowman",
+  sky: "sunrise-over-mountains",
+  sun: "sun",
+  moon: "crescent-moon",
+  star: "glowing-star",
+  rainbow: "rainbow",
+  mountain: "mountain",
+  sea: "water-wave",
+  island: "desert-island",
+  beach: "beach-with-umbrella",
+  desert: "desert",
+  cactus: "cactus",
+  flower: "blossom",
+  forest: "evergreen-tree",
+  fruit: "red-apple",
+  grass: "herb",
+  animal: "paw-prints",
+  dog: "dog-face",
+  cat: "cat-face",
+  horse: "horse-face",
+  butterfly: "butterfly",
+  dinosaur: "sauropod",
+  farm: "house-with-garden",
+  wheat: "sheaf-of-rice",
+  bread: "bread",
+  sugar: "candy",
+  cake: "birthday-cake",
+  tool: "hammer-and-wrench",
+  wheel: "gear",
+  cart: "shopping-cart",
+  bridge: "bridge-at-night",
+  boat: "sailboat",
+  castle: "castle",
+  village: "houses",
+  city: "cityscape",
+  glass: "tumbler-glass",
+  electricity: "electric-plug",
+  lightbulb: "light-bulb",
+  computer: "desktop-computer",
+  robot: "robot",
+  rocket: "rocket",
+  magic: "magic-wand",
+  unicorn: "unicorn",
+  wizard: "person-mage",
+  potion: "test-tube",
 };
 
-async function download(id: string, icon: string): Promise<void> {
-  const response = await fetch(`${ICONIFY_BASE}/${icon}.svg`);
+interface IconifyIcon {
+  body: string;
+  width?: number;
+  height?: number;
+}
+
+interface IconifyResponse {
+  width: number;
+  height: number;
+  icons: Record<string, IconifyIcon>;
+}
+
+function sleep(milliseconds: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, milliseconds);
+  });
+}
+
+async function fetchIcons(attempt = 0): Promise<IconifyResponse> {
+  const names = Object.values(SPRITES).join(",");
+  const response = await fetch(`${ICONIFY_BASE}.json?icons=${encodeURIComponent(names)}`);
+
+  if (response.status === 429 && attempt < 4) {
+    await sleep(2000 * 2 ** attempt);
+    return fetchIcons(attempt + 1);
+  }
   if (!response.ok) {
-    throw new Error(`Kon ${icon} niet ophalen (${response.status})`);
+    throw new Error(`Kon de iconenset niet ophalen (${response.status})`);
+  }
+  return (await response.json()) as IconifyResponse;
+}
+
+await mkdir(OUTPUT_DIR, { recursive: true });
+const data = await fetchIcons();
+
+for (const [id, icon] of Object.entries(SPRITES)) {
+  const entry = data.icons[icon];
+  if (!entry) {
+    throw new Error(`Onbekend icoon: ${icon}`);
   }
 
-  const svg = await response.text();
-  if (!svg.startsWith("<svg")) {
-    throw new Error(`Onverwacht antwoord voor ${icon}`);
-  }
-
+  const width = entry.width ?? data.width;
+  const height = entry.height ?? data.height;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 ${width} ${height}">${entry.body}</svg>`;
   await writeFile(`${OUTPUT_DIR}${id}.svg`, svg, "utf8");
   console.log(`✓ ${id}.svg`);
 }
 
-await mkdir(OUTPUT_DIR, { recursive: true });
-for (const [id, icon] of Object.entries(SPRITES)) {
-  await download(id, icon);
-}
 console.log(`Klaar: ${Object.keys(SPRITES).length} elementen.`);

@@ -44,7 +44,7 @@ describe("mengelmoes", () => {
 
     expect(await screen.findByRole("heading", { name: "Mengelmoes" })).toBeTruthy();
     expect(screen.getByTestId("alchemy-progress").textContent).toContain("4");
-    expect(screen.getByTestId("alchemy-progress").textContent).toContain("/ 22 ontdekt");
+    expect(screen.getByTestId("alchemy-progress").textContent).toContain("/ 71 ontdekt");
 
     for (const name of ["Water", "Vuur", "Aarde", "Lucht"]) {
       expect(shelfButton(name)).toBeTruthy();
@@ -100,8 +100,8 @@ describe("mengelmoes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
 
     expect(await screen.findByRole("heading", { name: "Labboek" })).toBeTruthy();
-    expect(screen.getByText("4 van 22 elementen ontdekt")).toBeTruthy();
-    expect(screen.getAllByText("Onbekend")).toHaveLength(18);
+    expect(screen.getByText("4 van 71 elementen ontdekt")).toBeTruthy();
+    expect(screen.getAllByText("Onbekend")).toHaveLength(67);
 
     fireEvent.click(screen.getByRole("button", { name: "Sluit labboek" }));
     expect(screen.queryByRole("heading", { name: "Labboek" })).toBeNull();
@@ -122,16 +122,16 @@ describe("mengelmoes", () => {
     expect(useAlchemyStore.getState().discovered).toContain("steam");
   });
 
-  it("hints with only one known ingredient", async () => {
+  it("hints with self-combinations and a single known ingredient", async () => {
     await renderAlchemy();
     act(() => useAlchemyStore.setState({ discovered: ["water"] }));
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
-    expect(await screen.findByText("Probeer Water met iets anders.")).toBeTruthy();
+    expect(await screen.findByText("Probeer Water + Water.")).toBeTruthy();
 
-    act(() => useAlchemyStore.setState({ discovered: ["earth"], hint: null }));
+    act(() => useAlchemyStore.setState({ discovered: ["fire"], hint: null }));
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
-    expect(await screen.findByText("Probeer Aarde met iets anders.")).toBeTruthy();
+    expect(await screen.findByText("Probeer Vuur met iets anders.")).toBeTruthy();
   });
 
   it("shows a known-result message when a combination is repeated", async () => {

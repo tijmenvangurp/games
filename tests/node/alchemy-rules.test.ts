@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   BASE_ELEMENT_IDS,
@@ -31,6 +33,13 @@ describe("alchemy rules", () => {
     }
   });
 
+  it("has a local sprite for every element", () => {
+    for (const element of ELEMENTS) {
+      const file = join(process.cwd(), "apps/games/public", element.icon.replace(/^\//, ""));
+      expect(existsSync(file), element.icon).toBe(true);
+    }
+  });
+
   it("keeps the four classical elements available", () => {
     expect(BASE_ELEMENT_IDS).toEqual(["water", "fire", "earth", "air"]);
     for (const id of BASE_ELEMENT_IDS) {
@@ -45,8 +54,6 @@ describe("alchemy rules", () => {
       expect(isElementId(recipe.a)).toBe(true);
       expect(isElementId(recipe.b)).toBe(true);
       expect(isElementId(recipe.result)).toBe(true);
-      expect(recipe.a).not.toBe(recipe.b);
-
       const key = pairKey(recipe.a, recipe.b);
       expect(pairs.has(key)).toBe(false);
       pairs.add(key);
@@ -94,10 +101,17 @@ describe("alchemy rules", () => {
     expect(getHint(everything)).toBeNull();
   });
 
-  it("keeps the first slice at a readable size", () => {
-    expect(ELEMENTS.length).toBeGreaterThanOrEqual(12);
-    expect(ELEMENTS.length).toBeLessThanOrEqual(30);
-    expect(RECIPES.length).toBeGreaterThanOrEqual(10);
+  it("keeps the element tree at a readable size", () => {
+    expect(ELEMENTS.length).toBeGreaterThanOrEqual(60);
+    expect(ELEMENTS.length).toBeLessThanOrEqual(80);
+    expect(RECIPES.length).toBeGreaterThanOrEqual(60);
+  });
+
+  it("supports combining two copies of the same element", () => {
+    expect(combine("air", "air")).toBe("wind");
+    expect(combine("water", "water")).toBe("sea");
+    expect(combine("stone", "stone")).toBe("mountain");
+    expect(combine("house", "house")).toBe("village");
   });
 
   it("handles unreachable ingredients in custom recipe sets", () => {
