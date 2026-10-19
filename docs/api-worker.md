@@ -1,6 +1,6 @@
 # API Worker: auth-fundament
 
-Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundament en `/api/health`; issue #43 voegt **Better Auth 1.7.10** toe met een ouderlogin via **Google OAuth** en **passkey**. Issue #64 maakt **passkey een zelfstandige loginmethode**: een ouder kan zonder Google een account aanmaken en Google later koppelen. Issue #44 voegt de **serverkant van kindprofielen en voortgang** toe (`/api/players`, `/api/progress`); de sync-client, flag en e2e-afwerking volgen in #44/#45.
+Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundament en `/api/health`; issue #43 voegt **Better Auth 1.7.10** toe met een ouderlogin via **Google OAuth** en **passkey**. Issue #64 maakt **passkey een zelfstandige loginmethode**: een ouder kan zonder Google een account aanmaken en Google later koppelen. Issue #44 voegde de **serverkant van kindprofielen en voortgang** toe (`/api/players`, `/api/progress`); #69 leverde de **client-sync met expliciete per-profiel opt-in** en #45 rondt de **CSP-, header- en flag-audit** af met preview-e2e.
 
 `apps/api` is een eigen Nx-project met de tags `layer:app`, `scope:api` en `type:app`. De Worker mag alleen uit `entities` en `shared` importeren, nooit uit `features`, `pages` of `widgets`.
 
@@ -29,7 +29,13 @@ Deze map beschrijft de Worker onder de statische app. Issue #42 legde het fundam
 | `/api/progress`                   | `POST`   | Idempotente, revision-guarded upsert van één spel-document                |
 | overig                            | alle     | JSON-`404` (`{"error":"not_found"}`)                                      |
 
-Alle API-responses krijgen `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `X-Robots-Tag: noindex`, `Referrer-Policy: no-referrer` en een strikte CSP (`default-src 'none'; frame-ancestors 'none'`). De statische `_headers` krijgen in #43 alleen `connect-src 'self'`; de volledige CSP-afwerking hoort bij #45.
+Alle API-responses krijgen `Cache-Control: no-store`, `X-Content-Type-Options: nosniff`, `X-Robots-Tag: noindex`, `Referrer-Policy: no-referrer` en een strikte CSP (`default-src 'none'; frame-ancestors 'none'`); alle helpers in `apps/api/src/response.ts` zetten dat op elk pad, inclusief fouten (400/401/403/404/405/409/413/500). `tests/api/api-headers.test.ts` wacht dit vast met een sweeptest over routes en statuscodes.
+
+De CSP-audit uit #45 is afgerond **zonder wijziging** van de CSP in `apps/games/public/_headers`:
+
+- `connect-src 'self'` blijft: de API draait same-origin, dus de client praat alleen met de eigen origin.
+- Google OAuth is een top-level navigatie via Better Auth. Navigaties vallen niet onder `connect-src` (of overige fetch-richtlijnen) en zijn bovendien alleen nodig wanneer Google is geconfigureerd; er is dus geen `frame-src`-, `img-src`- of connect-uitzondering voor Google en er komen geen remote avatars.
+- De CSP-stand wordt bewaakt door `tests/node/csp-headers.test.ts` (file-level) en door de preview-e2e in `e2e/account.spec.ts`, die tijdens gastmodus en accountgebruik alle requests op eigen origin controleert.
 
 ## Auth-configuratie
 
@@ -310,8 +316,44 @@ Een passkey-only account toont "Passkey-account zonder e-mail" in plaats van het
 
 ## Flags
 
+Elke route deelt dezelfde toestandsregel: `readAuthSettings` geeft `null` terug wanneer `ACCOUNTS_ENABLED` niet `"true"` is **of** wanneer `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` ontbreekt (of een secret korter is dan 32 tekens). Dan antwoordt de Worker met een nette JSON-`503` `{"error":"auth_unavailable"}` — ook op foutpaden en ook de capabilities/context-routes.
+
+| Endpoint                          | `ACCOUNTS_ENABLED=false`                                  |
+| --------------------------------- | --------------------------------------------------------- |
+| `/api/health`                     | Geen auth-afhankelijkheid: blijft `200` (D1-status apart) |
+| `/api/auth/*`                     | `503` `auth_unavailable`                                  |
+| `/api/auth/capabilities`          | `503` `auth_unavailable`                                  |
+| `/api/auth/passkey-first/context` | `503` `auth_unavailable`                                  |
+| `/api/players` (GET, POST)        | `503` `auth_unavailable`                                  |
+| `/api/players/:id` (DELETE)       | `503` `auth_unavailable`                                  |
+| `/api/progress` (GET, POST)       | `503` `auth_unavailable`                                  |
+| overige paden                     | JSON-`404`, onveranderd                                   |
+
+De flag-semantiek is vastgelegd met tests:
+
+- `tests/api/progress-routes.test.ts` en `tests/api/auth.test.ts`: 503 per route en pad;
+- `tests/api/api-headers.test.ts`: 503-sweep over alle routes mét de API-securityheaders;
+- `e2e/account.spec.ts`: preview-flows (gastmodus, accountveld, sync-paneel, CSP/origin-check), lokaal met gemockte `/api/*`-antwoorden en geen echte D1.
+
+### Clientgedrag bij een 503
+
+De sync-engine (`libs/features/sync`) en de account-UI mogen bij een 503 op ieder endpoint geen blokkerende state veroorzaken; spellen blijven lokaal werken:
+
+- `ProgressApi.hasSession()` behandelt elke niet-OK-response (dus ook 503) als "geen sessie": er wordt niets gesynchroniseerd en de outbox blijft gewoon staan.
+- De hydratie/flush-loop vangt API-fouten af en probeert later opnieuw met backoff; er is geen gebruikersmelding en geen blokkade.
+- De accountpagina toont bij een mislukte sessiecheck een nette melding ("Inloggen is nu niet beschikbaar. Je kunt gewoon blijven spelen.") met een herhaal-knop; de capabilities-fetch valt terug op passkey-only.
+- `SyncConsentPanel` rendert niets zonder sessie.
+
 - `ACCOUNTS_ENABLED=false` staat in productie en in `previews.vars`. De auth-route antwoordt met een JSON-503 tot de eigenaar de flag op `"true"` zet **en** de secrets heeft gezet.
-- `VITE_ACCOUNTS_ENABLED` bestaat nog niet; de route zichtbaar maken en de build-time flag horen bij #45.
+- `VITE_ACCOUNTS_ENABLED` bestaat nog niet; de route is nu alleen via deep link bereikbaar (nog niet gekoppeld aan het spelmenu) en de build-time flag horen bij de uitrol in #45.
+
+## Wat de integratiebranch nu levert
+
+- **Worker en D1 (#42):** `apps/api` als eigen Nx-project, `/api/health` met D1-check, `run_worker_first` voor `/api/*`, previews met een aparte D1-placeholder en `ACCOUNTS_ENABLED=false`.
+- **Better Auth met passkey-first en optionele Google (#43/#64):** zelfstandige account-aanmaak met alleen een passkey (ondertekende kortlevende context, synthetische `@invalid`-e-mail), Google alleen als beide credentials zijn gezet, accountlinking met `allowDifferentEmails`, database-rate-limiting en de API-securityheaders op alle responses.
+- **Profielen en voortgang (#44):** `/api/players` en `/api/progress` met slot-validatie (max 4), idempotente revision-guarded upserts, soft-delete met cascade, de game-allowlist als serverkopie van `gameCatalog` en in-memory SQLite-tests met de echte migraties.
+- **Client-sync (#69):** same-origin sync-client met outbox, debounce en merge-callbacks per spel, expliciete per-profiel opt-in (standaard uit), gast-eerst (sync voegt alleen toe) en het sync-gedeelte van de accountpagina.
+- **Deze stap (#45):** de CSP- en headeraudit, de flag-semantiek vastgelegd per endpoint en preview-e2e met gemockte API-antwoorden. Wat nog openligt: echte preview-e2e-runs en WebAuthn/Google/D1-checks op een preview-omgeving (zie "Wat lokaal niet getest kan worden").
 
 ## Checks
 
@@ -357,10 +399,10 @@ De passkey-first-tests dekken:
 - De player- en progress-tests draaien tegen in-memory SQLite met de echte migraties, maar niet tegen D1 zelf. D1-specifieke `batch()`-atomiciteit, `meta.changes` en gelijktijdige schrijvers moeten op een preview met de echte D1 worden gecontroleerd.
 - De routetests injecteren een sessieresolver; ze doorlopen geen echte Better Auth-cookie. De sessie zelf is in #43 getest en moet samen met de client op een preview worden getest.
 - De context-endpoint heeft geen eigen rate limiter. Test in productie of Cloudflare-rate-limiting nodig is voordat de registratie breed open staat.
-- De sync-client (outbox, debounce, merge per spel) bestaat nog niet; deze wijziging levert alleen het servercontract.
+- De preview-e2e in `e2e/account.spec.ts` draait tegen een statische Vite-preview met gemockte `/api/*`-antwoorden: de echte Better Auth-ceremonie, de echte D1 en een echte implementatie van `_headers`/`run_worker_first` in Cloudflare blijven op een preview-omgeving te controleren.
 
 ## Volgende stappen (#44/#45)
 
 - #64: passkey-first registratie, optionele Google-configuratie en accountlinking zijn klaar; de echte WebAuthn-ceremonie moet nog op een toestel met authenticator worden getest.
-- #44: de serverkant van `/api/players` en `/api/progress` met `player`/`progress`/`progress_mutation` is klaar. De sync-client, de `consent`-registratie en de UI blijven open.
-- #45: `VITE_ACCOUNTS_ENABLED`, de menu-ingang, de volledige CSP- en headeraudit, e2e-tests en de uitrol achter de flag.
+- #44/#69: de serverkant van `/api/players` en `/api/progress` en de client-sync met per-profiel opt-in zijn klaar; de `consent`-registratie volgt nog.
+- #45: de CSP- en headeraudit, de flag-semantiek en de preview-e2e-flows zijn afgerond (zie hiervoor). Open: `VITE_ACCOUNTS_ENABLED` met de menu-ingang, de echte preview-e2e-run en de uitrol achter de flag.
