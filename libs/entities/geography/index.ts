@@ -18,7 +18,7 @@ export {
   provincePuzzleMap,
   provinceShapeCodes,
   puzzleMap,
-  worldMap,
+  regionMap,
   worldShapeCodes,
 } from "./model/world";
 export type { PuzzleMap, PuzzleMapArea, PuzzlePiece, WorldMap } from "./model/world";

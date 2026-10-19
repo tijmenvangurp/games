@@ -2,16 +2,10 @@ import { geoArea, geoBounds, geoCentroid, geoMercator, geoPath } from "d3-geo";
 import type { Feature, FeatureCollection, Geometry, Polygon } from "geojson";
 import { feature } from "topojson-client";
 import type { GeometryCollection, Topology } from "topojson-specification";
+import { subjectsFor } from "./config";
 import { COUNTRIES } from "./countries";
 import { PROVINCES } from "./provinces";
 import type { FlagSubject } from "./types";
-
-/**
- * Degrees of longitude a map shows at least, so that small states and island
- * nations stay recognisable instead of filling the whole frame.
- */
-const MIN_SPAN = 12;
-const MAX_SPAN = 100;
 
 export interface WorldMap {
   /** SVG path for all land, drawn as a backdrop. */
@@ -25,13 +19,8 @@ export interface WorldMap {
   height: number;
 }
 
-/** What a map needs to know about a place. */
-export interface MapPlace {
-  latitude: number;
-  longitude: number;
-  /** ISO 3166-1 numeric code of a country; provinces have none. */
-  numeric?: string;
-}
+/** Breathing room around the continent on the answer map. */
+const REGION_MAP_PADDING = 14;
 
 interface Atlas {
   countries: FeatureCollection;
@@ -58,79 +47,64 @@ function loadAtlas(): Promise<Atlas> {
 }
 
 /**
- * The largest polygon of a country. Countries like France and the Netherlands
- * have overseas parts; fitting the map to those would zoom out to the Atlantic,
- * so the mainland decides the zoom level.
- */
-function largestPolygon(geometry: Geometry): Polygon | undefined {
-  if (geometry.type === "Polygon") {
-    return geometry;
-  }
-  if (geometry.type !== "MultiPolygon" || geometry.coordinates.length === 0) {
-    return undefined;
-  }
-
-  const polygons: Polygon[] = geometry.coordinates.map((coordinates) => ({
-    type: "Polygon",
-    coordinates,
-  }));
-
-  return polygons.reduce((largest, polygon) =>
-    geoArea(polygon) > geoArea(largest) ? polygon : largest,
-  );
-}
-
-function spanFor(polygon: Polygon | undefined): number {
-  if (!polygon) {
-    return MIN_SPAN;
-  }
-
-  const [[west, south], [east, north]] = geoBounds(polygon);
-  const span = Math.max(north - south, Math.abs(east - west));
-
-  return Math.min(MAX_SPAN, Math.max(MIN_SPAN, span * 1.6));
-}
-
-function matchesNumeric(entry: Feature, numeric: string | undefined): boolean {
-  return Boolean(numeric) && String(entry.id).padStart(3, "0") === numeric;
-}
-
-/**
- * Renders a place on a Mercator map of `width` by `height`: the surrounding
- * land as backdrop, the country highlighted (when the atlas has its outline)
- * and a marker on its centre. The zoom follows the country's size, so every
- * place gets a readable map.
+ * Renders the continent of a subject on a Mercator map of `width` by
+ * `height`: every country of that continent as context, the subject
+ * highlighted when the atlas has its outline, and a marker on its centre.
+ * Showing the whole continent teaches where the country lies, instead of a
+ * close-up of its neighbours. Without an outline (small states) the marker is
+ * the only mark.
  *
- * Pure rendering: no DOM, no network. Reusable for later map games (provinces,
- * rivers, capitals), which can pass their own geometry through the same
- * projection approach.
+ * Pure rendering: no DOM, no network.
  */
-export async function worldMap(place: MapPlace, width: number, height: number): Promise<WorldMap> {
-  const atlas = await loadAtlas();
-  const target = place.numeric
-    ? atlas.countries.features.find((entry) => matchesNumeric(entry, place.numeric))
-    : undefined;
-  const polygon = target?.geometry ? largestPolygon(target.geometry) : undefined;
-  const center: [number, number] = [place.longitude, place.latitude];
-  const span = spanFor(polygon);
+export async function regionMap(
+  subject: FlagSubject,
+  width: number,
+  height: number,
+): Promise<WorldMap> {
+  if (subject.region === "nederland") {
+    return provinceMap(subject.code, width, height);
+  }
 
-  // Mercator: a longitude span of `span` degrees is `span * π / 180` radians,
-  // so this scale makes that span exactly as wide as the map.
+  const atlas = await loadAtlas();
+  const shapes = countryShapes(byNumeric(atlas.countries.features));
+  const entries = subjectsFor(subject.region);
+  const features = [
+    ...fitFeatures(shapes, entries),
+    {
+      type: "Feature" as const,
+      properties: {},
+      geometry: {
+        type: "Point" as const,
+        coordinates: [subject.longitude, subject.latitude],
+      },
+    },
+  ];
   const projection = geoMercator()
-    .center(center)
-    .translate([width / 2, height / 2])
-    .scale((width * 180) / (span * Math.PI))
+    .fitExtent(
+      [
+        [REGION_MAP_PADDING, REGION_MAP_PADDING],
+        [width - REGION_MAP_PADDING, height - REGION_MAP_PADDING],
+      ],
+      { type: "FeatureCollection", features },
+    )
     .clipExtent([
       [0, 0],
       [width, height],
     ]);
   const path = geoPath(projection);
-  const point = projection(center) ?? [width / 2, height / 2];
+  const target = shapes.get(subject.code);
+  const marker = projection([subject.longitude, subject.latitude]) ?? [width / 2, height / 2];
 
   return {
-    land: path(atlas.land) ?? "",
-    highlight: target?.geometry ? (path(target) ?? "") : "",
-    marker: { x: point[0], y: point[1] },
+    land: entries
+      .flatMap((entry) => {
+        const shape = shapes.get(entry.code);
+
+        return shape ? [path(shape) ?? ""] : [];
+      })
+      .join(" "),
+    highlight: target ? (path(target) ?? "") : "",
+    marker: { x: marker[0], y: marker[1] },
     width,
     height,
   };

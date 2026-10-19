@@ -1,41 +1,24 @@
-import {
-  provinceMap,
-  worldMap,
-  type Country,
-  type FlagSubject,
-  type WorldMap,
-} from "@entities/geography";
+import { regionMap, type FlagSubject, type WorldMap } from "@entities/geography";
 import { useEffect, useState } from "react";
 
-const MAP_WIDTH = 320;
-const MAP_HEIGHT = 180;
-// The Netherlands is almost square; a portrait frame shows it bigger.
-const PROVINCE_MAP_WIDTH = 240;
-const PROVINCE_MAP_HEIGHT = 260;
-
-function isCountry(subject: FlagSubject): subject is Country {
-  return "numeric" in subject;
-}
+/** Countries use a landscape frame; the Netherlands is taller than it is wide. */
+const LANDSCAPE = { width: 320, height: 220 };
+const PORTRAIT = { width: 240, height: 260 };
 
 /**
  * The maps are separate chunks, so nothing loads until the answer is shown.
- * Countries use the world atlas; provinces use the Dutch province map, where
- * a marker on a world map would put all twelve on the same dot.
+ * The whole continent is drawn, not a close-up: that is where the child learns
+ * where the country lies. Provinces use the map of the Netherlands.
  */
-function usePlaceMap(subject: FlagSubject): WorldMap | null {
+function useRegionMap(subject: FlagSubject): WorldMap | null {
   const [map, setMap] = useState<WorldMap | null>(null);
-  const { code, latitude, longitude } = subject;
-  const numeric = isCountry(subject) ? subject.numeric : undefined;
+  const { code, region, latitude, longitude } = subject;
+  const frame = region === "nederland" ? PORTRAIT : LANDSCAPE;
 
   useEffect(() => {
     let cancelled = false;
     setMap(null);
-    const load =
-      numeric === undefined
-        ? provinceMap(code, PROVINCE_MAP_WIDTH, PROVINCE_MAP_HEIGHT)
-        : worldMap({ latitude, longitude, numeric }, MAP_WIDTH, MAP_HEIGHT);
-
-    void load
+    void regionMap(subject, frame.width, frame.height)
       .then((next) => {
         if (!cancelled) {
           setMap(next);
@@ -48,7 +31,8 @@ function usePlaceMap(subject: FlagSubject): WorldMap | null {
     return () => {
       cancelled = true;
     };
-  }, [code, latitude, longitude, numeric]);
+    // The subject is fresh per question; its primitives are the real inputs.
+  }, [code, region, latitude, longitude, frame.width, frame.height]);
 
   return map;
 }
@@ -59,7 +43,7 @@ function usePlaceMap(subject: FlagSubject): WorldMap | null {
  * adds nothing.
  */
 export function PlaceMap({ subject }: { subject: FlagSubject }) {
-  const map = usePlaceMap(subject);
+  const map = useRegionMap(subject);
   if (!map) {
     return null;
   }
