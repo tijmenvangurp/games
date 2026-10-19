@@ -1,8 +1,8 @@
 {
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "name": "features-flag-quiz",
+  "name": "features-flag-game",
   "projectType": "library",
-  "sourceRoot": "libs/features/flag-quiz",
+  "sourceRoot": "libs/features/flag-game",
   "tags": ["layer:features", "scope:flags", "type:feature"],
   "targets": {
     "lint": {
@@ -10,7 +10,7 @@
       "cache": true,
       "options": {
         "command": "oxlint .",
-        "cwd": "libs/features/flag-quiz"
+        "cwd": "libs/features/flag-game"
       }
     }
   },

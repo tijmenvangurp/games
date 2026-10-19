@@ -102,7 +102,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   {
     id: "flags",
     name: "Vlaggenreis",
-    description: "Leer vlaggen van landen en van de Nederlandse provincies.",
+    description: "Leer vlaggen én leg landen op de juiste plek op de kaart.",
     status: "available",
     to: "/vlaggen",
     thumbnail: "/thumbnails/flags-bd19d257.jpg",

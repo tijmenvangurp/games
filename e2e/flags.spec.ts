@@ -77,6 +77,50 @@ test.describe("vlaggen op een telefoon", () => {
     expect(overflows).toBe(false);
   });
 
+  test("speelt de kaartpuzzel met slepen en tikken", async ({ page }) => {
+    await page.goto("/vlaggen");
+    await page.getByRole("button", { name: /Kaartpuzzel/ }).click();
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    await expect(page.getByTestId("puzzle-map")).toBeVisible();
+    await expect(page.getByText(/van 8 geplaatst/)).toBeVisible();
+
+    const pieces = page.getByRole("button", { name: /\(stuk\)$/ });
+    await expect(pieces).toHaveCount(8);
+
+    const targets = page.locator('[data-country][role="button"]');
+    await expect(targets).toHaveCount(8);
+
+    // Slepen: het eerste stuk naar het eerste lege vlak.
+    const source = await pieces.first().boundingBox();
+    const destination = await targets.first().boundingBox();
+    if (!source || !destination) {
+      throw new Error("Geen stuk of doelvlak");
+    }
+    await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(
+      destination.x + destination.width / 2,
+      destination.y + destination.height / 2,
+      { steps: 8 },
+    );
+    await page.mouse.up();
+
+    await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
+
+    // Tikken: stuk kiezen en daarna een vlak aantikken.
+    await page.waitForTimeout(500);
+    await pieces.nth(2).click();
+    await targets.nth(1).click();
+
+    await expect(page.getByText(/Goed!|Dat is|Hier hoort/)).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
   test("wisselt beide richtingen af binnen één ronde", async ({ page }) => {
     await page.goto("/vlaggen");
     await page.getByRole("button", { name: /Europa/ }).click();

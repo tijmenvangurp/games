@@ -14,17 +14,16 @@ const FLAG_ASSET_ROOT = "/flags";
 
 interface RegionInfo {
   label: string;
-  emoji: string;
 }
 
 const REGION_INFO: Record<Region, RegionInfo> = {
-  europa: { label: "Europa", emoji: "🏰" },
-  azie: { label: "Azië", emoji: "🐉" },
-  afrika: { label: "Afrika", emoji: "🦁" },
-  "noord-amerika": { label: "Noord-Amerika", emoji: "🗽" },
-  "zuid-amerika": { label: "Zuid-Amerika", emoji: "🌴" },
-  oceanie: { label: "Oceanië", emoji: "🏝️" },
-  nederland: { label: "Nederland", emoji: "🇳🇱" },
+  europa: { label: "Europa" },
+  azie: { label: "Azië" },
+  afrika: { label: "Afrika" },
+  "noord-amerika": { label: "Noord-Amerika" },
+  "zuid-amerika": { label: "Zuid-Amerika" },
+  oceanie: { label: "Oceanië" },
+  nederland: { label: "Nederland" },
 };
 
 function countFor(continent: Continent): number {
@@ -34,7 +33,6 @@ function countFor(continent: Continent): number {
 interface ScopeInfo {
   label: string;
   hint: string;
-  emoji: string;
 }
 
 /**
@@ -45,7 +43,6 @@ export const FLAG_SCOPE_INFO: Record<FlagScope, ScopeInfo> = {
   wereld: {
     label: "Hele wereld",
     hint: `Alle ${COUNTRIES.length} landen`,
-    emoji: "🌍",
   },
   ...Object.fromEntries(
     CONTINENTS.map((continent) => [
@@ -53,27 +50,24 @@ export const FLAG_SCOPE_INFO: Record<FlagScope, ScopeInfo> = {
       {
         label: REGION_INFO[continent].label,
         hint: `${countFor(continent)} landen`,
-        emoji: REGION_INFO[continent].emoji,
       },
     ]),
   ),
   nederland: {
     label: "Nederland",
     hint: `${PROVINCES.length} provincies`,
-    emoji: REGION_INFO.nederland.emoji,
   },
 } as Record<FlagScope, ScopeInfo>;
 
 interface LevelInfo {
   label: string;
   hint: string;
-  emoji: string;
 }
 
 export const FLAG_LEVEL_INFO: Record<FlagLevel, LevelInfo> = {
-  makkelijk: { label: "Makkelijk", hint: "3 keuzes", emoji: "🌱" },
-  gemiddeld: { label: "Gemiddeld", hint: "4 keuzes", emoji: "🌤️" },
-  moeilijk: { label: "Moeilijk", hint: "4 keuzes die op elkaar lijken", emoji: "🔥" },
+  makkelijk: { label: "Makkelijk", hint: "3 keuzes" },
+  gemiddeld: { label: "Gemiddeld", hint: "4 keuzes" },
+  moeilijk: { label: "Moeilijk", hint: "4 keuzes die op elkaar lijken" },
 };
 
 /**

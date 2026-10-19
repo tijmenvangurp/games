@@ -22,6 +22,7 @@
     "css-selector-complexity": "error"
   },
   "health": {
+    "coverage": "coverage/coverage-final.json",
     "thresholdOverrides": [
       {
         "files": ["scripts/generate-geography.ts"],
@@ -29,6 +30,13 @@
         "maxCognitive": 12,
         "maxCrap": 150,
         "reason": "Eenmalig generatiescript: het parseert externe data (Wikidata, Wikimedia Commons, TopoJSON) en heeft geen unit-coverage. De uitvoer wordt bewaakt door tests/node/flags-generator.test.ts en pnpm run geography:check."
+      },
+      {
+        "files": ["libs/features/flag-game/ui/**", "libs/pages/flags/**"],
+        "maxCyclomatic": 14,
+        "maxCognitive": 22,
+        "maxCrap": 60,
+        "reason": "React-schermen met veel voorwaardelijke SVG-attributen; de CRAP-schatting telt JSX-takken mee. Gedekt door tests/web/puzzle.test.tsx, tests/web/flags.test.tsx en de mobiele e2e-ronde."
       }
     ]
   },

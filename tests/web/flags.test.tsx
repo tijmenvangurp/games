@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { COUNTRIES, PROVINCES, type FlagQuestion } from "@entities/geography";
-import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-quiz";
+import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-game";
 
 const STORAGE_KEY = "games.vlaggen.v1";
 

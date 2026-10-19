@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_FLAG_SETTINGS, loadFlagState, saveFlagState } from "@features/flag-quiz";
+import { DEFAULT_FLAG_SETTINGS, loadFlagState, saveFlagState } from "@features/flag-game";
 
 const STORAGE_KEY = "games.vlaggen.v1";
 
@@ -10,8 +10,16 @@ beforeEach(() => {
 describe("flag settings storage", () => {
   it("round-trips settings and best scores", () => {
     const state = {
-      settings: { scope: "azie" as const, level: "moeilijk" as const },
-      best: { "azie:moeilijk": 9, "europa:makkelijk": 10 },
+      settings: {
+        mode: "kaartpuzzel" as const,
+        scope: "azie" as const,
+        level: "moeilijk" as const,
+      },
+      best: {
+        "azie:moeilijk": 9,
+        "europa:makkelijk": 10,
+        "kaartpuzzel:afrika:gemiddeld": 6,
+      },
     };
 
     saveFlagState(state);
@@ -50,12 +58,18 @@ describe("flag best storage", () => {
       STORAGE_KEY,
       JSON.stringify({
         settings: { scope: "wereld", level: "makkelijk" },
-        best: { "wereld:makkelijk": 42, onzin: 3, oceanie: 4 },
+        best: {
+          "wereld:makkelijk": 42,
+          onzin: 3,
+          oceanie: 4,
+          "puzzel:wereld:makkelijk": 5,
+        },
       }),
     );
 
     expect(loadFlagState()).toEqual({
-      settings: { scope: "wereld", level: "makkelijk" },
+      // An older save has no mode; it loads as the flag quiz.
+      settings: { mode: "vlaggen", scope: "wereld", level: "makkelijk" },
       best: {},
     });
   });
