@@ -4,7 +4,8 @@ import { Button, PageHeader, Plus, SoundToggle, SpeechToggle } from "@shared/ui"
 
 interface GameShellProps {
   title: string;
-  subtitle: string;
+  /** Weglaten geeft een compactere paginakop, bijvoorbeeld tijdens een potje. */
+  subtitle?: string;
   onBack: () => void;
   backLabel?: string;
   onNewGame?: () => void;
