@@ -33,11 +33,14 @@ De eisen:
 3. **Geen game-engine als dependency.** De toestand en de zetten staan als pure functies in
    `libs/entities/four-in-a-row` (`createGame`, `applyDrop`, `undoDrop`, `isFinished`,
    `winnerOf`, `startingPlayerAfter`); de UI gebruikt de bestaande Zustand-store van de feature.
-   `boardgame.io` (0.50.2, november 2022) is overwogen en afgevallen: het heeft geen React
-   19-peer, het sleept koa, socket.io en redux mee voor een server die deze app niet heeft, en
-   het zou naast Zustand een tweede stateparadigma introduceren voor ongeveer tweehonderd regels
-   spellogica. De API-vorm van `G` en `Moves` blijft behouden, zodat een engine later alsnog kan
-   worden ingepakt. Zie ook **Bibliotheken eerst** in `AGENTS.md`.
+   `boardgame.io` (0.50.2, november 2022) is overwogen en in een proefproject getest: het werkt
+   met React 19 en Vite, maar de React-client kost 40 kB gzip (inclusief een ongebruikte
+   socket.io-transport) en vervangt ongeveer honderd regels beurt- en undocode. De spellogica,
+   de UI en de opslag blijven eigen werk, en de engine is op netwerk, fasen en verborgen
+   informatie gericht, die deze app niet gebruikt. De API-vorm van `G` en `Moves` blijft
+   behouden, zodat een engine later alsnog kan worden ingepakt. Zie
+   [research/2026-10-20-boardgame-io.md](../research/2026-10-20-boardgame-io.md) en
+   **Bibliotheken eerst** in `AGENTS.md`.
 4. **De stand staat lokaal.** De feature bewaart `{ settings, score }` onder
    `games.vier-op-een-rij.v1`; bij het laden wordt de opslag gevalideerd en anders genegeerd.
    Ongedaan maken verandert de stand niet.

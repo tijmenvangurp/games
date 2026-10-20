@@ -37,6 +37,7 @@
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
 - `research/2026-10-19-voorlezen-met-tts.md` — onderzoek naar vooraf gegenereerde Nederlandse TTS met de bestaande Nathalie-stem, leesafhankelijkheid per game en ontwerpprincipes voor audiofeedback.
+- `research/2026-10-20-boardgame-io.md` — of boardgame.io Vier op een Rij en latere bordspellen simpeler maakt: React 19-test, bundelmeting en herzieningsmomenten.
 - `plans/2026-10-19-voorlezen-in-alle-games.md` — plan voor een gedeelde spraakspeler, een catalogus met teksthashes en gefaseerde audio in de Nederlandse games.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.
