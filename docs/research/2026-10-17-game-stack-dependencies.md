@@ -1,7 +1,7 @@
 # Onderzoek: dependencies voor de game-stack
 
 - **Datum:** 2026-10-17
-- **Status:** Onderzoek, geen beslissing
+- **Status:** Onderzoek, geen beslissing. Let op: `AGENTS.md` zegt sinds 2026-10-20 dat je altijd eerst een bestaande library zoekt en dat een nieuwe library toevoegen mag zonder toestemming, ook met een grotere bundel. "Voeg nu niets toe" hieronder is daarom een momentopname van 2026-10-17, geen regel.
 - **Vraag:** welke dependencies kunnen we toevoegen voor drag-and-drop, animatie, geluid en aanverwante game-UI?
 - **Kader:** de regels uit `AGENTS.md` en [ADR 0001](../adr/0001-publieke-statische-spellen-app.md): publiek, statisch, alleen TypeScript, geen externe requests, geen backend, strikte CSP.
 

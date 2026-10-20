@@ -7,8 +7,59 @@ Publieke, statische spelletjes-app voor kinderen. Lees `README.md` en de relevan
 - **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, tailnet-namen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
 - **Alleen TypeScript.** Geen `.js`, `.mjs`, `.cjs`, `.jsx` of Python. `pnpm run ts-only` en de commit-hook bewaken dit.
 - **Geen `!important` in CSS.** Gebruik cascade layers (`@layer`) of een specifiekere selector; de fallow-regel `css-selector-complexity` (op `error`) bewaakt dit, net als id-selectors en diepe nesting.
-- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` via `@shared/ui` of uit `apps/games/public/`.
+- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` of `@phosphor-icons/react` via `@shared/ui`, of uit `apps/games/public/`.
 - **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de eigenaar. Spellen zijn client-side en lokaal.
+- **Bibliotheken eerst.** Zoek altijd eerst of een bestaande library het al oplost. Een nieuwe library toevoegen mag zonder toestemming, ook als de bundel daardoor groeit. Zie **Bibliotheken eerst**.
+
+## Bibliotheken eerst
+
+**Zoek altijd eerst of een bestaande bibliotheek het probleem al oplost.** Een library toevoegen is de standaardroute; zelf code schrijven is de uitzondering.
+
+- Kijk eerst in de lijst hieronder en in `package.json`. Zoek daarna verder (npm, documentatie van het ecosysteem) naar een bewezen, onderhouden library met TypeScript-typen.
+- **Toevoegen mag zonder toestemming van de eigenaar.** Vraag niet om een ADR of akkoord, en wacht daar niet op.
+- **Een grotere bundel is geen bezwaar.** Minder eigen code om te onderhouden weegt zwaarder dan een paar KB extra. Kies bij twijfel de library die het minst eigen code kost, ook als die groter is of meer meebrengt.
+- Noem de library in de commit (`deps:`) en in de pull request, en werk de lijst hieronder bij zodat de volgende zoektocht hier begint.
+- Leg alleen iets vast als je een voor de hand liggende library bewust _niet_ neemt: één regel in de pull request of in `docs/research/`.
+
+Wat blijft gelden:
+
+- **Geen backend en geen netwerk tijdens gebruik.** Een library moet in de statische app en binnen de CSP werken (`apps/games/public/_headers`): geen telemetrie, analytics, trackers, CDN's, externe fonts of runtime-calls. Iets dat een server, account of netwerkverbinding nodig heeft, valt onder de backend-regel en vraagt wél een ADR en expliciete goedkeuring.
+- Alleen TypeScript/ESM. `pnpm run ts-only` blijft bewaken dat er geen `.js`, `.mjs`, `.cjs` of `.jsx` in de repo komt.
+- `pnpm run quality` moet groen blijven; een library die de build, de tests of de CSP breekt, gaat eruit.
+
+## Wat we al hebben
+
+Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
+
+| Library                                                            | Waarvoor                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `react`, `react-dom`                                               | UI en rendering                                                     |
+| `@tanstack/react-router`                                           | routes en type-safe navigatie (`apps/games/src/app/router.tsx`)     |
+| `zustand`                                                          | spel- en UI-state per feature (`libs/features/*/model/`)            |
+| `tailwindcss`, `@tailwindcss/vite`                                 | styling, tokens en `@layer` (`apps/games/src/app/styles/index.css`) |
+| `clsx`, `tailwind-merge`                                           | `cn()` in `@shared/lib` voor conditionele classes                   |
+| `class-variance-authority`                                         | varianten van `Button` en verwanten                                 |
+| `@radix-ui/react-slot`                                             | `asChild` op `Button`                                               |
+| `lucide-react`                                                     | UI-iconen, geëxporteerd via `@shared/ui`                            |
+| `@phosphor-icons/react`                                            | spelidentiteit via `GameIcon`                                       |
+| `@dnd-kit/core`                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)          |
+| `chess.js`                                                         | schaakregels en zetgeneratie                                        |
+| `react-chessboard`                                                 | schaakbord                                                          |
+| `sudoku-gen`                                                       | sudoku-generator                                                    |
+| `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
+| `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
+| `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react` | unit- en componenttests                                             |
+| `@playwright/test`                                                 | e2e in `e2e/`                                                       |
+| `nx`                                                               | taken, cache en projectgraaf                                        |
+| `typescript`                                                       | typecheck                                                           |
+| `oxlint`, `oxfmt`                                                  | lint en formatting                                                  |
+| `steiger`, `@feature-sliced/steiger-plugin`                        | FSD-grenzen                                                         |
+| `fallow`                                                           | dead code, layer boundaries en CSS-regels                           |
+| `husky`, `@commitlint/cli`                                         | git-hooks en commitconventies                                       |
+| `tsx`                                                              | TypeScript-scripts in `scripts/`                                    |
+| `wrangler`                                                         | deploy naar Cloudflare Workers                                      |
+
+Ontbreekt er iets? Voeg het toe en zet het in deze tabel.
 
 ## Architectuur
 
