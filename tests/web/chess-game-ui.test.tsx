@@ -127,6 +127,28 @@ describe("ChessGamePlay", () => {
     fireEvent.click(screen.getByRole("button", { name: "Instellingen" }));
 
     expect(useChessGameStore.getState().phase).toBe("setup");
+    expect(screen.queryByText("Je partij is bewaard")).toBeNull();
+  });
+
+  it("keeps the board and resumes a paused game", () => {
+    resetStore({
+      phase: "playing",
+      history: [{ from: "e2", to: "e4", san: "e4", color: "w" }],
+      fen: "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+    });
+    render(<ChessGame onHome={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Instellingen" }));
+
+    expect(screen.getByText("Je partij is bewaard")).toBeTruthy();
+    expect(screen.getByText("Er staat 1 zet op het bord.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Nieuwe partij" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /Doorgaan/ }));
+
+    expect(useChessGameStore.getState().phase).toBe("playing");
+    expect(screen.getByText("Zetten (1)")).toBeTruthy();
+    expect(screen.getByText("Zwart is aan zet.")).toBeTruthy();
   });
 
   it("shows the promotion picker and applies the chosen piece", () => {

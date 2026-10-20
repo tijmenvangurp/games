@@ -96,6 +96,12 @@ laden valideert de app de opgeslagen FEN, zettenlijst, spelers en promoties en
 valt ze bij twijfel terug op een schone setup. Een onafgemaakte partij gaat na
 een herlaadbeurt verder; een afgeronde partij opent in de setup.
 
+De knop **Instellingen** wist een lopende partij niet. De setup toont dan
+“Je partij is bewaard” met **Doorgaan** en een **Nieuwe partij**-knop. Ook na
+een herlaadbeurt blijft die gepauzeerde partij beschikbaar. Een afgeronde
+partij wordt bij het openen van de instellingen wel opgeruimd, zodat de setup
+niet aanbiedt om een voorbij spel te hervatten.
+
 ## Gevolgen
 
 - De tutorial-URL is nu `/schaken/les`; de homepage linkt naar de hub.

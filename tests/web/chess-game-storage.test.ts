@@ -59,6 +59,23 @@ describe("chess state storage", () => {
     expect(loadChessState()).toEqual(playing);
   });
 
+  it("round-trips a paused game that is still in setup", () => {
+    const paused = {
+      ...playingState({
+        history: [
+          { from: "e2", to: "e4", san: "e4", color: "w" },
+          { from: "e7", to: "e5", san: "e5", color: "b" },
+        ],
+        fen: "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+      }),
+      phase: "setup" as const,
+    };
+
+    saveChessState(paused);
+
+    expect(loadChessState()).toEqual(paused);
+  });
+
   it("keeps settings when there is no unfinished game", () => {
     store({
       mode: "computer",

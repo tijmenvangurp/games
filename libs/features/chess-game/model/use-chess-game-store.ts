@@ -45,6 +45,8 @@ export interface ChessStore extends StoredChessState {
   readonly setPlayerAvatar: (color: Color, avatar: string) => void;
   readonly startGame: () => void;
   readonly resetToSetup: () => void;
+  readonly canResume: () => boolean;
+  readonly resumeGame: () => void;
   readonly selectSquare: (square: string) => void;
   readonly attemptMove: (from: string, to: string, promotion?: PieceSymbol) => boolean;
   readonly choosePromotion: (piece: PieceSymbol) => void;
@@ -65,6 +67,12 @@ export function resultOf(state: Pick<ChessStore, "fen" | "resignedBy">): ChessRe
   return state.resignedBy
     ? { kind: "resigned", winner: otherColor(state.resignedBy) }
     : describeResult(state.fen);
+}
+
+function canResumeState(
+  state: Pick<ChessStore, "phase" | "fen" | "history" | "resignedBy">,
+): boolean {
+  return state.phase === "setup" && state.history.length > 0 && resultOf(state).kind === "playing";
 }
 
 const COMPUTER_NAME = "Computer";
@@ -329,19 +337,48 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
 
   resetToSetup: () => {
     const state = get();
+    const resumable = state.history.length > 0 && resultOf(state).kind === "playing";
+    const fen = resumable ? state.fen : INITIAL_FEN;
+    const history = resumable ? state.history : [];
+    const resignedBy = resumable ? state.resignedBy : null;
+    const lastMove = resumable ? state.lastMove : null;
+
     commit(set, get, {
       phase: "setup",
-      fen: INITIAL_FEN,
-      history: [],
-      resignedBy: null,
+      fen,
+      history,
+      resignedBy,
       selectedSquare: null,
       legalTargets: [],
-      lastMove: null,
+      lastMove,
       pendingPromotion: null,
       thinking: false,
       feedback: "idle",
       gameId: state.gameId + 1,
     });
+  },
+
+  canResume: () => canResumeState(get()),
+
+  resumeGame: () => {
+    const state = get();
+    if (!canResumeState(state)) {
+      return;
+    }
+
+    commit(set, get, {
+      phase: "playing",
+      selectedSquare: null,
+      legalTargets: [],
+      pendingPromotion: null,
+      thinking: false,
+      feedback: "idle",
+      gameId: state.gameId + 1,
+    });
+
+    playSound("tap");
+    playHaptic("tap");
+    void runEngine(set, get);
   },
 
   selectSquare: (square) => {

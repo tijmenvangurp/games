@@ -109,7 +109,7 @@ export function saveChessState(state: StoredChessState): void {
 function readGame(
   value: Record<string, unknown>,
 ): Pick<StoredChessState, "phase" | "fen" | "history" | "resignedBy"> | null {
-  if (value.phase !== "playing") {
+  if (value.phase !== "playing" && value.phase !== "setup") {
     return null;
   }
 
@@ -135,7 +135,7 @@ function readGame(
   }
 
   return {
-    phase: "playing",
+    phase: value.phase,
     fen: value.fen,
     history: value.history,
     resignedBy: value.resignedBy ?? null,

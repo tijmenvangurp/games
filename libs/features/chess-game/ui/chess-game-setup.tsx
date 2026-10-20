@@ -109,6 +109,9 @@ export function ChessGameSetup() {
   const setLevel = useChessGameStore((state) => state.setLevel);
   const setHumanColor = useChessGameStore((state) => state.setHumanColor);
   const startGame = useChessGameStore((state) => state.startGame);
+  const resumeGame = useChessGameStore((state) => state.resumeGame);
+  const canResume = useChessGameStore((state) => state.canResume());
+  const moveCount = useChessGameStore((state) => state.history.length);
 
   return (
     <section className="mx-auto flex w-full max-w-xl flex-col gap-4">
@@ -118,6 +121,23 @@ export function ChessGameSetup() {
           Kies je tegenstander, een avatar en een naam. Daarna zie je meteen wie aan zet is.
         </p>
       </div>
+
+      {canResume ? (
+        <section className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-primary/30 bg-primary/5 p-3">
+          <div className="min-w-0 flex-1">
+            <p className="font-black">Je partij is bewaard</p>
+            <p className="text-sm text-muted-foreground">
+              {moveCount === 1
+                ? "Er staat 1 zet op het bord."
+                : `Er staan ${moveCount} zetten op het bord.`}
+            </p>
+          </div>
+          <Button size="lg" variant="success" onClick={resumeGame}>
+            <Play aria-hidden="true" className="size-5" />
+            Doorgaan
+          </Button>
+        </section>
+      ) : null}
 
       <OptionPicker
         columns={2}
@@ -152,7 +172,7 @@ export function ChessGameSetup() {
 
       <Button className="w-full" size="lg" variant="success" onClick={startGame}>
         <Play aria-hidden="true" className="size-5" />
-        Spelen
+        {canResume ? "Nieuwe partij" : "Spelen"}
       </Button>
     </section>
   );

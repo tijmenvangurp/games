@@ -159,6 +159,46 @@ describe("chess game store", () => {
     expect(store().attemptMove("e7", "e5")).toBe(false);
   });
 
+  it("keeps an unfinished game when opening the settings", () => {
+    store().startGame();
+    store().attemptMove("e2", "e4");
+
+    store().resetToSetup();
+
+    expect(store().phase).toBe("setup");
+    expect(store().history).toHaveLength(1);
+    expect(store().canResume()).toBe(true);
+
+    store().resumeGame();
+
+    expect(store().phase).toBe("playing");
+    expect(store().history).toHaveLength(1);
+    expect(store().lastMove).toEqual({ from: "e2", to: "e4" });
+  });
+
+  it("drops a finished game when opening the settings", () => {
+    store().startGame();
+    store().attemptMove("e2", "e4");
+    store().resign();
+
+    store().resetToSetup();
+
+    expect(store().phase).toBe("setup");
+    expect(store().history).toEqual([]);
+    expect(store().canResume()).toBe(false);
+  });
+
+  it("starts a fresh game while another one is paused", () => {
+    store().startGame();
+    store().attemptMove("e2", "e4");
+    store().resetToSetup();
+
+    store().startGame();
+
+    expect(store().history).toEqual([]);
+    expect(store().canResume()).toBe(false);
+  });
+
   it("starts a new game and resets to setup", () => {
     store().startGame();
     store().selectSquare("e2");

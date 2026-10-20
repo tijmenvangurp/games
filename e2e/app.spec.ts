@@ -303,6 +303,27 @@ test.describe("schaakpartij op een telefoon", () => {
     expect(overflows).toBe(false);
   });
 
+  test("bewaart de partij als je de instellingen opent", async ({ page }) => {
+    await page.goto("/schaken/partij");
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="e2"]').click();
+    await board.locator('[data-square="e4"]').click();
+    await expect(page.getByText("Zetten (1)")).toBeVisible();
+
+    await page.getByRole("button", { name: "Instellingen" }).click();
+    await expect(page.getByText("Je partij is bewaard")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Nieuwe partij" })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByText("Je partij is bewaard")).toBeVisible();
+    await page.getByRole("button", { name: /Doorgaan/ }).click();
+
+    await expect(page.getByText("Zetten (1)")).toBeVisible();
+    await expect(page.getByText("Zwart is aan zet.")).toBeVisible();
+  });
+
   test("kiest een avatar en een naam voor de partij", async ({ page }) => {
     await page.goto("/schaken/partij");
 
