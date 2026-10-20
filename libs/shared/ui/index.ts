@@ -1,5 +1,6 @@
 export { Button } from "./button";
 export { CelebrationDialog } from "./celebration-dialog";
+export { ChessBoard } from "./chess-board";
 export { Confetti } from "./confetti";
 export { GameIcon } from "./game-icon";
 export { OptionPicker } from "./option-picker";

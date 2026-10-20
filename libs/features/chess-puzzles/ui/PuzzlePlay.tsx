@@ -1,7 +1,16 @@
 import { useEffect, useId, useMemo, useRef } from "react";
-import { Chessboard, type ChessboardOptions } from "react-chessboard";
+import type { ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
-import { Button, Check, LayoutGrid, Lightbulb, Play, RotateCcw, SpeechButton } from "@shared/ui";
+import {
+  Button,
+  Check,
+  ChessBoard,
+  LayoutGrid,
+  Lightbulb,
+  Play,
+  RotateCcw,
+  SpeechButton,
+} from "@shared/ui";
 import { puzzlePromptSpeech, puzzleStatusSpeech, puzzleTitleSpeech } from "../model/audio";
 import { useChessPuzzle } from "../model/useChessPuzzle";
 import type { ChessPuzzle, PuzzleDifficulty, PuzzleFeedback, PuzzleStatus } from "../model/types";
@@ -45,15 +54,10 @@ function PuzzleHeader({ index, prompt, title, titleId, total }: PuzzleHeaderProp
 
 function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
   return (
-    <div
-      aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten."
-      className="mx-auto w-full max-w-lg"
-      role="group"
-    >
-      <div className="aspect-square w-full touch-manipulation">
-        <Chessboard options={options} />
-      </div>
-    </div>
+    <ChessBoard
+      label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten."
+      options={options}
+    />
   );
 }
 
