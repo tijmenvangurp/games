@@ -12,6 +12,7 @@ import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "
 import { HomePage } from "@pages/home";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
+import { MolenspelPage } from "@pages/molenspel";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
@@ -38,6 +39,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/rekenen", MathPage),
     gameRoute("/zoeken", SeekPage),
     gameRoute("/memory", MemoryPage),
+    gameRoute("/molenspel", MolenspelPage),
     gameRoute("/raad", PokemonQuizPage),
     gameRoute("/schaken", ChessPage),
     gameRoute("/puzzels", PuzzlesPage),

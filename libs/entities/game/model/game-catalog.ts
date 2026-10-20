@@ -16,6 +16,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/pijlen"
           | "/zoeken"
           | "/memory"
+          | "/molenspel"
           | "/raad"
           | "/schaken"
           | "/puzzels"
@@ -79,6 +80,15 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/memory",
     accentClassName: "from-amber-100 via-amber-50 to-white",
+  },
+  {
+    id: "molenspel",
+    name: "Het Molenspel",
+    description: "Een eeuwenoud bordspel voor twee. Maak molentjes en pak stenen.",
+    emoji: "🌪️",
+    status: "available",
+    to: "/molenspel",
+    accentClassName: "from-stone-100 via-amber-50 to-white",
   },
   {
     id: "pokemon-quiz",

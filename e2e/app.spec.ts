@@ -1,4 +1,19 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+/** Sleurt een stuk van het ene vak naar het andere. */
+async function dragPiece(page: Page, board: Locator, from: string, to: string): Promise<void> {
+  const fromBox = await board.locator(`[data-square="${from}"]`).boundingBox();
+  const toBox = await board.locator(`[data-square="${to}"]`).boundingBox();
+
+  if (!fromBox || !toBox) {
+    throw new Error(`Missing square ${from} or ${to}`);
+  }
+
+  await page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2, { steps: 12 });
+  await page.mouse.up();
+}
 
 test.describe("op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -125,26 +140,11 @@ test.describe("schaaktutorial op een telefoon", () => {
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.scrollIntoViewIfNeeded();
-    const dragPiece = async (from: string, to: string) => {
-      const fromBox = await board.locator(`[data-square="${from}"]`).boundingBox();
-      const toBox = await board.locator(`[data-square="${to}"]`).boundingBox();
 
-      if (!fromBox || !toBox) {
-        throw new Error(`Missing square ${from} or ${to}`);
-      }
-
-      await page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2);
-      await page.mouse.down();
-      await page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2, {
-        steps: 12,
-      });
-      await page.mouse.up();
-    };
-
-    await dragPiece("h1", "e1");
+    await dragPiece(page, board, "h1", "e1");
     await expect(page.getByText("Goed! Nog één zet naar de ster.")).toBeVisible();
 
-    await dragPiece("e1", "e5");
+    await dragPiece(page, board, "e1", "e5");
     await expect(page.getByText("Ster! De toren rijdt recht.")).toBeVisible();
   });
 
@@ -156,6 +156,10 @@ test.describe("schaaktutorial op een telefoon", () => {
 
     await expect(page.getByText("Nog niet! Kies eerst een blauwe stip.")).toBeVisible();
   });
+});
+
+test.describe("schaaktutorial met tikken op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
 
   test("speelt de torenles met tikken", async ({ page }) => {
     await page.goto("/");
@@ -188,6 +192,10 @@ test.describe("schaaktutorial op een telefoon", () => {
     )) as boolean;
     expect(overflows).toBe(false);
   });
+});
+
+test.describe("schaaktutorial met speciale zetten op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
 
   test("speelt de rokade", async ({ page }) => {
     await page.goto("/schaken");
@@ -292,6 +300,10 @@ test.describe("schaakpuzzels op een telefoon", () => {
     await expect(page.getByText(/1 van 42 opgelost/)).toBeVisible();
     await expect(page.getByRole("button", { name: "Puzzel 1, opgelost" })).toBeVisible();
   });
+});
+
+test.describe("schaakpuzzels op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
 
   test("wisselt van moeilijkheidsgraad en lost een lastige puzzel op", async ({ page }) => {
     await page.goto("/puzzels");
@@ -366,5 +378,53 @@ test.describe("pokémon quiz op een telefoon", () => {
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+});
+
+test.describe("molenspel op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("opent het spel vanuit het menu en legt een steen", async ({ page }) => {
+    await page.goto("/");
+
+    await page.getByRole("link", { name: /molenspel/i }).click();
+    await expect(page.getByRole("heading", { name: "Het Molenspel" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const board = page.getByRole("group", { name: "Molenspelbord" });
+    await expect(board).toBeVisible();
+    await expect(board.getByRole("button")).toHaveCount(24);
+    await expect(page.getByText("Wit is aan de beurt")).toBeVisible();
+
+    await board
+      .getByRole("button", { name: /^Leeg punt/ })
+      .first()
+      .click();
+    await expect(page.getByText("Zwart is aan de beurt")).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
+  test("opent het spel via een deep link", async ({ page }) => {
+    await page.goto("/molenspel");
+    await expect(page.getByRole("heading", { name: "Het Molenspel" })).toBeVisible();
+  });
+});
+
+test.describe("molenspel op een tablet", () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test("toont het bord en de beurt", async ({ page }) => {
+    await page.goto("/molenspel");
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const board = page.getByRole("group", { name: "Molenspelbord" });
+    await expect(board).toBeVisible();
+    await expect(board.getByRole("button")).toHaveCount(24);
+    await expect(page.getByText("Wit is aan de beurt")).toBeVisible();
   });
 });

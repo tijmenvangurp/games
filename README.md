@@ -39,6 +39,14 @@ Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet
 
 De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork, cries en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
 
+## Het Molenspel
+
+**Het Molenspel** is het eeuwenoude bordspel Nine Men's Morris, ook wel _mûne_ of _merels_ genoemd. Twee spelers leggen om en om negen stenen op een bord van 24 punten. Drie stenen van dezelfde kleur op één rij vormen een **molentje**; daarmee pak je één steen van de tegenstander.
+
+De puntposities, de 32 verbindingen en de 16 molentjes zijn uit de bordtekening op Wikipedia genomen en met een script nagerekend. De drie speelfasen (stenen leggen, stenen schuiven, met drie stenen vliegen), de winvoorwaarden en het gelijkspel na tien beurten staan in [ADR 0017](docs/adr/0017-het-molenspel.md).
+
+Het spel draait volledig client-side; de voortgang staat in `localStorage`.
+
 ## Deployment
 
 De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workernaam `games`). **Cloudflare Workers Builds** bouwt en deployt bij elke push naar `main`; er zijn geen GitHub-secrets of API-tokens nodig.
