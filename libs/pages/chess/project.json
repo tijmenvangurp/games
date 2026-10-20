@@ -14,5 +14,11 @@
       }
     }
   },
-  "implicitDependencies": ["widgets-game-shell", "features-chess-tutorial"]
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-chess-tutorial",
+    "features-chess-game",
+    "shared-lib",
+    "shared-ui"
+  ]
 }

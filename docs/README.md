@@ -19,13 +19,8 @@
 - `adr/0014-schaaktutorial-een-opdracht-per-scherm.md` — minder tekst, een coachbubbel en een visuele hint in de schaaktutorial.
 - `adr/0015-schaakpuzzels-uitbreiding.md` — 90 extra Lichess-puzzels, mat-in-twee, tactieken en meer stukvariatie.
 - `adr/0016-schaakpuzzeloverzicht.md` — het puzzeloverzicht en lokaal bewaarde opgeloste puzzels.
-- `adr/0017-letterklanken-en-audio.md` — CC0-klanken uit Rhasspy Nathalie en prototype-woordaudio, te vervangen vóór lancering.
-- `adr/0018-vlaggenspel.md` — Vlaggenreis: lokale vlaggen, Wikidata-namen, de provinciescope en de niveaus.
-- `adr/0019-wereldkaart.md` — de kaartstack met d3-geo en Natural Earth, de lazy chunk en de marker-terugval.
-- `adr/0020-kaartpuzzel.md` — de kaartpuzzel als tweede speelwijze: acht stukken rond een ankergebied, slepen of tikken en de hintniveaus.
-- `adr/0021-provinciegeometrie.md` — de twaalf provincievormen uit Natural Earth, als lazy chunk voor de puzzel en de vlaggenquiz.
-- `adr/0022-schaakbord-tikken-is-kijken.md` — tikken toont zetten (ook van de tegenstander), slepen en neerzetten doet de zet.
 - `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
+- `adr/0024-schaakpartij-en-lokale-stockfish.md` — de schaakhub, pass-and-play, de lokale Stockfish-wasm, de CSP-uitbreiding en lokale opslag.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

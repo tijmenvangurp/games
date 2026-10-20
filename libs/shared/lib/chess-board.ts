@@ -106,6 +106,7 @@ export interface SquareStylesInput {
   readonly previewTargets?: readonly Square[];
   readonly targetSquare?: Square | null;
   readonly hintMove?: BoardMoveLike | null;
+  readonly checkSquare?: Square | null;
 }
 
 export function chessSquareStyles({
@@ -116,6 +117,7 @@ export function chessSquareStyles({
   previewTargets,
   targetSquare,
   hintMove,
+  checkSquare,
 }: SquareStylesInput): Record<string, CSSProperties> {
   const styles: Record<string, CSSProperties> = {};
 
@@ -158,6 +160,13 @@ export function chessSquareStyles({
     });
   }
 
+  if (checkSquare) {
+    merge(checkSquare, {
+      backgroundColor: "rgba(248, 113, 113, 0.45)",
+      boxShadow: "inset 0 0 0 6px #dc2626",
+    });
+  }
+
   if (selectedSquare) {
     merge(selectedSquare, {
       boxShadow: "inset 0 0 0 6px #0284c7",
@@ -183,6 +192,8 @@ export interface ChessBoardOptionsInput {
   readonly squareStyles: Record<string, CSSProperties>;
   readonly onPieceDrop: (sourceSquare: string, targetSquare: string | null) => boolean;
   readonly onSquareClick: (square: string) => void;
+  /** Welke kant gesleept mag worden; standaard de kant waar het bord op staat. */
+  readonly dragColor?: Color;
 }
 
 export function chessBoardOptions({
@@ -192,6 +203,7 @@ export function chessBoardOptions({
   squareStyles,
   onPieceDrop,
   onSquareClick,
+  dragColor = playerColor,
 }: ChessBoardOptionsInput): ChessboardOptions {
   return {
     position,
@@ -224,7 +236,7 @@ export function chessBoardOptions({
     },
     squareStyles,
     canDragPiece: ({ isSparePiece, piece }) =>
-      !isSparePiece && piece.pieceType.startsWith(playerColor),
+      !isSparePiece && piece.pieceType.startsWith(dragColor),
     onPieceDrop: ({ sourceSquare, targetSquare }) => onPieceDrop(sourceSquare, targetSquare),
     onSquareClick: ({ square }) => onSquareClick(square),
   };

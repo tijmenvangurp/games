@@ -5,7 +5,7 @@ interface GameCatalogBase {
 }
 
 export type GameSpeech =
-  | { readonly kind: "group"; readonly folder: string }
+  | { readonly kind: "group"; readonly folders: readonly string[] }
   | { readonly kind: "visual"; readonly reason: string }
   | { readonly kind: "pending"; readonly reason: string }
   | { readonly kind: "legacy"; readonly reason: string };
@@ -22,7 +22,6 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/memory"
           | "/raad"
           | "/schaken"
-          | "/puzzels"
           | "/woordzoeker"
           | "/mengelmoes"
           | "/frans"
@@ -52,7 +51,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/rekenen",
     thumbnail: "/thumbnails/math-trainer-52c58abf.jpg",
-    speech: { kind: "group", folder: "math" },
+    speech: { kind: "group", folders: ["math"] },
   },
   {
     id: "arrows",
@@ -79,7 +78,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     status: "available",
     to: "/woordzoeker",
     thumbnail: "/thumbnails/word-search-bdb93413.jpg",
-    speech: { kind: "group", folder: "words" },
+    speech: { kind: "group", folders: ["words"] },
   },
   {
     id: "alchemy",
@@ -109,22 +108,13 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     speech: { kind: "pending", reason: "Buiten scope; later opnieuw bekijken." },
   },
   {
-    id: "chess-tutorial",
-    name: "Schaakles",
-    description: "Leer stap voor stap alle stukken en zet je eerste schaakmat.",
+    id: "chess",
+    name: "Schaken",
+    description: "Leer de stukken, los puzzels op of speel een partij.",
     status: "available",
     to: "/schaken",
     thumbnail: "/thumbnails/chess-tutorial-6b1e58dd.jpg",
-    speech: { kind: "group", folder: "chess" },
-  },
-  {
-    id: "chess-puzzles",
-    name: "Schaakpuzzels",
-    description: "Los korte puzzels op: zet schaakmat of win een stuk.",
-    status: "available",
-    to: "/puzzels",
-    thumbnail: "/thumbnails/chess-puzzles-d7f67a74.jpg",
-    speech: { kind: "group", folder: "chess-puzzles" },
+    speech: { kind: "group", folders: ["chess", "chess-puzzles"] },
   },
   {
     id: "flags",
