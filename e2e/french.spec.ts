@@ -5,7 +5,7 @@ test.describe("Frans sorteren op een telefoon", () => {
 
   test("sleept een woord naar een categorie", async ({ page }) => {
     await page.goto("/frans/sorteren");
-    await expect(page.getByText("Sorteer de woorden")).toBeVisible();
+    await expect(page.getByText("Voortgang")).toBeVisible();
 
     const word = page.locator("[data-sort-word]").first();
     const category = page.locator("[data-sort-category]").first();

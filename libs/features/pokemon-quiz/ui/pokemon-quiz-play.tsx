@@ -63,15 +63,10 @@ export function PokemonQuizPlay() {
 
       <aside className="order-2 space-y-3 lg:col-span-2">
         <div className="game-panel flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Raad de Pokémon
-            </p>
-            <p className="text-base font-black leading-tight">Kies de juiste naam</p>
-            <p className="text-xs text-muted-foreground">
-              {correctCount} van {rounds} goed
-            </p>
-          </div>
+          <p className="text-sm font-black">
+            {correctCount} van {rounds} goed
+          </p>
+
           <div className="text-right">
             <p className="text-3xl font-black leading-none">{rounds}</p>
             <p className="text-xs text-muted-foreground">rondes</p>
@@ -96,7 +91,7 @@ export function PokemonQuizPlay() {
           <QuizFeedback correct={correct} targetName={target.name} onNext={handleNext} />
         ) : (
           <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-            Kies een naam. Daarna hoor je de Pokémon.
+            Kies een naam.
           </p>
         )}
       </aside>

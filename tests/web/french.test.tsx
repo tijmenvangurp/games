@@ -169,7 +169,7 @@ describe("Frans luisterspel", () => {
 
   it("sorteert een woord in een categorie", async () => {
     renderApp("/frans/sorteren");
-    expect(await screen.findByText("Sorteer de woorden")).toBeTruthy();
+    expect(await screen.findByText("Voortgang")).toBeTruthy();
 
     const word = document.querySelector<HTMLButtonElement>("[data-sort-word]");
     const category = document.querySelector<HTMLButtonElement>("[data-sort-category]");

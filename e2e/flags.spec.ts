@@ -48,7 +48,6 @@ test.describe("vlaggen op een telefoon", () => {
   test("speelt een ronde met de Nederlandse provincies en toont de kaart", async ({ page }) => {
     await page.goto("/vlaggen");
     await page.getByRole("button", { name: /Nederland/ }).click();
-    await expect(page.getByText("12 provincies", { exact: true })).toBeVisible();
     await page.getByRole("button", { name: "Spelen" }).click();
 
     await expect(page.getByText(/Vraag 1 van 10/)).toBeVisible();

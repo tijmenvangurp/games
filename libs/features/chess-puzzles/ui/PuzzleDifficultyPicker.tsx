@@ -25,15 +25,7 @@ export function PuzzleDifficultyPicker({ current, onSelect }: PuzzleDifficultyPi
             )}
             onClick={() => onSelect(option.id)}
           >
-            <span className="block">{option.label}</span>
-            <span
-              className={cn(
-                "mt-0.5 block text-xs font-medium",
-                active ? "text-primary" : "text-muted-foreground",
-              )}
-            >
-              {option.hint}
-            </span>
+            {option.label}
           </button>
         );
       })}

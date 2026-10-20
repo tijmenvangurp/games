@@ -13,38 +13,29 @@ import {
 
 interface SetupPanelProps {
   settings: SudokuSettings;
-  hasActiveGame: boolean;
   isGenerating: boolean;
   onSizeChange: (size: SudokuSize) => void;
   onDifficultyChange: (difficulty: Difficulty) => void;
   onThemeChange: (theme: SymbolTheme) => void;
   onMistakeModeChange: (mode: MistakeMode) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
 export function SetupPanel({
   settings,
-  hasActiveGame,
   isGenerating,
   onSizeChange,
   onDifficultyChange,
   onThemeChange,
   onMistakeModeChange,
   onStart,
-  onBack,
 }: SetupPanelProps) {
   const preview = symbolsFor(settings.size, settings.theme);
 
   return (
     <section className="game-panel animate-rise p-4 sm:p-6">
       <div className="mb-5 flex items-start justify-between gap-3">
-        <div>
-          <h2 className="font-display text-2xl">Nieuw spel</h2>
-          <p className="text-sm text-muted-foreground">
-            Kies een rooster en hoe moeilijk het mag zijn.
-          </p>
-        </div>
+        <h2 className="font-display text-2xl">Nieuw spel</h2>
         <div
           className="flex items-center gap-1 rounded-2xl bg-muted px-3 py-2 text-lg"
           aria-hidden="true"
@@ -135,12 +126,7 @@ export function SetupPanel({
         </fieldset>
       ) : null}
 
-      <SetupActions
-        backLabel="Terug naar je puzzel"
-        loading={isGenerating}
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      <SetupActions loading={isGenerating} onStart={onStart} />
     </section>
   );
 }

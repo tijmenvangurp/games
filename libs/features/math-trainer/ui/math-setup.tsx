@@ -30,7 +30,6 @@ function ModePicker({ selected, onSelect }: ModePickerProps) {
               {option.symbol}
             </span>
             {option.label}
-            <span className="text-xs font-normal text-muted-foreground">{option.hint}</span>
           </button>
         ))}
       </div>
@@ -41,30 +40,23 @@ function ModePicker({ selected, onSelect }: ModePickerProps) {
 interface MathSetupProps {
   settings: MathSettings;
   best: Record<string, number>;
-  hasActiveGame: boolean;
   onModeChange: (mode: MathMode) => void;
   onLevelChange: (level: MathLevel) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
 export function MathSetup({
   settings,
   best,
-  hasActiveGame,
   onModeChange,
   onLevelChange,
   onStart,
-  onBack,
 }: MathSetupProps) {
   const bestScore = best[bestKey(settings.mode, settings.level)] ?? 0;
 
   return (
     <section className="game-panel animate-rise p-4 sm:p-6">
-      <div className="mb-5">
-        <h2 className="font-display text-2xl">Nieuw spel</h2>
-        <p className="text-sm text-muted-foreground">Kies wat je wilt oefenen.</p>
-      </div>
+      <h2 className="mb-5 font-display text-2xl">Nieuw spel</h2>
 
       <ModePicker selected={settings.mode} onSelect={onModeChange} />
 
@@ -81,11 +73,7 @@ export function MathSetup({
         {bestScore > 0 ? `Beste score: ${bestScore} van 10 sterren` : "Nog geen score"}
       </p>
 
-      <SetupActions
-        backLabel="Terug naar je sommen"
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      <SetupActions onStart={onStart} />
     </section>
   );
 }

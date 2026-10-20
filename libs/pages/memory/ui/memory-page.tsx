@@ -4,6 +4,7 @@ import { createMemoryScene } from "@entities/memory";
 import { MemoryPlay, MemorySetup, useMemoryStore } from "@features/memory-game";
 import { GameShell } from "@widgets/game-shell";
 import { CelebrationDialog } from "@shared/ui";
+import { useGameSetupNavigation } from "@shared/lib";
 
 export function MemoryPage() {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ export function MemoryPage() {
   const [showSetup, setShowSetup] = useState(false);
 
   const setupVisible = showSetup || !scene;
+  const gameSetup = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame: Boolean(scene),
+    backToGameLabel: "Terug naar je spel",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
 
   const startGame = () => {
     useMemoryStore.getState().start(createMemoryScene(settings.difficulty));
@@ -22,8 +30,7 @@ export function MemoryPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
-      onNewGame={scene ? () => setShowSetup(true) : undefined}
+      {...gameSetup}
       showSpeech={false}
       subtitle={scene ? `${scene.pairs} paren · Generatie 1` : "Kies je spel"}
       title="Pokémon Memory"
@@ -31,9 +38,7 @@ export function MemoryPage() {
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <MemorySetup
-            hasActiveGame={Boolean(scene)}
             settings={settings}
-            onBack={() => setShowSetup(false)}
             onDifficultyChange={(difficulty) =>
               useMemoryStore.getState().chooseDifficulty(difficulty)
             }

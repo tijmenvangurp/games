@@ -4,7 +4,6 @@ import { ChoiceCard } from "./choice-card";
 interface PickerOption<T extends string | number> {
   value: T;
   label: string;
-  hint?: string;
   symbol?: string;
 }
 
@@ -37,7 +36,6 @@ export function OptionPicker<T extends string | number>({
         {options.map((option) => (
           <ChoiceCard
             key={option.value}
-            hint={option.hint}
             label={option.label}
             leading={
               option.symbol ? (

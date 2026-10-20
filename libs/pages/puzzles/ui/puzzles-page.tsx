@@ -42,7 +42,7 @@ export function PuzzlesPage() {
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
-      subtitle="Kies een puzzel en zie je voortgang"
+      subtitle="Kies je moeilijkheid"
       title="Schaakpuzzels"
     >
       {puzzle ? (

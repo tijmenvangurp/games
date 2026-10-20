@@ -6,6 +6,7 @@ interface GameShellProps {
   title: string;
   subtitle: string;
   onBack: () => void;
+  backLabel?: string;
   onNewGame?: () => void;
   titleClassName?: string;
   /** Games zonder spraak verbergen de voorleesknop expliciet. */
@@ -17,6 +18,7 @@ export function GameShell({
   title,
   subtitle,
   onBack,
+  backLabel,
   onNewGame,
   titleClassName,
   showSpeech = true,
@@ -40,6 +42,7 @@ export function GameShell({
             </div>
           }
           onBack={onBack}
+          backLabel={backLabel}
           subtitle={subtitle}
           title={title}
           titleClassName={titleClassName}

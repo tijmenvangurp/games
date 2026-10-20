@@ -5,27 +5,14 @@ import { MEMORY_DIFFICULTY_OPTIONS, type MemorySettings } from "../model/setting
 
 interface MemorySetupProps {
   settings: MemorySettings;
-  hasActiveGame: boolean;
   onDifficultyChange: (difficulty: MemoryDifficulty) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
-export function MemorySetup({
-  settings,
-  hasActiveGame,
-  onDifficultyChange,
-  onStart,
-  onBack,
-}: MemorySetupProps) {
+export function MemorySetup({ settings, onDifficultyChange, onStart }: MemorySetupProps) {
   return (
     <section className="game-panel animate-rise p-4 sm:p-6">
-      <div className="mb-5">
-        <h2 className="font-display text-2xl">Nieuw spel</h2>
-        <p className="text-sm text-muted-foreground">
-          Hoeveel Pokémon-paren wil je zoeken? Alle kaarten komen uit Generatie 1.
-        </p>
-      </div>
+      <h2 className="mb-5 font-display text-2xl">Nieuw spel</h2>
 
       <OptionPicker
         legend="Moeilijkheid"
@@ -34,11 +21,7 @@ export function MemorySetup({
         onSelect={onDifficultyChange}
       />
 
-      <SetupActions
-        backLabel="Terug naar je spel"
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      <SetupActions onStart={onStart} />
 
       <PokemonAssetsCredits />
     </section>

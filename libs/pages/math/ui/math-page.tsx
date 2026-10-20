@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { MATH_LEVEL_INFO, MATH_MODE_INFO, type MathRound } from "@entities/math";
 import { MathPlay, MathSetup, useMathStore } from "@features/math-trainer";
 import { CelebrationDialog } from "@shared/ui";
+import { useGameSetupNavigation } from "@shared/lib";
 import { GameShell } from "@widgets/game-shell";
 
 function subtitleFor(round: MathRound | null): string {
@@ -29,6 +30,13 @@ export function MathPage() {
   const [showSetup, setShowSetup] = useState(false);
 
   const setupVisible = showSetup || !round;
+  const gameSetup = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame: Boolean(round),
+    backToGameLabel: "Terug naar je sommen",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
 
   const startGame = () => {
     useMathStore.getState().start();
@@ -36,19 +44,12 @@ export function MathPage() {
   };
 
   return (
-    <GameShell
-      onBack={() => navigate({ to: "/" })}
-      onNewGame={round ? () => setShowSetup(true) : undefined}
-      subtitle={subtitleFor(round)}
-      title="Tafel Topper"
-    >
+    <GameShell {...gameSetup} subtitle={subtitleFor(round)} title="Tafel Topper">
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <MathSetup
             best={best}
-            hasActiveGame={Boolean(round)}
             settings={settings}
-            onBack={() => setShowSetup(false)}
             onLevelChange={(level) => useMathStore.getState().chooseLevel(level)}
             onModeChange={(mode) => useMathStore.getState().chooseMode(mode)}
             onStart={startGame}

@@ -7,15 +7,23 @@ interface PageHeaderProps {
   title: string;
   subtitle?: string;
   onBack?: () => void;
+  backLabel?: string;
   actions?: ReactNode;
   titleClassName?: string;
 }
 
-export function PageHeader({ title, subtitle, onBack, actions, titleClassName }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  subtitle,
+  onBack,
+  backLabel = "Terug naar het menu",
+  actions,
+  titleClassName,
+}: PageHeaderProps) {
   return (
     <header className="flex min-w-0 items-center gap-2">
       {onBack ? (
-        <Button aria-label="Terug naar het menu" size="icon" variant="ghost" onClick={onBack}>
+        <Button aria-label={backLabel} size="icon" variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
         </Button>
       ) : (
