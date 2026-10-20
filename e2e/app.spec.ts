@@ -397,6 +397,9 @@ test.describe("molenspel op een telefoon", () => {
     await expect(board.getByRole("button")).toHaveCount(24);
     await expect(page.getByText("Wit is aan de beurt")).toBeVisible();
 
+    // Het bord bestaat uit drie gesloten vierkanten en vier verbindingen.
+    await expect(board.locator("polyline")).toHaveCount(7);
+
     await board
       .getByRole("button", { name: /^Leeg punt/ })
       .first()
@@ -407,6 +410,22 @@ test.describe("molenspel op een telefoon", () => {
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("draait een gelegde steen terug", async ({ page }) => {
+    await page.goto("/molenspel");
+    await page.getByRole("button", { name: "Spelen" }).click();
+
+    const board = page.getByRole("group", { name: "Molenspelbord" });
+    await board
+      .getByRole("button", { name: /^Leeg punt/ })
+      .first()
+      .click();
+    await expect(page.getByText("Zwart is aan de beurt")).toBeVisible();
+
+    await page.getByRole("button", { name: "Terug" }).click();
+    await expect(page.getByText("Wit is aan de beurt")).toBeVisible();
+    await expect(board.getByRole("button", { name: /^Eigen steen/ })).toHaveCount(0);
   });
 
   test("opent het spel via een deep link", async ({ page }) => {

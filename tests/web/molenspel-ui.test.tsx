@@ -71,16 +71,17 @@ describe("MolenspelHud", () => {
 });
 
 describe("MolenspelPlay", () => {
+  const defaults = {
+    canUndo: false,
+    notice: null,
+    onBack: () => undefined,
+    onRestart: () => undefined,
+    onTap: () => undefined,
+    onUndo: () => undefined,
+  };
+
   it("toont het bord en de aanwijzing", () => {
-    const game = createMolenspelGame("wit");
-    render(
-      <MolenspelPlay
-        game={game}
-        onBack={() => undefined}
-        onRestart={() => undefined}
-        onTap={() => undefined}
-      />,
-    );
+    render(<MolenspelPlay {...defaults} game={createMolenspelGame("wit")} />);
 
     expect(screen.getByRole("group", { name: "Molenspelbord" })).toBeDefined();
     expect(screen.getByText(/Tik op een leeg punt/)).toBeDefined();
@@ -88,30 +89,31 @@ describe("MolenspelPlay", () => {
 
   it("vraagt om een steen te pakken na een molentje", () => {
     const game: MolenspelGame = { ...createMolenspelGame("wit"), awaitRemoval: true };
-    render(
-      <MolenspelPlay
-        game={game}
-        onBack={() => undefined}
-        onRestart={() => undefined}
-        onTap={() => undefined}
-      />,
-    );
+    render(<MolenspelPlay {...defaults} game={game} />);
 
     expect(screen.getByText(/Pak nu een steen/)).toBeDefined();
   });
 
-  it("start een nieuw spel en gaat terug naar de uitleg", () => {
+  it("toont een melding als een tik niets deed", () => {
     render(
-      <MolenspelPlay
-        game={createMolenspelGame("wit")}
-        onBack={() => undefined}
-        onRestart={() => undefined}
-        onTap={() => undefined}
-      />,
+      <MolenspelPlay {...defaults} notice="Dat kan nu niet." game={createMolenspelGame("wit")} />,
     );
+
+    expect(screen.getByText("Dat kan nu niet.")).toBeDefined();
+  });
+
+  it("zet de terugknop uit als er niets terug te draaien is", () => {
+    render(<MolenspelPlay {...defaults} game={createMolenspelGame("wit")} />);
+
+    expect(screen.getByRole("button", { name: "Terug" }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("start een nieuw spel en gaat terug naar de uitleg", () => {
+    render(<MolenspelPlay {...defaults} canUndo game={createMolenspelGame("wit")} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
     fireEvent.click(screen.getByRole("button", { name: "Uitleg" }));
+    fireEvent.click(screen.getByRole("button", { name: "Terug" }));
     expect(screen.getByRole("button", { name: "Nieuw spel" })).toBeDefined();
   });
 });

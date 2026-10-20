@@ -373,6 +373,27 @@
     outline: 3px solid #0ea5e9;
     outline-offset: 4px;
   }
+
+  /*
+   * De punten van het molenspel zijn SVG-groepen. De browser tekent daar een
+   * rechthoekige focusrand omheen; in plaats daarvan lichten we een cirkel op.
+   */
+  .molenspel-point {
+    outline: none;
+    cursor: pointer;
+  }
+
+  .molenspel-point .molenspel-point-focus {
+    stroke: transparent;
+  }
+
+  .molenspel-point:focus-visible .molenspel-point-focus {
+    stroke: #0ea5e9;
+  }
+
+  .molenspel-point--target .molenspel-point-hit {
+    cursor: pointer;
+  }
 }
 
 @layer motion {

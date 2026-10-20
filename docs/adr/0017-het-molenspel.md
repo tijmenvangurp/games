@@ -29,6 +29,9 @@ De app is statisch, doet geen externe requests en kent geen backend. Het spel mo
 7. **Twee spelers op één apparaat.** Het originele spel is een spel voor twee. De app voegt geen computertegenstander toe; dat zou een apart spelontwerp zijn en de regels uitrekken.
 8. **De voortgang blijft lokaal.** Het bord en de instellingen staan in `localStorage` onder `games.molenspel.v1`. Er gaat niets naar een server.
 9. **Het bord is SVG.** De 24 punten zijn schaalbare cirkels met een treftarget van 0,45 rastereenheid, ruim boven de 44 px op een telefoon. Het bord past dus op 390 px (mobiel) en 1024 px (tablet) zonder scrollen.
+10. **De bordtekening volgt de bron op de voet.** De puntstippen hebben een straal van 0,085 rastereenheid, net als de kleine stippen in de bordtekening op Wikimedia Commons. Een steen is 0,26; groter oogt het bord als een vel cirkels in plaats van een bord.
+11. **Een zet is terug te draaien.** De store bewaart de laatste vijftig standen. Dat is met pure regelfuncties bijna gratis en het maakt het spel voor kinderen minder hard.
+12. **De regels worden met willekeurige potjes getest.** Naast gerichte tests speelt `tests/node/molenspel-random.test.ts` honderden potjes met een vaste dobbelsteen en bewaakt onderweg de invarianten: nooit meer dan negen stenen, altijd iets te pakken na een molentje, altijd een beurtwissel en altijd een eindstand.
 
 ## Gevolgen
 
@@ -36,6 +39,10 @@ De app is statisch, doet geen externe requests en kent geen backend. Het spel mo
 - Het bord is met 24 punten en 16 molentjes klein genoeg om volledig op één scherm te tonen, ook op een telefoon.
 - De spelregels zijn een jaar of ouder en kunnen veranderen; de ADR en de tests in `tests/node/molenspel-rules.test.ts` leggen de huidige interpretatie vast.
 - Er is geen computertegenstander. Wil de eigenaar die later, dan is dat een eigen spelregelschijf en een eigen ADR.
+
+## Les uit de eerste versie
+
+De eerste versie tekende de drie vierkanten met een `<polyline>` zonder het beginpunt nogmaals toe te voegen. Een polyline sluit zichzelf niet, dus elk vierkant miste zijn sluitende zijde en het bord leek op een doolhof. Dat is nu een regressietest: `tests/web/molenspel-store.test.tsx` controleert dat de drie gesloten lijnen in hetzelfde punt beginnen en eindigen. De puntstippen en stenen zijn daarbij ook kleiner gemaakt, zodat het bord de verhoudingen van de bordtekening volgt.
 
 ## Alternatieven
 

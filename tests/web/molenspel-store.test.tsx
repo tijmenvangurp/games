@@ -141,6 +141,66 @@ describe("useMolenspelStore: wisselen van speler en spel", () => {
     expect(result.current.game.board[1]).toBe("wit");
     expect(result.current.game.board[0]).toBe(null);
   });
+
+  it("draait een zet terug", () => {
+    const { result } = renderHook(() => useMolenspelStore());
+
+    act(() => {
+      result.current.start("wit");
+    });
+    act(() => {
+      result.current.tap(0);
+    });
+    expect(result.current.game.board[0]).toBe("wit");
+    expect(result.current.history).toHaveLength(1);
+
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.game.board[0]).toBe(null);
+    expect(result.current.game.turn).toBe("wit");
+    expect(result.current.history).toHaveLength(0);
+  });
+
+  it("doet niets als er niets terug te draaien is", () => {
+    const { result } = renderHook(() => useMolenspelStore());
+
+    act(() => {
+      result.current.start("wit");
+    });
+    act(() => {
+      result.current.undo();
+    });
+    expect(result.current.game.board.every((piece) => piece === null)).toBe(true);
+  });
+
+  it("wisselt van steen als je naast een doel tik", () => {
+    const base = createMolenspelGame("wit");
+    const board = base.board.slice();
+    board[0] = "wit";
+    board[1] = "wit";
+    board[2] = null;
+    board[10] = "zwart";
+    board[11] = "zwart";
+    board[12] = "zwart";
+    useMolenspelStore.setState({
+      game: { ...base, board, inHand: { wit: 0, zwart: 0 }, phase: "schuiven" },
+      started: true,
+    });
+    const { result } = renderHook(() => useMolenspelStore());
+
+    act(() => {
+      result.current.tap(0);
+    });
+    expect(result.current.game.selected).toBe(0);
+
+    // Punt 1 is een eigen steen en geen doel: de selectie verspringt.
+    act(() => {
+      result.current.tap(1);
+    });
+    expect(result.current.game.selected).toBe(1);
+    expect(result.current.game.board[0]).toBe("wit");
+  });
 });
 
 describe("MolenspelBoard", () => {
@@ -149,6 +209,25 @@ describe("MolenspelBoard", () => {
     render(<MolenspelBoard game={game} removable={[]} onTap={() => undefined} />);
 
     expect(screen.getAllByRole("button")).toHaveLength(24);
+  });
+
+  it("sluit de drie vierkanten van het bord", () => {
+    const game = createMolenspelGame("wit");
+    const { container } = render(
+      <MolenspelBoard game={game} removable={[]} onTap={() => undefined} />,
+    );
+    const polylines = [...container.querySelectorAll("polyline")];
+
+    // Drie gesloten vierkanten en vier open verbindingen.
+    expect(polylines).toHaveLength(7);
+    for (const line of polylines.slice(0, 3)) {
+      const points = (line.getAttribute("points") ?? "").trim().split(" ");
+      expect(points[0]).toBe(points[points.length - 1]);
+    }
+    for (const line of polylines.slice(3)) {
+      const points = (line.getAttribute("points") ?? "").trim().split(" ");
+      expect(points[0]).not.toBe(points[points.length - 1]);
+    }
   });
 
   it("meldt welke steen je kunt kiezen", () => {
