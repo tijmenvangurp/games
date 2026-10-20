@@ -1,4 +1,13 @@
-import { BOARD_SIZES, PLAYERS, type BoardSize, type Player } from "@entities/four-in-a-row";
+import {
+  BOARD_SIZES,
+  COMPUTER_LEVELS,
+  MODES,
+  PLAYERS,
+  type BoardSize,
+  type ComputerLevel,
+  type FourInARowMode,
+  type Player,
+} from "@entities/four-in-a-row";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
 import { DEFAULT_SETTINGS, type FourInARowSettings } from "./settings";
 
@@ -23,8 +32,25 @@ function isSize(value: unknown): value is BoardSize {
   return typeof value === "string" && (BOARD_SIZES as readonly string[]).includes(value);
 }
 
+function isMode(value: unknown): value is FourInARowMode {
+  return typeof value === "string" && (MODES as readonly string[]).includes(value);
+}
+
+function isLevel(value: unknown): value is ComputerLevel {
+  return typeof value === "string" && (COMPUTER_LEVELS as readonly string[]).includes(value);
+}
+
+/** Oude opslag kent alleen de grootte; de rest krijgt de standaardwaarde. */
 function toSettings(value: unknown): FourInARowSettings | undefined {
-  return isRecord(value) && isSize(value.size) ? { size: value.size } : undefined;
+  if (!isRecord(value) || !isSize(value.size)) {
+    return undefined;
+  }
+
+  return {
+    size: value.size,
+    mode: isMode(value.mode) ? value.mode : DEFAULT_SETTINGS.mode,
+    level: isLevel(value.level) ? value.level : DEFAULT_SETTINGS.level,
+  };
 }
 
 function isScore(value: unknown): value is Record<Player, number> {

@@ -21,7 +21,7 @@
 - `adr/0016-schaakpuzzeloverzicht.md` — het puzzeloverzicht en lokaal bewaarde opgeloste puzzels.
 - `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
 - `adr/0024-schaakpartij-en-lokale-stockfish.md` — de schaakhub, pass-and-play, de lokale Stockfish-wasm, de CSP-uitbreiding en lokale opslag.
-- `adr/0025-vier-op-een-rij.md` — Vier op een Rij als lokaal tweespelersspel: twee bordgroottes, pure regels, eerlijke starter en de kleuren van de spelers.
+- `adr/0025-vier-op-een-rij.md` — Vier op een Rij: twee bordgroottes, pure regels, een eerlijke starter, de kleuren van de spelers en de computer als tegenstander.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.

@@ -14,7 +14,7 @@ test.describe("vier op een rij op een telefoon", () => {
 
     await expect(page.getByRole("heading", { name: "Nieuw spel" })).toBeVisible();
     await page.getByRole("button", { name: /Klein bord/ }).click();
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     await expect(page.getByRole("group", { name: "Speelbord" })).toBeVisible();
     await expect(page.getByRole("button", { name: /^Kolom/ })).toHaveCount(6);
@@ -37,7 +37,7 @@ test.describe("vier op een rij op een telefoon", () => {
 
   test("houdt elke kolom groot genoeg om te tikken", async ({ page }) => {
     await page.goto("/vier-op-een-rij");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const columns = page.getByRole("button", { name: /^Kolom/ });
     await expect(columns).toHaveCount(7);
@@ -54,7 +54,7 @@ test.describe("vier op een rij op een telefoon", () => {
 
   test("maakt een zet ongedaan en begint opnieuw", async ({ page }) => {
     await page.goto("/vier-op-een-rij");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const undo = page.getByRole("button", { name: "Ongedaan maken" });
     await expect(undo).toBeDisabled();
@@ -73,6 +73,29 @@ test.describe("vier op een rij op een telefoon", () => {
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);
   });
+
+  test("speelt tegen de computer", async ({ page }) => {
+    await page.goto("/vier-op-een-rij");
+
+    await page.getByRole("button", { name: "Computer" }).click();
+    await expect(page.getByText("Niveau van de computer")).toBeVisible();
+
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+    await expect(page.getByText(/Jij begint/)).toBeVisible();
+
+    await page.getByRole("button", { name: "Kolom 4", exact: true }).click();
+
+    const undo = page.getByRole("button", { name: "Ongedaan maken" });
+    await expect(page.getByText("Jij bent aan de beurt.")).toBeVisible({ timeout: 5000 });
+    await expect(undo).toBeEnabled();
+
+    await undo.click();
+    await expect(page.getByText(/Jij begint/)).toBeVisible();
+    await expect(undo).toBeDisabled();
+
+    const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
+    expect(overflows).toBe(false);
+  });
 });
 
 test.describe("vier op een rij op een tablet", () => {
@@ -84,7 +107,7 @@ test.describe("vier op een rij op een tablet", () => {
     await expect(page.getByRole("heading", { name: "Vier op een Rij" })).toBeVisible();
     await expect(page.getByText(/Groot bord 7 × 6/)).toBeVisible();
 
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
     await expect(page.getByRole("button", { name: /^Kolom/ })).toHaveCount(7);
 
     await page.getByRole("button", { name: "Kolom 7", exact: true }).click();

@@ -1,4 +1,4 @@
-# ADR 0025: Vier op een Rij als lokaal tweespelersspel
+# ADR 0025: Vier op een Rij, samen of tegen de computer
 
 - **Status:** Aangenomen
 - **Datum:** 2026-10-20
@@ -17,6 +17,8 @@ mogelijk later.
 De eisen:
 
 - twee spelers op hetzelfde apparaat, om de beurt;
+- daarnaast tegen de computer kunnen spelen, zoals bij het schaken, met een niveau dat bij het
+  kind past;
 - een stand die een reeks potjes bijhoudt;
 - twee bordgroottes, zodat de jongste op een kleiner bord kan spelen;
 - fully client-side: geen backend, geen netwerk, binnen de CSP;
@@ -46,7 +48,8 @@ De eisen:
    Ongedaan maken verandert de stand niet.
 5. **De verliezer begint de volgende partij.** Dat houdt het eerlijk tussen twee kinderen zonder
    dat iemand hoeft te onderhandelen. Bij gelijkspel wisselt de starter. De allereerste partij
-   begint speler één (Blauw).
+   begint speler één (Blauw). Tegen de computer begint het kind altijd: de computer heeft geen
+   recht op een inhaalslag.
 6. **De speler die aan de beurt is, krijgt neutrale nadruk.** Indigo is de kleur van speler één
    (`--player-one`), niet van "actief"; de actieve kaart gebruikt daarom een donkere rand en het
    `muted`-vlak. Speler twee is klei (`--player-two`). Groen, amber en rood blijven gereserveerd
@@ -58,6 +61,22 @@ De eisen:
    `showSpeech={false}`.
 9. **De thumbnail is lokaal.** Een 800 × 500 JPEG in `apps/games/public/thumbnails`, met de
    eerste acht tekens van de sha256 in de bestandsnaam, vastgelegd met Playwright.
+10. **De computer speelt met eigen minimax.** De zoekfunctie staat als pure functie in
+    `libs/entities/four-in-a-row/model/ai.ts` (`chooseComputerColumn`): negamax met alpha-bèta,
+    een heuristiek over alle vensters van vier en de middelste kolom als voorkeur. Drie niveaus:
+    _makkelijk_ kijkt één zet vooruit en kiest soms expres een mindere kolom, _middel_ kijkt drie
+    zetten vooruit en _moeilijk_ vijf. Het kind is altijd Blauw en begint; de computer is Bruin.
+    Tijdens de beurt van de computer staat "De computer denkt na…" en na 650 ms valt de schijf,
+    zodat de beurtwissel leesbaar blijft. Ongedaan maken neemt je eigen zet én het antwoord van
+    de computer terug.
+
+    Er is geen AI-bibliotheek gebruikt. De bestaande pakketten zijn gecontroleerd:
+    `connect-four` (0.0.6, 2016) en `@devshareacademy/connect-four` leveren vooral bordlogica
+    die we al hebben, `@kenrick95/c4` is een complete bouwset met een eigen bordmodel, en
+    `connect-four-ai-wasm` is een perfecte solver in wasm. Die laatste is onverslaanbaar en dus
+    onbruikbaar voor een kind van zes, en een wasm-asset vraagt extra CSP- en bouwwerk. Onze
+    zoekfunctie is ongeveer honderd regels, getypeerd, deterministisch te testen en per niveau
+    af te stellen; ze gebruikt dezelfde pure `applyDrop` als de rest van het spel.
 
 ## Gevolgen
 
@@ -65,10 +84,15 @@ De eisen:
 - De stand is per apparaat en per browser. Delen tussen apparaten kan pas met de optionele sync
   uit ADR 0012/0013 en valt buiten dit spel.
 - De pure regels zijn los te testen (21 unit-tests) en later door een engine te vervangen; de
-  feature kent alleen `start`, `drop`, `undo` en `resetScore`.
+  feature kent alleen `start`, `drop`, `playComputer`, `undo` en `resetScore`. De zoekfunctie
+  heeft eigen tests: een directe winst pakken, een rij van de tegenstander blokkeren, nooit een
+  volle kolom kiezen en stoppen zodra de partij klaar is.
+- De instellingen (`size`, `mode`, `level`) en de stand staan onder `games.vier-op-een-rij.v1`;
+  een lopende partij bewaart het niveau waarmee ze begon, zodat een niveauwijziging in het menu
+  de partij niet stiekem sterker maakt.
 - `Ongedaan maken` is alleen beschikbaar zolang een partij loopt en verandert de stand niet; na
   een gewonnen partij blijft de uitslag staan tot de volgende start.
 - Een tweede bordgrootte is alleen een andere `BOARD_SHAPES`-waarde; nieuwe groottes vragen geen
-  wijziging in de UI.
+  wijziging in de UI. Hetzelfde geldt voor een extra niveau: dat is een waarde in `DEPTHS`.
 - De kwaliteitsgate dekt de entity, feature, page, route, catalogusentry, opslag, thumbnail en
   de e2e-flow op 390 px en 1024 px, inclusief tikdoelen van minimaal 44 px.

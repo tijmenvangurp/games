@@ -1,4 +1,10 @@
-import { BOARD_SIZES, type BoardShape, type BoardSize, type Player } from "./types";
+import {
+  BOARD_SIZES,
+  type BoardShape,
+  type BoardSize,
+  type ComputerLevel,
+  type Player,
+} from "./types";
 
 export const BOARD_SHAPES: Record<BoardSize, BoardShape> = {
   groot: { columns: 7, rows: 6 },
@@ -30,3 +36,10 @@ export const BOARD_SIZE_OPTIONS = BOARD_SIZES.map((value) => ({
   value,
   label: BOARD_SIZE_INFO[value].label,
 }));
+
+/** De namen van de niveaus; de moeilijkheid zelf staat in `ai.ts`. */
+export const COMPUTER_LEVEL_INFO: Record<ComputerLevel, { label: string }> = {
+  makkelijk: { label: "Makkelijk" },
+  middel: { label: "Middel" },
+  moeilijk: { label: "Moeilijk" },
+};

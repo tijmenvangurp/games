@@ -1,8 +1,19 @@
-import { PLAYERS, PLAYER_INFO, type Player } from "@entities/four-in-a-row";
+import { PLAYERS, type FourInARowMode, type Player } from "@entities/four-in-a-row";
 import { cn } from "@shared/lib";
 import { Button, RotateCcw, Undo2 } from "@shared/ui";
+import { playerName } from "../model/presentation";
 
-function PlayerChip({ player, score, active }: { player: Player; score: number; active: boolean }) {
+function PlayerChip({
+  player,
+  name,
+  score,
+  active,
+}: {
+  player: Player;
+  name: string;
+  score: number;
+  active: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -18,7 +29,7 @@ function PlayerChip({ player, score, active }: { player: Player; score: number; 
           player === "one" ? "bg-player-one" : "bg-player-two",
         )}
       />
-      <span className="truncate text-sm font-bold">{PLAYER_INFO[player].label}</span>
+      <span className="truncate text-sm font-bold">{name}</span>
       <span
         aria-label={`${score} gewonnen partijen`}
         className="ml-auto text-sm font-black text-muted-foreground"
@@ -32,12 +43,20 @@ function PlayerChip({ player, score, active }: { player: Player; score: number; 
 interface FourInARowHudProps {
   current: Player;
   score: Record<Player, number>;
+  mode: FourInARowMode;
   canUndo: boolean;
   onUndo: () => void;
   onRestart: () => void;
 }
 
-export function FourInARowHud({ current, score, canUndo, onUndo, onRestart }: FourInARowHudProps) {
+export function FourInARowHud({
+  current,
+  score,
+  mode,
+  canUndo,
+  onUndo,
+  onRestart,
+}: FourInARowHudProps) {
   return (
     <div className="game-panel flex items-center justify-between gap-2 p-2 sm:p-3">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
@@ -45,6 +64,7 @@ export function FourInARowHud({ current, score, canUndo, onUndo, onRestart }: Fo
           <PlayerChip
             key={player}
             active={player === current}
+            name={playerName(player, mode)}
             player={player}
             score={score[player]}
           />

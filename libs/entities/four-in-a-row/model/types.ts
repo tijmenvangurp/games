@@ -40,3 +40,13 @@ export interface Drop {
   readonly column: number;
   readonly row: number;
 }
+
+export const MODES = ["friend", "computer"] as const;
+
+/** Samen op één apparaat of tegen de computer. */
+export type FourInARowMode = (typeof MODES)[number];
+
+export const COMPUTER_LEVELS = ["makkelijk", "middel", "moeilijk"] as const;
+
+/** Hoe sterk de computer speelt. */
+export type ComputerLevel = (typeof COMPUTER_LEVELS)[number];

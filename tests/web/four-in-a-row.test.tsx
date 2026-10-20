@@ -16,6 +16,7 @@ beforeEach(() => {
     settings: DEFAULT_SETTINGS,
     score: { one: 0, two: 0 },
     game: null,
+    match: null,
   });
 });
 
@@ -157,5 +158,54 @@ describe("vier op een rij", () => {
     fireEvent.click(screen.getByRole("button", { name: /Terug naar je spel/ }));
     expect(await screen.findByRole("group", { name: "Speelbord" })).toBeTruthy();
     expect(useFourInARowStore.getState().game?.drops).toHaveLength(1);
+  });
+
+  it("speelt tegen de computer", async () => {
+    await openSetup();
+    expect(screen.queryByText("Niveau van de computer")).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Computer" }));
+    expect(screen.getByText("Niveau van de computer")).toBeTruthy();
+    expect(screen.getByText(/Jij begint deze partij/)).toBeTruthy();
+
+    startGame();
+    expect(screen.getByText(/Jij begint\./)).toBeTruthy();
+    expect(screen.getByText("Computer")).toBeTruthy();
+
+    clickColumn(4);
+    expect(useFourInARowStore.getState().game?.current).toBe("two");
+
+    expect(await screen.findByText("Jij bent aan de beurt.", {}, { timeout: 3000 })).toBeTruthy();
+    expect(useFourInARowStore.getState().game?.drops).toHaveLength(2);
+    expect(loadFourInARowState().settings).toMatchObject({ mode: "computer" });
+  });
+
+  it("neemt tegen de computer je zet en het antwoord terug", async () => {
+    await openSetup();
+    fireEvent.click(screen.getByRole("button", { name: "Computer" }));
+    startGame();
+
+    clickColumn(3);
+    await screen.findByText("Jij bent aan de beurt.", {}, { timeout: 3000 });
+
+    fireEvent.click(screen.getByRole("button", { name: "Ongedaan maken" }));
+
+    expect(useFourInARowStore.getState().game?.drops).toHaveLength(0);
+    expect(screen.getByText(/Jij begint\./)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Ongedaan maken" }).hasAttribute("disabled")).toBe(
+      true,
+    );
+  });
+
+  it("bewaart het niveau van de computer", async () => {
+    await openSetup();
+    fireEvent.click(screen.getByRole("button", { name: "Computer" }));
+    fireEvent.click(screen.getByRole("button", { name: "Moeilijk" }));
+
+    expect(loadFourInARowState().settings).toEqual({
+      size: "groot",
+      mode: "computer",
+      level: "moeilijk",
+    });
   });
 });

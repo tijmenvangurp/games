@@ -147,7 +147,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
   {
     id: "four-in-a-row",
     name: "Vier op een Rij",
-    description: "Laat om de beurt een schijf vallen en maak vier op een rij.",
+    description: "Maak vier op een rij, samen of tegen de computer.",
     status: "available",
     to: "/vier-op-een-rij",
     thumbnail: "/thumbnails/four-in-a-row-65b55d42.jpg",
