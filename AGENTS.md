@@ -45,6 +45,7 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `@dnd-kit/core`                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)          |
 | `chess.js`                                                         | schaakregels en zetgeneratie                                        |
 | `react-chessboard`                                                 | schaakbord                                                          |
+| `stockfish.js`                                                     | lokale schaakengine in een worker (wasm)                            |
 | `sudoku-gen`                                                       | sudoku-generator                                                    |
 | `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
 | `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
