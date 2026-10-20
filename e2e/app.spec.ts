@@ -31,6 +31,8 @@ test.describe("op een telefoon", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { name: "Spellen" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /schaken/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /schaakpuzzels/i })).toHaveCount(0);
     await page.getByRole("link", { name: /sudoku/i }).click();
 
     await expect(page.getByRole("heading", { name: "Nieuw spel" })).toBeVisible();
