@@ -1,4 +1,4 @@
-# ADR 0024: Vier op een Rij als lokaal tweespelersspel
+# ADR 0025: Vier op een Rij als lokaal tweespelersspel
 
 - **Status:** Aangenomen
 - **Datum:** 2026-10-20

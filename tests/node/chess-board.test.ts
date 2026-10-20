@@ -16,4 +16,17 @@ describe("chessSquareStyles", () => {
     expect(styles.h1?.boxShadow).toContain("2, 132, 199");
     expect(styles.e1?.boxShadow).toContain("#f59e0b");
   });
+
+  it("marks only the hinted piece before revealing the destination", () => {
+    const styles = chessSquareStyles({
+      lastMove: null,
+      selectedSquare: null,
+      legalTargets: [],
+      hintSquare: "g1",
+    });
+
+    expect(styles.g1?.boxShadow).toContain("#f59e0b");
+    expect(styles.g1?.backgroundImage).toBeUndefined();
+    expect(Object.keys(styles)).toEqual(["g1"]);
+  });
 });

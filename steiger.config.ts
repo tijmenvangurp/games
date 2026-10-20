@@ -9,4 +9,11 @@ export default defineConfig([
       "fsd/insignificant-slice": "off",
     },
   },
+  {
+    // "chess" is een onveranderlijk enkelvoud, maar pluralize ziet de -ss als meervoud.
+    files: ["libs/entities/chess/**"],
+    rules: {
+      "fsd/inconsistent-naming": "off",
+    },
+  },
 ]);

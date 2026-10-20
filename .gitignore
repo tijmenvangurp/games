@@ -22,6 +22,9 @@ test-results
 # Prototype-audio (lokaal gegenereerd, niet committen)
 /prototype/
 
+# Gegenereerd uit de stockfish.js-dependency; nooit committen (.js-bestand).
+apps/games/public/stockfish/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

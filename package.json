@@ -53,6 +53,7 @@
     "react": "^19.3.1",
     "react-chessboard": "^5.12.1",
     "react-dom": "^19.3.1",
+    "stockfish.js": "10.0.2",
     "sudoku-gen": "1.0.3",
     "tailwind-merge": "^3.7.0",
     "topojson-client": "3.1.0",

@@ -202,6 +202,9 @@ importers:
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      stockfish.js:
+        specifier: 10.0.2
+        version: 10.0.2
       sudoku-gen:
         specifier: 1.0.3
         version: 1.0.3
@@ -2784,6 +2787,9 @@ packages:
     engines: {node: '>=22.18.0'}
     hasBin: true
 
+  stockfish.js@10.0.2:
+    resolution: {integrity: sha512-treB3AYcdvRJ9SDPOyL0R2NcEAtQgG432nStfRzR4wzVELGQ6iVoeBHwvirHTfocNOTims7XNkK3SADaocsJmQ==}
+
   string-width@4.2.3:
     resolution: {integrity: sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==}
     engines: {node: '>=8'}
@@ -5277,6 +5283,8 @@ snapshots:
       zod-validation-error: 3.5.4(zod@3.25.76)
     transitivePeerDependencies:
       - typescript
+
+  stockfish.js@10.0.2: {}
 
   string-width@4.2.3:
     dependencies:
