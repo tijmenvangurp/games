@@ -10,6 +10,7 @@ import { AlchemyPage } from "@pages/alchemy";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessPage } from "@pages/chess";
 import { FlagsPage } from "@pages/flags";
+import { FourInARowPage } from "@pages/four-in-a-row";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
 import { HomePage } from "@pages/home";
 import { LettersPage } from "@pages/letter";
@@ -46,6 +47,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/puzzels", PuzzlesPage),
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/vlaggen", FlagsPage),
+    gameRoute("/vier-op-een-rij", FourInARowPage),
     gameRoute("/mengelmoes", AlchemyPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),

@@ -26,6 +26,7 @@
 - `adr/0021-provinciegeometrie.md` — de twaalf provincievormen uit Natural Earth, als lazy chunk voor de puzzel en de vlaggenquiz.
 - `adr/0022-schaakbord-tikken-is-kijken.md` — tikken toont zetten (ook van de tegenstander), slepen en neerzetten doet de zet.
 - `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
+- `adr/0024-vier-op-een-rij.md` — Vier op een Rij als lokaal tweespelersspel: twee bordgroottes, pure regels, eerlijke starter en de kleuren van de spelers.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
