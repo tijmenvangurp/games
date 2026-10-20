@@ -73,7 +73,7 @@ describe("Frans luisterspel", () => {
 
     expect(useFrenchQuizStore.getState().answered).toBe(true);
     expect(useFrenchQuizStore.getState().correctCount).toBe(1);
-    expect(screen.getByText("Goed gedaan!")).toBeTruthy();
+    expect(screen.getByText("Je vond het!")).toBeTruthy();
     expect(screen.getByText(question.item.fr)).toBeTruthy();
     expect(
       screen.getByRole("button", { name: question.item.nl }).getAttribute("data-answer-state"),
@@ -108,7 +108,7 @@ describe("Frans luisterspel", () => {
     fireEvent.click(screen.getByRole("button", { name: wrong }));
 
     expect(useFrenchQuizStore.getState().correctCount).toBe(0);
-    expect(screen.getByText("Bijna!")).toBeTruthy();
+    expect(screen.getByText("Nog niet.")).toBeTruthy();
     expect(screen.getAllByText(question.item.nl).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: wrong }).getAttribute("data-answer-state")).toBe(
       "wrong",
@@ -147,7 +147,7 @@ describe("Frans luisterspel", () => {
     }
     fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
 
-    expect(screen.getByText("Goed gedaan!")).toBeTruthy();
+    expect(screen.getByText("Je vond het!")).toBeTruthy();
     expect(screen.getByText(phrase.fr)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));

@@ -8,10 +8,20 @@ interface MemoryCardProps {
   index: number;
   faceUp: boolean;
   matched: boolean;
+  hinted: boolean;
+  hintLevel: 1 | 2 | 3 | null;
   onFlip: (index: number) => void;
 }
 
-export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCardProps) {
+export function MemoryCard({
+  pokemon,
+  index,
+  faceUp,
+  matched,
+  hinted,
+  hintLevel,
+  onFlip,
+}: MemoryCardProps) {
   const label = faceUp
     ? matched
       ? `${pokemon.name}, gevonden`
@@ -23,9 +33,14 @@ export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCa
       type="button"
       aria-label={label}
       aria-pressed={faceUp}
-      className="memory-card aspect-square w-full rounded-2xl p-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+      className={cn(
+        "memory-card aspect-square w-full rounded-2xl p-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+        hinted && "ring-4 ring-amber-300 ring-offset-2",
+        hinted && hintLevel === 3 && "ring-amber-400",
+      )}
       data-card-index={index}
       data-flipped={faceUp}
+      data-hinted={hinted || undefined}
       data-matched={matched}
       onClick={() => onFlip(index)}
     >

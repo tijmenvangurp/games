@@ -15,6 +15,8 @@ import type { WordSearchSettings } from "./settings";
 interface Hint {
   word: string;
   cells: readonly Cell[];
+  /** 1 = first letter only, 2 = the whole placement. */
+  stage: 1 | 2;
 }
 
 interface WordSearchStore {
@@ -82,8 +84,6 @@ function resolveSelection(set: StoreSet, get: StoreGet, cells: readonly Cell[]):
   const matched = puzzle.placements.find((placement) => selectionMatches(placement, cells));
   if (!matched) {
     set({ selected: cells, dragStart: null, wrong: true, lastFound: null });
-    playSound("wrong");
-    playHaptic("wrong");
     return;
   }
 
@@ -171,7 +171,7 @@ function cancelDrag(set: StoreSet): void {
 }
 
 function handleHint(set: StoreSet, get: StoreGet, word: string): void {
-  const { puzzle, found } = get();
+  const { puzzle, found, hint } = get();
   if (!puzzle || found.includes(word)) {
     return;
   }
@@ -179,7 +179,11 @@ function handleHint(set: StoreSet, get: StoreGet, word: string): void {
   if (!placement) {
     return;
   }
-  set({ hint: { word, cells: placement.cells } });
+  // First click shows only the first letter; a second click on the same word
+  // shows the placement. The child still has to trace the word.
+  const stage = hint?.word === word ? 2 : 1;
+  const cells = stage === 1 ? placement.cells.slice(0, 1) : placement.cells;
+  set({ hint: { word, cells, stage } });
   playSound("hint");
 }
 

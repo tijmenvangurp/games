@@ -41,7 +41,7 @@ function backgroundClassName(props: SudokuCellProps): string {
     props.isSameValue && "bg-warning/15",
     props.isHintUnit && "bg-success/10",
     props.isConflict && "bg-warning/20 font-bold text-warning",
-    props.isMistake && "bg-danger/10 font-bold text-danger",
+    props.isMistake && "bg-warning/10 font-bold text-warning",
     props.isHinted && "bg-success/10 font-bold text-success",
   );
 }
@@ -60,7 +60,7 @@ function label(props: SudokuCellProps): string {
     props.isHinted && "hint",
     props.isHintTarget && "tip",
     props.isConflict && "conflict",
-    props.isMistake && "fout",
+    props.isMistake && "nog niet goed",
   ].filter(Boolean);
   const row = props.row + 1;
   const col = props.col + 1;

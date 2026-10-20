@@ -1,6 +1,5 @@
-import { MAX_HEARTS, type MazeDifficulty, type MazeLevel } from "@entities/arrow";
-import { ArrowLeft, Button, Heart, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
-import { cn } from "@shared/lib";
+import type { MazeDifficulty, MazeLevel } from "@entities/arrow";
+import { ArrowLeft, Button, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
 
 const DIFFICULTY_LABELS: Record<MazeDifficulty, string> = {
   makkelijk: "Makkelijk",
@@ -12,7 +11,6 @@ const DIFFICULTY_LABELS: Record<MazeDifficulty, string> = {
 interface MazeHudProps {
   level: MazeLevel;
   levelIndex: number;
-  hearts: number;
   removedCount: number;
   canUndo: boolean;
   playing: boolean;
@@ -25,7 +23,6 @@ interface MazeHudProps {
 export function MazeHud({
   level,
   levelIndex,
-  hearts,
   removedCount,
   canUndo,
   playing,
@@ -52,20 +49,7 @@ export function MazeHud({
           <Undo2 aria-hidden="true" className="size-5" />
         </Button>
 
-        <div
-          aria-label={`${hearts} van ${MAX_HEARTS} harten`}
-          className="flex flex-1 items-center justify-center gap-1 text-danger"
-          role="img"
-        >
-          {Array.from({ length: MAX_HEARTS }, (_, index) => (
-            <Heart
-              key={index}
-              aria-hidden="true"
-              className={cn("size-5", index >= hearts && "text-danger/25")}
-              fill="currentColor"
-            />
-          ))}
-        </div>
+        <div className="flex-1" />
 
         <SoundToggle />
       </div>

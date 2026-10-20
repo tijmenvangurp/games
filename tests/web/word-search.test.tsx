@@ -129,9 +129,9 @@ describe("word search", () => {
     const { puzzle } = await startDefaultGame();
     useWordSearchStore.setState({ found: puzzle.placements.map((item) => item.word) });
 
-    expect(await screen.findByRole("heading", { name: "Knap gedaan!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Gevonden!" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Knap gedaan!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Gevonden!" })).toBeNull();
     expect(useWordSearchStore.getState().found).toEqual([]);
     expect(useWordSearchStore.getState().puzzle).not.toBe(puzzle);
   }, 30_000);

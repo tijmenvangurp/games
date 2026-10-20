@@ -123,7 +123,7 @@ export function useChessTutorial({
       const result = playTutorialMove(state.level, state.fen, from, to, state.moveCount);
 
       if (!result.ok) {
-        playHaptic("wrong");
+        playHaptic("tap");
         setState(illegalState(state, from));
         return false;
       }

@@ -52,10 +52,10 @@ export function statusText(input: StatusInput): string {
     return "Er staan dubbele cijfers.";
   }
   if (input.mistakeMode === "direct" && input.mistakeCount > 0) {
-    return "Er staat nog een foutje in.";
+    return "Er staat nog iets niet goed.";
   }
   if (input.isChecked && input.checkedMistakeCount > 0) {
-    return "Er staat nog een foutje in.";
+    return "Er staat nog iets niet goed.";
   }
   if (input.isChecked) {
     return "Alles klopt nog!";

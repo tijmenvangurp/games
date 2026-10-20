@@ -53,7 +53,7 @@ export function useChessPuzzle(puzzle: ChessPuzzle): UseChessPuzzleResult {
       const attempt = attemptPuzzleMove(state, sourceSquare, targetSquare);
 
       if (!attempt.ok) {
-        playHaptic("wrong");
+        playHaptic("tap");
         setState(wrongState(state));
         return false;
       }

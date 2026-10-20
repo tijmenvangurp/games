@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
@@ -6,7 +6,6 @@ import { createAppRouter } from "@app/router";
 import {
   levelAt,
   levelBounds,
-  MAX_HEARTS,
   removableArrows,
   solveMaze,
   visibleArrowPoints,
@@ -25,7 +24,6 @@ beforeEach(() => {
     level: levelAt(0),
     removedIds: [],
     history: [],
-    hearts: MAX_HEARTS,
     status: "playing",
     hintId: null,
   });
@@ -75,9 +73,6 @@ describe("arrows maze", () => {
 
     const level = currentLevel();
     expect(screen.getByRole("progressbar", { name: /0 van \d+ pijlen weg/ })).toBeTruthy();
-    expect(
-      screen.getByRole("img", { name: new RegExp(`3 van ${MAX_HEARTS} harten`) }),
-    ).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
     expect(document.querySelectorAll('[data-hint="true"]')).toHaveLength(1);
@@ -91,7 +86,6 @@ describe("arrows maze", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Ongedaan maken" }));
     expect(useArrowsStore.getState().removedIds).toEqual([]);
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
 
     const keyboardArrow = firstRemovable();
     fireEvent.keyDown(arrowNode(keyboardArrow.id), { key: "Enter" });
@@ -130,7 +124,8 @@ describe("arrows maze", () => {
     }
 
     fireEvent.click(arrowNode(blocked.id));
-    expect(vibrate).toHaveBeenCalledWith([30, 40, 30]);
+    expect(vibrate).toHaveBeenLastCalledWith(10);
+    expect(vibrate).not.toHaveBeenCalledWith([30, 40, 30]);
   });
 
   it("wins a level, unlocks the next one and starts it", async () => {
@@ -146,7 +141,7 @@ describe("arrows maze", () => {
     }
 
     expect(useArrowsStore.getState().status).toBe("won");
-    expect(await screen.findByRole("heading", { name: "Excellent!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Gelukt!" })).toBeTruthy();
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toMatchObject({
       unlocked: 2,
     });
@@ -157,7 +152,7 @@ describe("arrows maze", () => {
     expect(useArrowsStore.getState().level.name).toBe("Ster");
   });
 
-  it("loses a heart on a blocked arrow and restarts after three mistakes", async () => {
+  it("keeps the level playable after a blocked arrow", async () => {
     await startGame();
     const level = currentLevel();
     const free = new Set(removableArrows(level, new Set()).map((arrow) => arrow.id));
@@ -167,19 +162,16 @@ describe("arrows maze", () => {
     }
 
     fireEvent.click(arrowNode(blocked.id));
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS - 1);
-    expect(screen.getByText("Die pijl is geblokkeerd.")).toBeTruthy();
-
+    expect(screen.getByText("Die pijl kan nog niet weg. Kijk welke pijl vrij is.")).toBeTruthy();
     fireEvent.click(arrowNode(blocked.id));
     fireEvent.click(arrowNode(blocked.id));
 
-    expect(useArrowsStore.getState().status).toBe("lost");
-    expect(screen.getByRole("heading", { name: "Harten op" })).toBeTruthy();
-
-    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Opnieuw" }));
     expect(useArrowsStore.getState().status).toBe("playing");
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
     expect(screen.queryByRole("heading", { name: "Harten op" })).toBeNull();
+
+    const removable = firstRemovable();
+    fireEvent.click(arrowNode(removable.id));
+    expect(useArrowsStore.getState().removedIds).toContain(removable.id);
   });
 
   it("shows locked levels until the previous one is solved", async () => {
@@ -279,7 +271,6 @@ describe("arrows pointer gestures", () => {
     fireEvent.pointerUp(svg, { button: 0, clientX: x, clientY: y, isPrimary: true, pointerId: 1 });
 
     expect(useArrowsStore.getState().removedIds).toContain(arrow.id);
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
   });
 
   it("selects an arrow on a single stationary pointer tap", async () => {
@@ -317,7 +308,6 @@ describe("arrows pointer gestures", () => {
     });
 
     expect(useArrowsStore.getState().removedIds).toEqual([]);
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
   });
 
   it("ignores a tap while a second finger is down", async () => {
@@ -340,7 +330,6 @@ describe("arrows pointer gestures", () => {
     fireEvent.pointerUp(svg, { button: 0, clientX: x, clientY: y, isPrimary: true, pointerId: 1 });
 
     expect(useArrowsStore.getState().removedIds).toEqual([]);
-    expect(useArrowsStore.getState().hearts).toBe(MAX_HEARTS);
   });
 
   it("lights up the lattice points a departed arrow vacated", async () => {

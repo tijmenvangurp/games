@@ -140,8 +140,8 @@ interface FeedbackProps {
 export function SentenceFeedback({ item, correct, onNext }: FeedbackProps) {
   return (
     <div aria-live="polite" className="game-panel space-y-2 p-4">
-      <p className={correct ? "font-black text-success" : "font-black text-danger"}>
-        {correct ? "Goed gedaan!" : "Bijna!"}
+      <p className={correct ? "font-black text-success" : "font-black text-warning"}>
+        {correct ? "Je vond het!" : "Nog niet."}
       </p>
       <p className="text-sm text-muted-foreground">
         De zin is: <strong>{item.fr}</strong>

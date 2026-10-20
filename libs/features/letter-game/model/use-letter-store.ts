@@ -124,8 +124,7 @@ function choose(set: StoreSet, get: StoreGet, answer: string): void {
   if (revealed) {
     applyChoiceProgress(set, get, question, false);
   }
-  playSound(revealed ? "almost" : "wrong");
-  playHaptic(revealed ? "almost" : "wrong");
+  // A wrong choice is information; the answer is revealed after enough tries.
 }
 
 function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
@@ -142,8 +141,6 @@ function submitTrain(set: StoreSet, get: StoreGet, letter: LetterId): void {
 
   if (letter !== expected) {
     set({ wrongLetters: [...wrongLetters, letter] });
-    playSound("wrong");
-    playHaptic("wrong");
     return;
   }
 

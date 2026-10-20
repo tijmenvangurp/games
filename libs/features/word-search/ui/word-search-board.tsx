@@ -100,7 +100,7 @@ function WordSearchCell({
         found && "bg-success/10 text-success ring-1 ring-inset ring-success/20",
         hint && "bg-warning/15 text-warning ring-2 ring-inset ring-warning/50",
         selected && !wrong && "bg-primary/10 text-primary ring-2 ring-inset ring-primary",
-        selected && wrong && "bg-danger/10 text-danger ring-2 ring-inset ring-danger/50",
+        selected && wrong && "bg-warning/10 text-warning ring-2 ring-inset ring-warning/50",
       )}
       data-col={cell.col}
       data-row={cell.row}

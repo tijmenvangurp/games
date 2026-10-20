@@ -54,7 +54,7 @@ export function SortCategoryBox({
                 className={cn(
                   "min-h-11 rounded-lg border px-2.5 py-1.5 text-sm font-bold transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:pointer-events-none",
                   state === "correct" && "border-success/45 bg-success/10 text-success",
-                  state === "wrong" && "border-danger/45 bg-danger/10 text-danger",
+                  state === "wrong" && "border-warning/45 bg-warning/10 text-warning",
                   state === "idle" && "border-border bg-card hover:bg-muted/60",
                 )}
                 data-answer-state={state}

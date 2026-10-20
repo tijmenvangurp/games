@@ -63,7 +63,7 @@ export function SudokuPage() {
         <CelebrationDialog
           confetti
           description="Je hebt de sudoku helemaal opgelost."
-          title="Goed gedaan!"
+          title="Opgelost!"
           onAgain={() => useSudokuStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

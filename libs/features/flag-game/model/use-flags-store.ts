@@ -137,8 +137,7 @@ function answerQuestion(set: StoreSet, get: StoreGet, code: string): void {
     correct: false,
     streak: 0,
   });
-  playSound(revealed ? "almost" : "wrong");
-  playHaptic(revealed ? "almost" : "wrong");
+  // A wrong choice is information; the answer is revealed after enough tries.
 }
 
 function nextQuestion(set: StoreSet, get: StoreGet): void {
@@ -304,8 +303,6 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
     },
     streak: 0,
   });
-  playSound("wrong");
-  playHaptic("wrong");
 }
 
 const initial = loadFlagState();

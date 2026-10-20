@@ -256,7 +256,7 @@ describe("useChessTutorial", () => {
     act(() => {
       result.current.onPieceDrop("h1", "e5");
     });
-    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+    expect(vibrate).toHaveBeenLastCalledWith(10);
 
     act(() => {
       result.current.onPieceDrop("h1", "e1");

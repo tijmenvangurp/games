@@ -90,7 +90,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
             >
               <circle fill="transparent" pointerEvents="all" r={creature.size * 0.62} />
               {creature.id === wrongId ? (
-                <circle fill="none" r={ringSize} stroke="var(--danger)" strokeWidth="6" />
+                <circle fill="none" r={ringSize} stroke="var(--warning)" strokeWidth="6" />
               ) : null}
               <g transform={`rotate(${creature.rotation}) scale(${creature.size / 100})`}>
                 <CreatureGlyph creature={creature} />

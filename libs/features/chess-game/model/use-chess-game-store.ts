@@ -488,8 +488,6 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
         legalTargets: [],
         feedback: attempt.reason === "wrong-color" ? "not-your-turn" : "illegal",
       });
-      playHaptic("wrong");
-      playSound("wrong");
       return false;
     }
 

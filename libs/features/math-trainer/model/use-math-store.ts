@@ -89,8 +89,8 @@ function answerQuestion(set: StoreSet, get: StoreGet, choice: number): void {
     correct: false,
     streak: 0,
   });
-  playSound(revealed ? "almost" : "wrong");
-  playHaptic(revealed ? "almost" : "wrong");
+  // A wrong choice is information. The answer stays visible and the child
+  // gets a second try; there is no wrong sound or wrong haptic.
 }
 
 function nextQuestion(set: StoreSet, get: StoreGet): void {

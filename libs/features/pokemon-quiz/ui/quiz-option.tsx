@@ -1,5 +1,5 @@
 import type { Pokemon } from "@entities/pokedex";
-import { Check, X } from "@shared/ui";
+import { Check, RotateCcw } from "@shared/ui";
 import { cn } from "@shared/lib";
 
 const OPTION_LETTERS = ["A", "B", "C", "D", "E"] as const;
@@ -9,14 +9,14 @@ type AnswerState = "idle" | "correct" | "wrong" | "muted";
 const OPTION_CLASSES: Record<AnswerState, string> = {
   idle: "border-border bg-card hover:bg-muted/60",
   correct: "border-success/45 bg-success/10 text-success",
-  wrong: "border-danger/45 bg-danger/10 text-danger",
+  wrong: "border-warning/45 bg-warning/10 text-warning",
   muted: "border-border bg-muted/40 text-muted-foreground opacity-70",
 };
 
 const BADGE_CLASSES: Record<AnswerState, string> = {
   idle: "bg-muted text-muted-foreground",
   correct: "bg-success text-white",
-  wrong: "bg-danger text-white",
+  wrong: "bg-warning text-white",
   muted: "bg-muted text-muted-foreground",
 };
 
@@ -72,7 +72,7 @@ export function QuizOption({
       </span>
       <span className="min-w-0 flex-1">{option.name}</span>
       {state === "correct" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      {state === "wrong" ? <X aria-hidden="true" className="size-5 shrink-0" /> : null}
+      {state === "wrong" ? <RotateCcw aria-hidden="true" className="size-5 shrink-0" /> : null}
     </button>
   );
 }
