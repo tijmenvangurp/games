@@ -4,6 +4,7 @@ import {
   BOARD_SHAPES,
   chooseComputerColumn,
   createGame,
+  isFinished,
   isPlayable,
   winnerOf,
   type BoardSize,
@@ -33,6 +34,28 @@ function play(
 const NO_RANDOM = () => 0.99;
 
 const LEVELS: readonly ComputerLevel[] = ["makkelijk", "middel", "moeilijk"];
+
+/** Speelt de kolommen van de mens met steeds een antwoord van de computer. */
+function against(level: ComputerLevel, columns: readonly number[]): FourInARowGame {
+  let game = createGame(BOARD_SHAPES.groot, "one");
+
+  for (const column of columns) {
+    const afterHuman = applyDrop(game, column);
+    if (!afterHuman || isFinished(afterHuman)) {
+      return afterHuman ?? game;
+    }
+
+    const reply = chooseComputerColumn(afterHuman, level, NO_RANDOM);
+    const afterComputer = reply === null ? null : applyDrop(afterHuman, reply);
+    if (!afterComputer || isFinished(afterComputer)) {
+      return afterComputer ?? afterHuman;
+    }
+
+    game = afterComputer;
+  }
+
+  return game;
+}
 
 describe("de computer", () => {
   it("pakt een directe winst", () => {
@@ -109,6 +132,30 @@ describe("de computer", () => {
       const column = chooseComputerColumn(game, level, NO_RANDOM);
       expect(column).not.toBeNull();
       expect(isPlayable(game.board, column ?? -1)).toBe(true);
+    }
+  });
+
+  it("voorkomt een open drie in plaats van te stapelen", () => {
+    // x3 o3 x2: Blauw heeft twee op een rij op de onderste rij en dreigt een
+    // drie met twee open einden te maken. Alleen kolom 1 of 4 voorkomt dat;
+    // stapelen op kolom 2 of 3 laat de open drie toe.
+    const game = play("one", [3, 3, 2]);
+    expect(game.current).toBe("two");
+
+    expect([1, 4]).toContain(chooseComputerColumn(game, "middel", NO_RANDOM));
+  });
+
+  it("laat de mens op middel niet zomaar vier op een rij leggen", () => {
+    const attempts = [
+      // De reeks die op middel eerder won: Blauw bouwt op de onderste rij.
+      [3, 2, 4, 1],
+      [2, 3, 4, 5],
+      // Vier keer dezelfde kolom.
+      [3, 3, 3, 3],
+    ] as const;
+
+    for (const columns of attempts) {
+      expect(winnerOf(against("middel", columns))).not.toBe("one");
     }
   });
 });

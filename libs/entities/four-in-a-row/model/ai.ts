@@ -1,5 +1,5 @@
 import { applyDrop, isFinished, type FourInARowGame } from "./game";
-import { isPlayable, otherPlayer } from "./rules";
+import { isPlayable, landingRow, otherPlayer } from "./rules";
 import { LINE_LENGTH, type Board, type ComputerLevel, type Player } from "./types";
 
 /**
@@ -43,6 +43,83 @@ function orderedColumns(game: FourInARowGame): number[] {
   return legalColumns(game).sort(
     (left, right) => Math.abs(left - middle) - Math.abs(right - middle) || left - right,
   );
+}
+
+const DIRECTIONS = [
+  { column: 1, row: 0 },
+  { column: 0, row: 1 },
+  { column: 1, row: 1 },
+  { column: 1, row: -1 },
+] as const;
+
+/**
+ * Hoeveel schijven van `player` er in deze richting op een rij staan vanaf de
+ * gevallen schijf, aan beide kanten.
+ */
+function lineLength(
+  board: Board,
+  column: number,
+  row: number,
+  direction: { column: number; row: number },
+  player: Player,
+): number {
+  let discs = 1;
+
+  for (const side of [-1, 1]) {
+    for (let step = 1; step < LINE_LENGTH; step += 1) {
+      const cell =
+        board[column + direction.column * step * side]?.[row + direction.row * step * side];
+      if (cell !== player) {
+        break;
+      }
+      discs += 1;
+    }
+  }
+
+  return discs;
+}
+
+/** Zou een schijf in deze kolom vier op een rij maken? */
+function isWinningSquare(board: Board, column: number, player: Player): boolean {
+  const row = landingRow(board, column);
+  if (row < 0) {
+    return false;
+  }
+
+  return DIRECTIONS.some(
+    (direction) => lineLength(board, column, row, direction, player) >= LINE_LENGTH,
+  );
+}
+
+/**
+ * Het aantal kolommen waar `player` nu vier op een rij mee maakt. Twee of meer
+ * winstvelden betekent dat de tegenstander er maar één kan blokkeren: dan is
+ * de partij beslist.
+ */
+function winningSquares(board: Board, player: Player): number {
+  let squares = 0;
+  for (let column = 0; column < board.length; column += 1) {
+    if (isWinningSquare(board, column, player)) {
+      squares += 1;
+    }
+  }
+  return squares;
+}
+
+/**
+ * De score op het blad van de zoektocht. `me` is daar aan zet. Een directe
+ * winst telt meteen, en twee winstvelden van de tegenstander zijn niet meer te
+ * blokkeren. Zonder deze blik op de horizon mist een ondiepe zoektocht een
+ * open drie.
+ */
+function horizon(game: FourInARowGame, me: Player): number {
+  if (winningSquares(game.board, me) > 0) {
+    return WIN_SCORE;
+  }
+  if (winningSquares(game.board, otherPlayer(me)) >= 2) {
+    return -WIN_SCORE;
+  }
+  return evaluate(game.board, me);
 }
 
 /** De waarde van het bord voor `me`, zonder verder te kijken. */
@@ -115,7 +192,7 @@ function negamax(
     return 0;
   }
   if (depth === 0) {
-    return evaluate(game.board, me);
+    return horizon(game, me);
   }
 
   let best = -Infinity;

@@ -207,5 +207,8 @@ describe("vier op een rij", () => {
       mode: "computer",
       level: "moeilijk",
     });
+
+    startGame();
+    expect(useFourInARowStore.getState().match).toEqual({ mode: "computer", level: "moeilijk" });
   });
 });

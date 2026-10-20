@@ -66,10 +66,13 @@ De eisen:
     `libs/entities/four-in-a-row/model/ai.ts` (`chooseComputerColumn`): negamax met alpha-bèta,
     een heuristiek over alle vensters van vier en de middelste kolom als voorkeur. Drie niveaus:
     _makkelijk_ kijkt één zet vooruit en kiest soms expres een mindere kolom, _middel_ kijkt drie
-    zetten vooruit en _moeilijk_ vijf. Het kind is altijd Blauw en begint; de computer is Rood.
-    Tijdens de beurt van de computer staat "De computer denkt na…" en na 650 ms valt de schijf,
-    zodat de beurtwissel leesbaar blijft. Ongedaan maken neemt je eigen zet én het antwoord van
-    de computer terug.
+    zetten vooruit en _moeilijk_ vijf. Op het eind van de zoektocht kijkt de functie nog één zet
+    verder: een directe winst telt meteen en twee winstvelden van de tegenstander betekenen verlies,
+    want die kan niemand beide blokkeren. Daardoor ziet _middel_ een open drie op tijd en stapelt
+    hij niet door, terwijl _moeilijk_ dieper zoekt en ook zelf meer dreigingen opbouwt. Het kind is
+    altijd Blauw en begint; de computer is Rood. Tijdens de beurt van de computer staat "De computer
+    denkt na…" en na 650 ms valt de schijf, zodat de beurtwissel leesbaar blijft. Ongedaan maken
+    neemt je eigen zet én het antwoord van de computer terug.
 
     Er is geen AI-bibliotheek gebruikt. De bestaande pakketten zijn gecontroleerd:
     `connect-four` (0.0.6, 2016) en `@devshareacademy/connect-four` leveren vooral bordlogica
