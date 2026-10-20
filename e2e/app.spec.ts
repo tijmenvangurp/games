@@ -303,6 +303,32 @@ test.describe("schaakpartij op een telefoon", () => {
     expect(overflows).toBe(false);
   });
 
+  test("geeft een hint in twee stappen", async ({ page }) => {
+    await page.goto("/schaken/partij");
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    const hintedSquares = () =>
+      page.evaluate(
+        () =>
+          Array.from(document.querySelectorAll("[data-square]"))
+            .map((square) => square.lastElementChild)
+            .filter((square): square is HTMLElement => square instanceof HTMLElement)
+            .filter((square) => getComputedStyle(square).boxShadow.includes("245, 158, 11")).length,
+      );
+
+    await page.getByRole("button", { name: "Hint" }).click();
+    await expect(page.getByRole("button", { name: "Toon zet" })).toBeVisible({ timeout: 25_000 });
+    await expect.poll(hintedSquares).toBe(1);
+
+    await page.getByRole("button", { name: "Toon zet" }).click();
+    await expect(page.getByRole("button", { name: "Wis hint" })).toBeVisible();
+    await expect.poll(hintedSquares).toBe(2);
+
+    await page.getByRole("button", { name: "Wis hint" }).click();
+    await expect(page.getByRole("button", { name: "Hint" })).toBeVisible();
+    await expect.poll(hintedSquares).toBe(0);
+  });
+
   test("bewaart de partij als je de instellingen opent", async ({ page }) => {
     await page.goto("/schaken/partij");
     await page.getByRole("button", { name: "Spelen", exact: true }).click();
@@ -341,7 +367,7 @@ test.describe("schaakpartij op een telefoon", () => {
   test("laat de computer met zwart openen", async ({ page }) => {
     await page.goto("/schaken/partij");
 
-    await page.getByRole("button", { name: /Speel tegen Stockfish/ }).click();
+    await page.getByRole("button", { name: "Computer" }).click();
     await page.getByRole("button", { name: /Zwart/ }).click();
 
     const stockfishLoaded = page.waitForRequest(

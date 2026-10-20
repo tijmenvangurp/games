@@ -36,6 +36,9 @@ export interface ChessStore extends StoredChessState {
   readonly lastMove: BoardMove | null;
   readonly pendingPromotion: BoardMove | null;
   readonly thinking: boolean;
+  readonly hint: BoardMove | null;
+  readonly hintTarget: boolean;
+  readonly hintThinking: boolean;
   readonly feedback: ChessFeedback;
   readonly gameId: number;
   readonly setMode: (mode: ChessMode) => void;
@@ -54,6 +57,7 @@ export interface ChessStore extends StoredChessState {
   readonly undo: () => void;
   readonly canUndo: () => boolean;
   readonly resign: () => void;
+  readonly requestHint: () => void;
   readonly resumeEngine: () => void;
   readonly suspendEngine: () => void;
 }
@@ -77,6 +81,7 @@ function canResumeState(
 
 const COMPUTER_NAME = "Computer";
 const DEFAULT_NAMES: Record<Color, string> = { w: "Wit", b: "Zwart" };
+const HINT_LEVEL: ComputerLevel = "moeilijk";
 
 function snapshot(state: ChessStore): StoredChessState {
   return {
@@ -168,6 +173,9 @@ function commitMove(
     legalTargets: [],
     pendingPromotion: null,
     thinking: false,
+    hint: null,
+    hintTarget: false,
+    hintThinking: false,
     feedback: "idle",
   });
 
@@ -243,6 +251,48 @@ async function runEngine(set: StoreSet, get: StoreGet): Promise<void> {
   }
 }
 
+async function runHint(set: StoreSet, get: StoreGet): Promise<void> {
+  const state = get();
+
+  if (!canMove(state) || state.hintThinking) {
+    return;
+  }
+
+  if (state.hint) {
+    const hintTarget = !state.hintTarget;
+    commit(set, get, { hint: hintTarget ? state.hint : null, hintTarget });
+    playHaptic("tap");
+    return;
+  }
+
+  const token = state.gameId;
+  const fen = state.fen;
+  commit(set, get, { hintThinking: true });
+
+  let move: EngineMove | null = null;
+  try {
+    move = await requestEngineMove(fen, HINT_LEVEL);
+  } catch {
+    move = null;
+  }
+
+  const current = get();
+  if (current.gameId !== token || current.fen !== fen || current.phase !== "playing") {
+    return;
+  }
+
+  commit(set, get, {
+    hintThinking: false,
+    hint: move ? { from: move.from, to: move.to } : null,
+    hintTarget: false,
+    feedback: move ? current.feedback : "engine-error",
+  });
+
+  if (move) {
+    playHaptic("tap");
+  }
+}
+
 function undoableCount(state: ChessStore): number {
   if (state.phase !== "playing" || state.thinking || state.history.length === 0) {
     return 0;
@@ -277,6 +327,9 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
   lastMove: initialLastMove,
   pendingPromotion: null,
   thinking: false,
+  hint: null,
+  hintTarget: false,
+  hintThinking: false,
   feedback: "idle",
   gameId: 0,
 
@@ -326,6 +379,9 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
       lastMove: null,
       pendingPromotion: null,
       thinking: false,
+      hint: null,
+      hintTarget: false,
+      hintThinking: false,
       feedback: "idle",
       gameId: state.gameId + 1,
     });
@@ -353,6 +409,9 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
       lastMove,
       pendingPromotion: null,
       thinking: false,
+      hint: null,
+      hintTarget: false,
+      hintThinking: false,
       feedback: "idle",
       gameId: state.gameId + 1,
     });
@@ -372,6 +431,9 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
       legalTargets: [],
       pendingPromotion: null,
       thinking: false,
+      hint: null,
+      hintTarget: false,
+      hintThinking: false,
       feedback: "idle",
       gameId: state.gameId + 1,
     });
@@ -470,6 +532,9 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
       legalTargets: [],
       pendingPromotion: null,
       thinking: false,
+      hint: null,
+      hintTarget: false,
+      hintThinking: false,
       feedback: "idle",
       gameId: state.gameId + 1,
     });
@@ -492,10 +557,17 @@ export const useChessGameStore = create<ChessStore>((set, get) => ({
       legalTargets: [],
       pendingPromotion: null,
       thinking: false,
+      hint: null,
+      hintTarget: false,
+      hintThinking: false,
       gameId: state.gameId + 1,
     });
     playSound("almost");
     playHaptic("almost");
+  },
+
+  requestHint: () => {
+    void runHint(set, get);
   },
 
   resumeEngine: () => {

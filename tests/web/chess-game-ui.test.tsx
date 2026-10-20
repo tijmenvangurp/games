@@ -29,6 +29,9 @@ function resetStore(overrides: Partial<ChessStore> = {}): void {
     lastMove: null,
     pendingPromotion: null,
     thinking: false,
+    hint: null,
+    hintTarget: false,
+    hintThinking: false,
     feedback: "idle",
     gameId: 0,
     ...overrides,
@@ -73,10 +76,10 @@ describe("ChessGameSetup", () => {
   it("reveals the computer settings and starts a friend game", () => {
     render(<ChessGame onHome={vi.fn()} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /Speel tegen Stockfish/ }));
-    expect(
-      screen.getByRole("button", { name: /Speel tegen Stockfish/ }).getAttribute("aria-pressed"),
-    ).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Computer" }));
+    expect(screen.getByRole("button", { name: "Computer" }).getAttribute("aria-pressed")).toBe(
+      "true",
+    );
     expect(screen.getByText("Hoe sterk is de computer?")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Moeilijk/ }));
@@ -149,6 +152,24 @@ describe("ChessGamePlay", () => {
     expect(useChessGameStore.getState().phase).toBe("playing");
     expect(screen.getByText("Zetten (1)")).toBeTruthy();
     expect(screen.getByText("Zwart is aan zet.")).toBeTruthy();
+  });
+
+  it("shows a hint piece first and the destination after a second tap", () => {
+    resetStore({
+      phase: "playing",
+      fen: INITIAL_FEN,
+      hint: { from: "e2", to: "e4" },
+    });
+    render(<ChessGame onHome={vi.fn()} />);
+
+    expect(screen.getByRole("button", { name: "Toon zet" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Toon zet" }));
+    expect(useChessGameStore.getState().hintTarget).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Wis hint" }));
+    expect(useChessGameStore.getState().hint).toBeNull();
+    expect(screen.getByRole("button", { name: "Hint" })).toBeTruthy();
   });
 
   it("shows the promotion picker and applies the chosen piece", () => {

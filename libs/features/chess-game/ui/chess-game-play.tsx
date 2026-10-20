@@ -10,7 +10,7 @@ import {
   type ChessResult,
 } from "@entities/chess";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, CelebrationDialog, Flag, LayoutGrid, Undo2 } from "@shared/ui";
+import { Button, CelebrationDialog, Flag, LayoutGrid, Lightbulb, Undo2 } from "@shared/ui";
 import {
   capturedBy,
   feedbackText,
@@ -25,6 +25,18 @@ import { PromotionPicker } from "./promotion-picker";
 
 interface ChessGamePlayProps {
   readonly onHome: () => void;
+}
+
+function hintLabelFor(state: Pick<ChessStore, "hint" | "hintTarget" | "hintThinking">): string {
+  if (state.hintThinking) {
+    return "Hint…";
+  }
+
+  if (!state.hint) {
+    return "Hint";
+  }
+
+  return state.hintTarget ? "Wis hint" : "Toon zet";
 }
 
 function canHumanPlay(state: ChessStore, result: ChessResult, turn: Color): boolean {
@@ -139,17 +151,41 @@ function BoardPanel({
 }
 
 interface GameActionsProps {
+  readonly canHint: boolean;
+  readonly hintActive: boolean;
+  readonly hintLabel: string;
   readonly canUndo: boolean;
   readonly finished: boolean;
   readonly thinking: boolean;
+  readonly onHint: () => void;
   readonly onUndo: () => void;
   readonly onResign: () => void;
   readonly onSetup: () => void;
 }
 
-function GameActions({ canUndo, finished, thinking, onUndo, onResign, onSetup }: GameActionsProps) {
+function GameActions({
+  canHint,
+  hintActive,
+  hintLabel,
+  canUndo,
+  finished,
+  thinking,
+  onHint,
+  onUndo,
+  onResign,
+  onSetup,
+}: GameActionsProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 gap-2">
+      <Button
+        className="min-h-12 px-2 text-xs sm:text-sm"
+        disabled={!canHint}
+        variant={hintActive ? "default" : "outline"}
+        onClick={onHint}
+      >
+        <Lightbulb aria-hidden="true" className="size-5" />
+        {hintLabel}
+      </Button>
       <Button
         className="min-h-12 px-2 text-xs sm:text-sm"
         disabled={!canUndo}
@@ -193,6 +229,7 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
   });
   const feedback = feedbackText(state.feedback);
   const copy = resultCopy(result, state.players, state.mode, state.humanColor);
+  const hintLabel = hintLabelFor(state);
 
   const squareStyles = useMemo(
     () =>
@@ -200,9 +237,18 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
         lastMove: state.lastMove,
         selectedSquare: state.selectedSquare,
         legalTargets: state.legalTargets,
+        hintSquare: state.hint && !state.hintTarget ? state.hint.from : null,
+        hintMove: state.hint && state.hintTarget ? state.hint : null,
         checkSquare,
       }),
-    [state.lastMove, state.selectedSquare, state.legalTargets, checkSquare],
+    [
+      state.lastMove,
+      state.selectedSquare,
+      state.legalTargets,
+      state.hint,
+      state.hintTarget,
+      checkSquare,
+    ],
   );
 
   return (
@@ -225,9 +271,13 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
         onSelect={state.selectSquare}
       />
       <GameActions
+        canHint={canPlay && !state.hintThinking}
         canUndo={state.canUndo()}
         finished={result.kind !== "playing"}
+        hintActive={state.hint !== null}
+        hintLabel={hintLabel}
         thinking={state.thinking}
+        onHint={state.requestHint}
         onResign={state.resign}
         onSetup={state.resetToSetup}
         onUndo={state.undo}

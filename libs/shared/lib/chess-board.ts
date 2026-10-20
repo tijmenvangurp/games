@@ -106,6 +106,8 @@ export interface SquareStylesInput {
   readonly previewTargets?: readonly Square[];
   readonly targetSquare?: Square | null;
   readonly hintMove?: BoardMoveLike | null;
+  /** Alleen het stuk markeren, zonder de bestemming te verklappen. */
+  readonly hintSquare?: Square | null;
   readonly checkSquare?: Square | null;
 }
 
@@ -117,6 +119,7 @@ export function chessSquareStyles({
   previewTargets,
   targetSquare,
   hintMove,
+  hintSquare,
   checkSquare,
 }: SquareStylesInput): Record<string, CSSProperties> {
   const styles: Record<string, CSSProperties> = {};
@@ -170,6 +173,13 @@ export function chessSquareStyles({
   if (selectedSquare) {
     merge(selectedSquare, {
       boxShadow: "inset 0 0 0 6px #0284c7",
+    });
+  }
+
+  if (hintSquare) {
+    merge(hintSquare, {
+      backgroundColor: "rgba(253, 230, 138, 0.35)",
+      boxShadow: "inset 0 0 0 6px #f59e0b",
     });
   }
 

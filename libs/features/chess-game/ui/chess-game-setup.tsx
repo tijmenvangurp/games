@@ -15,27 +15,24 @@ const MODE_OPTIONS = [
   {
     value: "friend" as ChessMode,
     label: "Samen spelen",
-    hint: "Om de beurt op dit scherm",
-    emoji: "👫",
+    symbol: "👫",
   },
   {
     value: "computer" as ChessMode,
     label: "Computer",
-    hint: "Speel tegen Stockfish",
-    emoji: "🤖",
+    symbol: "🤖",
   },
 ] as const;
 
 const LEVEL_OPTIONS = COMPUTER_LEVELS.map((level) => ({
   value: level,
   label: COMPUTER_LEVEL_INFO[level].label,
-  hint: COMPUTER_LEVEL_INFO[level].hint,
-  emoji: COMPUTER_LEVEL_INFO[level].emoji,
+  symbol: COMPUTER_LEVEL_INFO[level].emoji,
 }));
 
 const SIDE_OPTIONS = [
-  { value: "w" as Color, label: "Wit", hint: "Jij begint", emoji: "⚪" },
-  { value: "b" as Color, label: "Zwart", hint: "Computer begint", emoji: "⚫" },
+  { value: "w" as Color, label: "Wit", symbol: "⚪" },
+  { value: "b" as Color, label: "Zwart", symbol: "⚫" },
 ] as const;
 
 function PlayerSetup({ color }: { readonly color: Color }) {

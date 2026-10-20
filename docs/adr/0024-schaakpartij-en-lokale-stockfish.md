@@ -87,6 +87,22 @@ Er zijn geen externe hosts, CDN's of trackers toegevoegd. `default-src 'self'`
 blijft staan en de worker wordt van de eigen origin geladen. De stockfish-assets
 krijgen een lange cache-header, net als de gehashte app-assets.
 
+### Hints in twee stappen
+
+Tijdens een partij kan de speler om een hint vragen. De hint gebruikt dezelfde
+lokale Stockfish, ook in de modus Samen spelen, en komt in twee stappen:
+
+1. de eerste tik markeert alleen het stuk dat volgens de engine het beste kan
+   bewegen;
+2. de tweede tik toont ook het bestemmingsveld;
+3. een derde tik haalt de hint weer weg.
+
+Zo verklapt de eerste tik nog niet waar het stuk naartoe moet en kan een kind
+eerst zelf nadenken. Een hint verdwijnt zodra er echt een zet wordt gedaan, bij
+ongedaan maken, opgeven, herstarten of het openen van de instellingen. De knop
+heet achtereenvolgens **Hint**, **Toon zet** en **Wis hint**. Tijdens het denken
+van de computer of na het einde van de partij is de knop uitgeschakeld.
+
 ### Avatars, namen en opslag
 
 Avatars zijn emoji uit een vaste, lokale lijst. Namen zijn optioneel en lokaal.
@@ -106,8 +122,8 @@ niet aanbiedt om een voorbij spel te hervatten.
 
 - De tutorial-URL is nu `/schaken/les`; de homepage linkt naar de hub.
 - De app bevat ongeveer 0,6 MB aan Stockfish-wasm plus de glue. Dat is alleen
-  nodig zodra iemand tegen de computer speelt; de hub, les en puzzels laden de
-  engine niet.
+  nodig zodra iemand tegen de computer speelt of een hint vraagt; de hub, les en
+  puzzels laden de engine niet.
 - De engine is GPL-3.0. De dependency en de bijgeleverde `Copying.txt` worden
   ongewijzigd meegeleverd. De bron van deze build staat in het npm-pakket
   `stockfish.js@10.0.2` en in de bijbehorende upstream-repository.

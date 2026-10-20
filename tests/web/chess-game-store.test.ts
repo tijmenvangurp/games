@@ -15,6 +15,9 @@ function resetStore(): void {
     lastMove: null,
     pendingPromotion: null,
     thinking: false,
+    hint: null,
+    hintTarget: false,
+    hintThinking: false,
     feedback: "idle",
     gameId: 0,
   });
@@ -197,6 +200,37 @@ describe("chess game store", () => {
 
     expect(store().history).toEqual([]);
     expect(store().canResume()).toBe(false);
+  });
+
+  it("reveals a hint in two steps and clears it after moving", async () => {
+    store().startGame();
+
+    store().requestHint();
+    expect(store().hintThinking).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(store().hint).not.toBeNull();
+    });
+
+    expect(store().hintThinking).toBe(false);
+    expect(store().hintTarget).toBe(false);
+
+    store().requestHint();
+    expect(store().hintTarget).toBe(true);
+
+    store().requestHint();
+    expect(store().hint).toBeNull();
+
+    store().requestHint();
+    await vi.waitFor(() => {
+      expect(store().hint).not.toBeNull();
+    });
+
+    const hint = store().hint;
+    expect(hint).not.toBeNull();
+    expect(store().attemptMove(hint!.from, hint!.to)).toBe(true);
+    expect(store().hint).toBeNull();
+    expect(store().hintTarget).toBe(false);
   });
 
   it("starts a new game and resets to setup", () => {
