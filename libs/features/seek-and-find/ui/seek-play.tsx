@@ -37,7 +37,7 @@ export function SeekPlay() {
     ? "Gevonden!"
     : wrongId !== null
       ? "Nog niet — kijk goed naar de ster."
-      : "Tik op de Wobbel met de ster.";
+      : null;
 
   const handleTap = (id: number) => {
     const wasFound = useSeekStore.getState().found;
@@ -72,7 +72,6 @@ export function SeekPlay() {
               Zoek deze
             </p>
             <p className="text-base font-black leading-tight">Wobbel met de ster</p>
-            <p className="text-xs text-muted-foreground">Alle anderen hebben een ander teken.</p>
           </div>
         </div>
 
@@ -99,13 +98,15 @@ export function SeekPlay() {
               }}
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Nieuw
+              Nieuw zoekveld
             </Button>
           </div>
 
-          <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-            {status}
-          </p>
+          {status ? (
+            <p aria-live="polite" className="text-center text-xs text-muted-foreground">
+              {status}
+            </p>
+          ) : null}
         </div>
       </aside>
 

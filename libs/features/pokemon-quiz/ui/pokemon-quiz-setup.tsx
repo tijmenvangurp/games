@@ -5,28 +5,14 @@ import type { QuizDifficulty } from "../model/quiz";
 
 interface PokemonQuizSetupProps {
   settings: PokemonQuizSettings;
-  hasActiveGame: boolean;
   onDifficultyChange: (difficulty: QuizDifficulty) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
-export function PokemonQuizSetup({
-  settings,
-  hasActiveGame,
-  onDifficultyChange,
-  onStart,
-  onBack,
-}: PokemonQuizSetupProps) {
+export function PokemonQuizSetup({ settings, onDifficultyChange, onStart }: PokemonQuizSetupProps) {
   return (
     <section className="game-panel animate-rise p-4 sm:p-6">
-      <div className="mb-5">
-        <h2 className="font-display text-2xl">Nieuw spel</h2>
-        <p className="text-sm text-muted-foreground">
-          Hoe moeilijker, hoe meer namen en hoe minder je van de Pokémon ziet. Op de moeilijkste
-          stand beweegt het silhouet langzaam voorbij.
-        </p>
-      </div>
+      <h2 className="mb-5 font-display text-2xl">Nieuw spel</h2>
 
       <OptionPicker
         columns={2}
@@ -36,11 +22,7 @@ export function PokemonQuizSetup({
         onSelect={onDifficultyChange}
       />
 
-      <SetupActions
-        backLabel="Terug naar je spel"
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      <SetupActions onStart={onStart} />
 
       <PokemonAssetsCredits />
     </section>

@@ -21,13 +21,7 @@ export function FrenchAudioPanel({ kind, onReplay }: FrenchAudioPanelProps) {
       >
         <Volume2 aria-hidden="true" className="size-10" />
       </button>
-      <p className="mt-3 text-sm font-semibold text-muted-foreground">
-        Tik om opnieuw te luisteren
-      </p>
       <div className="mt-3 flex justify-center gap-2">
-        <Button size="sm" variant="outline" onClick={() => onReplay(1)}>
-          Opnieuw
-        </Button>
         <Button size="sm" variant="outline" onClick={() => onReplay(0.7)}>
           Langzaam
         </Button>

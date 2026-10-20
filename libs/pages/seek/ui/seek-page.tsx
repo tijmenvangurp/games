@@ -4,6 +4,7 @@ import { createSeekScene } from "@entities/hidden-object";
 import { SeekPlay, SeekSetup, useSeekStore } from "@features/seek-and-find";
 import { GameShell } from "@widgets/game-shell";
 import { CelebrationDialog } from "@shared/ui";
+import { useGameSetupNavigation } from "@shared/lib";
 
 const THEME_LABELS = {
   tuin: "in de tuin",
@@ -19,6 +20,13 @@ export function SeekPage() {
   const [showSetup, setShowSetup] = useState(false);
 
   const setupVisible = showSetup || !scene;
+  const gameSetup = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame: Boolean(scene),
+    backToGameLabel: "Terug naar je zoekveld",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
 
   const startGame = () => {
     useSeekStore.getState().start(createSeekScene(settings.difficulty, settings.theme));
@@ -27,8 +35,7 @@ export function SeekPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
-      onNewGame={scene ? () => setShowSetup(true) : undefined}
+      {...gameSetup}
       showSpeech={false}
       subtitle={scene ? `${scene.difficulty} · ${THEME_LABELS[scene.theme]}` : "Kies je zoekveld"}
       title="Waar is Wobbel?"
@@ -36,9 +43,7 @@ export function SeekPage() {
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <SeekSetup
-            hasActiveGame={Boolean(scene)}
             settings={settings}
-            onBack={() => setShowSetup(false)}
             onDifficultyChange={(difficulty) =>
               useSeekStore.getState().chooseDifficulty(difficulty)
             }

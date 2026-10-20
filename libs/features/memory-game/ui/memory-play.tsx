@@ -27,21 +27,16 @@ export function MemoryPlay() {
     ? "Bijna… twee kaarten omgedraaid."
     : found
       ? "Alle Pokémon gevonden!"
-      : "Draai twee kaarten om en zoek hetzelfde Pokémon-paar.";
+      : "Draai twee kaarten om.";
 
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
         <div className="order-1 game-panel flex items-center justify-between gap-3 p-4">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Pokémon Memory
-            </p>
-            <p className="text-base font-black leading-tight">Vind alle paren</p>
-            <p className="text-xs text-muted-foreground">
-              {matchedPairs} van {scene.pairs} paren
-            </p>
-          </div>
+          <p className="text-base font-black leading-tight">
+            {matchedPairs} van {scene.pairs} paren
+          </p>
+
           <div className="text-right">
             <p className="text-3xl font-black leading-none">{moves}</p>
             <p className="text-xs text-muted-foreground">zetten</p>

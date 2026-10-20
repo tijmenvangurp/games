@@ -23,3 +23,4 @@ export {
 } from "./speech";
 export type { SpeechGroup, SpeechLine } from "./speech";
 export { readStoredJson, writeStoredJson } from "./storage";
+export { useGameSetupNavigation } from "./use-game-setup-navigation";

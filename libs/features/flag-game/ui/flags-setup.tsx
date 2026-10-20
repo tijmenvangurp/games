@@ -35,7 +35,6 @@ function ScopePicker({ selected, onSelect }: ScopePickerProps) {
               onClick={() => onSelect(option.value)}
             >
               <span className="truncate">{option.label}</span>
-              <span className="text-xs font-normal text-muted-foreground">{option.hint}</span>
             </button>
           );
         })}
@@ -47,34 +46,25 @@ function ScopePicker({ selected, onSelect }: ScopePickerProps) {
 interface FlagsSetupProps {
   settings: FlagSettings;
   best: Record<string, number>;
-  hasActiveGame: boolean;
   onModeChange: (mode: FlagMode) => void;
   onScopeChange: (scope: FlagScope) => void;
   onLevelChange: (level: FlagLevel) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
 export function FlagsSetup({
   settings,
   best,
-  hasActiveGame,
   onModeChange,
   onScopeChange,
   onLevelChange,
   onStart,
-  onBack,
 }: FlagsSetupProps) {
   const bestScore = best[scoreKey(settings.mode, settings.scope, settings.level)] ?? 0;
 
   return (
     <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
-      <div className="mb-5">
-        <h2 className="text-xl font-black">Nieuw spel</h2>
-        <p className="text-sm text-muted-foreground">
-          Kies een speelwijze, een gebied en een niveau.
-        </p>
-      </div>
+      <h2 className="mb-5 text-xl font-black">Nieuw spel</h2>
 
       <OptionPicker
         columns={2}
@@ -101,11 +91,7 @@ export function FlagsSetup({
         {bestScore > 0 ? `Beste score: ${bestScore} sterren` : "Nog geen score"}
       </p>
 
-      <SetupActions
-        backLabel="Terug naar je spel"
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      <SetupActions onStart={onStart} />
     </section>
   );
 }

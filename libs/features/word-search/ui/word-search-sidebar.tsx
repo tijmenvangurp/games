@@ -43,7 +43,7 @@ function WordSearchActions({
         </Button>
         <Button variant="outline" onClick={onNew}>
           <RotateCcw aria-hidden="true" className="size-4" />
-          Nieuw
+          Nieuw bord
         </Button>
       </div>
 

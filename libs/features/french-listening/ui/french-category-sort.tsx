@@ -100,7 +100,7 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Sorteer de woorden
+            Voortgang
           </p>
           <p className="text-sm font-bold">
             {round.words.length - unplaced.length} van {round.words.length} geplaatst

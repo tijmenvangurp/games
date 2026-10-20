@@ -4,12 +4,11 @@ import { cn } from "../lib";
 interface ChoiceCardProps {
   selected: boolean;
   label: string;
-  hint?: string;
   leading?: ReactNode;
   onClick: () => void;
 }
 
-export function ChoiceCard({ selected, label, hint, leading, onClick }: ChoiceCardProps) {
+export function ChoiceCard({ selected, label, leading, onClick }: ChoiceCardProps) {
   return (
     <button
       type="button"
@@ -28,7 +27,6 @@ export function ChoiceCard({ selected, label, hint, leading, onClick }: ChoiceCa
         </span>
       ) : null}
       <span className="text-sm font-bold">{label}</span>
-      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
     </button>
   );
 }

@@ -176,7 +176,6 @@ describe("flag game", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: /Nederland/ }));
     fireEvent.click(screen.getByRole("button", { name: /Moeilijk/ }));
-    expect(screen.getByText("Alle 12 provincies")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
 
@@ -188,7 +187,6 @@ describe("flag game", () => {
     renderApp();
 
     fireEvent.click(await screen.findByRole("button", { name: /Nederland/ }));
-    expect(screen.getByText("12 provincies")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
 
@@ -220,7 +218,10 @@ describe("flag game", () => {
     fireEvent.click(screen.getByRole("button", { name: /Ander spel kiezen/ }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "Terug naar het menu" }));
+    fireEvent.click(screen.getByRole("button", { name: "Terug naar je spel" }));
+    expect(await screen.findByRole("heading", { name: "Perfect!" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Naar het menu" }));
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();
     expect(screen.getByRole("link", { name: /Vlaggenreis/ })).toBeTruthy();
   });

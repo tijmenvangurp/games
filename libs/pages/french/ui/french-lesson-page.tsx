@@ -65,7 +65,7 @@ export function FrenchLessonPage() {
       onBack={() => navigate({ to: "/frans" })}
       onNewGame={mode === "intro" ? undefined : reset}
       showSpeech={false}
-      subtitle={`${lesson.title} · ${lesson.level}`}
+      subtitle="Frans luisteren"
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"
     >
@@ -75,10 +75,7 @@ export function FrenchLessonPage() {
             <span className="mx-auto grid size-14 place-items-center rounded-lg bg-muted text-primary">
               <GameIcon aria-hidden="true" name="french-lesson" size={30} />
             </span>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-              Thema
-            </p>
-            <h2 className="mt-1 font-display text-3xl leading-snug">{lesson.title}</h2>
+            <h2 className="mt-2 font-display text-3xl leading-snug">{lesson.title}</h2>
             <p className="mt-2 text-muted-foreground">{lesson.subtitle}</p>
             <p className="mt-3 text-sm font-semibold text-muted-foreground">
               {lesson.items.length} items · {lesson.level}

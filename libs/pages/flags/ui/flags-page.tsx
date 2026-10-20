@@ -14,6 +14,7 @@ import {
   type FlagMode,
   type FlagSettings,
 } from "@features/flag-game";
+import { useGameSetupNavigation } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
 
@@ -41,9 +42,7 @@ interface BodyProps {
   mode: FlagMode;
   settings: FlagSettings;
   best: Record<string, number>;
-  hasActiveGame: boolean;
   onStart: () => void;
-  onBack: () => void;
   onModeChange: (mode: FlagMode) => void;
   onScopeChange: (scope: FlagScope) => void;
   onLevelChange: (level: FlagLevel) => void;
@@ -94,6 +93,13 @@ export function FlagsPage() {
 
   const activeRound = mode === "vlaggen" ? round : (puzzle?.round ?? null);
   const setupVisible = showSetup || !activeRound;
+  const gameSetup = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame: Boolean(activeRound),
+    backToGameLabel: "Terug naar je spel",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
   const totalStars = activeRound?.questions.length ?? 10;
 
   const startGame = () => {
@@ -115,19 +121,16 @@ export function FlagsPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
-      onNewGame={activeRound ? () => setShowSetup(true) : undefined}
+      {...gameSetup}
       showSpeech={false}
       subtitle={subtitleFor(activeRound)}
       title="Vlaggenreis"
     >
       <Body
         best={best}
-        hasActiveGame={Boolean(activeRound)}
         mode={mode}
         settings={settings}
         setupVisible={setupVisible}
-        onBack={() => setShowSetup(false)}
         onLevelChange={(level) => useFlagStore.getState().chooseLevel(level)}
         onModeChange={(nextMode) => useFlagStore.getState().chooseMode(nextMode)}
         onScopeChange={(scope) => useFlagStore.getState().chooseScope(scope)}
