@@ -31,10 +31,12 @@ test.describe("op een telefoon", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { name: "Spellen" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /schaken/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /schaakpuzzels/i })).toHaveCount(0);
     await page.getByRole("link", { name: /sudoku/i }).click();
 
     await expect(page.getByRole("heading", { name: "Nieuw spel" })).toBeVisible();
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const board = page.getByRole("group", { name: /rooster van 4 bij 4/i });
     await expect(board).toBeVisible();
@@ -65,7 +67,7 @@ test.describe("op een tablet", () => {
 
   test("toont het bord en de knoppen naast elkaar", async ({ page }) => {
     await page.goto("/sudoku");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     await expect(page.getByRole("group", { name: /rooster van 4 bij 4/i })).toBeVisible();
     await expect(page.getByRole("button", { name: "Hint" })).toBeVisible();
@@ -79,7 +81,7 @@ test.describe("pijlen op een telefoon", () => {
   test("start een level en gebruikt de hint", async ({ page }) => {
     await page.goto("/pijlen");
     await expect(page.getByRole("heading", { name: "Hart" })).toBeVisible();
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const board = page.getByRole("group", { name: /pijlenpuzzel/i });
     await expect(board).toBeVisible();
@@ -100,7 +102,7 @@ test.describe("zoeken op een telefoon", () => {
 
   test("vindt Wobbel met de hint", async ({ page }) => {
     await page.goto("/zoeken");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     await expect(page.getByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeVisible();
 
@@ -123,7 +125,7 @@ test.describe("memory op een telefoon", () => {
 
   test("draait kaartjes om", async ({ page }) => {
     await page.goto("/memory");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const cards = page.locator("[data-card-index]");
     await expect(cards).toHaveCount(16);
@@ -145,7 +147,7 @@ test.describe("schaaktutorial op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
   test("sleept de toren naar de ster", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
 
@@ -157,7 +159,7 @@ test.describe("schaaktutorial op een telefoon", () => {
   });
 
   test("tikt op de ster zonder meteen een zet te doen", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await board.locator('[data-square="e5"]').click();
@@ -171,7 +173,10 @@ test.describe("schaaktutorial op een telefoon", () => {
 
   test("tikt om te kijken en sleept om te zetten", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("link", { name: /schaakles/i }).click();
+    await page.getByRole("link", { name: /schaken/i }).click();
+
+    await expect(page.getByRole("heading", { name: "Schaken" })).toBeVisible();
+    await page.getByRole("link", { name: /Schaakles/ }).click();
 
     await expect(page.getByRole("heading", { name: "Schaakles" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "De Toren-trein" })).toBeVisible();
@@ -211,7 +216,7 @@ test.describe("schaaktutorial op een telefoon", () => {
   });
 
   test("speelt de rokade", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 7: Rokade" }).click();
     await expect(page.getByRole("heading", { name: "Rokade" })).toBeVisible();
@@ -225,7 +230,7 @@ test.describe("schaaktutorial op een telefoon", () => {
   });
 
   test("zet de koning schaak", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 8: Schaak zetten" }).click();
     await expect(page.getByRole("heading", { name: "Schaak zetten" })).toBeVisible();
@@ -239,7 +244,7 @@ test.describe("schaaktutorial op een telefoon", () => {
   });
 
   test("zet schaakmat met de dame", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
     await page.getByText("Kies een les").click();
     await page.getByRole("button", { name: "Les 9: Schaakmat" }).click();
     await expect(page.getByRole("heading", { name: "Schaakmat", exact: true })).toBeVisible();
@@ -257,7 +262,7 @@ test.describe("schaaktutorial op een tablet", () => {
   test.use({ viewport: { width: 1024, height: 768 } });
 
   test("toont het bord, de coördinaten en de navigatie", async ({ page }) => {
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
 
     const board = page.getByRole("group", { name: /coördinaten/i });
     await expect(board).toBeVisible();
@@ -267,6 +272,130 @@ test.describe("schaaktutorial op een tablet", () => {
     await expect(page.getByRole("button", { name: "Toon zet" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Opnieuw" })).toBeVisible();
     await expect(page.getByText("Kies een les")).toBeVisible();
+  });
+});
+
+test.describe("schaakpartij op een telefoon", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+
+  test("speelt samen een zet en draait die terug", async ({ page }) => {
+    await page.goto("/schaken/partij");
+
+    await expect(page.getByRole("heading", { name: "Nieuwe partij" })).toBeVisible();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    await expect(page.getByText("Wit is aan zet.")).toBeVisible();
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await expect(board).toBeVisible();
+
+    await board.locator('[data-square="e2"]').click();
+    await board.locator('[data-square="e4"]').click();
+
+    await expect(page.getByText("Zwart is aan zet.")).toBeVisible();
+    await expect(page.getByText("Zetten (1)")).toBeVisible();
+
+    await page.getByRole("button", { name: "Ongedaan" }).click();
+    await expect(page.getByText("Wit is aan zet.")).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
+  test("geeft een hint in twee stappen", async ({ page }) => {
+    await page.goto("/schaken/partij");
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    const hintedSquares = () =>
+      page.evaluate(
+        () =>
+          Array.from(document.querySelectorAll("[data-square]"))
+            .map((square) => square.lastElementChild)
+            .filter((square): square is HTMLElement => square instanceof HTMLElement)
+            .filter((square) => getComputedStyle(square).boxShadow.includes("245, 158, 11")).length,
+      );
+
+    await page.getByRole("button", { name: "Hint" }).click();
+    await expect(page.getByRole("button", { name: "Toon zet" })).toBeVisible({ timeout: 25_000 });
+    await expect.poll(hintedSquares).toBe(1);
+
+    await page.getByRole("button", { name: "Toon zet" }).click();
+    await expect(page.getByRole("button", { name: "Wis hint" })).toBeVisible();
+    await expect.poll(hintedSquares).toBe(2);
+
+    await page.getByRole("button", { name: "Wis hint" }).click();
+    await expect(page.getByRole("button", { name: "Hint" })).toBeVisible();
+    await expect.poll(hintedSquares).toBe(0);
+  });
+
+  test("bewaart de partij als je de instellingen opent", async ({ page }) => {
+    await page.goto("/schaken/partij");
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    const board = page.getByRole("group", { name: /coördinaten/i });
+    await board.locator('[data-square="e2"]').click();
+    await board.locator('[data-square="e4"]').click();
+    await expect(page.getByText("Zetten (1)")).toBeVisible();
+
+    await page.getByRole("button", { name: "Instellingen" }).click();
+    await expect(page.getByText("Je partij is bewaard")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Nieuwe partij" })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByText("Je partij is bewaard")).toBeVisible();
+    await page.getByRole("button", { name: /Doorgaan/ }).click();
+
+    await expect(page.getByText("Zetten (1)")).toBeVisible();
+    await expect(page.getByText("Zwart is aan zet.")).toBeVisible();
+  });
+
+  test("kiest een avatar en een naam voor de partij", async ({ page }) => {
+    await page.goto("/schaken/partij");
+
+    await page.getByRole("button", { name: "Avatar 🦁" }).first().click();
+    await page.getByLabel("Naam voor wit").fill("Noa");
+    await expect(page.getByRole("button", { name: "Avatar 🦁" }).first()).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    await expect(page.getByText("Noa is aan zet.")).toBeVisible();
+  });
+
+  test("laat de computer met zwart openen", async ({ page }) => {
+    await page.goto("/schaken/partij");
+
+    await page.getByRole("button", { name: "Computer" }).click();
+    await page.getByRole("button", { name: /Zwart/ }).click();
+
+    const stockfishLoaded = page.waitForRequest(
+      (request) => request.url().includes("/stockfish/stockfish.wasm.js"),
+      { timeout: 20_000 },
+    );
+    const wasmLoaded = page.waitForRequest(
+      (request) => request.url().endsWith("/stockfish/stockfish.wasm"),
+      { timeout: 20_000 },
+    );
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
+
+    await Promise.all([stockfishLoaded, wasmLoaded]);
+    await expect(page.getByText("Zetten (1)")).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText("Zwart is aan zet.")).toBeVisible();
+  });
+});
+
+test.describe("schaken op een tablet", () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test("toont de hub met les, partij en puzzels", async ({ page }) => {
+    await page.goto("/schaken");
+
+    await expect(page.getByRole("heading", { name: "Schaken" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Schaakles/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Schaakpartij/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Schaakpuzzels/ })).toBeVisible();
   });
 });
 
@@ -396,7 +525,7 @@ test.describe("pokémon quiz op een telefoon", () => {
 
   test("kiest een naam en krijgt feedback", async ({ page }) => {
     await page.goto("/raad");
-    await page.getByRole("button", { name: "Spelen" }).click();
+    await page.getByRole("button", { name: "Spelen", exact: true }).click();
 
     const options = page.getByRole("group", { name: "Kies de juiste naam" });
     await expect(options.getByRole("button")).toHaveCount(4);

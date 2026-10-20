@@ -9,6 +9,7 @@ export {
   Eraser,
   Eye,
   Flame,
+  Flag,
   Heart,
   Home,
   LayoutGrid,

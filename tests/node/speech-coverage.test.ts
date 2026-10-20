@@ -11,7 +11,9 @@ describe("spraakdekking per game", () => {
     expect(available.length).toBeGreaterThan(0);
     for (const game of available) {
       if (game.speech.kind === "group") {
-        expect(folders.has(game.speech.folder), `${game.id}: ${game.speech.folder}`).toBe(true);
+        for (const folder of game.speech.folders) {
+          expect(folders.has(folder), `${game.id}: ${folder}`).toBe(true);
+        }
       } else {
         expect(game.speech.reason.trim().length, game.id).toBeGreaterThan(0);
       }
@@ -22,7 +24,7 @@ describe("spraakdekking per game", () => {
     const groups = await loadSpeechGroups();
     const used = new Set(
       gameCatalog.flatMap((game) =>
-        game.status === "available" && game.speech.kind === "group" ? [game.speech.folder] : [],
+        game.status === "available" && game.speech.kind === "group" ? game.speech.folders : [],
       ),
     );
 

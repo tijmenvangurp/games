@@ -15,7 +15,7 @@ test.describe("voorlezen op een telefoon", () => {
 
   test("vraagt lokale schaakaudio op en de toggle werkt", async ({ page }) => {
     const requests = audioRequests(page);
-    await page.goto("/schaken");
+    await page.goto("/schaken/les");
     await page.getByRole("button", { name: "Kijk" }).click();
 
     await expect.poll(() => requests.some((url) => url.includes("/audio/nl/chess/"))).toBe(true);
