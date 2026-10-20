@@ -70,6 +70,7 @@
     "pages-flags",
     "pages-letter",
     "pages-alchemy",
+    "pages-four-in-a-row",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -84,6 +85,7 @@
     "features-flag-game",
     "features-letter-game",
     "features-alchemy-lab",
+    "features-four-in-a-row-game",
     "entities-game",
     "entities-chess",
     "entities-french",
@@ -95,6 +97,7 @@
     "entities-geography",
     "entities-letter",
     "entities-alchemy",
+    "entities-four-in-a-row",
     "shared-lib",
     "shared-ui"
   ]

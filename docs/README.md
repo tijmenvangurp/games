@@ -21,6 +21,7 @@
 - `adr/0016-schaakpuzzeloverzicht.md` — het puzzeloverzicht en lokaal bewaarde opgeloste puzzels.
 - `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
 - `adr/0024-schaakpartij-en-lokale-stockfish.md` — de schaakhub, pass-and-play, de lokale Stockfish-wasm, de CSP-uitbreiding en lokale opslag.
+- `adr/0025-vier-op-een-rij.md` — Vier op een Rij: twee bordgroottes, pure regels, een eerlijke starter, de kleuren van de spelers en de computer als tegenstander.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
@@ -31,6 +32,7 @@
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
 - `research/2026-10-19-voorlezen-met-tts.md` — onderzoek naar vooraf gegenereerde Nederlandse TTS met de bestaande Nathalie-stem, leesafhankelijkheid per game en ontwerpprincipes voor audiofeedback.
+- `research/2026-10-20-boardgame-io.md` — of boardgame.io Vier op een Rij en latere bordspellen simpeler maakt: React 19-test, bundelmeting en herzieningsmomenten.
 - `plans/2026-10-19-voorlezen-in-alle-games.md` — plan voor een gedeelde spraakspeler, een catalogus met teksthashes en gefaseerde audio in de Nederlandse games.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.

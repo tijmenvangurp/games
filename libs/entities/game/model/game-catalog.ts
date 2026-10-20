@@ -26,7 +26,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/mengelmoes"
           | "/frans"
           | "/letters"
-          | "/vlaggen";
+          | "/vlaggen"
+          | "/vier-op-een-rij";
         thumbnail: string;
         /** Elke game kiest expliciet hoe het met spraak omgaat. */
         speech: GameSpeech;
@@ -142,5 +143,14 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     to: "/letters",
     thumbnail: "/thumbnails/letters-6b90ec8a.jpg",
     speech: { kind: "legacy", reason: "Heeft een eigen Nathalie-audiospeler." },
+  },
+  {
+    id: "four-in-a-row",
+    name: "Vier op een Rij",
+    description: "Maak vier op een rij, samen of tegen de computer.",
+    status: "available",
+    to: "/vier-op-een-rij",
+    thumbnail: "/thumbnails/four-in-a-row-fa19af46.jpg",
+    speech: { kind: "visual", reason: "Het bord en de schijven zijn visueel." },
   },
 ];

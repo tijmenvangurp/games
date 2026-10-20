@@ -31,6 +31,8 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-player-one: var(--player-one);
+  --color-player-two: var(--player-two);
 }
 
 :root {
@@ -46,6 +48,12 @@
   --success: oklch(0.5 0.1 150);
   --warning: oklch(0.56 0.13 72);
   --danger: oklch(0.53 0.17 25);
+  /*
+   * Twee rustige spelerkleuren voor bordspellen. Ze staan los van de
+   * feedbackkleuren: groen, amber en rood blijven betekenis houden.
+   */
+  --player-one: #4f5d9e;
+  --player-two: oklch(0.58 0.2 30);
 }
 
 @layer base {

@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-four-in-a-row",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/four-in-a-row",
+  "tags": ["layer:pages", "scope:four-in-a-row", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/four-in-a-row"
+      }
+    }
+  },
+  "implicitDependencies": ["features-four-in-a-row-game", "entities-four-in-a-row"]
+}

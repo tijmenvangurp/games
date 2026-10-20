@@ -5,6 +5,7 @@ import {
   Cards,
   Chalkboard,
   Crown,
+  CirclesFour,
   Flag,
   Flask,
   MagnifyingGlass,
@@ -32,6 +33,7 @@ const GAME_ICONS = {
   letters: Chalkboard,
   flags: Flag,
   alchemy: Flask,
+  "four-in-a-row": CirclesFour,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;

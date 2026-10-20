@@ -1,0 +1,102 @@
+# ADR 0025: Vier op een Rij, samen of tegen de computer
+
+- **Status:** Aangenomen
+- **Datum:** 2026-10-20
+
+## Context
+
+De app had alleen spellen voor één speler. De kinderen van de eigenaar (6 en 8 jaar) spelen
+graag samen op één tablet of telefoon. Gevraagd is een klassiek bordspel met eigen, Nederlandse
+namen, zonder merknamen of logo's, met de spellogica in de vorm van boardgame.io's `G` en
+`Moves`: een pure toestand en pure functies, zodat een engine er later omheen kan.
+
+Vier op een Rij is de eerste kandidaat: de regels zijn in één zin uit te leggen, een potje duurt
+kort en er is geen verborgen informatie. Pionnenrace (mens-erger-je-niet) en Ganzenbord volgen
+mogelijk later.
+
+De eisen:
+
+- twee spelers op hetzelfde apparaat, om de beurt;
+- daarnaast tegen de computer kunnen spelen, zoals bij het schaken, met een niveau dat bij het
+  kind past;
+- een stand die een reeks potjes bijhoudt;
+- twee bordgroottes, zodat de jongste op een kleiner bord kan spelen;
+- fully client-side: geen backend, geen netwerk, binnen de CSP;
+- de regels staan in de app zelf, want een kind van zes leest geen handleiding.
+
+## Beslissing
+
+1. **Het spel heet _Vier op een Rij_.** Dat is de generieke Nederlandse naam; er is geen
+   merknaam, logo of beschermde vormgeving in het spel, de iconen of de thumbnail.
+2. **Twee bordgroottes.** `groot` is 7 × 6 (het standaardbord) en `klein` is 6 × 5 voor de
+   jongste speler. Vier op een rij wint horizontaal, verticaal of diagonaal. Het bord is
+   kolom-georiënteerd (`board[kolom][rij]`, rij 0 onderaan); een tik op een kolom laat de schijf
+   op de laagste vrije rij vallen.
+3. **Geen game-engine als dependency.** De toestand en de zetten staan als pure functies in
+   `libs/entities/four-in-a-row` (`createGame`, `applyDrop`, `undoDrop`, `isFinished`,
+   `winnerOf`, `startingPlayerAfter`); de UI gebruikt de bestaande Zustand-store van de feature.
+   `boardgame.io` (0.50.2, november 2022) is overwogen en in een proefproject getest: het werkt
+   met React 19 en Vite, maar de React-client kost 40 kB gzip (inclusief een ongebruikte
+   socket.io-transport) en vervangt ongeveer honderd regels beurt- en undocode. De spellogica,
+   de UI en de opslag blijven eigen werk, en de engine is op netwerk, fasen en verborgen
+   informatie gericht, die deze app niet gebruikt. De API-vorm van `G` en `Moves` blijft
+   behouden, zodat een engine later alsnog kan worden ingepakt. Zie
+   [research/2026-10-20-boardgame-io.md](../research/2026-10-20-boardgame-io.md) en
+   **Bibliotheken eerst** in `AGENTS.md`.
+4. **De stand staat lokaal.** De feature bewaart `{ settings, score }` onder
+   `games.vier-op-een-rij.v1`; bij het laden wordt de opslag gevalideerd en anders genegeerd.
+   Ongedaan maken verandert de stand niet.
+5. **De verliezer begint de volgende partij.** Dat houdt het eerlijk tussen twee kinderen zonder
+   dat iemand hoeft te onderhandelen. Bij gelijkspel wisselt de starter. De allereerste partij
+   begint speler één (Blauw). Tegen de computer begint het kind altijd: de computer heeft geen
+   recht op een inhaalslag.
+6. **De speler die aan de beurt is, krijgt neutrale nadruk.** Indigo is de kleur van speler één
+   (`--player-one`), niet van "actief"; de actieve kaart gebruikt daarom een donkere rand en het
+   `muted`-vlak. Speler twee is rood (`--player-two`, een warm vermiljoen). Groen en amber blijven
+   gereserveerd voor feedback; het feedback-rood (`--danger`) is een eigen, donkerder token, en de
+   actieve speler houdt neutrale nadruk, zodat een rode schijf nooit "fout" betekent.
+7. **De uitslag komt pas na 600 ms.** De winnende rij licht eerst op, daarna opent het
+   vieringsvenster met "Nog een potje", "Andere grootte" en "Naar het menu".
+8. **Geen spraak.** Er is geen leertekst om voor te lezen; het bord en de schijven zijn visueel.
+   De catalogus vast dat met `speech: { kind: "visual", reason: … }` en de pagina zet
+   `showSpeech={false}`.
+9. **De thumbnail is lokaal.** Een 800 × 500 JPEG in `apps/games/public/thumbnails`, met de
+   eerste acht tekens van de sha256 in de bestandsnaam, vastgelegd met Playwright.
+10. **De computer speelt met eigen minimax.** De zoekfunctie staat als pure functie in
+    `libs/entities/four-in-a-row/model/ai.ts` (`chooseComputerColumn`): negamax met alpha-bèta,
+    een heuristiek over alle vensters van vier en de middelste kolom als voorkeur. Drie niveaus:
+    _makkelijk_ kijkt één zet vooruit en kiest soms expres een mindere kolom, _middel_ kijkt drie
+    zetten vooruit en _moeilijk_ vijf. Op het eind van de zoektocht kijkt de functie nog één zet
+    verder: een directe winst telt meteen en twee winstvelden van de tegenstander betekenen verlies,
+    want die kan niemand beide blokkeren. Daardoor ziet _middel_ een open drie op tijd en stapelt
+    hij niet door, terwijl _moeilijk_ dieper zoekt en ook zelf meer dreigingen opbouwt. Het kind is
+    altijd Blauw en begint; de computer is Rood. Tijdens de beurt van de computer staat "De computer
+    denkt na…" en na 650 ms valt de schijf, zodat de beurtwissel leesbaar blijft. Ongedaan maken
+    neemt je eigen zet én het antwoord van de computer terug.
+
+    Er is geen AI-bibliotheek gebruikt. De bestaande pakketten zijn gecontroleerd:
+    `connect-four` (0.0.6, 2016) en `@devshareacademy/connect-four` leveren vooral bordlogica
+    die we al hebben, `@kenrick95/c4` is een complete bouwset met een eigen bordmodel, en
+    `connect-four-ai-wasm` is een perfecte solver in wasm. Die laatste is onverslaanbaar en dus
+    onbruikbaar voor een kind van zes, en een wasm-asset vraagt extra CSP- en bouwwerk. Onze
+    zoekfunctie is ongeveer honderd regels, getypeerd, deterministisch te testen en per niveau
+    af te stellen; ze gebruikt dezelfde pure `applyDrop` als de rest van het spel.
+
+## Gevolgen
+
+- De app blijft statisch: geen backend, geen account, geen netwerkverkeer tijdens het spelen.
+- De stand is per apparaat en per browser. Delen tussen apparaten kan pas met de optionele sync
+  uit ADR 0012/0013 en valt buiten dit spel.
+- De pure regels zijn los te testen (21 unit-tests) en later door een engine te vervangen; de
+  feature kent alleen `start`, `drop`, `playComputer`, `undo` en `resetScore`. De zoekfunctie
+  heeft eigen tests: een directe winst pakken, een rij van de tegenstander blokkeren, nooit een
+  volle kolom kiezen en stoppen zodra de partij klaar is.
+- De instellingen (`size`, `mode`, `level`) en de stand staan onder `games.vier-op-een-rij.v1`;
+  een lopende partij bewaart het niveau waarmee ze begon, zodat een niveauwijziging in het menu
+  de partij niet stiekem sterker maakt.
+- `Ongedaan maken` is alleen beschikbaar zolang een partij loopt en verandert de stand niet; na
+  een gewonnen partij blijft de uitslag staan tot de volgende start.
+- Een tweede bordgrootte is alleen een andere `BOARD_SHAPES`-waarde; nieuwe groottes vragen geen
+  wijziging in de UI. Hetzelfde geldt voor een extra niveau: dat is een waarde in `DEPTHS`.
+- De kwaliteitsgate dekt de entity, feature, page, route, catalogusentry, opslag, thumbnail en
+  de e2e-flow op 390 px en 1024 px, inclusief tikdoelen van minimaal 44 px.

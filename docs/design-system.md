@@ -28,12 +28,18 @@ De waarden staan in `apps/games/src/app/styles/index.css`.
 | `--muted` / `--muted-foreground` | Rustige vlakken en secundaire tekst |
 | `--border`                       | Hairline-randen                     |
 | `--primary`                      | Actie, selectie, actieve staat      |
+| `--player-one` / `--player-two`  | Spelerskleuren: indigo en rood      |
 | `--success`                      | Goed, gevonden, opgelost            |
 | `--warning`                      | Hint, aandacht, bijna               |
 | `--danger`                       | Fout, conflict, verloren            |
 
 Typografie: één systeem-sans voor tekst en een systeem-serif voor schermkoppen en
 spelnamen. Geen externe fonts.
+
+Spelerskleuren zijn voor speelstukken, niet voor UI-status. Een actieve speler krijgt daarom
+neutrale nadruk (een donkere rand en het `muted`-vlak) in plaats van `--primary`; groen en amber
+blijven feedback. Het feedback-rood (`--danger`) is een eigen, donkerder token dan de spelerskleur,
+zodat een rode schijf nooit als fout leest.
 
 ## Componenten
 
