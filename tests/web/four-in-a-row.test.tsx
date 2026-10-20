@@ -50,7 +50,7 @@ function playColumns(columns: readonly number[]) {
   }
 }
 
-/** Blauw wint verticaal in kolom 1; Bruin speelt steeds in kolom 2. */
+/** Blauw wint verticaal in kolom 1; Rood speelt steeds in kolom 2. */
 const WIN_FOR_ONE = [1, 2, 1, 2, 1, 2, 1] as const;
 
 describe("vier op een rij", () => {
@@ -68,7 +68,7 @@ describe("vier op een rij", () => {
     expect(screen.getByText(/Blauw begint/)).toBeTruthy();
 
     clickColumn(1);
-    expect(screen.getByText("Bruin is aan de beurt.")).toBeTruthy();
+    expect(screen.getByText("Rood is aan de beurt.")).toBeTruthy();
     expect(useFourInARowStore.getState().game?.last).toEqual({
       player: "one",
       column: 0,
@@ -82,7 +82,7 @@ describe("vier op een rij", () => {
     expect(
       await screen.findByRole("heading", { name: "Blauw wint!" }, { timeout: 3000 }),
     ).toBeTruthy();
-    expect(screen.getByText(/De stand is nu Blauw 1 – Bruin 0/)).toBeTruthy();
+    expect(screen.getByText(/De stand is nu Blauw 1 – Rood 0/)).toBeTruthy();
     expect(loadFourInARowState().score).toEqual({ one: 1, two: 0 });
   });
 
@@ -102,7 +102,7 @@ describe("vier op een rij", () => {
     const game = useFourInARowStore.getState().game;
     expect(game?.drops).toHaveLength(1);
     expect(game?.current).toBe("two");
-    expect(screen.getByText("Bruin is aan de beurt.")).toBeTruthy();
+    expect(screen.getByText("Rood is aan de beurt.")).toBeTruthy();
   });
 
   it("speelt op een kleiner bord als je dat kiest", async () => {
@@ -134,16 +134,16 @@ describe("vier op een rij", () => {
     fireEvent.click(screen.getByRole("button", { name: "Nog een potje" }));
 
     expect(screen.queryByRole("heading", { name: "Blauw wint!" })).toBeNull();
-    expect(screen.getByText(/Bruin begint\./)).toBeTruthy();
+    expect(screen.getByText(/Rood begint\./)).toBeTruthy();
     expect(screen.getByLabelText("1 gewonnen partijen")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
-    expect(screen.getByText(/Stand: Blauw 1 – Bruin 0/)).toBeTruthy();
-    expect(screen.getByText(/Bruin begint deze partij/)).toBeTruthy();
+    expect(screen.getByText(/Stand: Blauw 1 – Rood 0/)).toBeTruthy();
+    expect(screen.getByText(/Rood begint deze partij/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Stand op nul" }));
-    expect(screen.getByText(/Stand: Blauw 0 – Bruin 0/)).toBeTruthy();
+    expect(screen.getByText(/Stand: Blauw 0 – Rood 0/)).toBeTruthy();
     expect(loadFourInARowState().score).toEqual({ one: 0, two: 0 });
   });
 

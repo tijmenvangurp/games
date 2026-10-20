@@ -23,7 +23,7 @@ import {
 const GROOT = BOARD_SHAPES.groot;
 const KLEIN = BOARD_SHAPES.klein;
 
-/** "x" is speler een (Blauw), "o" is speler twee (Bruin), "." is leeg. */
+/** "x" is speler een (Blauw), "o" is speler twee (Rood), "." is leeg. */
 function cellFrom(symbol: string): Player | null {
   if (symbol === "x") {
     return "one";

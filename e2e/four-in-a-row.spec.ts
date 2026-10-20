@@ -26,10 +26,10 @@ test.describe("vier op een rij op een telefoon", () => {
 
     await expect(page.getByText("Blauw heeft vier op een rij!")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Blauw wint!" })).toBeVisible();
-    await expect(page.getByText(/De stand is nu Blauw 1 – Bruin 0/)).toBeVisible();
+    await expect(page.getByText(/De stand is nu Blauw 1 – Rood 0/)).toBeVisible();
 
     await page.getByRole("button", { name: "Nog een potje" }).click();
-    await expect(page.getByText(/Bruin begint/)).toBeVisible();
+    await expect(page.getByText(/Rood begint/)).toBeVisible();
 
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);
@@ -60,7 +60,7 @@ test.describe("vier op een rij op een telefoon", () => {
     await expect(undo).toBeDisabled();
 
     await page.getByRole("button", { name: "Kolom 4", exact: true }).click();
-    await expect(page.getByText("Bruin is aan de beurt.")).toBeVisible();
+    await expect(page.getByText("Rood is aan de beurt.")).toBeVisible();
     await expect(undo).toBeEnabled();
 
     await undo.click();
@@ -111,7 +111,7 @@ test.describe("vier op een rij op een tablet", () => {
     await expect(page.getByRole("button", { name: /^Kolom/ })).toHaveCount(7);
 
     await page.getByRole("button", { name: "Kolom 7", exact: true }).click();
-    await expect(page.getByText("Bruin is aan de beurt.")).toBeVisible();
+    await expect(page.getByText("Rood is aan de beurt.")).toBeVisible();
 
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);

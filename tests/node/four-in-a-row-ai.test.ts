@@ -36,7 +36,7 @@ const LEVELS: readonly ComputerLevel[] = ["makkelijk", "middel", "moeilijk"];
 
 describe("de computer", () => {
   it("pakt een directe winst", () => {
-    // Bruin heeft drie op een rij en mag weer.
+    // Rood heeft drie op een rij en mag weer.
     const game = play("one", [6, 0, 6, 1, 5, 2, 5]);
     expect(game.current).toBe("two");
     expect(winnerOf(game)).toBeNull();
@@ -47,7 +47,7 @@ describe("de computer", () => {
   });
 
   it("blokkeert de rij van de tegenstander", () => {
-    // Blauw heeft drie op een rij op de onderste rij; Bruin moet kolom 3 nemen.
+    // Blauw heeft drie op een rij op de onderste rij; Rood moet kolom 3 nemen.
     const game = play("one", [0, 6, 1, 6, 2, 5, 5]);
     expect(game.current).toBe("two");
     expect(winnerOf(game)).toBeNull();
@@ -58,7 +58,7 @@ describe("de computer", () => {
   });
 
   it("wint zelf in plaats van alleen te blokkeren", () => {
-    // Beide spelers hebben drie op een rij; Bruin is aan zet en wint direct.
+    // Beide spelers hebben drie op een rij; Rood is aan zet en wint direct.
     const game = play("one", [6, 0, 6, 0, 6, 0, 5]);
     expect(game.current).toBe("two");
 

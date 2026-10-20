@@ -150,7 +150,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Maak vier op een rij, samen of tegen de computer.",
     status: "available",
     to: "/vier-op-een-rij",
-    thumbnail: "/thumbnails/four-in-a-row-65b55d42.jpg",
+    thumbnail: "/thumbnails/four-in-a-row-fa19af46.jpg",
     speech: { kind: "visual", reason: "Het bord en de schijven zijn visueel." },
   },
 ];

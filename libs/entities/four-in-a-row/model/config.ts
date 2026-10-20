@@ -18,7 +18,7 @@ interface PlayerInfo {
 /** Spelers heten naar hun kleur; de kleuren zelf staan in het design systeem. */
 export const PLAYER_INFO: Record<Player, PlayerInfo> = {
   one: { label: "Blauw" },
-  two: { label: "Bruin" },
+  two: { label: "Rood" },
 };
 
 interface BoardSizeInfo {

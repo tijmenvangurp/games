@@ -52,8 +52,9 @@ De eisen:
    recht op een inhaalslag.
 6. **De speler die aan de beurt is, krijgt neutrale nadruk.** Indigo is de kleur van speler één
    (`--player-one`), niet van "actief"; de actieve kaart gebruikt daarom een donkere rand en het
-   `muted`-vlak. Speler twee is klei (`--player-two`). Groen, amber en rood blijven gereserveerd
-   voor feedback.
+   `muted`-vlak. Speler twee is rood (`--player-two`, een warm vermiljoen). Groen en amber blijven
+   gereserveerd voor feedback; het feedback-rood (`--danger`) is een eigen, donkerder token, en de
+   actieve speler houdt neutrale nadruk, zodat een rode schijf nooit "fout" betekent.
 7. **De uitslag komt pas na 600 ms.** De winnende rij licht eerst op, daarna opent het
    vieringsvenster met "Nog een potje", "Andere grootte" en "Naar het menu".
 8. **Geen spraak.** Er is geen leertekst om voor te lezen; het bord en de schijven zijn visueel.
@@ -65,7 +66,7 @@ De eisen:
     `libs/entities/four-in-a-row/model/ai.ts` (`chooseComputerColumn`): negamax met alpha-bèta,
     een heuristiek over alle vensters van vier en de middelste kolom als voorkeur. Drie niveaus:
     _makkelijk_ kijkt één zet vooruit en kiest soms expres een mindere kolom, _middel_ kijkt drie
-    zetten vooruit en _moeilijk_ vijf. Het kind is altijd Blauw en begint; de computer is Bruin.
+    zetten vooruit en _moeilijk_ vijf. Het kind is altijd Blauw en begint; de computer is Rood.
     Tijdens de beurt van de computer staat "De computer denkt na…" en na 650 ms valt de schijf,
     zodat de beurtwissel leesbaar blijft. Ongedaan maken neemt je eigen zet én het antwoord van
     de computer terug.
