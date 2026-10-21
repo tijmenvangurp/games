@@ -81,7 +81,7 @@ export function AlchemyPlay() {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 lg:min-h-0 lg:flex-1">
         <AlchemyToolbar
           boardEmpty={board.length === 0}
           discoveredCount={discovered.length}
@@ -97,8 +97,10 @@ export function AlchemyPlay() {
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
         >
-          <AlchemyBoard boardRef={boardRef} />
-          <AlchemyShelf />
+          <div className="grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5">
+            <AlchemyBoard boardRef={boardRef} />
+            <AlchemyShelf />
+          </div>
           <DragOverlay dropAnimation={null}>
             {activeElement ? (
               <div className="rotate-3 scale-105 drop-shadow-2xl">

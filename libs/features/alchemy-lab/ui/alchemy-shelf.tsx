@@ -35,6 +35,8 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
     useAlchemyStore.getState().addToBoard(element.id);
   };
 
+  // pan-y houdt het schap met de vinger scrollbaar; de TouchSensor start na
+  // een korte hold alsnog een sleep.
   return (
     <button
       ref={setNodeRef}
@@ -42,7 +44,7 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
       {...listeners}
       aria-label={`${element.name} op de werkbank leggen`}
       className={cn(
-        "touch-none rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+        "touch-pan-y rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
         isDragging && "opacity-30",
       )}
       type="button"
@@ -70,9 +72,9 @@ export function AlchemyShelf() {
   return (
     <section
       aria-label="Mijn elementen"
-      className="rounded-3xl border bg-card p-3 shadow-sm sm:p-4"
+      className="flex min-h-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 lg:col-span-2 lg:h-full lg:overflow-hidden"
     >
-      <div className="mb-2">
+      <div className="mb-2 shrink-0">
         <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
           Mijn elementen
         </h2>
@@ -85,7 +87,7 @@ export function AlchemyShelf() {
       </div>
 
       {elements.length > 8 ? (
-        <div className="mb-2">
+        <div className="mb-2 shrink-0">
           <ElementFilters
             category={category}
             sort={sort}
@@ -95,17 +97,22 @@ export function AlchemyShelf() {
         </div>
       ) : null}
 
-      {visibleElements.length === 0 ? (
-        <p className="py-4 text-center text-sm text-muted-foreground">
-          Nog geen elementen in deze categorie.
-        </p>
-      ) : (
-        <div className="grid grid-cols-4 gap-1 sm:grid-cols-6 sm:gap-2">
-          {visibleElements.map((element) => (
-            <ShelfToken key={element.id} element={element} />
-          ))}
-        </div>
-      )}
+      <div
+        className="min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-1"
+        data-alchemy-shelf-scroll="true"
+      >
+        {visibleElements.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            Nog geen elementen in deze categorie.
+          </p>
+        ) : (
+          <div className="grid grid-cols-4 gap-1 sm:grid-cols-6 sm:gap-2 lg:grid-cols-5 lg:gap-1.5 xl:gap-2">
+            {visibleElements.map((element) => (
+              <ShelfToken key={element.id} element={element} />
+            ))}
+          </div>
+        )}
+      </div>
     </section>
   );
 }
