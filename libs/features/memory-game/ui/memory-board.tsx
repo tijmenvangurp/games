@@ -22,10 +22,13 @@ function playFlipFeedback(beforeMatched: number): void {
 }
 
 function columnsFor(pairs: number): string {
-  if (pairs <= 4) {
+  if (pairs <= 8) {
     return "grid-cols-4";
   }
-  return "grid-cols-4 sm:grid-cols-5";
+  if (pairs <= 10) {
+    return "grid-cols-4 sm:grid-cols-5";
+  }
+  return "grid-cols-4 sm:grid-cols-6";
 }
 
 export function MemoryBoard() {
