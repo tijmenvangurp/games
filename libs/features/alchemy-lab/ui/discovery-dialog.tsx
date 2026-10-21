@@ -31,7 +31,7 @@ export function DiscoveryDialog() {
         }
       }}
     >
-      <Confetti pieces={28} />
+      <Confetti pieces={28} variant="shower" />
       <div className="animate-pop relative z-50 w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl">
         <p className="flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-widest text-emerald-700">
           <Sparkles aria-hidden="true" className="size-4" />

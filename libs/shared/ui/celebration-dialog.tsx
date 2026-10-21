@@ -45,7 +45,7 @@ export function CelebrationDialog({
         }
       }}
     >
-      {confetti ? <Confetti pieces={28} /> : null}
+      {confetti ? <Confetti pieces={28} variant="shower" /> : null}
       <div className="game-panel animate-pop w-full max-w-sm p-6 text-center">
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
           <Sparkles className="animate-rise size-10 text-primary" />

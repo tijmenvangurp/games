@@ -264,33 +264,6 @@
     }
   }
 
-  .confetti-piece {
-    position: absolute;
-    left: 50%;
-    top: 45%;
-    width: 0.5rem;
-    height: 0.75rem;
-    border-radius: 9999px;
-    background-color: var(--confetti-color);
-    opacity: 0;
-    animation: confetti-burst 1000ms ease-out var(--confetti-delay) forwards;
-  }
-
-  @keyframes confetti-burst {
-    0% {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(0.4) rotate(0);
-    }
-    70% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
-      transform: translate(calc(-50% + var(--confetti-x)), calc(-50% + var(--confetti-y))) scale(1)
-        rotate(var(--confetti-rotate));
-    }
-  }
-
   .maze-arrow {
     color: #111827;
   }

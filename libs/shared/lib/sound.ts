@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-type SoundName = "tap" | "select" | "match" | "wrong" | "hint" | "almost" | "win";
+type SoundName = "tap" | "select" | "match" | "hint" | "almost" | "win";
 
 interface Tone {
   frequency: number;
@@ -19,7 +19,6 @@ const SOUND_PATTERNS: Record<SoundName, readonly Tone[]> = {
     { frequency: 659, delay: 0, duration: 0.08, type: "sine", volume: 0.05 },
     { frequency: 880, delay: 0.07, duration: 0.1, type: "sine", volume: 0.05 },
   ],
-  wrong: [{ frequency: 220, delay: 0, duration: 0.16, type: "square", volume: 0.035 }],
   hint: [{ frequency: 880, delay: 0, duration: 0.1, type: "triangle", volume: 0.045 }],
   almost: [
     { frequency: 659, delay: 0, duration: 0.08, type: "sine", volume: 0.045 },

@@ -1,43 +1,104 @@
-import type { CSSProperties } from "react";
-
-interface ConfettiStyle extends CSSProperties {
-  "--confetti-x": string;
-  "--confetti-y": string;
-  "--confetti-delay": string;
-  "--confetti-rotate": string;
-  "--confetti-color": string;
-}
+import { useEffect, useRef } from "react";
 
 const COLORS = ["#f59e0b", "#ef4444", "#22c55e", "#0ea5e9", "#a855f7", "#ec4899"];
-const PIECES = 28;
-
-const PIECE_STYLES: ConfettiStyle[] = Array.from({ length: PIECES }, (_, index) => {
-  const angle = (index / PIECES) * Math.PI * 2;
-  const distance = 80 + (index % 5) * 24;
-  return {
-    "--confetti-x": `${(Math.cos(angle) * distance).toFixed(1)}px`,
-    "--confetti-y": `${(Math.sin(angle) * distance - 32).toFixed(1)}px`,
-    "--confetti-delay": `${(index % 4) * 25}ms`,
-    "--confetti-rotate": `${180 + (index % 6) * 60}deg`,
-    "--confetti-color": COLORS[index % COLORS.length] ?? "#f59e0b",
-  };
-});
 
 interface ConfettiProps {
+  /** Number of particles in the first burst. */
   pieces?: number;
+  /** A single pop, or a wider shower with two extra side bursts. */
+  variant?: "burst" | "shower";
 }
 
-/** A short, dependency-free confetti burst that respects reduced motion. */
-export function Confetti({ pieces = 18 }: ConfettiProps) {
+function prefersReducedMotion(): boolean {
   return (
-    <div
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+function hasCanvasSupport(canvas: HTMLCanvasElement): boolean {
+  try {
+    return canvas.getContext("2d") !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A short, dependency-light confetti burst on a dedicated canvas. The library
+ * is loaded on demand so the first screen stays small, and all drawing stays
+ * local: no fetches, images or CSP changes.
+ */
+export function Confetti({ pieces = 18, variant = "burst" }: ConfettiProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas || !hasCanvasSupport(canvas)) {
+      return;
+    }
+
+    let cancelled = false;
+    let reset: (() => void) | null = null;
+
+    void import("canvas-confetti").then(({ default: confetti }) => {
+      if (cancelled || !canvasRef.current) {
+        return;
+      }
+
+      const fire = confetti.create(canvas, { resize: true, useWorker: false });
+      reset = fire.reset;
+
+      const base = {
+        colors: COLORS,
+        disableForReducedMotion: true,
+        gravity: 0.9,
+        scalar: 0.9,
+        spread: 70,
+        startVelocity: 38,
+        ticks: 160,
+      };
+
+      fire({ ...base, particleCount: pieces, origin: { x: 0.5, y: 0.55 } });
+
+      if (variant === "shower") {
+        window.setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
+          const sideCount = Math.max(8, Math.round(pieces / 2));
+          fire({
+            ...base,
+            angle: 60,
+            particleCount: sideCount,
+            origin: { x: 0, y: 0.7 },
+          });
+          fire({
+            ...base,
+            angle: 120,
+            particleCount: sideCount,
+            origin: { x: 1, y: 0.7 },
+          });
+        }, 120);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      reset?.();
+    };
+  }, [pieces, variant]);
+
+  return (
+    <canvas
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-40 overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-40 size-full"
       data-confetti="true"
-    >
-      {PIECE_STYLES.slice(0, pieces).map((style, index) => (
-        <span key={index} className="confetti-piece" style={style} />
-      ))}
-    </div>
+      ref={canvasRef}
+    />
   );
 }
