@@ -157,9 +157,9 @@ De `wrong`-klank en de bijbehorende haptiek zijn verwijderd. Ze hoorden niet bij
 De eigenaar keurt een confettidependency goed om vieringen in meerdere spellen sterker te maken. `canvas-confetti` 1.9.4 (ISC) vervangt de handgeschreven CSS-burst:
 
 - **Lui geladen.** De component importeert de bibliotheek pas als er echt gevierd wordt, dus het startscherm blijft klein.
-- **Lokaal en CSP-veilig.** De bibliotheek tekent op een eigen canvas; er is geen afbeelding, fetch of worker nodig. `useWorker: false` voorkomt een blob-worker en houdt de CSP ongewijzigd.
+- **Lokaal en CSP-veilig.** De bibliotheek beheert zelf een canvas op `document.body` met `zIndex: 60`; daardoor blijft de confetti boven de dialoogoverlay en de dimlaag. Er is geen afbeelding, fetch of worker nodig.
 - **Toegankelijk.** Bij `prefers-reduced-motion` wordt er niets getekend; daarnaast staat `disableForReducedMotion` aan en is het canvas `aria-hidden`.
-- **Meer vormen.** Dezelfde component ondersteunt een enkele burst en een bredere `shower` met twee zijwaartse bursts. De ontdekkingskaart en de afsluitdialoog gebruiken de `shower`; sudoku houdt de rustige burst.
+- **Meer vormen.** Dezelfde component ondersteunt een enkele burst, een bredere `shower` met twee zijwaartse bursts en stervormige confetti. De ontdekkingskaart gebruikt sterren, de afsluitdialoog de `shower` en sudoku de rustige burst.
 - **Minder eigen code.** De oude `@keyframes confetti-burst` en `.confetti-piece` zijn verwijderd.
 
 De `Confetti`-API blijft `pieces` en `data-confetti`, zodat bestaande tests en schermen blijven werken.
