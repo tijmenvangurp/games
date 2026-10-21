@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { AnimatePresence, m } from "motion/react";
 import { elementName, type ElementId, type Hint } from "@entities/alchemy";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import type { AlchemyFeedback } from "../model/use-alchemy-store";
@@ -61,15 +62,22 @@ export function AlchemyMessages({ discovered, feedback, hint }: AlchemyMessagesP
         </p>
       ) : null}
 
-      {feedback && feedback.kind !== "new" ? (
-        <p
-          aria-live="polite"
-          className="rounded-2xl border bg-muted px-3 py-2 text-center text-sm font-bold text-foreground"
-          role="status"
-        >
-          {feedbackText(feedback.kind, "elementId" in feedback ? feedback.elementId : undefined)}
-        </p>
-      ) : null}
+      <AnimatePresence initial={false}>
+        {feedback && feedback.kind !== "new" ? (
+          <m.p
+            key={feedback.kind}
+            animate={{ opacity: 1, y: 0 }}
+            aria-live="polite"
+            className="rounded-2xl border bg-muted px-3 py-2 text-center text-sm font-bold text-foreground"
+            exit={{ opacity: 0, y: -4 }}
+            initial={{ opacity: 0, y: 6 }}
+            role="status"
+            transition={{ duration: 0.18 }}
+          >
+            {feedbackText(feedback.kind, "elementId" in feedback ? feedback.elementId : undefined)}
+          </m.p>
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }

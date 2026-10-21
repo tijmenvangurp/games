@@ -3,6 +3,7 @@ export { CelebrationDialog } from "./celebration-dialog";
 export { ChessBoard } from "./chess-board";
 export { Confetti } from "./confetti";
 export { GameIcon } from "./game-icon";
+export { MotionProvider } from "./motion-provider";
 export { OptionPicker } from "./option-picker";
 export { PageHeader } from "./page-header";
 export { SetupActions } from "./setup-actions";

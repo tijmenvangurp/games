@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { m } from "motion/react";
 import { ELEMENTS, getElement, type AlchemyElement, type ElementId } from "@entities/alchemy";
 import { Button, X } from "@shared/ui";
 import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
@@ -52,8 +53,11 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
         }
       }}
     >
-      <div
-        className="animate-pop max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-3xl border bg-card p-4 shadow-xl sm:p-6"
+      <m.div
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-3xl border bg-card p-4 shadow-xl sm:p-6"
+        initial={{ opacity: 0, scale: 0.96, y: 10 }}
+        transition={{ damping: 28, stiffness: 340, type: "spring" }}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
@@ -130,7 +134,7 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
             </Button>
           </>
         )}
-      </div>
+      </m.div>
     </div>
   );
 }

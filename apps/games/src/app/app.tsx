@@ -1,4 +1,5 @@
 import { RouterProvider } from "@tanstack/react-router";
+import { MotionProvider } from "@shared/ui";
 import { router as defaultRouter, type AppRouter } from "@app/router";
 
 interface AppProps {
@@ -6,5 +7,9 @@ interface AppProps {
 }
 
 export function App({ router = defaultRouter }: AppProps) {
-  return <RouterProvider router={router} />;
+  return (
+    <MotionProvider>
+      <RouterProvider router={router} />
+    </MotionProvider>
+  );
 }
