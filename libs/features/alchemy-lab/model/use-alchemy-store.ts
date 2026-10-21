@@ -1,5 +1,13 @@
 import { create } from "zustand";
-import { BASE_ELEMENT_IDS, combine, getHint, type ElementId, type Hint } from "@entities/alchemy";
+import {
+  BASE_ELEMENT_IDS,
+  combine,
+  firstIncompleteMission,
+  getHint,
+  nextMission as findNextMission,
+  type ElementId,
+  type Hint,
+} from "@entities/alchemy";
 import { playHaptic, playSound } from "@shared/lib";
 import {
   loadAlchemyState,
@@ -31,6 +39,7 @@ interface AlchemyStore {
   selected: string | null;
   feedback: AlchemyFeedback | null;
   hint: Hint | null;
+  missionId: string | null;
   addToBoard: (elementId: ElementId, position?: Position) => void;
   moveBoardElement: (instanceId: string, position: Position) => void;
   combineBoardElements: (firstId: string, secondId: string) => void;
@@ -40,6 +49,7 @@ interface AlchemyStore {
   clearBoard: () => void;
   showHint: () => void;
   clearHint: () => void;
+  nextMission: () => void;
   dismissFeedback: () => void;
   reset: () => void;
 }
@@ -127,6 +137,8 @@ function finishCombination(
 }
 
 const initial = loadAlchemyState();
+const initialDiscovered = normalizeDiscovered(initial.discovered);
+const initialMission = firstIncompleteMission(initialDiscovered);
 const initialBoard = initial.board.map((item) => ({
   instanceId: createInstanceId(),
   elementId: item.elementId,
@@ -134,11 +146,12 @@ const initialBoard = initial.board.map((item) => ({
 }));
 
 export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
-  discovered: normalizeDiscovered(initial.discovered),
+  discovered: initialDiscovered,
   board: initialBoard,
   selected: null,
   feedback: null,
   hint: null,
+  missionId: initialMission?.id ?? null,
 
   addToBoard: (elementId, position) => {
     const { board } = get();
@@ -265,15 +278,25 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
 
   clearHint: () => set({ hint: null }),
 
+  nextMission: () => {
+    const { discovered, missionId } = get();
+    const mission = findNextMission(discovered, missionId);
+    set({ missionId: mission?.id ?? null });
+    playSound("tap");
+    playHaptic("tap");
+  },
+
   dismissFeedback: () => set({ feedback: null }),
 
   reset: () => {
+    const discovered = [...BASE_ELEMENT_IDS];
     set({
-      discovered: [...BASE_ELEMENT_IDS],
+      discovered,
       board: [],
       selected: null,
       feedback: null,
       hint: null,
+      missionId: firstIncompleteMission(discovered)?.id ?? null,
     });
     persist(get);
   },

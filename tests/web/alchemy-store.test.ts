@@ -13,6 +13,7 @@ function resetStore() {
     selected: null,
     feedback: null,
     hint: null,
+    missionId: "mud",
   });
 }
 

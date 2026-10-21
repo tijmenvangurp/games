@@ -13,5 +13,13 @@ export {
   tierOf,
   totalElements,
 } from "./model/rules";
+export {
+  MISSIONS,
+  completedMissionCount,
+  firstIncompleteMission,
+  isMissionDone,
+  missionById,
+  nextMission,
+} from "./model/missions";
 export { ELEMENT_CATEGORIES, ELEMENT_CATEGORY_LABELS } from "./model/types";
 export type { AlchemyElement, ElementCategory, ElementId, Hint } from "./model/types";

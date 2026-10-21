@@ -16,6 +16,7 @@ import { AlchemyBoard } from "./alchemy-board";
 import { AlchemyMessages } from "./alchemy-messages";
 import { AlchemyShelf } from "./alchemy-shelf";
 import { AlchemyToolbar } from "./alchemy-toolbar";
+import { AlchemyMissionCard } from "./mission-card";
 import { mergeCollision } from "./collision";
 import { DiscoveryDialog } from "./discovery-dialog";
 import { dropPosition, elementForDrag, resolveDrop, type DropAction } from "./drop-action";
@@ -89,6 +90,8 @@ export function AlchemyPlay() {
           onHint={() => useAlchemyStore.getState().showHint()}
           onOpenLabBook={() => setLabOpen(true)}
         />
+
+        <AlchemyMissionCard />
 
         <DndContext
           collisionDetection={mergeCollision}

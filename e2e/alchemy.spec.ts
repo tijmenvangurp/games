@@ -4,6 +4,25 @@ import { ELEMENTS } from "../libs/entities/alchemy/model/elements";
 test.describe("mengelmoes op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
+  test("maakt de eerste opdracht en gaat verder", async ({ page }) => {
+    await page.goto("/mengelmoes");
+    const mission = page.getByTestId("alchemy-mission");
+    await expect(mission).toContainText("Maak modder.");
+
+    await page.getByRole("button", { name: "Water op de werkbank leggen" }).click();
+    await page.getByRole("button", { name: "Aarde op de werkbank leggen" }).click();
+    await page.getByRole("button", { name: "Verder ontdekken" }).click();
+
+    await expect(mission).toContainText("Gelukt!");
+    await page.getByRole("button", { name: "Volgende opdracht" }).click();
+    await expect(mission).toContainText("Maak stoom.");
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+
   test("combineert water en vuur met twee tikken", async ({ page }) => {
     await page.goto("/mengelmoes");
 
