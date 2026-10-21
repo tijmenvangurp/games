@@ -43,7 +43,7 @@ export function ElementFilters({
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 md:portrait:hidden">
         <label className="text-xs font-bold text-muted-foreground" htmlFor={sortId}>
           Sorteer
         </label>

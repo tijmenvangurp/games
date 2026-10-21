@@ -215,9 +215,10 @@ test.describe("mengelmoes slepen op een tablet", () => {
   test("sleept vanaf het schap naar de werkbank", async ({ page }) => {
     await page.goto("/mengelmoes");
 
+    const tile = page.getByRole("button", { name: "Water op de werkbank leggen" });
     await touchDrag(
       page,
-      page.locator('[data-drag-surface="water"]'),
+      tile.getByText("Water", { exact: true }),
       page.getByRole("group", { name: "Werkbank" }),
     );
 
