@@ -89,11 +89,11 @@ export function ElementDetail({ element, discovered, onBack }: ElementDetailProp
           <div className="mt-2 flex flex-col gap-1.5">
             {madeFrom.map((recipe) => (
               <div key={`${recipe.a}-${recipe.b}`} className="flex flex-wrap items-center gap-1.5">
-                <ElementChip discovered={discovered} elementId={recipe.a} />
+                <ElementChip discovered={discovered} elementId={recipe.a} mystery />
                 <span aria-hidden="true" className="text-xs font-black text-muted-foreground">
                   +
                 </span>
-                <ElementChip discovered={discovered} elementId={recipe.b} />
+                <ElementChip discovered={discovered} elementId={recipe.b} mystery />
               </div>
             ))}
           </div>

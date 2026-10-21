@@ -193,6 +193,24 @@ describe("mengelmoes", () => {
     expect(within(dialog).getByRole("button", { name: "Bekijk Stoom" })).toBeTruthy();
   });
 
+  it("keeps undiscovered recipe ingredients hidden in the element detail", async () => {
+    await renderAlchemy();
+    await makeSteam();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Stoom" }));
+
+    const madeFrom = within(dialog).getByText("Gemaakt van").closest("section");
+    if (!madeFrom) {
+      throw new Error("Gemaakt van-section niet gevonden");
+    }
+
+    expect(within(madeFrom).queryByText("IJs")).toBeNull();
+    expect(within(madeFrom).queryByText("Draak")).toBeNull();
+    expect(within(madeFrom).getAllByText("?")).toHaveLength(2);
+  });
+
   it("clears the workbench without losing discoveries", async () => {
     await renderAlchemy();
 
