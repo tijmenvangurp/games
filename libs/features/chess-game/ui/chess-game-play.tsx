@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import type { Color } from "chess.js";
 import type { ChessboardOptions } from "react-chessboard";
-import { Chessboard } from "react-chessboard";
 import {
   checkedKingSquare,
   otherColor,
@@ -10,7 +9,15 @@ import {
   type ChessResult,
 } from "@entities/chess";
 import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, CelebrationDialog, Flag, LayoutGrid, Lightbulb, Undo2 } from "@shared/ui";
+import {
+  Button,
+  CelebrationDialog,
+  ChessBoard,
+  Flag,
+  LayoutGrid,
+  Lightbulb,
+  Undo2,
+} from "@shared/ui";
 import {
   capturedBy,
   feedbackText,
@@ -138,15 +145,10 @@ function BoardPanel({
   });
 
   return (
-    <div
-      aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk en daarna op een groene stip, of sleep het stuk."
-      className="mx-auto w-full max-w-lg"
-      role="group"
-    >
-      <div className="aspect-square w-full touch-manipulation">
-        <Chessboard options={boardOptions} />
-      </div>
-    </div>
+    <ChessBoard
+      label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk en daarna op een groene stip, of sleep het stuk."
+      options={boardOptions}
+    />
   );
 }
 

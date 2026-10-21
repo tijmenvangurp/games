@@ -1,11 +1,12 @@
 import { useId, useMemo, useRef } from "react";
 import type { PieceSymbol } from "chess.js";
-import { Chessboard, type ChessboardOptions } from "react-chessboard";
+import type { ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
 import {
   Button,
   ArrowRight,
   Check,
+  ChessBoard,
   Eye,
   LayoutGrid,
   Lightbulb,
@@ -133,15 +134,10 @@ function BoardPanel({
   readonly options: ChessboardOptions;
 }) {
   return (
-    <div
-      aria-label={`Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten. ${label}`}
-      className="mx-auto w-full max-w-lg"
-      role="group"
-    >
-      <div className="aspect-square w-full touch-manipulation">
-        <Chessboard options={options} />
-      </div>
-    </div>
+    <ChessBoard
+      label={`Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten. ${label}`}
+      options={options}
+    />
   );
 }
 

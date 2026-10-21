@@ -51,6 +51,8 @@ zodat een rode schijf nooit als fout leest.
 - `Button` — primair, outline, ghost en success; vaste focusring.
 - `ChoiceCard` / `OptionPicker` — keuze met label, hint en optioneel symbool.
 - `GameIcon` — Phosphor-icoon per spel of les.
+- `ChessBoard` — schaakbord met de coördinaten buiten de velden: rijnummers
+  links, kolomletters onder. Draait mee met de bordstand.
 - `CelebrationDialog` — afsluiting met optionele confetti.
 - `Confetti` — alleen bij een echte overwinning.
 

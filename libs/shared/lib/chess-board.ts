@@ -218,7 +218,9 @@ export function chessBoardOptions({
   return {
     position,
     boardOrientation: playerColor === "w" ? "white" : "black",
-    showNotation: true,
+    // De coördinaten tekent ChessBoard buiten het bord; in het bord zouden de
+    // stukken ze bedekken.
+    showNotation: false,
     allowDragging,
     allowDragOffBoard: false,
     allowDrawingArrows: false,
@@ -230,20 +232,6 @@ export function chessBoardOptions({
     },
     lightSquareStyle: { backgroundColor: "#fef3c7" },
     darkSquareStyle: { backgroundColor: "#7dd3fc" },
-    lightSquareNotationStyle: { color: "#92400e", opacity: 1 },
-    darkSquareNotationStyle: { color: "#075985", opacity: 1 },
-    alphaNotationStyle: {
-      fontSize: "clamp(12px, 3.2vw, 18px)",
-      fontWeight: 800,
-      right: 5,
-      bottom: 3,
-    },
-    numericNotationStyle: {
-      fontSize: "clamp(12px, 3.2vw, 18px)",
-      fontWeight: 800,
-      left: 5,
-      top: 3,
-    },
     squareStyles,
     canDragPiece: ({ isSparePiece, piece }) =>
       !isSparePiece && piece.pieceType.startsWith(dragColor),
