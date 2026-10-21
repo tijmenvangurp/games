@@ -180,9 +180,15 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   skeleton: fluent("skull"),
   pirateship: fluent("ship"),
   gold: fluent("coin"),
-  // Fluent Emoji has no flour or sand sprite; these are hand-drawn in the same
-  // flat style. Replace them with an Iconify reference when a suitable set is
-  // added.
+  mammal: fluent("hamster"),
+  reptile: fluent("lizard"),
+  insect: fluent("lady-beetle"),
+  crocodile: fluent("crocodile"),
+  ant: fluent("ant"),
+  // Fluent Emoji has no flour, sand or tadpole sprite; these are hand-drawn in
+  // the same flat style. Replace them with an Iconify reference when a
+  // suitable set is added.
   flour: { custom: true },
   sand: { custom: true },
+  amphibian: { custom: true },
 };

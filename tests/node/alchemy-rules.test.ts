@@ -140,7 +140,7 @@ describe("alchemy rules", () => {
     expect(combine("bread", "cow")).toBe("burger");
     expect(combine("human", "fish")).toBe("mermaid");
     expect(combine("human", "pirateship")).toBe("pirate");
-    expect(combine("cat", "sun")).toBe("lion");
+    expect(combine("cat", "jungle")).toBe("lion");
     expect(combine("bird", "ice")).toBe("penguin");
     expect(combine("palm", "fruit")).toBe("banana");
     expect(combine("batter", "fire")).toBe("pancakes");
@@ -164,9 +164,9 @@ describe("alchemy rules", () => {
     expect(combine("tree", "beach")).toBe("palm");
     expect(combine("palm", "fruit")).toBe("banana");
     expect(combine("forest", "rain")).toBe("jungle");
-    expect(combine("animal", "jungle")).toBe("elephant");
+    expect(combine("mammal", "jungle")).toBe("elephant");
     expect(combine("tree", "wind")).toBe("leaf");
-    expect(combine("horse", "leaf")).toBe("giraffe");
+    expect(combine("mammal", "leaf")).toBe("giraffe");
     expect(combine("animal", "leaf")).toBe("hedgehog");
     expect(combine("cow", "grass")).toBe("milk");
     expect(combine("alien", "airplane")).toBe("ufo");
@@ -177,6 +177,24 @@ describe("alchemy rules", () => {
     expect(combine("human", "pirateship")).toBe("pirate");
     expect(combine("metal", "sun")).toBe("gold");
     expect(combine("gold", "island")).toBe("treasure");
+  });
+
+  it("classifies animals by their traits", () => {
+    expect(combine("animal", "milk")).toBe("mammal");
+    expect(combine("animal", "sun")).toBe("reptile");
+    expect(combine("animal", "water")).toBe("amphibian");
+    expect(combine("animal", "flower")).toBe("insect");
+    expect(combine("mammal", "human")).toBe("dog");
+    expect(combine("mammal", "sea")).toBe("whale");
+    expect(combine("reptile", "sand")).toBe("snake");
+    expect(combine("reptile", "beach")).toBe("turtle");
+    expect(combine("reptile", "water")).toBe("crocodile");
+    expect(combine("amphibian", "water")).toBe("frog");
+    expect(combine("insect", "sugar")).toBe("bee");
+    expect(combine("insect", "flower")).toBe("butterfly");
+    expect(combine("insect", "sand")).toBe("ant");
+    expect(combine("bird", "farm")).toBe("chicken");
+    expect(combine("fish", "dinosaur")).toBe("shark");
   });
 
   it("offers alternate routes to the same element", () => {

@@ -136,14 +136,14 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Vis",
     icon: "/elements/fish.svg",
     category: "water",
-    fact: "Vissen leven in water.",
+    fact: "Vissen hebben vinnen en kieuwen en leven in water.",
   },
   {
     id: "bird",
     name: "Vogel",
     icon: "/elements/bird.svg",
     category: "life",
-    fact: "Vogels hebben vleugels en veren.",
+    fact: "Vogels hebben veren, vleugels en leggen eieren.",
   },
   {
     id: "human",
@@ -332,7 +332,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Vlinder",
     icon: "/elements/butterfly.svg",
     category: "life",
-    fact: "Een vlinder heeft kleurige vleugels.",
+    fact: "Een vlinder is een insect met kleurige vleugels.",
   },
   {
     id: "dinosaur",
@@ -577,14 +577,14 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Walvis",
     icon: "/elements/whale.svg",
     category: "water",
-    fact: "Een walvis is een heel groot zeedier.",
+    fact: "Een walvis is een zoogdier dat in de zee leeft.",
   },
   {
     id: "shark",
     name: "Haai",
     icon: "/elements/shark.svg",
     category: "water",
-    fact: "Een haai heeft scherpe tanden.",
+    fact: "Een haai is een vis met scherpe tanden.",
   },
   {
     id: "treasure",
@@ -696,7 +696,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Bij",
     icon: "/elements/bee.svg",
     category: "life",
-    fact: "Een bij verzamelt nectar uit bloemen.",
+    fact: "Een bij is een insect dat honing maakt.",
   },
   {
     id: "honey",
@@ -710,7 +710,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Kikker",
     icon: "/elements/frog.svg",
     category: "life",
-    fact: "Een kikker kan goed springen en zwemmen.",
+    fact: "Een kikker is een amfibie die goed kan springen.",
   },
   {
     id: "fairytale",
@@ -780,7 +780,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Schildpad",
     icon: "/elements/turtle.svg",
     category: "life",
-    fact: "Een schildpad draagt zijn huisje op zijn rug.",
+    fact: "Een schildpad is een reptiel met een schild.",
   },
   {
     id: "pig",
@@ -794,7 +794,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Koe",
     icon: "/elements/cow.svg",
     category: "life",
-    fact: "Een koe geeft melk.",
+    fact: "Een koe is een zoogdier en geeft melk.",
   },
   {
     id: "potato",
@@ -871,7 +871,7 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     name: "Slang",
     icon: "/elements/snake.svg",
     category: "life",
-    fact: "Een slang glijdt over het zand.",
+    fact: "Een slang is een reptiel zonder poten.",
   },
   {
     id: "bear",
@@ -1138,6 +1138,48 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     icon: "/elements/gold.svg",
     category: "tech",
     fact: "Goud is een glanzend metaal.",
+  },
+  {
+    id: "mammal",
+    name: "Zoogdier",
+    icon: "/elements/mammal.svg",
+    category: "life",
+    fact: "Zoogdieren hebben haar en geven melk aan hun jongen.",
+  },
+  {
+    id: "reptile",
+    name: "Reptiel",
+    icon: "/elements/reptile.svg",
+    category: "life",
+    fact: "Reptielen hebben schubben en worden warm in de zon.",
+  },
+  {
+    id: "amphibian",
+    name: "Amfibie",
+    icon: "/elements/amphibian.svg",
+    category: "life",
+    fact: "Amfibieën leven eerst in water en later op het land.",
+  },
+  {
+    id: "insect",
+    name: "Insect",
+    icon: "/elements/insect.svg",
+    category: "life",
+    fact: "Insecten hebben zes poten en een hard pantser.",
+  },
+  {
+    id: "crocodile",
+    name: "Krokodil",
+    icon: "/elements/crocodile.svg",
+    category: "life",
+    fact: "Een krokodil is een reptiel met scherpe tanden.",
+  },
+  {
+    id: "ant",
+    name: "Mier",
+    icon: "/elements/ant.svg",
+    category: "life",
+    fact: "Een mier is een insect dat in een groep leeft.",
   },
 ];
 
