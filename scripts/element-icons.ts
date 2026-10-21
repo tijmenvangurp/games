@@ -74,7 +74,7 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   sugar: fluent("candy"),
   cake: fluent("birthday-cake"),
   tool: fluent("hammer-and-wrench"),
-  wheel: fluent("gear"),
+  wheel: fluent("wheel"),
   cart: fluent("shopping-cart"),
   bridge: fluent("bridge-at-night"),
   boat: fluent("sailboat"),
@@ -171,7 +171,15 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   kite: fluent("kite"),
   book: fluent("closed-book"),
   clock: fluent("alarm-clock"),
-  // Fluent Emoji has no sand sprite; this one is hand-drawn in the same flat
-  // style. Replace it with an Iconify reference when a suitable set is added.
+  motor: fluent("gear"),
+  door: fluent("door"),
+  batter: fluent("bowl-with-spoon"),
+  palm: fluent("palm-tree"),
+  jungle: fluent("national-park"),
+  leaf: fluent("fallen-leaf"),
+  // Fluent Emoji has no flour or sand sprite; these are hand-drawn in the same
+  // flat style. Replace them with an Iconify reference when a suitable set is
+  // added.
+  flour: { custom: true },
   sand: { custom: true },
 };

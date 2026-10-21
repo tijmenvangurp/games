@@ -1069,6 +1069,55 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     category: "tech",
     fact: "Een klok vertelt hoe laat het is.",
   },
+  {
+    id: "motor",
+    name: "Motor",
+    icon: "/elements/motor.svg",
+    category: "tech",
+    fact: "Een motor maakt iets aan het bewegen.",
+  },
+  {
+    id: "door",
+    name: "Deur",
+    icon: "/elements/door.svg",
+    category: "tech",
+    fact: "Met een deur ga je naar binnen.",
+  },
+  {
+    id: "flour",
+    name: "Meel",
+    icon: "/elements/flour.svg",
+    category: "life",
+    fact: "Meel maak je door tarwe fijn te malen.",
+  },
+  {
+    id: "batter",
+    name: "Beslag",
+    icon: "/elements/batter.svg",
+    category: "life",
+    fact: "Van meel en melk maak je beslag.",
+  },
+  {
+    id: "palm",
+    name: "Palm",
+    icon: "/elements/palm.svg",
+    category: "life",
+    fact: "Een palmboom groeit op een warm strand.",
+  },
+  {
+    id: "jungle",
+    name: "Oerwoud",
+    icon: "/elements/jungle.svg",
+    category: "life",
+    fact: "In een oerwoud groeien veel planten en bomen.",
+  },
+  {
+    id: "leaf",
+    name: "Blad",
+    icon: "/elements/leaf.svg",
+    category: "life",
+    fact: "Een blad groeit aan een boom.",
+  },
 ];
 
 export const BASE_ELEMENT_IDS: readonly ElementId[] = ["water", "fire", "earth", "air"];

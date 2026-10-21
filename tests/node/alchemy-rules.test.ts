@@ -133,7 +133,7 @@ describe("alchemy rules", () => {
 
   it("adds playful combinations children can guess", () => {
     expect(combine("wheel", "wheel")).toBe("bicycle");
-    expect(combine("metal", "wheel")).toBe("car");
+    expect(combine("motor", "wheel")).toBe("car");
     expect(combine("car", "fire")).toBe("firetruck");
     expect(combine("plant", "mud")).toBe("potato");
     expect(combine("potato", "fire")).toBe("fries");
@@ -142,12 +142,36 @@ describe("alchemy rules", () => {
     expect(combine("human", "treasure")).toBe("pirate");
     expect(combine("cat", "sun")).toBe("lion");
     expect(combine("bird", "ice")).toBe("penguin");
-    expect(combine("fruit", "moon")).toBe("banana");
-    expect(combine("cake", "fire")).toBe("pancakes");
-    expect(combine("metal", "cart")).toBe("train");
+    expect(combine("palm", "fruit")).toBe("banana");
+    expect(combine("batter", "fire")).toBe("pancakes");
+    expect(combine("motor", "cart")).toBe("train");
     expect(combine("tree", "water")).toBe("paper");
     expect(combine("paper", "wind")).toBe("kite");
     expect(combine("human", "lightning")).toBe("superhero");
+  });
+
+  it("takes a longer path where a direct combination felt figurative", () => {
+    expect(combine("metal", "steam")).toBe("motor");
+    expect(combine("motor", "wheel")).toBe("car");
+    expect(combine("motor", "cart")).toBe("train");
+    expect(combine("motor", "farm")).toBe("tractor");
+    expect(combine("motor", "airplane")).toBe("helicopter");
+    expect(combine("wood", "house")).toBe("door");
+    expect(combine("metal", "door")).toBe("key");
+    expect(combine("wheat", "stone")).toBe("flour");
+    expect(combine("flour", "milk")).toBe("batter");
+    expect(combine("batter", "fire")).toBe("pancakes");
+    expect(combine("tree", "beach")).toBe("palm");
+    expect(combine("palm", "fruit")).toBe("banana");
+    expect(combine("forest", "rain")).toBe("jungle");
+    expect(combine("animal", "jungle")).toBe("elephant");
+    expect(combine("tree", "wind")).toBe("leaf");
+    expect(combine("horse", "leaf")).toBe("giraffe");
+    expect(combine("animal", "leaf")).toBe("hedgehog");
+    expect(combine("cow", "grass")).toBe("milk");
+    expect(combine("alien", "airplane")).toBe("ufo");
+    expect(combine("dog", "chicken")).toBe("fox");
+    expect(combine("fruit", "bee")).toBe("strawberry");
   });
 
   it("offers alternate routes to the same element", () => {
