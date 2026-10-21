@@ -110,15 +110,17 @@ export function AlchemyShelf() {
   return (
     <section
       aria-label="Mijn elementen"
-      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-96 md:landscape:col-span-2"
+      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
     >
       <div className="mb-2 shrink-0">
-        <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-          Mijn elementen
-        </h2>
-        <p className="text-sm font-bold">
-          {elements.length} van {ELEMENTS.length} ontdekt
-        </p>
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+            Mijn elementen
+          </h2>
+          <p className="text-sm font-bold">
+            {elements.length} van {ELEMENTS.length}
+          </p>
+        </div>
         <p className="text-xs text-muted-foreground">
           {selected ? "Kies een tweede element om te mengen" : "Tik of sleep naar de werkbank"}
         </p>
