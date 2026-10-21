@@ -103,10 +103,9 @@ describe("alchemy rules", () => {
     expect(getHint(everything)).toBeNull();
   });
 
-  it("keeps the element tree at a readable size", () => {
+  it("grows without leaving new elements without a recipe", () => {
     expect(ELEMENTS.length).toBeGreaterThanOrEqual(90);
-    expect(ELEMENTS.length).toBeLessThanOrEqual(120);
-    expect(RECIPES.length).toBeGreaterThanOrEqual(90);
+    expect(RECIPES.length).toBeGreaterThanOrEqual(ELEMENTS.length - BASE_ELEMENT_IDS.length);
   });
 
   it("supports combining two copies of the same element", () => {
@@ -143,6 +142,12 @@ describe("alchemy rules", () => {
     expect(combine("human", "treasure")).toBe("pirate");
     expect(combine("cat", "sun")).toBe("lion");
     expect(combine("bird", "ice")).toBe("penguin");
+    expect(combine("fruit", "moon")).toBe("banana");
+    expect(combine("cake", "fire")).toBe("pancakes");
+    expect(combine("metal", "cart")).toBe("train");
+    expect(combine("tree", "water")).toBe("paper");
+    expect(combine("paper", "wind")).toBe("kite");
+    expect(combine("human", "lightning")).toBe("superhero");
   });
 
   it("offers alternate routes to the same element", () => {
