@@ -177,14 +177,15 @@ De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (
 
 ### 5.4 De andere voorgestelde dependencies
 
-| Package           | Verdict         | Onderbouwing                                                                                                                                                                       |
-| ----------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `canvas-confetti` | **Ja**          | Kleine, gerichte bibliotheek; goedgekeurd en geïmplementeerd.                                                                                                                      |
-| `motion`          | **Ja**          | motion.dev; goedgekeurd en geïmplementeerd met `LazyMotion` + `m` voor dialogen en feedback.                                                                                       |
-| `zustand`         | **Al aanwezig** | Stond al in `package.json` (5.0.15) en wordt door alle features gebruikt. Geen actie.                                                                                              |
-| `immer`           | **Nee**         | De stores zijn klein en gebruiken expliciete immutable updates. Immer voegt een tweede stijl en bundlegewicht toe zonder dat het een concreet probleem oplost.                     |
-| `use-sound`       | **Nee**         | Dit is een Howler-wrapper voor audiobestanden. De app synthetiseert bewust met Web Audio en heeft geen audiobestanden nodig; use-sound zou juist naar gelicentieerde assets duwen. |
-| `nanoid`          | **Nee**         | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                       |
+| Package           | Verdict          | Onderbouwing                                                                                                                                                                                                          |
+| ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canvas-confetti` | **Ja**           | Kleine, gerichte bibliotheek; goedgekeurd en geïmplementeerd.                                                                                                                                                         |
+| `motion`          | **Ja**           | motion.dev; goedgekeurd en geïmplementeerd met `LazyMotion` + `m` voor dialogen en feedback.                                                                                                                          |
+| `zustand`         | **Al aanwezig**  | Stond al in `package.json` (5.0.15) en wordt door alle features gebruikt. Geen actie.                                                                                                                                 |
+| `immer`           | **Nee**          | De stores zijn klein en gebruiken expliciete immutable updates. Immer voegt een tweede stijl en bundlegewicht toe zonder dat het een concreet probleem oplost.                                                        |
+| `use-sound`       | **Nee**          | Dit is een Howler-wrapper voor audiobestanden. De app synthetiseert bewust met Web Audio en heeft geen audiobestanden nodig; use-sound zou juist naar gelicentieerde assets duwen.                                    |
+| `howler`          | **Nee, nu niet** | MIT en ±7 KB gzip, maar de SFX zijn gesynthetiseerd en spraak/lessen spelen al via één herbruikbare `HTMLAudioElement`. Sprites, fades en spatial audio hebben we niet nodig; de laatste release (2.2.4) is van 2023. |
+| `nanoid`          | **Nee**          | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                                                          |
 
 ### 5.5 Wat verder ongewijzigd blijft
 
@@ -231,6 +232,7 @@ De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (
 - [MDN — `prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
 - [canvas-confetti — GitHub, ISC](https://github.com/catdad/canvas-confetti)
 - [Motion — documentatie](https://motion.dev/) en [GitHub, MIT](https://github.com/motiondivision/motion)
+- [Howler.js — documentatie](https://howlerjs.com/) en [GitHub, MIT](https://github.com/goldfire/howler.js)
 - [ADR 0026 — adaptief niveaumodel en foutvriendelijke feedback](../adr/0026-adaptief-niveaumodel.md)
 - [`libs/shared/ui/motion-provider.tsx`](../../libs/shared/ui/motion-provider.tsx), [`libs/shared/ui/confetti.tsx`](../../libs/shared/ui/confetti.tsx), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts), [`libs/shared/lib/haptics.ts`](../../libs/shared/lib/haptics.ts), [`libs/features/alchemy-lab/model/use-alchemy-store.ts`](../../libs/features/alchemy-lab/model/use-alchemy-store.ts), [`libs/features/alchemy-lab/ui/alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)
 - [`docs/design-system.md`](../design-system.md) en [`docs/research/2026-10-19-mengelmoes-assets.md`](2026-10-19-mengelmoes-assets.md)
