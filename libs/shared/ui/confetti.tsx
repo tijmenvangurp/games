@@ -2,14 +2,17 @@ import { useEffect } from "react";
 import type confetti from "canvas-confetti";
 
 const COLORS = ["#f59e0b", "#ef4444", "#22c55e", "#0ea5e9", "#a855f7", "#ec4899"];
+const STAR_COLORS = ["#fbbf24", "#f59e0b", "#fde68a", "#c084fc", "#a855f7", "#ffffff"];
+const STAR_SHAPES: ("star" | "circle")[] = ["star", "circle"];
 
+type ConfettiVariant = "burst" | "shower" | "stars";
 type Fire = (options: confetti.Options) => unknown;
 
 interface ConfettiProps {
   /** Number of particles in the first burst. */
   pieces?: number;
-  /** A single pop, or a wider shower with two extra side bursts. */
-  variant?: "burst" | "shower";
+  /** A single pop, a wider shower with side bursts, or magical stars. */
+  variant?: ConfettiVariant;
 }
 
 function prefersReducedMotion(): boolean {
@@ -29,39 +32,98 @@ function canUseCanvas(): boolean {
   }
 }
 
-// The library creates its own canvas on document.body. zIndex 60 keeps the
-// confetti above the z-50 dialog overlay and its dim layer.
-const BASE = {
+interface BurstStyle {
+  colors: string[];
+  gravity: number;
+  scalar: number;
+  spread: number;
+  startVelocity: number;
+  ticks: number;
+}
+
+const PARTY_STYLE: BurstStyle = {
   colors: COLORS,
-  disableForReducedMotion: true,
   gravity: 0.9,
   scalar: 0.9,
   spread: 70,
   startVelocity: 38,
   ticks: 160,
-  zIndex: 60,
 };
 
-function fireBursts(
-  fire: Fire,
-  variant: "burst" | "shower",
-  pieces: number,
-  cancelled: () => boolean,
-): void {
-  fire({ ...BASE, particleCount: pieces, origin: { x: 0.5, y: 0.55 } });
+const BURST_STYLES: Record<ConfettiVariant, BurstStyle> = {
+  burst: PARTY_STYLE,
+  shower: PARTY_STYLE,
+  stars: {
+    colors: STAR_COLORS,
+    gravity: 0.8,
+    scalar: 1.05,
+    spread: 100,
+    startVelocity: 34,
+    ticks: 180,
+  },
+};
 
-  if (variant !== "shower") {
-    return;
-  }
+function burstOptions(variant: ConfettiVariant) {
+  // The library creates its own canvas on document.body. zIndex 60 keeps the
+  // confetti above the z-50 dialog overlay and its dim layer.
+  return { disableForReducedMotion: true, zIndex: 60, ...BURST_STYLES[variant] };
+}
+
+function fireStars(fire: Fire, pieces: number, cancelled: () => boolean): void {
+  const base = burstOptions("stars");
+  fire({
+    ...base,
+    particleCount: pieces,
+    origin: { x: 0.5, y: 0.55 },
+    shapes: STAR_SHAPES,
+  });
+
+  window.setTimeout(() => {
+    if (cancelled()) {
+      return;
+    }
+    fire({
+      ...base,
+      particleCount: Math.max(6, Math.round(pieces / 3)),
+      origin: { x: 0.5, y: 0.45 },
+      shapes: STAR_SHAPES,
+    });
+  }, 140);
+}
+
+function fireShower(fire: Fire, pieces: number, cancelled: () => boolean): void {
+  const base = burstOptions("shower");
+  fire({ ...base, particleCount: pieces, origin: { x: 0.5, y: 0.55 } });
 
   window.setTimeout(() => {
     if (cancelled()) {
       return;
     }
     const sideCount = Math.max(8, Math.round(pieces / 2));
-    fire({ ...BASE, angle: 60, particleCount: sideCount, origin: { x: 0, y: 0.7 } });
-    fire({ ...BASE, angle: 120, particleCount: sideCount, origin: { x: 1, y: 0.7 } });
+    fire({ ...base, angle: 60, particleCount: sideCount, origin: { x: 0, y: 0.7 } });
+    fire({ ...base, angle: 120, particleCount: sideCount, origin: { x: 1, y: 0.7 } });
   }, 120);
+}
+
+function fireBursts(
+  fire: Fire,
+  variant: ConfettiVariant,
+  pieces: number,
+  cancelled: () => boolean,
+): void {
+  if (variant === "stars") {
+    fireStars(fire, pieces, cancelled);
+    return;
+  }
+  if (variant === "shower") {
+    fireShower(fire, pieces, cancelled);
+    return;
+  }
+  fire({
+    ...burstOptions("burst"),
+    particleCount: pieces,
+    origin: { x: 0.5, y: 0.55 },
+  });
 }
 
 /**

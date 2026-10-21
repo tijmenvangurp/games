@@ -9,6 +9,7 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
+import { m } from "motion/react";
 import { type AlchemyElement } from "@entities/alchemy";
 import { playHaptic, playSound } from "@shared/lib";
 import { useAlchemyStore } from "../model/use-alchemy-store";
@@ -106,9 +107,14 @@ export function AlchemyPlay() {
           </div>
           <DragOverlay dropAnimation={null}>
             {activeElement ? (
-              <div className="rotate-3 scale-105 drop-shadow-2xl">
+              <m.div
+                animate={{ rotate: 3, scale: 1.08 }}
+                className="drop-shadow-2xl"
+                initial={{ rotate: -2, scale: 0.96 }}
+                transition={{ damping: 24, stiffness: 480, type: "spring" }}
+              >
                 <ElementToken element={activeElement} variant="overlay" />
-              </div>
+              </m.div>
             ) : null}
           </DragOverlay>
         </DndContext>

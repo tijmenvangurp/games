@@ -75,9 +75,11 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
         </div>
 
         <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-primary transition-all"
-            style={{ width: `${progress}%` }}
+          <m.div
+            animate={{ scaleX: progress / 100 }}
+            className="h-full w-full origin-left rounded-full bg-primary"
+            initial={{ scaleX: 0 }}
+            transition={{ damping: 26, stiffness: 120, type: "spring" }}
           />
         </div>
 
