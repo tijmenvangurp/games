@@ -10,4 +10,4 @@ export { AlchemyPlay } from "./ui/alchemy-play";
 export { filterAndSortElements } from "./model/filters";
 export { mergeCollision } from "./ui/collision";
 export { dropPosition, elementForDrag, resolveDrop } from "./ui/drop-action";
-export { boardItemId, BOARD_ID, parseActiveId, shelfHandleItemId, shelfItemId } from "./ui/dnd-ids";
+export { boardItemId, BOARD_ID, parseActiveId, shelfItemId } from "./ui/dnd-ids";

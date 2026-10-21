@@ -165,12 +165,12 @@ test.describe("mengelmoes op een tablet in landschap", () => {
 test.describe("mengelmoes slepen met een vinger", () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
 
-  test("sleept een element via het handvat naar de werkbank", async ({ page }) => {
+  test("sleept een element van het schap naar de werkbank", async ({ page }) => {
     await page.goto("/mengelmoes");
 
     await touchDrag(
       page,
-      page.getByRole("button", { name: "Sleep Water" }),
+      page.getByRole("button", { name: "Water op de werkbank leggen" }),
       page.getByRole("group", { name: "Werkbank" }),
     );
 

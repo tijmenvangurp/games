@@ -10,7 +10,6 @@ export {
   Eye,
   Flame,
   Flag,
-  GripVertical,
   Home,
   LayoutGrid,
   Lightbulb,
