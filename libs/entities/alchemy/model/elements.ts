@@ -160,6 +160,13 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     fact: "Een draak is een verzonnen dier.",
   },
   {
+    id: "rainbowdragon",
+    name: "Regenboogdraak",
+    icon: "/elements/rainbowdragon.svg",
+    category: "fantasy",
+    fact: "Een regenboogdraak blaast geen vuur, maar kleuren.",
+  },
+  {
     id: "wind",
     name: "Wind",
     icon: "/elements/wind.svg",

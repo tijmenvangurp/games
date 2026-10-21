@@ -148,6 +148,7 @@ describe("alchemy rules", () => {
     expect(combine("tree", "water")).toBe("paper");
     expect(combine("paper", "wind")).toBe("kite");
     expect(combine("human", "lightning")).toBe("superhero");
+    expect(combine("dragon", "rainbow")).toBe("rainbowdragon");
   });
 
   it("takes a longer path where a direct combination felt figurative", () => {

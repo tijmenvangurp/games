@@ -195,4 +195,5 @@ export const RECIPES: readonly Recipe[] = [
   { a: "dragon", b: "stone", result: "lava" },
   { a: "dragon", b: "water", result: "steam" },
   { a: "dragon", b: "sand", result: "glass" },
+  { a: "dragon", b: "rainbow", result: "rainbowdragon" },
 ];
