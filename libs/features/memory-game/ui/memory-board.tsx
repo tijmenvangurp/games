@@ -1,4 +1,4 @@
-import { getPokemon, usePokemonCry } from "@entities/pokedex";
+import { getPokemon } from "@entities/pokedex";
 import { cn, playHaptic, playSound } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryCard } from "./memory-card";
@@ -6,6 +6,7 @@ import { MemoryCard } from "./memory-card";
 function playFlipFeedback(beforeMatched: number): void {
   const next = useMemoryStore.getState();
   if (next.found) {
+    playSound("win");
     playHaptic("win");
     return;
   }
@@ -17,6 +18,7 @@ function playFlipFeedback(beforeMatched: number): void {
     // quietly. There is deliberately no wrong sound or wrong haptic.
     return;
   } else {
+    playSound("tap");
     playHaptic("tap");
   }
 }
@@ -36,7 +38,6 @@ export function MemoryBoard() {
   const matched = useMemoryStore((state) => state.matched);
   const flipped = useMemoryStore((state) => state.flipped);
   const hint = useMemoryStore((state) => state.hint);
-  const playCry = usePokemonCry();
 
   if (!scene) {
     return null;
@@ -54,14 +55,9 @@ export function MemoryBoard() {
       return;
     }
 
-    const pokemon = getPokemon(state.scene.cards[index]);
     const beforeMatched = state.matched.filter(Boolean).length;
     state.flip(index);
     playFlipFeedback(beforeMatched);
-
-    if (pokemon) {
-      playCry(pokemon);
-    }
   };
 
   return (

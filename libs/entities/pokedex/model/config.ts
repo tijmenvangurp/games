@@ -3,7 +3,7 @@ import type { Pokemon } from "./types";
 /**
  * All 151 Generation 1 Pokémon in National Pokédex order.
  *
- * Artwork and cries are bundled locally under `apps/games/public/pokemon`.
+ * Artwork and animated sprites are bundled locally under `apps/games/public/pokemon`.
  * Sources and licensing notes live in `docs/adr/0005-pokemon-assets.md`.
  */
 export const POKEDEX: readonly Pokemon[] = [

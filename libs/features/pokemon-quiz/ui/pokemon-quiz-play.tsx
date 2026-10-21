@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { getPokemon, usePokemonCry, type Pokemon } from "@entities/pokedex";
+import { getPokemon, type Pokemon } from "@entities/pokedex";
 import { playHaptic, playSound } from "@shared/lib";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
@@ -13,7 +12,6 @@ export function PokemonQuizPlay() {
   const answered = usePokemonQuizStore((state) => state.answered);
   const correctCount = usePokemonQuizStore((state) => state.correctCount);
   const rounds = usePokemonQuizStore((state) => state.rounds);
-  const playCry = usePokemonCry();
 
   const target = question ? getPokemon(question.targetId) : undefined;
   const options = question
@@ -22,12 +20,6 @@ export function PokemonQuizPlay() {
         .filter((pokemon): pokemon is Pokemon => Boolean(pokemon))
     : [];
   const correct = answered && question ? selectedId === question.targetId : false;
-
-  useEffect(() => {
-    if (answered && target) {
-      playCry(target);
-    }
-  }, [answered, target, playCry]);
 
   if (!question || !target) {
     return null;

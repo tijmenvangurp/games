@@ -38,7 +38,7 @@ Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet
 
 ## Pokémon-assets
 
-De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork, cries en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
+De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. De geluiden komen uit de gesynthetiseerde `playSound`-set van de app. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
 
 ## Element-assets
 
