@@ -132,6 +132,19 @@ describe("alchemy rules", () => {
     expect(combine("dragon", "knight")).toBe("fairytale");
   });
 
+  it("adds playful combinations children can guess", () => {
+    expect(combine("wheel", "wheel")).toBe("bicycle");
+    expect(combine("metal", "wheel")).toBe("car");
+    expect(combine("car", "fire")).toBe("firetruck");
+    expect(combine("plant", "mud")).toBe("potato");
+    expect(combine("potato", "fire")).toBe("fries");
+    expect(combine("bread", "cow")).toBe("burger");
+    expect(combine("human", "fish")).toBe("mermaid");
+    expect(combine("human", "treasure")).toBe("pirate");
+    expect(combine("cat", "sun")).toBe("lion");
+    expect(combine("bird", "ice")).toBe("penguin");
+  });
+
   it("offers alternate routes to the same element", () => {
     expect(findRecipesFor("steam").length).toBeGreaterThanOrEqual(2);
     expect(findRecipesFor("metal").length).toBeGreaterThanOrEqual(2);
