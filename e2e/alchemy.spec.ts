@@ -35,6 +35,29 @@ async function touchDrag(page: Page, from: Locator, to: Locator): Promise<void> 
   await page.waitForTimeout(100);
 }
 
+async function touchSwipe(
+  page: Page,
+  from: { x: number; y: number },
+  distance: number,
+): Promise<void> {
+  const client = await page.context().newCDPSession(page);
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [from],
+  });
+
+  for (let step = 1; step <= 8; step += 1) {
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [{ x: from.x - (distance * step) / 8, y: from.y }],
+    });
+    await page.waitForTimeout(8);
+  }
+
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await page.waitForTimeout(300);
+}
+
 test.describe("mengelmoes op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
 
@@ -206,6 +229,36 @@ test.describe("mengelmoes slepen met een vinger", () => {
       "document.documentElement.scrollWidth > document.documentElement.clientWidth",
     )) as boolean;
     expect(overflows).toBe(false);
+  });
+
+  test("veegt het schap opzij zonder een element op te pakken", async ({ page }) => {
+    await page.addInitScript(
+      (ids) => {
+        localStorage.setItem("games.mengelmoes.v1", JSON.stringify({ discovered: ids, board: [] }));
+      },
+      ELEMENTS.map((element) => element.id),
+    );
+
+    await page.goto("/mengelmoes");
+
+    const shelf = page.locator("[data-alchemy-shelf-scroll]");
+    await shelf.scrollIntoViewIfNeeded();
+    const surface = page.locator("[data-drag-surface]").nth(1);
+    const surfaceBox = await surface.boundingBox();
+    if (!surfaceBox) {
+      throw new Error("Geen positie voor vegen");
+    }
+
+    const before = await shelf.evaluate((element) => element.scrollLeft);
+    await touchSwipe(
+      page,
+      { x: surfaceBox.x + surfaceBox.width / 2, y: surfaceBox.y + surfaceBox.height / 2 },
+      120,
+    );
+    const after = await shelf.evaluate((element) => element.scrollLeft);
+
+    expect(after).toBeGreaterThan(before);
+    await expect(page.getByRole("button", { name: /geselecteerd/ })).toHaveCount(0);
   });
 });
 

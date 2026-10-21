@@ -119,6 +119,36 @@
       0 20px 40px -30px oklch(0.3 0.025 145 / 0.45);
   }
 
+  /*
+   * Zichtbare, dunne scrollbar voor scrollende speelvlakken zoals het
+   * elementenschap van Mengelmoes. De styling maakt de browser-scrollbar
+   * klassiek in plaats van overlay, zodat er ook met een muis een zichtbare
+   * greep is om te scrollen.
+   */
+  .game-scrollbar {
+    scrollbar-color: var(--primary) var(--muted);
+    scrollbar-width: thin;
+  }
+
+  .game-scrollbar::-webkit-scrollbar {
+    height: 0.5rem;
+    width: 0.5rem;
+  }
+
+  .game-scrollbar::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: var(--muted);
+  }
+
+  .game-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 55%, var(--muted));
+  }
+
+  .game-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
   .memory-card {
     perspective: 900px;
   }
