@@ -170,7 +170,28 @@ test.describe("mengelmoes slepen met een vinger", () => {
 
     await touchDrag(
       page,
-      page.getByRole("button", { name: "Water op de werkbank leggen" }),
+      page.locator('[data-drag-surface="water"]'),
+      page.getByRole("group", { name: "Werkbank" }),
+    );
+
+    await expect(page.getByRole("button", { name: "Water, geselecteerd" })).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+});
+
+test.describe("mengelmoes slepen op een tablet", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 768, height: 1024 } });
+
+  test("sleept vanaf het schap naar de werkbank", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    await touchDrag(
+      page,
+      page.locator('[data-drag-surface="water"]'),
       page.getByRole("group", { name: "Werkbank" }),
     );
 

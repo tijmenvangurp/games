@@ -100,7 +100,7 @@ export function AlchemyPlay() {
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
         >
-          <div className="grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-5">
+          <div className="grid gap-3 md:grid-cols-5 md:items-start lg:min-h-0 lg:flex-1">
             <AlchemyBoard boardRef={boardRef} />
             <AlchemyShelf />
           </div>
