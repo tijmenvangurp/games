@@ -160,7 +160,8 @@ De kaart is ook een natuurlijk moment voor `aria-live`: "Nieuw element ontdekt: 
 - Bovenaan een teller: **23 / 60** en een dunne voortgangsring.
 - Filters als chips per categorie.
 - Raster van elementmunten; ontdekt in kleur, onontdekt als donkere silhouette met een vraagteken.
-- Tik op een ontdekt element voor een detailkaart met een weetje en de gebruikte combinatie.
+- Tik op een ontdekt element voor een detailkaart met een weetje en de gebruikte combinatie. Onontdekte ingrediënten van alternatieve recepten blijven een vraagteken; ze tonen pas naam en icoon als het kind ze zelf heeft ontdekt.
+- Heeft een element geen enkele combinatie, dan vervalt de sectie "Kan maken met" in plaats van een lege mededeling.
 - Geen timer, geen "je mist er nog één"-druk. Wel een subtiele "nieuw"-badge.
 
 ### 3.7 Geluid en haptiek
@@ -230,15 +231,16 @@ Voor de twee-gleuven-variant is `pointerWithin` genoeg; dan zijn er geen vrije p
 
 ### Scrollen versus slepen
 
-Dit is het belangrijkste tabletrisico. Als de elementen in een horizontaal scrollende rij staan, kan een sleepbeweging de pagina laten scrollen in plaats van de munt te pakken. Daarom:
+Dit is het belangrijkste tabletrisico. **In de implementatie** scrollt het schap op een telefoon en in tabletportret horizontaal en in tabletlandschap verticaal. Daarom volgt `touch-action` op elke munt én op het onzichtbare sleepvlak de scrollrichting van het schap:
 
-- gebruik een **raster met categoriefilters** in plaats van een lange horizontale rij;
-- zet `touch-none` op de munten, zodat een sleepbeweging op een munt niet de pagina scrolt;
-- laat de achtergrond gewoon verticaal scrollen;
-- houd de sleepafstand klein (6 px) en de touch-delay kort (150 ms);
+- horizontaal schap: `touch-pan-x`; een veeg langs het schap scrolt, een sleep dwars op de scrollrichting (naar de werkbank) pakt het element op;
+- verticaal schap: `touch-pan-y`, met dezelfde regel;
+- de scrollbar is met `game-scrollbar` zichtbaar waar de browser aangepaste scrollbars ondersteunt, zodat er ook met een muis of stylus een greep is om te scrollen;
+- gebruik een raster met categoriefilters, zodat het schap niet onnodig lang wordt;
+- gebruik `MouseSensor` (afstand 6 px) voor een muis en `TouchSensor` (delay 150 ms) voor een vinger; `PointerSensor` luistert ook naar touch en kan een veeg als sleep beginnen;
 - test op 390 px en 1024 px in Playwright, niet alleen in jsdom. jsdom heeft geen echte pointergeometrie.
 
-Als later blijkt dat kinderen vooral willen vegen, kan een lange-druk-drag met een langere delay worden toegevoegd. Voor de eerste versie is tikken de primaire route.
+Tikken blijft de primaire en meest toegankelijke route. Een lange-druk-drag met een langere delay is niet nodig zolang de dwarsrichting vrij blijft voor slepen.
 
 ## 5. Technische opzet
 

@@ -193,6 +193,40 @@ describe("mengelmoes", () => {
     expect(within(dialog).getByRole("button", { name: "Bekijk Stoom" })).toBeTruthy();
   });
 
+  it("keeps undiscovered recipe ingredients hidden in the element detail", async () => {
+    await renderAlchemy();
+    await makeSteam();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Stoom" }));
+
+    const madeFrom = within(dialog).getByText("Gemaakt van").closest("section");
+    if (!madeFrom) {
+      throw new Error("Gemaakt van-section niet gevonden");
+    }
+
+    expect(within(madeFrom).queryByText("IJs")).toBeNull();
+    expect(within(madeFrom).queryByText("Draak")).toBeNull();
+    expect(within(madeFrom).getAllByText("?")).toHaveLength(2);
+  });
+
+  it("omits the uses section when an element has no combinations", async () => {
+    act(() =>
+      useAlchemyStore.setState({
+        discovered: [...BASE_ELEMENT_IDS, "unicorn"],
+      }),
+    );
+    await renderAlchemy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Eenhoorn" }));
+
+    expect(within(dialog).queryByText("Kan maken met")).toBeNull();
+    expect(within(dialog).queryByText("Dit element is nog nergens voor gebruikt.")).toBeNull();
+  });
+
   it("clears the workbench without losing discoveries", async () => {
     await renderAlchemy();
 

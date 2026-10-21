@@ -89,11 +89,11 @@ export function ElementDetail({ element, discovered, onBack }: ElementDetailProp
           <div className="mt-2 flex flex-col gap-1.5">
             {madeFrom.map((recipe) => (
               <div key={`${recipe.a}-${recipe.b}`} className="flex flex-wrap items-center gap-1.5">
-                <ElementChip discovered={discovered} elementId={recipe.a} />
+                <ElementChip discovered={discovered} elementId={recipe.a} mystery />
                 <span aria-hidden="true" className="text-xs font-black text-muted-foreground">
                   +
                 </span>
-                <ElementChip discovered={discovered} elementId={recipe.b} />
+                <ElementChip discovered={discovered} elementId={recipe.b} mystery />
               </div>
             ))}
           </div>
@@ -102,38 +102,38 @@ export function ElementDetail({ element, discovered, onBack }: ElementDetailProp
         )}
       </section>
 
-      <section>
-        <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-          Kan maken met
-        </h4>
-        {knownUses.length > 0 ? (
-          <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
-            {knownUses.map(({ recipe, otherId }) => (
-              <div
-                key={`${recipe.a}-${recipe.b}-${recipe.result}`}
-                className="flex flex-wrap items-center gap-1.5"
-              >
-                <ElementChip discovered={discovered} elementId={otherId} />
-                <span aria-hidden="true" className="text-xs font-black text-muted-foreground">
-                  →
-                </span>
-                <ElementChip discovered={discovered} elementId={recipe.result} mystery />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-1 text-sm text-muted-foreground">
-            {hiddenUses > 0
-              ? "Probeer meer elementen te ontdekken."
-              : "Dit element is nog nergens voor gebruikt."}
-          </p>
-        )}
-        {knownUses.length > 0 && hiddenUses > 0 ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            Nog {hiddenUses} combinaties te ontdekken.
-          </p>
-        ) : null}
-      </section>
+      {knownUses.length > 0 || hiddenUses > 0 ? (
+        <section>
+          <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+            Kan maken met
+          </h4>
+          {knownUses.length > 0 ? (
+            <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+              {knownUses.map(({ recipe, otherId }) => (
+                <div
+                  key={`${recipe.a}-${recipe.b}-${recipe.result}`}
+                  className="flex flex-wrap items-center gap-1.5"
+                >
+                  <ElementChip discovered={discovered} elementId={otherId} />
+                  <span aria-hidden="true" className="text-xs font-black text-muted-foreground">
+                    →
+                  </span>
+                  <ElementChip discovered={discovered} elementId={recipe.result} mystery />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Probeer meer elementen te ontdekken.
+            </p>
+          )}
+          {knownUses.length > 0 && hiddenUses > 0 ? (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Nog {hiddenUses} combinaties te ontdekken.
+            </p>
+          ) : null}
+        </section>
+      ) : null}
     </div>
   );
 }
