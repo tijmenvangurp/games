@@ -5,8 +5,6 @@ export interface Point {
 
 export type MazeDirection = "up" | "right" | "down" | "left";
 
-export type MazeDifficulty = "makkelijk" | "gemiddeld" | "moeilijk" | "super-hard";
-
 export interface MazeArrow {
   id: number;
   /** Points from tail to head. The last segment points in the escape direction. */
@@ -16,7 +14,6 @@ export interface MazeArrow {
 export interface MazeLevel {
   id: string;
   name: string;
-  difficulty: MazeDifficulty;
   width: number;
   height: number;
   arrows: readonly MazeArrow[];

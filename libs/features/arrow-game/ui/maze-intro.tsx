@@ -1,6 +1,5 @@
 import type { MazeLevel } from "@entities/arrow";
 import { ArrowUp, Button, Home, LayoutGrid, Play, SoundToggle } from "@shared/ui";
-import { MAZE_DIFFICULTY_LABELS } from "../model/labels";
 
 interface MazeIntroProps {
   level: MazeLevel;
@@ -39,9 +38,7 @@ export function MazeIntro({
           Level {levelIndex + 1} van {levelCount}
         </p>
         <h1 className="mt-1 font-display text-3xl tracking-tight">{level.name}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {MAZE_DIFFICULTY_LABELS[level.difficulty]} · {level.arrows.length} pijlen
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">{level.arrows.length} pijlen</p>
 
         <Button className="mt-8 w-full max-w-xs" size="lg" variant="success" onClick={onPlay}>
           <Play aria-hidden="true" className="size-5" />

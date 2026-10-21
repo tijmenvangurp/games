@@ -364,7 +364,6 @@ function levelWith(arrows: readonly MazeArrow[], width: number, height: number):
   return {
     id: "candidate",
     name: "candidate",
-    difficulty: "makkelijk",
     width,
     height,
     arrows,

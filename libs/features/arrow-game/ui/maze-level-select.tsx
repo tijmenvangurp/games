@@ -1,7 +1,6 @@
 import type { MazeLevel } from "@entities/arrow";
 import { ArrowLeft, Button, Check, Lock, SoundToggle } from "@shared/ui";
 import { cn } from "@shared/lib";
-import { MAZE_DIFFICULTY_LABELS } from "../model/labels";
 
 interface MazeLevelSelectProps {
   levels: readonly MazeLevel[];
@@ -36,9 +35,7 @@ export function MazeLevelSelect({
             <button
               key={level.id}
               aria-label={
-                locked
-                  ? `Level ${index + 1}, vergrendeld`
-                  : `Level ${index + 1}, ${level.name}, ${MAZE_DIFFICULTY_LABELS[level.difficulty]}`
+                locked ? `Level ${index + 1}, vergrendeld` : `Level ${index + 1}, ${level.name}`
               }
               aria-disabled={locked}
               className={cn(
@@ -54,7 +51,7 @@ export function MazeLevelSelect({
             >
               <span className="text-sm font-black">Level {index + 1}</span>
               <span className="text-xs text-muted-foreground">
-                {level.name} · {MAZE_DIFFICULTY_LABELS[level.difficulty]}
+                {level.name} · {level.arrows.length} pijlen
               </span>
               <span className="absolute right-2 top-2">
                 {locked ? (
