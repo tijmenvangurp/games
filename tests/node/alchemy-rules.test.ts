@@ -84,7 +84,7 @@ describe("alchemy rules", () => {
   });
 
   it("returns null for unknown combinations", () => {
-    expect(combine("water", "dragon")).toBeNull();
+    expect(combine("water", "crown")).toBeNull();
     expect(combine("onbekend", "water")).toBeNull();
   });
 
@@ -110,11 +110,26 @@ describe("alchemy rules", () => {
   });
 
   it("supports combining two copies of the same element", () => {
-    expect(combine("air", "air")).toBe("wind");
+    expect(combine("air", "air")).toBe("storm");
     expect(combine("water", "water")).toBe("sea");
     expect(combine("stone", "stone")).toBe("mountain");
     expect(combine("house", "house")).toBe("village");
     expect(combine("star", "star")).toBe("galaxy");
+  });
+
+  it("keeps wind reachable now that two airs make a storm", () => {
+    expect(combine("air", "dust")).toBe("wind");
+    expect(combine("wind", "rain")).toBe("storm");
+  });
+
+  it("builds glass from sand and gives the dragon useful recipes", () => {
+    expect(combine("stone", "air")).toBe("sand");
+    expect(combine("sand", "fire")).toBe("glass");
+    expect(combine("sand", "glass")).toBe("hourglass");
+    expect(findRecipesFor("glass").length).toBeGreaterThanOrEqual(2);
+    expect(recipesUsing("dragon").length).toBeGreaterThanOrEqual(3);
+    expect(combine("dragon", "castle")).toBe("fairytale");
+    expect(combine("dragon", "knight")).toBe("fairytale");
   });
 
   it("offers alternate routes to the same element", () => {

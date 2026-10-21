@@ -108,7 +108,17 @@ const SPRITES: Record<string, string> = {
   heart: "anatomical-heart",
   brain: "brain",
   bone: "bone",
+  hourglass: "hourglass-not-done",
+  bee: "honeybee",
+  honey: "honey-pot",
+  frog: "frog",
+  fairytale: "open-book",
 };
+
+/**
+ * `sand.svg` is hand-drawn instead of downloaded: Fluent Emoji has no sand
+ * sprite, and a beach or desert icon would look the same as those elements.
+ */
 
 interface IconifyIcon {
   body: string;
