@@ -16,6 +16,7 @@ beforeEach(() => {
     selected: null,
     feedback: null,
     hint: null,
+    missionId: "mud",
   });
 });
 
@@ -55,6 +56,32 @@ describe("mengelmoes", () => {
     for (const name of ["Water", "Vuur", "Aarde", "Lucht"]) {
       expect(shelfButton(name)).toBeTruthy();
     }
+  });
+
+  it("shows the first mission and advances after completing it", async () => {
+    await renderAlchemy();
+    const mission = screen.getByTestId("alchemy-mission");
+    expect(mission.textContent).toContain("Maak modder.");
+
+    fireEvent.click(shelfButton("Water"));
+    fireEvent.click(shelfButton("Aarde"));
+    fireEvent.click(await screen.findByRole("button", { name: "Verder ontdekken" }));
+
+    expect(mission.textContent).toContain("Gelukt!");
+    expect(mission.textContent).toContain("Opdracht 1/30");
+
+    fireEvent.click(screen.getByRole("button", { name: "Volgende opdracht" }));
+    expect(mission.textContent).toContain("Maak stoom.");
+    expect(useAlchemyStore.getState().missionId).toBe("steam");
+  });
+
+  it("skips to the next mission without completing it", async () => {
+    await renderAlchemy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Andere opdracht" }));
+
+    expect(screen.getByTestId("alchemy-mission").textContent).toContain("Maak stoom.");
+    expect(useAlchemyStore.getState().missionId).toBe("steam");
   });
 
   it("combines water and fire by tapping and celebrates steam", async () => {

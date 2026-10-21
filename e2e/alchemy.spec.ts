@@ -1,8 +1,61 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { ELEMENTS } from "../libs/entities/alchemy/model/elements";
+
+async function touchDrag(page: Page, from: Locator, to: Locator): Promise<void> {
+  const fromBox = await from.boundingBox();
+  const toBox = await to.boundingBox();
+  if (!fromBox || !toBox) {
+    throw new Error("Geen positie voor aanraaksleep");
+  }
+
+  const client = await page.context().newCDPSession(page);
+  const start = { x: fromBox.x + fromBox.width / 2, y: fromBox.y + fromBox.height / 2 };
+  const end = { x: toBox.x + toBox.width / 2, y: toBox.y + toBox.height / 2 };
+
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: start.x, y: start.y }],
+  });
+  await page.waitForTimeout(220);
+
+  for (let step = 1; step <= 12; step += 1) {
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        {
+          x: start.x + ((end.x - start.x) * step) / 12,
+          y: start.y + ((end.y - start.y) * step) / 12,
+        },
+      ],
+    });
+    await page.waitForTimeout(16);
+  }
+
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await page.waitForTimeout(100);
+}
 
 test.describe("mengelmoes op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
+
+  test("maakt de eerste opdracht en gaat verder", async ({ page }) => {
+    await page.goto("/mengelmoes");
+    const mission = page.getByTestId("alchemy-mission");
+    await expect(mission).toContainText("Maak modder.");
+
+    await page.getByRole("button", { name: "Water op de werkbank leggen" }).click();
+    await page.getByRole("button", { name: "Aarde op de werkbank leggen" }).click();
+    await page.getByRole("button", { name: "Verder ontdekken" }).click();
+
+    await expect(mission).toContainText("Gelukt!");
+    await page.getByRole("button", { name: "Volgende opdracht" }).click();
+    await expect(mission).toContainText("Maak stoom.");
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
 
   test("combineert water en vuur met twee tikken", async ({ page }) => {
     await page.goto("/mengelmoes");
@@ -106,5 +159,73 @@ test.describe("mengelmoes op een tablet in landschap", () => {
       return scroller ? scroller.scrollHeight > scroller.clientHeight : false;
     });
     expect(shelfScrolls).toBe(true);
+  });
+});
+
+test.describe("mengelmoes op een tablet in portret", () => {
+  test.use({ viewport: { width: 1024, height: 1366 } });
+
+  test("zet het schap onder de werkbank en past binnen één scherm", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    const board = page.getByRole("group", { name: "Werkbank" });
+    const shelf = page.getByRole("region", { name: "Mijn elementen" });
+    await expect(board).toBeVisible();
+    await expect(shelf).toBeVisible();
+
+    const boardBox = await board.boundingBox();
+    const shelfBox = await shelf.boundingBox();
+    if (!boardBox || !shelfBox) {
+      throw new Error("Geen positie voor werkbank of schap");
+    }
+    expect(shelfBox.y).toBeGreaterThanOrEqual(boardBox.y + boardBox.height);
+
+    const pageFits = await page.evaluate(() => ({
+      vertical: document.documentElement.scrollHeight <= window.innerHeight + 1,
+      horizontal: document.documentElement.scrollWidth <= window.innerWidth,
+    }));
+    expect(pageFits).toEqual({ vertical: true, horizontal: true });
+  });
+});
+
+test.describe("mengelmoes slepen met een vinger", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+  test("sleept een element van het schap naar de werkbank", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    await touchDrag(
+      page,
+      page.locator('[data-drag-surface="water"]'),
+      page.getByRole("group", { name: "Werkbank" }),
+    );
+
+    await expect(page.getByRole("button", { name: "Water, geselecteerd" })).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
+  });
+});
+
+test.describe("mengelmoes slepen op een tablet", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 768, height: 1024 } });
+
+  test("sleept vanaf het schap naar de werkbank", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    await touchDrag(
+      page,
+      page.locator('[data-drag-surface="water"]'),
+      page.getByRole("group", { name: "Werkbank" }),
+    );
+
+    await expect(page.getByRole("button", { name: "Water, geselecteerd" })).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
   });
 });
