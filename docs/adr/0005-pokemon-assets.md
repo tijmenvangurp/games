@@ -1,6 +1,6 @@
 # ADR 0005: Pokémon-assets lokaal gebundeld
 
-- **Status:** Accepted
+- **Status:** Accepted (bijgewerkt op 2026-10-21: cries verwijderd, zie onderaan)
 - **Datum:** 2026-10-17
 - **Vervangt:** [ADR 0003](0003-originele-spelassets.md)
 
@@ -45,3 +45,14 @@ Pokémon en alle bijbehorende namen, personages en afbeeldingen zijn eigendom va
 - De app blijft volledig statisch, offline bruikbaar en vrij van externe requests tijdens het spelen.
 - De bronlinks hierboven dienen als attributie en herkomstbewijs.
 - Nieuwe assets toevoegen vereist een bron, een lokale bestandsnaam en een update van deze ADR.
+
+## Update 2026-10-21: cries vervangen door app-geluidjes
+
+De eigenaar vond de ingebouwde Pokémon-cries niet mooi genoeg. Na het beluisteren van alternatieven (PokeAPI `latest` en `legacy`, zachter afspelen en dieper afspelen) is gekozen voor de gesynthetiseerde geluidjes die de rest van de app al gebruikt.
+
+1. **Geen Pokémon-audiobestanden meer.** De 151 MP3's in `apps/games/public/pokemon/cries/` zijn verwijderd, samen met `pokemonCrySrc` en `usePokemonCry`. De repository wordt daarmee ongeveer 1,5 MB kleiner.
+2. **Memory** speelt `tap` bij een omgedraaide kaart, `match` bij een gevonden paar en `win` bij de laatste pair. **Wie is deze Pokémon?** speelt `match` bij een goed antwoord en `tap` bij de knop naar de volgende vraag.
+3. **Eén geluidssysteem.** Alle feedback loopt via `playSound` uit `@shared/lib`, respecteert de geluidstoggle en gebruikt geen externe bestanden.
+4. **Artwork en animated sprites blijven ongewijzigd.** De bronnen en licentieafweging hierboven gelden nog voor die twee sets.
+
+De CSP en de offline-eigenschappen veranderen niet.
