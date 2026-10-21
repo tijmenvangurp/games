@@ -1,36 +1,36 @@
 # Mengelmoes: audio, sfeer en visuele polish
 
 - **Datum:** 2026-10-21
-- **Status:** Onderzoek. Nog geen beslissing of implementatie.
+- **Status:** Onderzoek en eerste implementatie. `canvas-confetti` is toegevoegd; de `wrong`-klank is verwijderd.
 - **Aanleiding:** een lijst met externe audio- en assetbronnen (Kenney, Freesound, Pixabay, Zapsplat, Poly Haven/ambientCG, itch.io, OpenGameArt, game-icons.net) en drie polish-ideeën: omgevingsgeluid, deeltjes en oppak-physics. De vraag is wat daarvan past bij de Spellen-app, met **Mengelmoes** als MVP.
 - **Kader:** [AGENTS.md](../../AGENTS.md), [ADR 0001](../adr/0001-publieke-statische-spellen-app.md), [ADR 0005](../adr/0005-pokemon-assets.md), de [CSP in `_headers`](../../apps/games/public/_headers), [het design systeem](../design-system.md), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts) en het eerdere [Mengelmoes-assetonderzoek](2026-10-19-mengelmoes-assets.md).
 
 ## Samenvatting
 
 1. **Dit is vooral een inkooplijst, geen gap-analyse.** Mengelmoes heeft voor de MVP geen externe audio of texturen nodig. De app heeft al een CSP-veilige synthesizer, een globale geluidstoggle, haptiek, confetti en een sparkle-icoon.
-2. **De grootste audiogap is niet "mooiere samples", maar een ontbrekend geluid.** Een mislukte combinatie is nu volledig stil: `rejectCombination()` zet alleen een tekstmelding. De bestaande `wrong`-klank wordt door geen enkel spel gebruikt en kan dus zonder bijwerkingen voor Mengelmoes worden ingezet.
+2. **De stilte bij een fout is beleid, geen gap.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) zegt: fouten zijn informatie, geen straf. Geen foutgeluid dus. De winst zit in **vieringen**: de eigenaar keurt `canvas-confetti` goed, en die vervangt nu de handgeschreven CSS-burst in alle spellen.
 3. **Oppak-physics bestaat al.** De `DragOverlay` schaalt naar 105% en kantelt 3 graden ([`alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)). De voorgestelde 5% en 2–5 graden zijn dus al gehaald.
-4. **Een deeltjesburst bestaat al voor de ontdekking.** `Confetti` is CSS-only, heeft geen dependency en respecteert reduced motion via de globale motion-laag. `Sparkles` op de ontdekkingskaart is een icoon, geen deeltjessysteem. `tsParticles` of Framer Motion toevoegen kost meer code en een dependency voor een effect van 300–450 ms.
+4. **Vieren kan nu rijker.** `Confetti` gebruikt `canvas-confetti`, laadt de bibliotheek pas bij een viering en respecteert reduced motion. Het is gedeeld door Mengelmoes, de afsluitdialoog en sudoku; de oude CSS-burst is verwijderd. `Sparkles` blijft een icoon, geen deeltjessysteem.
 5. **Voor audio is alleen CC0 probleemloos, en Kenney is de eenvoudigste bron.** Pixabay en Zapsplat verbieden herdistributie van losse bestanden; een publieke git-repo met de ruwe mp3's is precies dat. CC-BY-bronnen mogen wel, maar vragen attributie en administratie.
 6. **Fotorealistische texturen en een donkere vignette passen niet.** Het design systeem kiest ivory, rust en geen achtergronddecoratie. Een 1K-fototextuur is bovendien enkele MB's; de bestaande CSS-stippen op de werkbank kosten niets.
-7. **Advies:** geen externe assets voor de MVP. Maak een mislukte combinatie zacht hoorbaar, geef een nieuwe ontdekking eventueel een eigen chime, en houd ambience, fototexturen en nieuwe icoonfamilies buiten de eerste versie.
+7. **Advies:** geen externe audio of texturen voor de MVP. Wel rijkere vieringen via `canvas-confetti`, geen foutgeluid, en ambience, fototexturen en nieuwe icoonfamilies buiten de eerste versie.
 
 ## 1. Wat Mengelmoes nu al doet
 
-| Actie                 | Bestaand gedrag                                                                  | Bron                                                          |
-| --------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| Element oppakken      | `tap`-toon, haptiek, overlay op 105% met 3° kanteling en sterke schaduw          | `alchemy-play.tsx`, `use-alchemy-store.ts`                    |
-| Op de werkbank leggen | `select`-toon en haptiek                                                         | `addToBoard()`                                                |
-| Nieuwe combinatie     | `win`-toon, haptiek, confetti (28 stukken), sparkle-icoon en de ontdekkingskaart | `finishCombination()`, `discovery-dialog.tsx`, `confetti.tsx` |
-| Bestaande combinatie  | `match`-toon en haptiek                                                          | `finishCombination()`                                         |
-| Mislukte combinatie   | **Stil.** Alleen de tekst "Hm, dat mengt niet. Probeer iets anders."             | `rejectCombination()`                                         |
-| Hint                  | `hint`-toon en haptiek                                                           | `showHint()`                                                  |
-| Werkbank opruimen     | `tap`-toon                                                                       | `clearBoard()`                                                |
-| Alles ontdekt         | Melding "Je hebt alle elementen ontdekt." zonder eigen geluid                    | `showHint()` → `feedback: "all-found"`                        |
+| Actie                 | Bestaand gedrag                                                                                                      | Bron                                                          |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Element oppakken      | `tap`-toon, haptiek, overlay op 105% met 3° kanteling en sterke schaduw                                              | `alchemy-play.tsx`, `use-alchemy-store.ts`                    |
+| Op de werkbank leggen | `select`-toon en haptiek                                                                                             | `addToBoard()`                                                |
+| Nieuwe combinatie     | `win`-toon, haptiek, confetti (28 stukken), sparkle-icoon en de ontdekkingskaart                                     | `finishCombination()`, `discovery-dialog.tsx`, `confetti.tsx` |
+| Bestaande combinatie  | `match`-toon en haptiek                                                                                              | `finishCombination()`                                         |
+| Mislukte combinatie   | **Stil**, in lijn met ADR 0026: geen foutgeluid. Alleen de neutrale tekst "Hm, dat mengt niet. Probeer iets anders." | `rejectCombination()`                                         |
+| Hint                  | `hint`-toon en haptiek                                                                                               | `showHint()`                                                  |
+| Werkbank opruimen     | `tap`-toon                                                                                                           | `clearBoard()`                                                |
+| Alles ontdekt         | Melding "Je hebt alle elementen ontdekt." zonder eigen geluid                                                        | `showHint()` → `feedback: "all-found"`                        |
 
-De geluiden komen uit zeven patronen in [`sound.ts`](../../libs/shared/lib/sound.ts): `tap`, `select`, `match`, `wrong`, `hint`, `almost` en `win`. Ze worden met de Web Audio API gesynthetiseerd, dus er is geen bestand, geen fetch en geen CSP-uitzondering nodig. `media-src 'self'` staat lokale audiobestanden wel toe, maar de synthesizer heeft ze niet nodig.
+De geluiden komen uit zes patronen in [`sound.ts`](../../libs/shared/lib/sound.ts): `tap`, `select`, `match`, `hint`, `almost` en `win`. Ze worden met de Web Audio API gesynthetiseerd, dus er is geen bestand, geen fetch en geen CSP-uitzondering nodig. `media-src 'self'` staat lokale audiobestanden wel toe, maar de synthesizer heeft ze niet nodig.
 
-De `wrong`-klank is nu dood: een zoekactie over `libs/` vindt geen enkele `playSound("wrong")`. Alleen Mengelmoes hoeft hem te gaan gebruiken, dus de klank kan op dit spel worden afgestemd zonder andere spellen te raken.
+De `wrong`-klank en de bijbehorende haptiek zijn uit de gedeelde modules verwijderd: [ADR 0026](../adr/0026-adaptief-niveaumodel.md) verbiedt een foutgeluid, en geen enkel spel gebruikte ze nog.
 
 ## 2. Audio-bronnen
 
@@ -126,9 +126,9 @@ Een loop van een haardvuur of pruttelende ketel vult stiltes, maar heeft nadelen
 
 ### 4.2 Deeltjes
 
-`Confetti` is al een dependency-vrije CSS-burst van 28 stukken. De ontdekkingskaart gebruikt daarnaast het `Sparkles`-icoon, maar er is nog geen deeltjessysteem. De globale motion-laag zet onder `prefers-reduced-motion` alle animaties op 0,01 ms.
+`Confetti` gebruikt nu `canvas-confetti` op een eigen canvas, laadt de bibliotheek pas bij een viering en slaat bij `prefers-reduced-motion` het tekenen helemaal over. De ontdekkingskaart gebruikt daarnaast het `Sparkles`-icoon.
 
-Een extra "merge-spat" op het punt waar twee elementen samensmelten is de enige zinvolle toevoeging. Die is klein (8–12 stipjes, 300–450 ms) en kan met dezelfde CSS-aanpak. Let op: `AlchemyFeedback` bevat nu geen positie. Het combineerpunt wordt in `finishCombination()` wel berekend, dus de feedback kan worden uitgebreid met `x`/`y` zonder de spellogica te veranderen.
+Een extra "merge-spat" op het punt waar twee elementen samensmelten is nu de enige zinvolle extra deeltjestoevoeging. Die is klein (8–12 stipjes, 300–450 ms) en kan met dezelfde canvas-aanpak. Let op: `AlchemyFeedback` bevat nu geen positie. Het combineerpunt wordt in `finishCombination()` wel berekend, dus de feedback kan worden uitgebreid met `x`/`y` zonder de spellogica te veranderen.
 
 **Advies:** pas doen als playtesting laat zien dat de samensmelting te weinig impact heeft. Geen `tsParticles`, geen Framer Motion: dat is een nieuwe dependency en meer API dan het effect rechtvaardigt.
 
@@ -144,24 +144,44 @@ De suggestie (5% groter, 2–5 graden kantelen) is al geïmplementeerd:
 
 **Advies:** niets doen. Een extra sprong naar 108% of 4 graden is nauwelijks zichtbaar en maakt de sleepbeweging onrustiger.
 
-## 5. Aanbevolen MVP-slice
+## 5. Beslissingen en MVP-slice
 
-In deze volgorde, van klein naar optioneel:
+### 5.1 Geen foutgeluid
 
-1. **Mislukte combinatie hoorbaar maken.** Roep in `rejectCombination()` `playSound("wrong")` en `playHaptic("wrong")` aan. Dit is één regel per soort feedback en sluit aan op de bestaande semantiek.
-2. **De `wrong`-klank zachter maken.** Het huidige patroon is een square-golf van 220 Hz; dat klinkt als een foutmelding. Voor kinderen is een korte, dalende tweeklank met triangle-golven vriendelijker:
-   ```ts
-   wrong: [
-     { frequency: 233, delay: 0, duration: 0.1, type: "triangle", volume: 0.03 },
-     { frequency: 185, delay: 0.09, duration: 0.14, type: "triangle", volume: 0.03 },
-   ],
-   ```
-   Omdat geen enkel ander spel `wrong` gebruikt, is dit veilig. Laat de eigenaar het wel beluisteren.
-3. **Optioneel: een eigen ontdekkings-chime.** Voeg een `discover`-patroon toe (drie stijgende sine-noten, bijvoorbeeld 784 → 988 → 1319 Hz) en gebruik dat bij `isNew`. Houd `win` dan apart voor de eindmelding, die nu nog geen geluid heeft. Dit is alleen nodig als de huidige `win` te veel als "spel afgelopen" voelt.
-4. **Optioneel: een korte wiebel bij een mislukte combinatie.** Geef de twee betrokken `instanceId`s mee in de `wrong`-feedback en laat alleen die twee munten 180 ms horizontalen. Respecteer de bestaande reduced-motion-laag. Dit is meer werk dan het geluid en voegt vooral tactiele duidelijkheid toe.
-5. **Optioneel: merge-spat.** Alleen na playtesting, zoals beschreven in 4.2.
+De eigenaar wil geen `wrong`-klank, en dat is precies wat [ADR 0026](../adr/0026-adaptief-niveaumodel.md) voorschrijft: **"Fouten zijn informatie, geen straf."** Geen foutgeluid, geen levens, geen scoreverlies en neutrale copy. De stilte bij een mislukte combinatie is dus geen gap maar beleid.
 
-Alles hierboven blijft binnen de bestaande architectuur: `libs/shared/lib/sound.ts` voor de klank, `libs/shared/ui` voor een gedeeld effect, en de alchemy-feature voor de aanroep. Geen nieuwe dependency, geen CSP-wijziging, geen netwerk.
+De `wrong`-klank en de bijbehorende haptiek zijn verwijderd. Ze hoorden niet bij de MVP en druisten tegen ADR 0026 in. De neutrale tekst "Hm, dat mengt niet. Probeer iets anders." blijft de feedback.
+
+### 5.2 Wel: rijkere vieringen met `canvas-confetti`
+
+De eigenaar keurt een confettidependency goed om vieringen in meerdere spellen sterker te maken. `canvas-confetti` 1.9.4 (ISC) vervangt de handgeschreven CSS-burst:
+
+- **Lui geladen.** De component importeert de bibliotheek pas als er echt gevierd wordt, dus het startscherm blijft klein.
+- **Lokaal en CSP-veilig.** De bibliotheek tekent op een eigen canvas; er is geen afbeelding, fetch of worker nodig. `useWorker: false` voorkomt een blob-worker en houdt de CSP ongewijzigd.
+- **Toegankelijk.** Bij `prefers-reduced-motion` wordt er niets getekend; daarnaast staat `disableForReducedMotion` aan en is het canvas `aria-hidden`.
+- **Meer vormen.** Dezelfde component ondersteunt een enkele burst en een bredere `shower` met twee zijwaartse bursts. De ontdekkingskaart en de afsluitdialoog gebruiken de `shower`; sudoku houdt de rustige burst.
+- **Minder eigen code.** De oude `@keyframes confetti-burst` en `.confetti-piece` zijn verwijderd.
+
+De `Confetti`-API blijft `pieces` en `data-confetti`, zodat bestaande tests en schermen blijven werken.
+
+### 5.3 De andere voorgestelde dependencies
+
+| Package           | Verdict          | Onderbouwing                                                                                                                                                                                                       |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `canvas-confetti` | **Ja**           | Kleine, gerichte bibliotheek; goedgekeurd en geïmplementeerd.                                                                                                                                                      |
+| `framer-motion`   | **Nee, nu niet** | De app gebruikt al CSS-transities en dnd-kit. Framer Motion is vooral nuttig voor layout-animaties en gedeelde veerpatronen; daar is nu geen concreet geval voor. Eerst een dependency-afweging als dat verandert. |
+| `zustand`         | **Al aanwezig**  | Stond al in `package.json` (5.0.15) en wordt door alle features gebruikt. Geen actie.                                                                                                                              |
+| `immer`           | **Nee**          | De stores zijn klein en gebruiken expliciete immutable updates. Immer voegt een tweede stijl en bundlegewicht toe zonder dat het een concreet probleem oplost.                                                     |
+| `use-sound`       | **Nee**          | Dit is een Howler-wrapper voor audiobestanden. De app synthetiseert bewust met Web Audio en heeft geen audiobestanden nodig; use-sound zou juist naar gelicentieerde assets duwen.                                 |
+| `nanoid`          | **Nee**          | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                                                       |
+
+### 5.4 Wat verder ongewijzigd blijft
+
+- Geen ambience in de MVP.
+- Geen fotorealistische texturen of donkere vignette.
+- Geen nieuwe icoonfamilie.
+- Geen extra deeltjessysteem naast `canvas-confetti`; een merge-spat is pas aan de orde na playtesting.
+- Geen nieuwe audio-assets; de synthesizer blijft de standaard.
 
 ## 6. Als er later toch externe audio komt
 
@@ -178,7 +198,7 @@ Alles hierboven blijft binnen de bestaande architectuur: `libs/shared/lib/sound.
 ## 7. Open vragen
 
 - Willen we überhaupt een ambience, of is stilte beter voor concentratie en ouderlijke acceptatie?
-- Is een geluid bij een fout pedagogisch wenselijk, of liever alleen de visuele wiebel en de tekst?
+- Is een neutrale visuele wiebel bij een mislukte combinatie wenselijk, of is de tekst genoeg?
 - Willen we per categorie variëren in toonhoogte (water hoog, aarde laag), of blijft elk geluid hetzelfde?
 - Wie luistert en keurt de klanken goed: de eigenaar, kinderen, of beiden?
 - Blijft de geluidstoggle globaal, of krijgt sfeer een eigen schakelaar?
@@ -198,5 +218,7 @@ Alles hierboven blijft binnen de bestaande architectuur: `libs/shared/lib/sound.
 - [game-icons.net — CC BY 3.0 en attributie](https://game-icons.net/about.html)
 - [MDN — Autoplay guide voor media en Web Audio](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay)
 - [MDN — `prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
-- [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts), [`libs/shared/lib/haptics.ts`](../../libs/shared/lib/haptics.ts), [`libs/features/alchemy-lab/model/use-alchemy-store.ts`](../../libs/features/alchemy-lab/model/use-alchemy-store.ts), [`libs/features/alchemy-lab/ui/alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx), [`libs/shared/ui/confetti.tsx`](../../libs/shared/ui/confetti.tsx)
+- [canvas-confetti — GitHub, ISC](https://github.com/catdad/canvas-confetti)
+- [ADR 0026 — adaptief niveaumodel en foutvriendelijke feedback](../adr/0026-adaptief-niveaumodel.md)
+- [`libs/shared/ui/confetti.tsx`](../../libs/shared/ui/confetti.tsx), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts), [`libs/shared/lib/haptics.ts`](../../libs/shared/lib/haptics.ts), [`libs/features/alchemy-lab/model/use-alchemy-store.ts`](../../libs/features/alchemy-lab/model/use-alchemy-store.ts), [`libs/features/alchemy-lab/ui/alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)
 - [`docs/design-system.md`](../design-system.md) en [`docs/research/2026-10-19-mengelmoes-assets.md`](2026-10-19-mengelmoes-assets.md)
