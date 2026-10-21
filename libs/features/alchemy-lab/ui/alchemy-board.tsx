@@ -94,7 +94,7 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
       ref={setRefs}
       aria-label="Werkbank"
       className={cn(
-        "relative min-h-72 w-full overflow-hidden rounded-3xl border-2 border-dashed bg-card/80 p-3 shadow-sm transition sm:min-h-96 md:col-span-3 md:min-h-112 lg:h-full lg:min-h-0",
+        "relative min-h-72 w-full overflow-hidden rounded-3xl border-2 border-dashed bg-card/80 p-3 shadow-sm transition sm:min-h-96 md:h-full md:min-h-0 md:landscape:col-span-3",
         isOver && "border-primary bg-primary/5",
       )}
       data-alchemy-board="true"

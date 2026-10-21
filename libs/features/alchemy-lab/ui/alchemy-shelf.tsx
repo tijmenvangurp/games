@@ -110,7 +110,7 @@ export function AlchemyShelf() {
   return (
     <section
       aria-label="Mijn elementen"
-      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:col-span-2 md:h-112 md:overflow-hidden lg:h-full"
+      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-72 md:landscape:col-span-2"
     >
       <div className="mb-2 shrink-0">
         <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
@@ -149,7 +149,7 @@ export function AlchemyShelf() {
               Nog geen elementen in deze categorie.
             </p>
           ) : (
-            <div className="flex shrink-0 gap-2 md:grid md:grid-cols-4 md:gap-1.5 lg:grid-cols-5 xl:gap-2">
+            <div className="flex shrink-0 gap-2 md:grid md:gap-1.5 md:portrait:grid-cols-8 md:landscape:grid-cols-4 xl:gap-2">
               {visibleElements.map((element) => (
                 <ShelfToken key={element.id} element={element} />
               ))}

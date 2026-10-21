@@ -14,7 +14,7 @@ interface GameShellProps {
   showSpeech?: boolean;
   /** Geeft de pagina meer breedte, bijvoorbeeld voor een werkbank met zijpaneel. */
   wide?: boolean;
-  /** Houdt de pagina op een tablet in landschap binnen één scherm. */
+  /** Houdt de pagina op een tablet en groter binnen één scherm. */
   fitViewport?: boolean;
   children: ReactNode;
 }
@@ -38,7 +38,7 @@ export function GameShell({
       className={cn(
         "mx-auto flex min-h-svh w-full max-w-4xl flex-col gap-4 px-5 pb-safe pt-safe sm:px-6",
         wide && "max-w-6xl",
-        fitViewport && "lg:h-svh lg:min-h-0 lg:overflow-hidden",
+        fitViewport && "md:h-svh md:min-h-0 md:overflow-hidden",
       )}
     >
       <div className="flex min-w-0 items-center gap-2 border-b border-border pb-3">

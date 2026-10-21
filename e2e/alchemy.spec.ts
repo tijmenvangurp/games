@@ -162,6 +162,32 @@ test.describe("mengelmoes op een tablet in landschap", () => {
   });
 });
 
+test.describe("mengelmoes op een tablet in portret", () => {
+  test.use({ viewport: { width: 1024, height: 1366 } });
+
+  test("zet het schap onder de werkbank en past binnen één scherm", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    const board = page.getByRole("group", { name: "Werkbank" });
+    const shelf = page.getByRole("region", { name: "Mijn elementen" });
+    await expect(board).toBeVisible();
+    await expect(shelf).toBeVisible();
+
+    const boardBox = await board.boundingBox();
+    const shelfBox = await shelf.boundingBox();
+    if (!boardBox || !shelfBox) {
+      throw new Error("Geen positie voor werkbank of schap");
+    }
+    expect(shelfBox.y).toBeGreaterThanOrEqual(boardBox.y + boardBox.height);
+
+    const pageFits = await page.evaluate(() => ({
+      vertical: document.documentElement.scrollHeight <= window.innerHeight + 1,
+      horizontal: document.documentElement.scrollWidth <= window.innerWidth,
+    }));
+    expect(pageFits).toEqual({ vertical: true, horizontal: true });
+  });
+});
+
 test.describe("mengelmoes slepen met een vinger", () => {
   test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
 
