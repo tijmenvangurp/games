@@ -1118,6 +1118,27 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     category: "life",
     fact: "Een blad groeit aan een boom.",
   },
+  {
+    id: "skeleton",
+    name: "Skelet",
+    icon: "/elements/skeleton.svg",
+    category: "life",
+    fact: "Een skelet is een geraamte van botten.",
+  },
+  {
+    id: "pirateship",
+    name: "Piratenschip",
+    icon: "/elements/pirateship.svg",
+    category: "water",
+    fact: "Een piratenschip vaart met een schedelvlag.",
+  },
+  {
+    id: "gold",
+    name: "Goud",
+    icon: "/elements/gold.svg",
+    category: "tech",
+    fact: "Goud is een glanzend metaal.",
+  },
 ];
 
 export const BASE_ELEMENT_IDS: readonly ElementId[] = ["water", "fire", "earth", "air"];

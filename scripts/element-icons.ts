@@ -177,6 +177,9 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   palm: fluent("palm-tree"),
   jungle: fluent("national-park"),
   leaf: fluent("fallen-leaf"),
+  skeleton: fluent("skull"),
+  pirateship: fluent("ship"),
+  gold: fluent("coin"),
   // Fluent Emoji has no flour or sand sprite; these are hand-drawn in the same
   // flat style. Replace them with an Iconify reference when a suitable set is
   // added.

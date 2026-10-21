@@ -139,7 +139,7 @@ describe("alchemy rules", () => {
     expect(combine("potato", "fire")).toBe("fries");
     expect(combine("bread", "cow")).toBe("burger");
     expect(combine("human", "fish")).toBe("mermaid");
-    expect(combine("human", "treasure")).toBe("pirate");
+    expect(combine("human", "pirateship")).toBe("pirate");
     expect(combine("cat", "sun")).toBe("lion");
     expect(combine("bird", "ice")).toBe("penguin");
     expect(combine("palm", "fruit")).toBe("banana");
@@ -172,6 +172,11 @@ describe("alchemy rules", () => {
     expect(combine("alien", "airplane")).toBe("ufo");
     expect(combine("dog", "chicken")).toBe("fox");
     expect(combine("fruit", "bee")).toBe("strawberry");
+    expect(combine("human", "bone")).toBe("skeleton");
+    expect(combine("boat", "skeleton")).toBe("pirateship");
+    expect(combine("human", "pirateship")).toBe("pirate");
+    expect(combine("metal", "sun")).toBe("gold");
+    expect(combine("gold", "island")).toBe("treasure");
   });
 
   it("offers alternate routes to the same element", () => {

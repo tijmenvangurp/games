@@ -50,7 +50,7 @@ describe("mengelmoes", () => {
 
     expect(await screen.findByRole("heading", { name: "Mengelmoes" })).toBeTruthy();
     expect(screen.getByTestId("alchemy-progress").textContent).toContain("4");
-    expect(screen.getByTestId("alchemy-progress").textContent).toContain("/ 159 ontdekt");
+    expect(screen.getByTestId("alchemy-progress").textContent).toContain("/ 162 ontdekt");
 
     for (const name of ["Water", "Vuur", "Aarde", "Lucht"]) {
       expect(shelfButton(name)).toBeTruthy();
@@ -106,8 +106,8 @@ describe("mengelmoes", () => {
     fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
 
     expect(await screen.findByRole("heading", { name: "Labboek" })).toBeTruthy();
-    expect(screen.getByText("4 van 159 elementen ontdekt")).toBeTruthy();
-    expect(screen.getAllByText("Onbekend")).toHaveLength(155);
+    expect(screen.getByText("4 van 162 elementen ontdekt")).toBeTruthy();
+    expect(screen.getAllByText("Onbekend")).toHaveLength(158);
 
     fireEvent.click(screen.getByRole("button", { name: "Sluit labboek" }));
     expect(screen.queryByRole("heading", { name: "Labboek" })).toBeNull();
