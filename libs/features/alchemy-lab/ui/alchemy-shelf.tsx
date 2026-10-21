@@ -1,33 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { ELEMENTS, getElement, type AlchemyElement } from "@entities/alchemy";
+import { GripVertical } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
 import { useAlchemyStore } from "../model/use-alchemy-store";
-import { shelfItemId } from "./dnd-ids";
+import { shelfHandleItemId, shelfItemId } from "./dnd-ids";
 import { ElementFilters } from "./element-filters";
 import { ElementToken } from "./element-token";
 
 function ShelfToken({ element }: { element: AlchemyElement }) {
   const board = useAlchemyStore((state) => state.board);
   const selected = useAlchemyStore((state) => state.selected);
-  const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
-    id: shelfItemId(element.id),
-  });
-  const wasDragging = useRef(false);
-  const dndPointerDown = listeners?.onPointerDown;
+  const tileDrag = useDraggable({ id: shelfItemId(element.id) });
+  const handleDrag = useDraggable({ id: shelfHandleItemId(element.id) });
+  const tileWasDragging = useRef(false);
+  const handleWasDragging = useRef(false);
 
   useEffect(() => {
-    if (isDragging) {
-      wasDragging.current = true;
+    if (tileDrag.isDragging) {
+      tileWasDragging.current = true;
     }
-  }, [isDragging]);
+  }, [tileDrag.isDragging]);
 
-  const handleClick = () => {
-    if (wasDragging.current) {
-      wasDragging.current = false;
-      return;
+  useEffect(() => {
+    if (handleDrag.isDragging) {
+      handleWasDragging.current = true;
     }
+  }, [handleDrag.isDragging]);
+
+  const activate = () => {
     if (selected && board.some((item) => item.instanceId === selected)) {
       useAlchemyStore.getState().combineWithBoard(element.id, selected);
       return;
@@ -35,27 +37,66 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
     useAlchemyStore.getState().addToBoard(element.id);
   };
 
-  // pan-y houdt het schap met de vinger scrollbaar; de TouchSensor start na
-  // een korte hold alsnog een sleep.
+  const handleTileClick = () => {
+    if (tileWasDragging.current) {
+      tileWasDragging.current = false;
+      return;
+    }
+    activate();
+  };
+
+  const handleHandleClick = () => {
+    if (handleWasDragging.current) {
+      handleWasDragging.current = false;
+      return;
+    }
+    activate();
+  };
+
+  const dragging = tileDrag.isDragging || handleDrag.isDragging;
+
+  // The tile keeps pan-y so the shelf and page stay scrollable. The grip has
+  // touch-none, so a vertical drag on a phone starts the touch sensor.
   return (
-    <button
-      ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      aria-label={`${element.name} op de werkbank leggen`}
-      className={cn(
-        "touch-pan-y rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
-        isDragging && "opacity-30",
-      )}
-      type="button"
-      onClick={handleClick}
-      onPointerDown={(event) => {
-        wasDragging.current = false;
-        dndPointerDown?.(event);
-      }}
-    >
-      <ElementToken element={element} />
-    </button>
+    <div className="relative">
+      <button
+        ref={tileDrag.setNodeRef}
+        {...tileDrag.attributes}
+        {...tileDrag.listeners}
+        aria-label={`${element.name} op de werkbank leggen`}
+        className={cn(
+          "touch-pan-y rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+          dragging && "opacity-30",
+        )}
+        type="button"
+        onClick={handleTileClick}
+        onPointerDown={(event) => {
+          tileWasDragging.current = false;
+          tileDrag.listeners?.onPointerDown?.(event);
+        }}
+      >
+        <ElementToken element={element} />
+      </button>
+
+      <button
+        ref={handleDrag.setNodeRef}
+        {...handleDrag.attributes}
+        {...handleDrag.listeners}
+        aria-label={`Sleep ${element.name}`}
+        className="absolute -right-1 -top-1 z-10 grid size-11 touch-none place-items-center rounded-full focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+        title={`Sleep ${element.name} naar de werkbank`}
+        type="button"
+        onClick={handleHandleClick}
+        onPointerDown={(event) => {
+          handleWasDragging.current = false;
+          handleDrag.listeners?.onPointerDown?.(event);
+        }}
+      >
+        <span className="grid size-6 place-items-center rounded-full bg-card/95 text-muted-foreground shadow-sm ring-1 ring-border">
+          <GripVertical aria-hidden="true" className="size-3.5" />
+        </span>
+      </button>
+    </div>
   );
 }
 

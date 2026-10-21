@@ -7,6 +7,7 @@ import {
   elementForDrag,
   parseActiveId,
   resolveDrop,
+  shelfHandleItemId,
   shelfItemId,
 } from "@features/alchemy-lab";
 
@@ -27,9 +28,14 @@ const board = {
 describe("alchemy drag identifiers", () => {
   it("builds and parses shelf and board ids", () => {
     expect(shelfItemId("water")).toBe("alchemy-shelf-item:water");
+    expect(shelfHandleItemId("water")).toBe("alchemy-shelf-handle:water");
     expect(boardItemId("board-1")).toBe("alchemy-board-item:board-1");
 
     expect(parseActiveId("alchemy-shelf-item:water")).toEqual({
+      source: "shelf",
+      elementId: "water",
+    });
+    expect(parseActiveId("alchemy-shelf-handle:water")).toEqual({
       source: "shelf",
       elementId: "water",
     });

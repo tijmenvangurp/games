@@ -1,5 +1,39 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 import { ELEMENTS } from "../libs/entities/alchemy/model/elements";
+
+async function touchDrag(page: Page, from: Locator, to: Locator): Promise<void> {
+  const fromBox = await from.boundingBox();
+  const toBox = await to.boundingBox();
+  if (!fromBox || !toBox) {
+    throw new Error("Geen positie voor aanraaksleep");
+  }
+
+  const client = await page.context().newCDPSession(page);
+  const start = { x: fromBox.x + fromBox.width / 2, y: fromBox.y + fromBox.height / 2 };
+  const end = { x: toBox.x + toBox.width / 2, y: toBox.y + toBox.height / 2 };
+
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [{ x: start.x, y: start.y }],
+  });
+  await page.waitForTimeout(220);
+
+  for (let step = 1; step <= 12; step += 1) {
+    await client.send("Input.dispatchTouchEvent", {
+      type: "touchMove",
+      touchPoints: [
+        {
+          x: start.x + ((end.x - start.x) * step) / 12,
+          y: start.y + ((end.y - start.y) * step) / 12,
+        },
+      ],
+    });
+    await page.waitForTimeout(16);
+  }
+
+  await client.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await page.waitForTimeout(100);
+}
 
 test.describe("mengelmoes op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -125,5 +159,26 @@ test.describe("mengelmoes op een tablet in landschap", () => {
       return scroller ? scroller.scrollHeight > scroller.clientHeight : false;
     });
     expect(shelfScrolls).toBe(true);
+  });
+});
+
+test.describe("mengelmoes slepen met een vinger", () => {
+  test.use({ hasTouch: true, isMobile: true, viewport: { width: 390, height: 844 } });
+
+  test("sleept een element via het handvat naar de werkbank", async ({ page }) => {
+    await page.goto("/mengelmoes");
+
+    await touchDrag(
+      page,
+      page.getByRole("button", { name: "Sleep Water" }),
+      page.getByRole("group", { name: "Werkbank" }),
+    );
+
+    await expect(page.getByRole("button", { name: "Water, geselecteerd" })).toBeVisible();
+
+    const overflows = (await page.evaluate(
+      "document.documentElement.scrollWidth > document.documentElement.clientWidth",
+    )) as boolean;
+    expect(overflows).toBe(false);
   });
 });
