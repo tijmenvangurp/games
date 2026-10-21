@@ -143,7 +143,7 @@ describe("arrows maze", () => {
     expect(useArrowsStore.getState().status).toBe("won");
     expect(await screen.findByRole("heading", { name: "Gelukt!" })).toBeTruthy();
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toMatchObject({
-      unlocked: 2,
+      state: { unlocked: 2 },
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Volgende level" }));

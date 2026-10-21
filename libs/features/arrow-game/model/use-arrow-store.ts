@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import {
   findHint,
   isArrowRemovable,
@@ -8,7 +9,13 @@ import {
   type MazeArrow,
   type MazeLevel,
 } from "@entities/arrow";
-import { loadArrowsProgress, saveArrowsProgress } from "./storage";
+import {
+  ARROWS_STORAGE_KEY,
+  ARROWS_STORAGE_VERSION,
+  arrowsStorage,
+  DEFAULT_ARROWS_PROGRESS,
+  normalizeArrowsProgress,
+} from "./storage";
 
 type ArrowsStatus = "playing" | "won";
 
@@ -34,9 +41,6 @@ interface ArrowsStore {
 type ArrowsSet = (partial: Partial<ArrowsStore>) => void;
 type ArrowsGet = () => ArrowsStore;
 
-const initialProgress = loadArrowsProgress();
-const initialLevel = levelAt(initialProgress.current);
-
 const emptyBoard = {
   removedIds: [] as number[],
   history: [] as number[],
@@ -56,7 +60,6 @@ function startLevelAction(set: ArrowsSet, get: ArrowsGet, index: number): void {
     level: levelAt(levelIndex),
     ...emptyBoard,
   });
-  saveArrowsProgress({ unlocked, current: levelIndex });
 }
 
 function blockArrow(set: ArrowsSet): ArrowsTapResult {
@@ -80,10 +83,6 @@ function removeArrow(set: ArrowsSet, state: ArrowsStore, arrow: MazeArrow): Arro
     hintId: null,
     unlocked,
   });
-
-  if (solved) {
-    saveArrowsProgress({ unlocked, current: state.levelIndex });
-  }
 
   return solved ? "won" : "removed";
 }
@@ -138,17 +137,38 @@ function nextLevelAction(set: ArrowsSet, get: ArrowsGet): void {
   }
 }
 
-export const useArrowsStore = create<ArrowsStore>((set, get) => ({
-  levelIndex: initialProgress.current,
-  unlocked: initialProgress.unlocked,
-  level: initialLevel,
-  ...emptyBoard,
+export const useArrowsStore = create<ArrowsStore>()(
+  persist(
+    (set, get) => ({
+      levelIndex: DEFAULT_ARROWS_PROGRESS.current,
+      unlocked: DEFAULT_ARROWS_PROGRESS.unlocked,
+      level: levelAt(DEFAULT_ARROWS_PROGRESS.current),
+      ...emptyBoard,
 
-  startLevel: (index) => startLevelAction(set, get, index),
-  tap: (id) => tapAction(set, get, id),
-  undo: () => undoAction(set, get),
-  hint: () => hintAction(set, get),
-  clearHint: () => set({ hintId: null }),
-  restart: () => set({ ...emptyBoard }),
-  nextLevel: () => nextLevelAction(set, get),
-}));
+      startLevel: (index) => startLevelAction(set, get, index),
+      tap: (id) => tapAction(set, get, id),
+      undo: () => undoAction(set, get),
+      hint: () => hintAction(set, get),
+      clearHint: () => set({ hintId: null }),
+      restart: () => set({ ...emptyBoard }),
+      nextLevel: () => nextLevelAction(set, get),
+    }),
+    {
+      name: ARROWS_STORAGE_KEY,
+      version: ARROWS_STORAGE_VERSION,
+      storage: createJSONStorage(() => arrowsStorage),
+      // Keep the flat `{ unlocked, current }` shape so older saves upgrade cleanly.
+      partialize: (state) => ({ unlocked: state.unlocked, current: state.levelIndex }),
+      merge: (persisted, current) => {
+        const progress = normalizeArrowsProgress(persisted);
+        return {
+          ...current,
+          ...emptyBoard,
+          unlocked: progress.unlocked,
+          levelIndex: progress.current,
+          level: levelAt(progress.current),
+        };
+      },
+    },
+  ),
+);

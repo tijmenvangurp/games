@@ -1,12 +1,5 @@
-import type { MazeDifficulty, MazeLevel } from "@entities/arrow";
+import type { MazeLevel } from "@entities/arrow";
 import { ArrowLeft, Button, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
-
-const DIFFICULTY_LABELS: Record<MazeDifficulty, string> = {
-  makkelijk: "Makkelijk",
-  gemiddeld: "Gemiddeld",
-  moeilijk: "Moeilijk",
-  "super-hard": "Super hard",
-};
 
 interface MazeHudProps {
   level: MazeLevel;
@@ -55,9 +48,6 @@ export function MazeHud({
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-          {DIFFICULTY_LABELS[level.difficulty]}
-        </span>
         <div
           aria-label={`${removedCount} van ${level.arrows.length} pijlen weg`}
           aria-valuemax={level.arrows.length}

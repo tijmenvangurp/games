@@ -24,7 +24,6 @@ function level(arrows: MazeArrow[], width = 6, height = 6): MazeLevel {
   return {
     id: "test",
     name: "Test",
-    difficulty: "makkelijk",
     width,
     height,
     arrows,
