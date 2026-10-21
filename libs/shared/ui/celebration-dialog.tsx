@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { m } from "motion/react";
 import { playSound } from "@shared/lib";
 import { Button } from "./button";
 import { Confetti } from "./confetti";
@@ -46,7 +47,12 @@ export function CelebrationDialog({
       }}
     >
       {confetti ? <Confetti pieces={28} variant="shower" /> : null}
-      <div className="game-panel animate-pop w-full max-w-sm p-6 text-center">
+      <m.div
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        className="game-panel w-full max-w-sm p-6 text-center"
+        initial={{ opacity: 0, scale: 0.94, y: 8 }}
+        transition={{ damping: 26, stiffness: 360, type: "spring" }}
+      >
         <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
           <Sparkles className="animate-rise size-10 text-primary" />
           <Star className="size-10 text-warning" />
@@ -73,7 +79,7 @@ export function CelebrationDialog({
             {homeLabel}
           </Button>
         </div>
-      </div>
+      </m.div>
     </div>
   );
 }

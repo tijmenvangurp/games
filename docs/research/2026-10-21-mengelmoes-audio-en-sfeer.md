@@ -1,7 +1,7 @@
 # Mengelmoes: audio, sfeer en visuele polish
 
 - **Datum:** 2026-10-21
-- **Status:** Onderzoek en eerste implementatie. `canvas-confetti` is toegevoegd; de `wrong`-klank is verwijderd.
+- **Status:** Onderzoek en eerste implementatie. `canvas-confetti` en `motion` zijn toegevoegd; de `wrong`-klank is verwijderd.
 - **Aanleiding:** een lijst met externe audio- en assetbronnen (Kenney, Freesound, Pixabay, Zapsplat, Poly Haven/ambientCG, itch.io, OpenGameArt, game-icons.net) en drie polish-ideeën: omgevingsgeluid, deeltjes en oppak-physics. De vraag is wat daarvan past bij de Spellen-app, met **Mengelmoes** als MVP.
 - **Kader:** [AGENTS.md](../../AGENTS.md), [ADR 0001](../adr/0001-publieke-statische-spellen-app.md), [ADR 0005](../adr/0005-pokemon-assets.md), de [CSP in `_headers`](../../apps/games/public/_headers), [het design systeem](../design-system.md), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts) en het eerdere [Mengelmoes-assetonderzoek](2026-10-19-mengelmoes-assets.md).
 
@@ -10,7 +10,7 @@
 1. **Dit is vooral een inkooplijst, geen gap-analyse.** Mengelmoes heeft voor de MVP geen externe audio of texturen nodig. De app heeft al een CSP-veilige synthesizer, een globale geluidstoggle, haptiek, confetti en een sparkle-icoon.
 2. **De stilte bij een fout is beleid, geen gap.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) zegt: fouten zijn informatie, geen straf. Geen foutgeluid dus. De winst zit in **vieringen**: de eigenaar keurt `canvas-confetti` goed, en die vervangt nu de handgeschreven CSS-burst in alle spellen.
 3. **Oppak-physics bestaat al.** De `DragOverlay` schaalt naar 105% en kantelt 3 graden ([`alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)). De voorgestelde 5% en 2–5 graden zijn dus al gehaald.
-4. **Vieren kan nu rijker.** `Confetti` gebruikt `canvas-confetti`, laadt de bibliotheek pas bij een viering en respecteert reduced motion. Het is gedeeld door Mengelmoes, de afsluitdialoog en sudoku; de oude CSS-burst is verwijderd. `Sparkles` blijft een icoon, geen deeltjessysteem.
+4. **Vieren kan nu rijker.** `Confetti` gebruikt `canvas-confetti`, laadt de bibliotheek pas bij een viering en respecteert reduced motion. Het is gedeeld door Mengelmoes, de afsluitdialoog en sudoku; de oude CSS-burst is verwijderd. `Sparkles` blijft een icoon, geen deeltjessysteem. Daarnaast gebruiken de dialogen en de feedbackregel nu **Motion** (`motion.dev`) met `LazyMotion` + `m`, zodat de handgeschreven `animate-pop` daar weg is.
 5. **Voor audio is alleen CC0 probleemloos, en Kenney is de eenvoudigste bron.** Pixabay en Zapsplat verbieden herdistributie van losse bestanden; een publieke git-repo met de ruwe mp3's is precies dat. CC-BY-bronnen mogen wel, maar vragen attributie en administratie.
 6. **Fotorealistische texturen en een donkere vignette passen niet.** Het design systeem kiest ivory, rust en geen achtergronddecoratie. Een 1K-fototextuur is bovendien enkele MB's; de bestaande CSS-stippen op de werkbank kosten niets.
 7. **Advies:** geen externe audio of texturen voor de MVP. Wel rijkere vieringen via `canvas-confetti`, geen foutgeluid, en ambience, fototexturen en nieuwe icoonfamilies buiten de eerste versie.
@@ -164,18 +164,29 @@ De eigenaar keurt een confettidependency goed om vieringen in meerdere spellen s
 
 De `Confetti`-API blijft `pieces` en `data-confetti`, zodat bestaande tests en schermen blijven werken.
 
-### 5.3 De andere voorgestelde dependencies
+### 5.3 Motion voor dialogen en feedback
 
-| Package           | Verdict          | Onderbouwing                                                                                                                                                                                                       |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `canvas-confetti` | **Ja**           | Kleine, gerichte bibliotheek; goedgekeurd en geïmplementeerd.                                                                                                                                                      |
-| `framer-motion`   | **Nee, nu niet** | De app gebruikt al CSS-transities en dnd-kit. Framer Motion is vooral nuttig voor layout-animaties en gedeelde veerpatronen; daar is nu geen concreet geval voor. Eerst een dependency-afweging als dat verandert. |
-| `zustand`         | **Al aanwezig**  | Stond al in `package.json` (5.0.15) en wordt door alle features gebruikt. Geen actie.                                                                                                                              |
-| `immer`           | **Nee**          | De stores zijn klein en gebruiken expliciete immutable updates. Immer voegt een tweede stijl en bundlegewicht toe zonder dat het een concreet probleem oplost.                                                     |
-| `use-sound`       | **Nee**          | Dit is een Howler-wrapper voor audiobestanden. De app synthetiseert bewust met Web Audio en heeft geen audiobestanden nodig; use-sound zou juist naar gelicentieerde assets duwen.                                 |
-| `nanoid`          | **Nee**          | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                                                       |
+De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (motion.dev, MIT) toegevoegd. De integratie blijft bewust klein:
 
-### 5.4 Wat verder ongewijzigd blijft
+- `MotionProvider` in `libs/shared/ui` wrapped de app met `LazyMotion features={domAnimation}` en `MotionConfig reducedMotion="user"`.
+- Componenten gebruiken de lichte `m`-primitive, niet de volledige `motion`-component. Zo blijft de feature-bundel beperkt.
+- Motion doet nu de entree van de ontdekkingskaart, het labboek en de afsluitdialoog, plus het in- en uitfaden van de feedbackregel via `AnimatePresence`.
+- De handgeschreven `animate-pop`-klasse is op die panelen verdwenen. Voor de overige spellen blijft de CSS-klasse voorlopig staan; die kan later stap voor stap worden vervangen.
+- Slepen blijft bij dnd-kit. Motion en dnd-kit tegelijk op hetzelfde element zou de transformatie overschrijven.
+- **Kosten:** de main chunk groeit uncompressed van ±1,0 MB naar ±1,1 MB. Dat is de prijs voor minder eigen animatiecode; de confetti blijft juist in een apart lazy chunk van ±11 KB.
+
+### 5.4 De andere voorgestelde dependencies
+
+| Package           | Verdict         | Onderbouwing                                                                                                                                                                       |
+| ----------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canvas-confetti` | **Ja**          | Kleine, gerichte bibliotheek; goedgekeurd en geïmplementeerd.                                                                                                                      |
+| `motion`          | **Ja**          | motion.dev; goedgekeurd en geïmplementeerd met `LazyMotion` + `m` voor dialogen en feedback.                                                                                       |
+| `zustand`         | **Al aanwezig** | Stond al in `package.json` (5.0.15) en wordt door alle features gebruikt. Geen actie.                                                                                              |
+| `immer`           | **Nee**         | De stores zijn klein en gebruiken expliciete immutable updates. Immer voegt een tweede stijl en bundlegewicht toe zonder dat het een concreet probleem oplost.                     |
+| `use-sound`       | **Nee**         | Dit is een Howler-wrapper voor audiobestanden. De app synthetiseert bewust met Web Audio en heeft geen audiobestanden nodig; use-sound zou juist naar gelicentieerde assets duwen. |
+| `nanoid`          | **Nee**         | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                       |
+
+### 5.5 Wat verder ongewijzigd blijft
 
 - Geen ambience in de MVP.
 - Geen fotorealistische texturen of donkere vignette.
@@ -219,6 +230,7 @@ De `Confetti`-API blijft `pieces` en `data-confetti`, zodat bestaande tests en s
 - [MDN — Autoplay guide voor media en Web Audio](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Autoplay)
 - [MDN — `prefers-reduced-motion`](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion)
 - [canvas-confetti — GitHub, ISC](https://github.com/catdad/canvas-confetti)
+- [Motion — documentatie](https://motion.dev/) en [GitHub, MIT](https://github.com/motiondivision/motion)
 - [ADR 0026 — adaptief niveaumodel en foutvriendelijke feedback](../adr/0026-adaptief-niveaumodel.md)
-- [`libs/shared/ui/confetti.tsx`](../../libs/shared/ui/confetti.tsx), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts), [`libs/shared/lib/haptics.ts`](../../libs/shared/lib/haptics.ts), [`libs/features/alchemy-lab/model/use-alchemy-store.ts`](../../libs/features/alchemy-lab/model/use-alchemy-store.ts), [`libs/features/alchemy-lab/ui/alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)
+- [`libs/shared/ui/motion-provider.tsx`](../../libs/shared/ui/motion-provider.tsx), [`libs/shared/ui/confetti.tsx`](../../libs/shared/ui/confetti.tsx), [`libs/shared/lib/sound.ts`](../../libs/shared/lib/sound.ts), [`libs/shared/lib/haptics.ts`](../../libs/shared/lib/haptics.ts), [`libs/features/alchemy-lab/model/use-alchemy-store.ts`](../../libs/features/alchemy-lab/model/use-alchemy-store.ts), [`libs/features/alchemy-lab/ui/alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)
 - [`docs/design-system.md`](../design-system.md) en [`docs/research/2026-10-19-mengelmoes-assets.md`](2026-10-19-mengelmoes-assets.md)
