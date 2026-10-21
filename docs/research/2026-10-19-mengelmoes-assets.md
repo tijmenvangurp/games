@@ -161,6 +161,7 @@ De kaart is ook een natuurlijk moment voor `aria-live`: "Nieuw element ontdekt: 
 - Filters als chips per categorie.
 - Raster van elementmunten; ontdekt in kleur, onontdekt als donkere silhouette met een vraagteken.
 - Tik op een ontdekt element voor een detailkaart met een weetje en de gebruikte combinatie. Onontdekte ingrediënten van alternatieve recepten blijven een vraagteken; ze tonen pas naam en icoon als het kind ze zelf heeft ontdekt.
+- Heeft een element geen enkele combinatie, dan vervalt de sectie "Kan maken met" in plaats van een lege mededeling.
 - Geen timer, geen "je mist er nog één"-druk. Wel een subtiele "nieuw"-badge.
 
 ### 3.7 Geluid en haptiek

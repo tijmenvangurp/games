@@ -211,6 +211,22 @@ describe("mengelmoes", () => {
     expect(within(madeFrom).getAllByText("?")).toHaveLength(2);
   });
 
+  it("omits the uses section when an element has no combinations", async () => {
+    act(() =>
+      useAlchemyStore.setState({
+        discovered: [...BASE_ELEMENT_IDS, "unicorn"],
+      }),
+    );
+    await renderAlchemy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Eenhoorn" }));
+
+    expect(within(dialog).queryByText("Kan maken met")).toBeNull();
+    expect(within(dialog).queryByText("Dit element is nog nergens voor gebruikt.")).toBeNull();
+  });
+
   it("clears the workbench without losing discoveries", async () => {
     await renderAlchemy();
 
