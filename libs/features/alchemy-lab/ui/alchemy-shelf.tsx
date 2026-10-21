@@ -66,7 +66,7 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
         {...tileDrag.listeners}
         aria-label={`${element.name} op de werkbank leggen`}
         className={cn(
-          "touch-pan-x rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 md:touch-pan-y",
+          "touch-pan-x rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 md:landscape:touch-pan-y",
           dragging && "opacity-30",
         )}
         type="button"
@@ -110,7 +110,7 @@ export function AlchemyShelf() {
   return (
     <section
       aria-label="Mijn elementen"
-      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-72 md:landscape:col-span-2"
+      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-96 md:landscape:col-span-2"
     >
       <div className="mb-2 shrink-0">
         <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
@@ -138,10 +138,10 @@ export function AlchemyShelf() {
       <div className="relative min-h-0 min-w-0 md:flex-1">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent md:hidden"
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent md:landscape:hidden"
         />
         <div
-          className="flex min-h-0 min-w-0 max-w-full gap-2 overflow-x-auto pb-1 md:block md:h-full md:overflow-x-hidden md:overflow-y-auto md:overscroll-contain md:pr-1"
+          className="flex min-h-0 min-w-0 max-w-full gap-2 overflow-x-auto pb-1 md:landscape:block md:landscape:h-full md:landscape:overflow-x-hidden md:landscape:overflow-y-auto md:landscape:overscroll-contain md:landscape:pr-1"
           data-alchemy-shelf-scroll="true"
         >
           {visibleElements.length === 0 ? (
@@ -149,7 +149,7 @@ export function AlchemyShelf() {
               Nog geen elementen in deze categorie.
             </p>
           ) : (
-            <div className="flex shrink-0 gap-2 md:grid md:gap-1.5 md:portrait:grid-cols-8 md:landscape:grid-cols-4 xl:gap-2">
+            <div className="flex shrink-0 gap-2 md:portrait:grid md:portrait:auto-cols-max md:portrait:grid-flow-col md:portrait:grid-rows-2 md:portrait:gap-1.5 md:landscape:grid md:landscape:grid-cols-4 md:landscape:gap-1.5 xl:gap-2">
               {visibleElements.map((element) => (
                 <ShelfToken key={element.id} element={element} />
               ))}
