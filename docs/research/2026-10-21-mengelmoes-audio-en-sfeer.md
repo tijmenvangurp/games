@@ -175,7 +175,18 @@ De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (
 - Slepen blijft bij dnd-kit. Motion en dnd-kit tegelijk op hetzelfde element zou de transformatie overschrijven.
 - **Kosten:** de main chunk groeit uncompressed van ±1,0 MB naar ±1,1 MB. Dat is de prijs voor minder eigen animatiecode; de confetti blijft juist in een apart lazy chunk van ±11 KB.
 
-### 5.4 De andere voorgestelde dependencies
+### 5.4 Extra effecten in de tweede PR
+
+De tweede PR bouwt voort op dezelfde basis en voegt vier korte effecten toe, zonder nieuwe dependency:
+
+- **Oppakken:** de `DragOverlay` veert met Motion van 96% naar 108% en van -2° naar 3°.
+- **Mengen:** het resultaat krijgt een eenmalige pop (0,5 → 1,0, -10° → 0°) op de plek waar de twee elementen samensmolten. De store bewaart daarvoor `lastMergedId`; na de animatie wordt die gewist.
+- **Ontdekken:** de ontdekkingskaart gebruikt stervormige confetti in goud en violet, en het element zelf popt met een korte glow.
+- **Labboek:** de voortgangsbalk veegt met een spring naar het juiste percentage.
+
+Alle effecten respecteren `prefers-reduced-motion` via `MotionConfig` en de confetti-guard. Er komen geen dependencies of opslagschema-wijzigingen bij; `lastMergedId` is tijdelijke UI-state.
+
+### 5.5 De andere voorgestelde dependencies
 
 | Package           | Verdict          | Onderbouwing                                                                                                                                                                                                          |
 | ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -187,7 +198,7 @@ De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (
 | `howler`          | **Nee, nu niet** | MIT en ±7 KB gzip, maar de SFX zijn gesynthetiseerd en spraak/lessen spelen al via één herbruikbare `HTMLAudioElement`. Sprites, fades en spatial audio hebben we niet nodig; de laatste release (2.2.4) is van 2023. |
 | `nanoid`          | **Nee**          | Bordinstanties leven alleen binnen één sessie en worden niet bewaard. De bestaande teller (`board-1`, `board-2`, ...) is genoeg en deterministisch testbaar.                                                          |
 
-### 5.5 Wat verder ongewijzigd blijft
+### 5.6 Wat verder ongewijzigd blijft
 
 - Geen ambience in de MVP.
 - Geen fotorealistische texturen of donkere vignette.

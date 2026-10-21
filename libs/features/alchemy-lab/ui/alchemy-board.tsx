@@ -1,5 +1,6 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { m } from "motion/react";
 import { getElement } from "@entities/alchemy";
 import { cn } from "@shared/lib";
 import { useAlchemyStore, type BoardElement } from "../model/use-alchemy-store";
@@ -9,11 +10,15 @@ import { ElementToken } from "./element-token";
 function BoardToken({
   item,
   selected,
+  justMerged,
   onTap,
+  onMergedAnimationDone,
 }: {
   item: BoardElement;
   selected: boolean;
+  justMerged: boolean;
   onTap: () => void;
+  onMergedAnimationDone: () => void;
 }) {
   const element = getElement(item.elementId);
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
@@ -69,7 +74,19 @@ function BoardToken({
           dndPointerDown?.(event);
         }}
       >
-        <ElementToken element={element} selected={selected} variant="board" />
+        <m.span
+          animate={{ opacity: 1, rotate: 0, scale: 1 }}
+          className="inline-flex"
+          initial={justMerged ? { opacity: 0, rotate: -10, scale: 0.5 } : false}
+          transition={{ damping: 22, stiffness: 380, type: "spring" }}
+          onAnimationComplete={() => {
+            if (justMerged) {
+              onMergedAnimationDone();
+            }
+          }}
+        >
+          <ElementToken element={element} selected={selected} variant="board" />
+        </m.span>
       </button>
     </div>
   );
@@ -82,6 +99,8 @@ interface AlchemyBoardProps {
 export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
   const board = useAlchemyStore((state) => state.board);
   const selected = useAlchemyStore((state) => state.selected);
+  const lastMergedId = useAlchemyStore((state) => state.lastMergedId);
+  const clearLastMerged = useAlchemyStore((state) => state.clearLastMerged);
   const { isOver, setNodeRef } = useDroppable({ id: BOARD_ID });
 
   const setRefs = (node: HTMLDivElement | null) => {
@@ -120,6 +139,8 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
           key={item.instanceId}
           item={item}
           selected={selected === item.instanceId}
+          justMerged={lastMergedId === item.instanceId}
+          onMergedAnimationDone={clearLastMerged}
           onTap={() => useAlchemyStore.getState().tapBoardElement(item.instanceId)}
         />
       ))}

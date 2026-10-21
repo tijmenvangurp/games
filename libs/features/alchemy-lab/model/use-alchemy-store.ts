@@ -40,6 +40,7 @@ interface AlchemyStore {
   feedback: AlchemyFeedback | null;
   hint: Hint | null;
   missionId: string | null;
+  lastMergedId: string | null;
   addToBoard: (elementId: ElementId, position?: Position) => void;
   moveBoardElement: (instanceId: string, position: Position) => void;
   combineBoardElements: (firstId: string, secondId: string) => void;
@@ -51,6 +52,7 @@ interface AlchemyStore {
   clearHint: () => void;
   nextMission: () => void;
   dismissFeedback: () => void;
+  clearLastMerged: () => void;
   reset: () => void;
 }
 
@@ -130,6 +132,7 @@ function finishCombination(
     selected: resultInstance.instanceId,
     feedback: isNew ? { kind: "new", elementId: result } : { kind: "known", elementId: result },
     hint: null,
+    lastMergedId: resultInstance.instanceId,
   });
   persist(get);
   playSound(isNew ? "win" : "match");
@@ -152,6 +155,7 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
   feedback: null,
   hint: null,
   missionId: initialMission?.id ?? null,
+  lastMergedId: null,
 
   addToBoard: (elementId, position) => {
     const { board } = get();
@@ -259,7 +263,7 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
   },
 
   clearBoard: () => {
-    set({ board: [], selected: null, feedback: null, hint: null });
+    set({ board: [], selected: null, feedback: null, hint: null, lastMergedId: null });
     persist(get);
     playSound("tap");
   },
@@ -288,6 +292,8 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
 
   dismissFeedback: () => set({ feedback: null }),
 
+  clearLastMerged: () => set({ lastMergedId: null }),
+
   reset: () => {
     const discovered = [...BASE_ELEMENT_IDS];
     set({
@@ -297,6 +303,7 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
       feedback: null,
       hint: null,
       missionId: firstIncompleteMission(discovered)?.id ?? null,
+      lastMergedId: null,
     });
     persist(get);
   },

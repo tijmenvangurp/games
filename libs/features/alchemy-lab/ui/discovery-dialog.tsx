@@ -35,7 +35,7 @@ export function DiscoveryDialog() {
         }
       }}
     >
-      <Confetti pieces={28} variant="shower" />
+      <Confetti pieces={32} variant="stars" />
       <m.div
         animate={{ opacity: 1, scale: 1, y: 0 }}
         className="relative z-50 w-full max-w-sm rounded-3xl border bg-card p-6 text-center shadow-xl"
@@ -48,7 +48,22 @@ export function DiscoveryDialog() {
         </p>
 
         <div className="mt-3 flex justify-center">
-          <ElementToken element={element} showLabel={false} variant="overlay" />
+          <div className="relative">
+            <m.div
+              aria-hidden="true"
+              animate={{ opacity: [0, 0.55, 0.28], scale: [0.8, 1.25, 1.1] }}
+              className="absolute inset-0 rounded-full bg-amber-300 blur-2xl"
+              initial={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+            <m.div
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              initial={{ opacity: 0, rotate: -8, scale: 0.6 }}
+              transition={{ damping: 18, delay: 0.06, stiffness: 320, type: "spring" }}
+            >
+              <ElementToken element={element} showLabel={false} variant="overlay" />
+            </m.div>
+          </div>
         </div>
 
         <h2 className="mt-2 text-3xl font-black" id="discovery-title">

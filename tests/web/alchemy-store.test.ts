@@ -14,6 +14,7 @@ function resetStore() {
     feedback: null,
     hint: null,
     missionId: "mud",
+    lastMergedId: null,
   });
 }
 
@@ -59,6 +60,10 @@ describe("alchemy store", () => {
     expect(state.board[0]).toMatchObject({ elementId: "steam", x: 0.4, y: 0.4 });
     expect(state.feedback).toEqual({ kind: "new", elementId: "steam" });
     expect(state.selected).toBe(state.board[0]?.instanceId);
+    expect(state.lastMergedId).toBe(state.board[0]?.instanceId);
+
+    state.clearLastMerged();
+    expect(useAlchemyStore.getState().lastMergedId).toBeNull();
   });
 
   it("keeps both elements when a combination does not exist", () => {
