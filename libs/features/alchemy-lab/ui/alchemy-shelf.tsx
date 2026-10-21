@@ -55,9 +55,9 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
   const dragging = tileDrag.isDragging || iconDrag.isDragging;
   const hasTouch = typeof navigator !== "undefined" && navigator.maxTouchPoints > 0;
 
-  // The tile itself stays pan-x/pan-y so the shelf can scroll. On a touch
-  // screen an invisible surface over the picture has touch-none, so dragging
-  // the picture works without an extra visible handle.
+  // Both the tile and the drag surface follow the shelf's scroll direction.
+  // A swipe along the shelf therefore scrolls it, while a drag across the
+  // shelf (towards the workbench) still picks the element up.
   return (
     <div className="relative shrink-0">
       <button
@@ -84,7 +84,7 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
           ref={iconDrag.setNodeRef}
           {...iconDrag.listeners}
           aria-hidden="true"
-          className="absolute left-1/2 top-1 z-10 size-16 -translate-x-1/2 touch-none cursor-grab"
+          className="absolute left-1/2 top-1 z-10 size-16 -translate-x-1/2 touch-pan-x cursor-grab md:landscape:touch-pan-y"
           data-drag-surface={element.id}
           onClick={handleIconClick}
           onPointerDown={(event) => {
@@ -143,7 +143,7 @@ export function AlchemyShelf() {
           className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-card to-transparent md:landscape:hidden"
         />
         <div
-          className="flex min-h-0 min-w-0 max-w-full gap-2 overflow-x-auto pb-1 md:landscape:block md:landscape:h-full md:landscape:overflow-x-hidden md:landscape:overflow-y-auto md:landscape:overscroll-contain md:landscape:pr-1"
+          className="game-scrollbar flex min-h-0 min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain pb-1 md:landscape:block md:landscape:h-full md:landscape:overflow-x-hidden md:landscape:overflow-y-auto md:landscape:overscroll-contain md:landscape:pr-1"
           data-alchemy-shelf-scroll="true"
         >
           {visibleElements.length === 0 ? (
