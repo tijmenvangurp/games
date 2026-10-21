@@ -1,0 +1,17 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-adaptive",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/adaptive",
+  "tags": ["layer:entities", "scope:adaptive", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/adaptive"
+      }
+    }
+  }
+}

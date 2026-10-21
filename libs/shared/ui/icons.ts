@@ -10,7 +10,6 @@ export {
   Eye,
   Flame,
   Flag,
-  Heart,
   Home,
   LayoutGrid,
   Lightbulb,

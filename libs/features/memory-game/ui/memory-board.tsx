@@ -1,14 +1,7 @@
-import type { MemoryDifficulty } from "@entities/memory";
 import { getPokemon, usePokemonCry } from "@entities/pokedex";
 import { cn, playHaptic, playSound } from "@shared/lib";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryCard } from "./memory-card";
-
-const COLUMN_CLASSES: Record<MemoryDifficulty, string> = {
-  makkelijk: "grid-cols-3 sm:grid-cols-4",
-  gemiddeld: "grid-cols-4",
-  moeilijk: "grid-cols-4 sm:grid-cols-5",
-};
 
 function playFlipFeedback(beforeMatched: number): void {
   const next = useMemoryStore.getState();
@@ -20,17 +13,29 @@ function playFlipFeedback(beforeMatched: number): void {
     playSound("match");
     playHaptic("match");
   } else if (next.locked) {
-    playSound("wrong");
-    playHaptic("wrong");
+    // A mismatch is information, not a punishment: the cards turn back
+    // quietly. There is deliberately no wrong sound or wrong haptic.
+    return;
   } else {
     playHaptic("tap");
   }
+}
+
+function columnsFor(pairs: number): string {
+  if (pairs <= 8) {
+    return "grid-cols-4";
+  }
+  if (pairs <= 10) {
+    return "grid-cols-4 sm:grid-cols-5";
+  }
+  return "grid-cols-4 sm:grid-cols-6";
 }
 
 export function MemoryBoard() {
   const scene = useMemoryStore((state) => state.scene);
   const matched = useMemoryStore((state) => state.matched);
   const flipped = useMemoryStore((state) => state.flipped);
+  const hint = useMemoryStore((state) => state.hint);
   const playCry = usePokemonCry();
 
   if (!scene) {
@@ -39,10 +44,13 @@ export function MemoryBoard() {
 
   const flipCard = (index: number) => {
     const state = useMemoryStore.getState();
-    if (!state.scene || state.locked || state.found) {
+    if (!state.scene) {
       return;
     }
-    if (state.matched[index] || state.flipped.includes(index)) {
+    if (state.locked || state.found || state.matched[index] || state.flipped.includes(index)) {
+      // Let the store count ignored taps for the stuck signal; it ignores them
+      // without changing the board.
+      state.flip(index);
       return;
     }
 
@@ -58,16 +66,19 @@ export function MemoryBoard() {
 
   return (
     <div className="game-panel mx-auto w-full max-w-2xl p-2 sm:p-3">
-      <div className={cn("grid w-full gap-2 sm:gap-3", COLUMN_CLASSES[scene.difficulty])}>
+      <div className={cn("grid w-full gap-2 sm:gap-3", columnsFor(scene.pairs))}>
         {scene.cards.map((pokemonId, index) => {
           const pokemon = getPokemon(pokemonId);
           if (!pokemon) {
             return null;
           }
+          const hinted = hint?.indices.includes(index) ?? false;
           return (
             <MemoryCard
               key={index}
-              faceUp={matched[index] || flipped.includes(index)}
+              faceUp={matched[index] || flipped.includes(index) || (hint?.level === 3 && hinted)}
+              hinted={hinted}
+              hintLevel={hint?.level ?? null}
               index={index}
               matched={matched[index]}
               pokemon={pokemon}

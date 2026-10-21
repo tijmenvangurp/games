@@ -10,6 +10,7 @@ export { cn } from "./utils";
 export { playHaptic, vibrate } from "./haptics";
 export { pointAlongPolyline, polylineLength, trimPolyline } from "./polyline";
 export { createSeed, mulberry32, shuffledIndexes } from "./random";
+export { isFiniteNumber, isNonNegativeInteger, isNonNegativeNumber, isRecord } from "./validate";
 export { isSoundEnabled, playSound, setSoundEnabled, toggleSound, useSoundEnabled } from "./sound";
 export {
   audioSrc,

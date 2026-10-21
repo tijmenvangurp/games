@@ -97,8 +97,6 @@ function persist(get: StoreGet): void {
 
 function rejectCombination(set: StoreSet): void {
   set({ selected: null, feedback: { kind: "wrong" }, hint: null });
-  playSound("wrong");
-  playHaptic("wrong");
 }
 
 function finishCombination(

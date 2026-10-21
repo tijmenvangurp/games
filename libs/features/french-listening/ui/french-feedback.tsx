@@ -11,8 +11,8 @@ interface FrenchFeedbackProps {
 export function FrenchFeedback({ item, correct, onNext, onPlayExample }: FrenchFeedbackProps) {
   return (
     <div aria-live="polite" className="game-panel space-y-3 p-4">
-      <p className={correct ? "font-black text-success" : "font-black text-danger"}>
-        {correct ? "Goed gedaan!" : "Bijna!"}
+      <p className={correct ? "font-black text-success" : "font-black text-warning"}>
+        {correct ? "Je vond het!" : "Nog niet."}
       </p>
       {!correct ? (
         <p className="text-sm text-muted-foreground">

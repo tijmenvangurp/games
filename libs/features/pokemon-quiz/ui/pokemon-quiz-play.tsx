@@ -39,8 +39,10 @@ export function PokemonQuizPlay() {
     const next = usePokemonQuizStore.getState();
     if (!wasAnswered && next.answered && next.question) {
       const correctAnswer = pokemonId === next.question.targetId;
-      playSound(correctAnswer ? "match" : "wrong");
-      playHaptic(correctAnswer ? "match" : "wrong");
+      if (correctAnswer) {
+        playSound("match");
+        playHaptic("match");
+      }
     }
   };
 

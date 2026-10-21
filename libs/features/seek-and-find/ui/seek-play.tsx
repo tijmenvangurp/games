@@ -48,9 +48,6 @@ export function SeekPlay() {
     }
     if (next.found) {
       playHaptic("win");
-    } else if (next.wrongId === id) {
-      playSound("wrong");
-      playHaptic("wrong");
     }
   };
 

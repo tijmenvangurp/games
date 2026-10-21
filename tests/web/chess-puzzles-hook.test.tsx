@@ -94,7 +94,7 @@ describe("useChessPuzzle", () => {
     expect(result.current.feedback).toBe("solved");
   });
 
-  it("gives haptic feedback for a wrong move, a hint and a solve", () => {
+  it("gives a neutral haptic for a wrong move, a hint and a solve", () => {
     const vibrate = vi.fn(() => true);
     Object.defineProperty(navigator, "vibrate", {
       configurable: true,
@@ -106,7 +106,7 @@ describe("useChessPuzzle", () => {
     act(() => {
       result.current.onPieceDrop("a1", "a2");
     });
-    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+    expect(vibrate).toHaveBeenLastCalledWith(10);
 
     act(() => {
       result.current.showHint();

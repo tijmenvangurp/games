@@ -93,12 +93,12 @@ describe("math trainer", () => {
     playRoundCorrectly();
 
     expect(useMathStore.getState().stars).toBe(10);
-    expect(await screen.findByRole("heading", { name: "Perfect!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Je bleef scherp!" })).toBeTruthy();
     expect(screen.getByText("Je haalde 10 van de 10 sterren.")).toBeTruthy();
     expect(loadMathState().best["keer:gemiddeld"]).toBe(10);
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Perfect!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Je bleef scherp!" })).toBeNull();
     expect(useMathStore.getState().finished).toBe(false);
     expect(useMathStore.getState().stars).toBe(0);
     expect(useMathStore.getState().round).not.toBe(round);

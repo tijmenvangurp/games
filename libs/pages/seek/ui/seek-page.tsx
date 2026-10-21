@@ -60,8 +60,8 @@ export function SeekPage() {
           confetti
           description={
             tries === 0
-              ? "In één keer gevonden, knap gedaan!"
-              : `${tries} keer mis, maar toch gevonden!`
+              ? "Je vond hem meteen. Goed gekeken!"
+              : `${tries} keer verder gekeken, en toch gevonden!`
           }
           title="Gevonden!"
           onAgain={() => useSeekStore.getState().newScene()}

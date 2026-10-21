@@ -63,7 +63,7 @@ export function WordSearchPage() {
         <CelebrationDialog
           confetti
           description={`Je vond alle ${puzzle.placements.length} woorden.`}
-          title="Knap gedaan!"
+          title="Gevonden!"
           onAgain={() => useWordSearchStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

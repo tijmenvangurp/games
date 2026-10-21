@@ -15,9 +15,9 @@ function subtitleFor(round: MathRound | null): string {
 
 function celebrationTitle(stars: number): string {
   if (stars === 10) {
-    return "Perfect!";
+    return "Je bleef scherp!";
   }
-  return stars >= 7 ? "Knap gedaan!" : "Goed geoefend!";
+  return stars >= 7 ? "Je bleef rekenen!" : "Goed geoefend!";
 }
 
 export function MathPage() {

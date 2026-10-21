@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-  MEMORY_DIFFICULTIES,
-  MEMORY_PAIRS,
+  MEMORY_LEVELS,
   MEMORY_POKEMON_POOL_SIZE,
   createMemoryScene,
+  pairsForLevel,
 } from "@entities/memory";
 import { POKEDEX, getPokemon } from "@entities/pokedex";
 
@@ -20,13 +20,13 @@ describe("pokémon memory generator", () => {
     expect(getPokemon(152)).toBeUndefined();
   });
 
-  for (const difficulty of MEMORY_DIFFICULTIES) {
-    it(`builds a ${difficulty} deck with pairs`, () => {
-      const scene = createMemoryScene(difficulty, 2026);
-      const pairs = MEMORY_PAIRS[difficulty];
+  MEMORY_LEVELS.forEach((pairs, levelIndex) => {
+    it(`builds a ${pairs}-pair deck for level ${levelIndex}`, () => {
+      const scene = createMemoryScene(levelIndex, 2026);
 
       expect(scene.cards).toHaveLength(pairs * 2);
       expect(scene.pairs).toBe(pairs);
+      expect(scene.levelIndex).toBe(levelIndex);
 
       const counts = new Map<number, number>();
       for (const id of scene.cards) {
@@ -39,21 +39,34 @@ describe("pokémon memory generator", () => {
       expect(counts.size).toBe(pairs);
       expect([...counts.values()].every((count) => count === 2)).toBe(true);
     });
-  }
+  });
 
   it("is deterministic per seed", () => {
-    expect(createMemoryScene("gemiddeld", 77)).toEqual(createMemoryScene("gemiddeld", 77));
+    expect(createMemoryScene(4, 77)).toEqual(createMemoryScene(4, 77));
   });
 
   it("shuffles differently for another seed", () => {
-    const first = createMemoryScene("moeilijk", 1);
-    const second = createMemoryScene("moeilijk", 2);
+    const first = createMemoryScene(6, 1);
+    const second = createMemoryScene(6, 2);
     expect(first.cards).not.toEqual(second.cards);
   });
 
   it("uses fewer cards on easier levels", () => {
-    const easy = createMemoryScene("makkelijk", 5);
-    const hard = createMemoryScene("moeilijk", 5);
+    const easy = createMemoryScene(0, 5);
+    const hard = createMemoryScene(MEMORY_LEVELS.length - 1, 5);
     expect(hard.cards.length).toBeGreaterThan(easy.cards.length);
+  });
+
+  it("includes review items and still fills the deck", () => {
+    const scene = createMemoryScene(3, 12, [25, 25, 0, 999]);
+    expect(scene.reviewIds).toEqual([25]);
+    expect(scene.cards).toContain(25);
+    expect(scene.cards).toHaveLength(pairsForLevel(3) * 2);
+    expect(new Set(scene.cards).size).toBe(pairsForLevel(3));
+  });
+
+  it("clamps an out-of-range level", () => {
+    expect(createMemoryScene(-10, 1).pairs).toBe(MEMORY_LEVELS[0]);
+    expect(createMemoryScene(999, 1).pairs).toBe(MEMORY_LEVELS.at(-1));
   });
 });

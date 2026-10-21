@@ -5,15 +5,14 @@ import {
   isSolved,
   levelAt,
   LEVEL_COUNT,
-  MAX_HEARTS,
   type MazeArrow,
   type MazeLevel,
 } from "@entities/arrow";
 import { loadArrowsProgress, saveArrowsProgress } from "./storage";
 
-type ArrowsStatus = "playing" | "won" | "lost";
+type ArrowsStatus = "playing" | "won";
 
-export type ArrowsTapResult = "ignored" | "blocked" | "removed" | "won" | "lost";
+export type ArrowsTapResult = "ignored" | "blocked" | "removed" | "won";
 
 interface ArrowsStore {
   levelIndex: number;
@@ -21,7 +20,6 @@ interface ArrowsStore {
   level: MazeLevel;
   removedIds: number[];
   history: number[];
-  hearts: number;
   status: ArrowsStatus;
   hintId: number | null;
   startLevel: (index: number) => void;
@@ -42,7 +40,6 @@ const initialLevel = levelAt(initialProgress.current);
 const emptyBoard = {
   removedIds: [] as number[],
   history: [] as number[],
-  hearts: MAX_HEARTS,
   status: "playing" as ArrowsStatus,
   hintId: null,
 };
@@ -62,11 +59,11 @@ function startLevelAction(set: ArrowsSet, get: ArrowsGet, index: number): void {
   saveArrowsProgress({ unlocked, current: levelIndex });
 }
 
-function blockArrow(set: ArrowsSet, state: ArrowsStore): ArrowsTapResult {
-  const hearts = Math.max(0, state.hearts - 1);
-  const status = hearts === 0 ? "lost" : "playing";
-  set({ hearts, status, hintId: null });
-  return status === "lost" ? "lost" : "blocked";
+function blockArrow(set: ArrowsSet): ArrowsTapResult {
+  // A blocked tap never ends the level. The arrow shakes, the status line
+  // explains why, and the child can try another arrow or ask for a hint.
+  set({ hintId: null });
+  return "blocked";
 }
 
 function removeArrow(set: ArrowsSet, state: ArrowsStore, arrow: MazeArrow): ArrowsTapResult {
@@ -105,7 +102,7 @@ function tapAction(set: ArrowsSet, get: ArrowsGet, id: number): ArrowsTapResult 
   const removed = new Set(state.removedIds);
   return isArrowRemovable(arrow, state.level, removed)
     ? removeArrow(set, state, arrow)
-    : blockArrow(set, state);
+    : blockArrow(set);
 }
 
 function undoAction(set: ArrowsSet, get: ArrowsGet): void {

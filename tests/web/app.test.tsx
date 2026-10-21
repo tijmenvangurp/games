@@ -187,7 +187,7 @@ describe("games app", () => {
     preloadSolvedGame();
     renderApp("/sudoku");
 
-    expect(await screen.findByRole("heading", { name: "Goed gedaan!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Opgelost!" })).toBeTruthy();
     expect(screen.getByText("Je hebt de sudoku helemaal opgelost.")).toBeTruthy();
     expect(document.querySelector('[data-confetti="true"]')).not.toBeNull();
     expect(
@@ -197,7 +197,7 @@ describe("games app", () => {
     ).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Goed gedaan!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Opgelost!" })).toBeNull();
     expect(screen.getByText(/0 van 16 vakjes ingevuld/)).toBeTruthy();
   });
 
@@ -274,11 +274,11 @@ describe("games app", () => {
 
     const board = await screen.findByRole("group", { name: /rooster van 4 bij 4/i });
     const wrong = within(board).getAllByRole("button")[1];
-    expect(wrong?.getAttribute("aria-label")).not.toContain("fout");
+    expect(wrong?.getAttribute("aria-label")).not.toContain("nog niet goed");
 
     fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
-    expect(wrong?.getAttribute("aria-label")).toContain("fout");
-    expect(screen.getByText("Er staat nog een foutje in.")).toBeTruthy();
+    expect(wrong?.getAttribute("aria-label")).toContain("nog niet goed");
+    expect(screen.getByText("Er staat nog iets niet goed.")).toBeTruthy();
   });
 
   it("marks duplicate digits as conflicts", async () => {
@@ -350,7 +350,7 @@ describe("games app", () => {
     preloadSolvedGame();
     renderApp("/sudoku");
 
-    expect(await screen.findByRole("heading", { name: "Goed gedaan!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Opgelost!" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Ander spel kiezen/ }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -360,7 +360,7 @@ describe("games app", () => {
     preloadSolvedGame();
     renderApp("/sudoku");
 
-    expect(await screen.findByRole("heading", { name: "Goed gedaan!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Opgelost!" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Naar het menu/ }));
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();

@@ -70,7 +70,9 @@ function hintMessageFor(
   if (!hintUnavailable) {
     return null;
   }
-  return solutionMistakes.length > 0 ? "Los eerst het foutje op." : "Er is nu geen logische hint.";
+  return solutionMistakes.length > 0
+    ? "Los eerst het vakje op dat nog niet klopt."
+    : "Er is nu geen logische hint.";
 }
 
 interface DeriveInput {
@@ -162,9 +164,11 @@ function useSudokuActions(
     }
     const after = countMistakes(next.entries, next.puzzle.solution).length;
     if (after > before) {
-      playSound("wrong");
-      playHaptic("wrong");
-    } else if (next.solved || next.entries.length - filledCount(next.entries) === 1) {
+      // A wrong cell is information, not a punishment. The board shows it
+      // neutrally and the child can erase it; there is no wrong sound here.
+      return;
+    }
+    if (next.solved || next.entries.length - filledCount(next.entries) === 1) {
       feedbackAfterMove();
     } else {
       playSound("select");
@@ -216,8 +220,10 @@ function useSudokuActions(
     }
     const mistakes = countMistakes(play.entries, play.puzzle.solution);
     setCheck({ entries: play.entries, mistakes });
-    playSound(mistakes.length > 0 ? "wrong" : "match");
-    playHaptic(mistakes.length > 0 ? "wrong" : "match");
+    if (mistakes.length === 0) {
+      playSound("match");
+      playHaptic("match");
+    }
   };
 
   return {

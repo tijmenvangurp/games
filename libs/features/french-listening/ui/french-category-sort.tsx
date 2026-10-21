@@ -85,7 +85,9 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
     }
     const correct = round.words.filter((word) => placements[word.item.id] === word.lessonId).length;
     setChecked(true);
-    playSound(correct === round.words.length ? "match" : "wrong");
+    if (correct === round.words.length) {
+      playSound("match");
+    }
   };
 
   const restart = () => {
@@ -158,11 +160,11 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
             className={
               score === round.words.length
                 ? "flex items-center justify-center gap-1.5 font-black text-success"
-                : "flex items-center justify-center gap-1.5 font-black text-danger"
+                : "flex items-center justify-center gap-1.5 font-black text-warning"
             }
           >
             <Sparkles aria-hidden="true" className="size-5" />
-            {score === round.words.length ? "Alles goed!" : "Bijna!"}
+            {score === round.words.length ? "Alles goed!" : "Nog niet."}
           </p>
           <p className="text-center text-sm text-muted-foreground">
             Je had {score} van {round.words.length} goed.

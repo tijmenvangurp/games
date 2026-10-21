@@ -60,7 +60,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Haal alle pijlen weg zonder dat ze tegen elkaar botsen.",
     status: "available",
     to: "/pijlen",
-    thumbnail: "/thumbnails/arrows-381e560b.jpg",
+    thumbnail: "/thumbnails/arrows-65ece2ce.jpg",
     speech: { kind: "visual", reason: "De pijlen en het bord zijn visueel." },
   },
   {
@@ -96,7 +96,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Zoek de paren tussen de 151 Pokémon uit Generatie 1.",
     status: "available",
     to: "/memory",
-    thumbnail: "/thumbnails/memory-144b9a2e.jpg",
+    thumbnail: "/thumbnails/memory-707e748b.jpg",
     speech: { kind: "visual", reason: "Alleen de instructie; nog geen spraakcatalogus." },
   },
   {

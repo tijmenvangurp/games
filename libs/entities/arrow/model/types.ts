@@ -22,8 +22,5 @@ export interface MazeLevel {
   arrows: readonly MazeArrow[];
 }
 
-/** A player may bump into three blocked arrows before the level ends. */
-export const MAX_HEARTS = 3;
-
 /** Padding around the puzzle so arrowheads on the edge remain visible. */
 export const MAZE_PADDING = 2;

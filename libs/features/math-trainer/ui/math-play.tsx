@@ -56,7 +56,7 @@ function ChoiceButton({
       className={cn(
         "flex min-h-14 items-center justify-center gap-1 rounded-lg border text-2xl font-black transition active:scale-[0.99]",
         state === "default" && "border-border bg-card hover:bg-muted",
-        state === "wrong" && "border-danger/40 bg-danger/10 text-danger",
+        state === "wrong" && "border-warning/40 bg-warning/10 text-warning",
         state === "correct" && "border-success/40 bg-success/10 text-success",
         state === "muted" && "border-border bg-muted text-muted-foreground opacity-50",
       )}
@@ -132,7 +132,7 @@ function MathFeedback({
       <div className="flex items-center justify-center gap-2">
         <p
           aria-live="polite"
-          className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-danger")}
+          className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-warning")}
         >
           {correct ? "Goed gerekend!" : `Het juiste antwoord is ${question.answer}.`}
         </p>

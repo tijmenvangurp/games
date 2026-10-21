@@ -13,7 +13,6 @@ export function MazePlay({ onBack }: MazePlayProps) {
   const level = useArrowsStore((state) => state.level);
   const levelIndex = useArrowsStore((state) => state.levelIndex);
   const removedIds = useArrowsStore((state) => state.removedIds);
-  const hearts = useArrowsStore((state) => state.hearts);
   const status = useArrowsStore((state) => state.status);
   const hintId = useArrowsStore((state) => state.hintId);
   const history = useArrowsStore((state) => state.history);
@@ -31,7 +30,6 @@ export function MazePlay({ onBack }: MazePlayProps) {
     <div className="mx-auto flex min-h-svh w-full max-w-3xl flex-col gap-3 px-3 pb-safe pt-safe sm:px-4">
       <MazeHud
         canUndo={history.length > 0}
-        hearts={hearts}
         level={level}
         levelIndex={levelIndex}
         playing={status === "playing"}
