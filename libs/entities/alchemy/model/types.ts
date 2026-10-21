@@ -1,6 +1,14 @@
 export type ElementId = string;
 
-export type ElementCategory = "water" | "fire" | "earth" | "air" | "life" | "tech" | "fantasy";
+export type ElementCategory =
+  | "water"
+  | "fire"
+  | "earth"
+  | "air"
+  | "life"
+  | "food"
+  | "tech"
+  | "fantasy";
 
 export const ELEMENT_CATEGORIES = [
   "water",
@@ -8,6 +16,7 @@ export const ELEMENT_CATEGORIES = [
   "earth",
   "air",
   "life",
+  "food",
   "tech",
   "fantasy",
 ] as const satisfies readonly ElementCategory[];
@@ -18,6 +27,7 @@ export const ELEMENT_CATEGORY_LABELS: Record<ElementCategory, string> = {
   earth: "Aarde",
   air: "Lucht",
   life: "Leven",
+  food: "Eten",
   tech: "Techniek",
   fantasy: "Fantasie",
 };

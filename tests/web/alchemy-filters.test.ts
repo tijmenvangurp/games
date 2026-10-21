@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ELEMENTS, ELEMENT_CATEGORIES } from "@entities/alchemy";
+import { ELEMENTS, ELEMENT_CATEGORIES, ELEMENT_CATEGORY_LABELS } from "@entities/alchemy";
 import { filterAndSortElements } from "@features/alchemy-lab";
 
 describe("alchemy element filters", () => {
@@ -8,6 +8,16 @@ describe("alchemy element filters", () => {
 
     expect(water.length).toBeGreaterThan(0);
     expect(water.every((element) => element.category === "water")).toBe(true);
+  });
+
+  it("gives food its own category", () => {
+    const food = filterAndSortElements(ELEMENTS, "food", "name");
+    const life = filterAndSortElements(ELEMENTS, "life", "name");
+
+    expect(ELEMENT_CATEGORY_LABELS.food).toBe("Eten");
+    expect(food.every((element) => element.category === "food")).toBe(true);
+    expect(food.map((element) => element.id)).toContain("sugar");
+    expect(life.map((element) => element.id)).not.toContain("sugar");
   });
 
   it("sorts alphabetically within a category", () => {
