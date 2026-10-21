@@ -42,6 +42,7 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `@radix-ui/react-slot`                                             | `asChild` op `Button`                                               |
 | `lucide-react`                                                     | UI-iconen, geëxporteerd via `@shared/ui`                            |
 | `@phosphor-icons/react`                                            | spelidentiteit via `GameIcon`                                       |
+| `@iconify-json/fluent-emoji-flat`, `@iconify-json/ph`              | elementiconen voor Mengelmoes, dev-time gegenereerd uit Iconify     |
 | `@dnd-kit/core`                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)          |
 | `chess.js`                                                         | schaakregels en zetgeneratie                                        |
 | `react-chessboard`                                                 | schaakbord                                                          |

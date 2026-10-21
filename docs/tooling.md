@@ -62,6 +62,27 @@ corepack pnpm run build
 
 `NX_DAEMON=false` is alleen een laatste redmiddel voor een bewuste parallelle run. Het is geen oplossing voor package-installatie en hoeft niet standaard gebruikt te worden. Voor dat laatste redmiddel staat een expliciete allow-regel in `opencode.jsonc`, zodat een bewuste keuze geen prompt oplevert.
 
+## Elementiconen (Mengelmoes)
+
+De iconen in `apps/games/public/elements/` worden gegenereerd uit lokale Iconify-pakketten. Er gaat geen netwerkrequest aan te pas: de sets staan als dev-dependency in `pnpm-lock.yaml`.
+
+```sh
+corepack pnpm run elements        # schrijf alle SVG's opnieuw
+corepack pnpm run elements:check  # controleer zonder te schrijven (zit in quality)
+```
+
+De lijst met elementen en hun iconen staat in `scripts/element-icons.ts`. Een icoon is een Iconify-referentie (`set:name`) of een prioriteitslijst daarvan; de eerste match wint. Zo kan een element terugvallen op een andere set als Fluent Emoji geen passend beeld heeft.
+
+Een set toevoegen:
+
+```sh
+corepack pnpm add -D @iconify-json/<prefix>
+```
+
+en daarna `<prefix>:<name>` in de lijst zetten. Monochrome sets (zoals Phosphor) gebruiken `currentColor`; geef zo'n element een `color` mee, anders wordt het icoon zwart in de `<img>`.
+
+Een icoon dat echt niet bestaat, mag handmatig in dezelfde platte stijl in `apps/games/public/elements/` staan. Zet het element dan op `{ custom: true }`; de generator laat het bestand met rust en controleert alleen of het bestaat.
+
 ## Playwright
 
 De Playwright-browser heeft in deze omgeving extra libraries en fonts nodig. Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en `FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Gebruik bij voorkeur het bestaande script:
