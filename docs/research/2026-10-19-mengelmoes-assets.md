@@ -78,7 +78,7 @@ Gebruik **Fluent Emoji Flat** als basis. Het is MIT, het ziet er verzorgd uit en
 
 Voor de paar begrippen zonder passende emoji maken we **twee of drie eigen SVG's** in dezelfde platte stijl. Denk aan "leven", "mengsel" of "uitvinding". We mengen dus niet twee grote stijlen; we vullen één set aan.
 
-De gekozen SVG's komen eenmalig in `apps/games/public/elements/` en worden gecommit. Een script (`scripts/fetch-element-sprites.ts`) downloadt ze tijdens ontwikkeling, net zoals de Pokémon-assets eenmalig zijn binnengehaald. Tijdens het spelen doet de app alleen een request naar de eigen origin; de CSP blijft `img-src 'self' data:`.
+De gekozen SVG's komen eenmalig in `apps/games/public/elements/` en worden gecommit. Een script (`scripts/build-element-sprites.ts`) bouwt ze tijdens ontwikkeling uit lokale Iconify-pakketten (`@iconify-json/fluent-emoji-flat`, met `@iconify-json/ph` als terugval), net zoals de Pokémon-assets eenmalig zijn binnengehaald. Er is geen netwerk nodig bij het bouwen of spelen. Tijdens het spelen doet de app alleen een request naar de eigen origin; de CSP blijft `img-src 'self' data:`.
 
 **Attributie:** voeg `LICENSES/fluent-emoji-MIT.txt` toe en noem de bron in een klein "Over dit spel"-paneel of in `docs/credits.md`. Bij MIT is dat geen zware verplichting, maar het is netjes en het maakt de herkomst controleerbaar. Als we later toch OpenMoji gebruiken, moet de share-alike-voorwaarde expliciet worden gedocumenteerd.
 

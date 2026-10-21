@@ -84,7 +84,7 @@ describe("alchemy rules", () => {
   });
 
   it("returns null for unknown combinations", () => {
-    expect(combine("water", "dragon")).toBeNull();
+    expect(combine("water", "crown")).toBeNull();
     expect(combine("onbekend", "water")).toBeNull();
   });
 
@@ -103,18 +103,98 @@ describe("alchemy rules", () => {
     expect(getHint(everything)).toBeNull();
   });
 
-  it("keeps the element tree at a readable size", () => {
+  it("grows without leaving new elements without a recipe", () => {
     expect(ELEMENTS.length).toBeGreaterThanOrEqual(90);
-    expect(ELEMENTS.length).toBeLessThanOrEqual(120);
-    expect(RECIPES.length).toBeGreaterThanOrEqual(90);
+    expect(RECIPES.length).toBeGreaterThanOrEqual(ELEMENTS.length - BASE_ELEMENT_IDS.length);
   });
 
   it("supports combining two copies of the same element", () => {
-    expect(combine("air", "air")).toBe("wind");
+    expect(combine("air", "air")).toBe("storm");
     expect(combine("water", "water")).toBe("sea");
     expect(combine("stone", "stone")).toBe("mountain");
     expect(combine("house", "house")).toBe("village");
     expect(combine("star", "star")).toBe("galaxy");
+  });
+
+  it("keeps wind reachable now that two airs make a storm", () => {
+    expect(combine("air", "dust")).toBe("wind");
+    expect(combine("wind", "rain")).toBe("storm");
+  });
+
+  it("builds glass from sand and gives the dragon useful recipes", () => {
+    expect(combine("stone", "air")).toBe("sand");
+    expect(combine("sand", "fire")).toBe("glass");
+    expect(combine("sand", "glass")).toBe("hourglass");
+    expect(findRecipesFor("glass").length).toBeGreaterThanOrEqual(2);
+    expect(recipesUsing("dragon").length).toBeGreaterThanOrEqual(3);
+    expect(combine("dragon", "castle")).toBe("fairytale");
+    expect(combine("dragon", "knight")).toBe("fairytale");
+  });
+
+  it("adds playful combinations children can guess", () => {
+    expect(combine("wheel", "wheel")).toBe("bicycle");
+    expect(combine("motor", "wheel")).toBe("car");
+    expect(combine("car", "fire")).toBe("firetruck");
+    expect(combine("plant", "mud")).toBe("potato");
+    expect(combine("potato", "fire")).toBe("fries");
+    expect(combine("bread", "cow")).toBe("burger");
+    expect(combine("human", "fish")).toBe("mermaid");
+    expect(combine("human", "pirateship")).toBe("pirate");
+    expect(combine("cat", "jungle")).toBe("lion");
+    expect(combine("bird", "ice")).toBe("penguin");
+    expect(combine("palm", "fruit")).toBe("banana");
+    expect(combine("batter", "fire")).toBe("pancakes");
+    expect(combine("motor", "cart")).toBe("train");
+    expect(combine("tree", "water")).toBe("paper");
+    expect(combine("paper", "wind")).toBe("kite");
+    expect(combine("human", "lightning")).toBe("superhero");
+  });
+
+  it("takes a longer path where a direct combination felt figurative", () => {
+    expect(combine("metal", "steam")).toBe("motor");
+    expect(combine("motor", "wheel")).toBe("car");
+    expect(combine("motor", "cart")).toBe("train");
+    expect(combine("motor", "farm")).toBe("tractor");
+    expect(combine("motor", "airplane")).toBe("helicopter");
+    expect(combine("wood", "house")).toBe("door");
+    expect(combine("metal", "door")).toBe("key");
+    expect(combine("wheat", "stone")).toBe("flour");
+    expect(combine("flour", "milk")).toBe("batter");
+    expect(combine("batter", "fire")).toBe("pancakes");
+    expect(combine("tree", "beach")).toBe("palm");
+    expect(combine("palm", "fruit")).toBe("banana");
+    expect(combine("forest", "rain")).toBe("jungle");
+    expect(combine("mammal", "jungle")).toBe("elephant");
+    expect(combine("tree", "wind")).toBe("leaf");
+    expect(combine("mammal", "leaf")).toBe("giraffe");
+    expect(combine("animal", "leaf")).toBe("hedgehog");
+    expect(combine("cow", "grass")).toBe("milk");
+    expect(combine("alien", "airplane")).toBe("ufo");
+    expect(combine("dog", "chicken")).toBe("fox");
+    expect(combine("fruit", "bee")).toBe("strawberry");
+    expect(combine("human", "bone")).toBe("skeleton");
+    expect(combine("boat", "skeleton")).toBe("pirateship");
+    expect(combine("human", "pirateship")).toBe("pirate");
+    expect(combine("metal", "sun")).toBe("gold");
+    expect(combine("gold", "island")).toBe("treasure");
+  });
+
+  it("classifies animals by their traits", () => {
+    expect(combine("animal", "milk")).toBe("mammal");
+    expect(combine("animal", "sun")).toBe("reptile");
+    expect(combine("animal", "water")).toBe("amphibian");
+    expect(combine("animal", "flower")).toBe("insect");
+    expect(combine("mammal", "human")).toBe("dog");
+    expect(combine("mammal", "sea")).toBe("whale");
+    expect(combine("reptile", "sand")).toBe("snake");
+    expect(combine("reptile", "beach")).toBe("turtle");
+    expect(combine("reptile", "water")).toBe("crocodile");
+    expect(combine("amphibian", "water")).toBe("frog");
+    expect(combine("insect", "sugar")).toBe("bee");
+    expect(combine("insect", "flower")).toBe("butterfly");
+    expect(combine("insect", "sand")).toBe("ant");
+    expect(combine("bird", "farm")).toBe("chicken");
+    expect(combine("fish", "dinosaur")).toBe("shark");
   });
 
   it("offers alternate routes to the same element", () => {

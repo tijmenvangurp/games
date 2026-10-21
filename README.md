@@ -42,7 +42,7 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 ## Element-assets
 
-**Mengelmoes** gebruikt lokale SVG's uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (Flat). Die vallen onder de MIT-licentie; de volledige tekst staat in [`LICENSES/fluent-emoji-MIT.txt`](LICENSES/fluent-emoji-MIT.txt). De bestanden staan in `apps/games/public/elements/` en worden niet tijdens het spelen bij een externe host opgehaald.
+**Mengelmoes** gebruikt lokale SVG's uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (Flat). Die vallen onder de MIT-licentie; de volledige tekst staat in [`LICENSES/fluent-emoji-MIT.txt`](LICENSES/fluent-emoji-MIT.txt). Ontbreekt een emoji, dan valt het element terug op [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT, [`LICENSES/phosphor-MIT.txt`](LICENSES/phosphor-MIT.txt)) of op een handgemaakte SVG in dezelfde platte stijl. De bestanden staan in `apps/games/public/elements/` en worden niet tijdens het spelen bij een externe host opgehaald.
 
 ## Audio
 
