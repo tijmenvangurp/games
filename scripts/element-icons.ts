@@ -59,7 +59,7 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   desert: fluent("desert"),
   cactus: fluent("cactus"),
   flower: fluent("blossom"),
-  forest: fluent("evergreen-tree"),
+  forest: { custom: true },
   fruit: fluent("red-apple"),
   grass: fluent("herb"),
   animal: fluent("paw-prints"),
@@ -194,10 +194,11 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   insect: fluent("lady-beetle"),
   crocodile: fluent("crocodile"),
   ant: fluent("ant"),
-  // Fluent Emoji has no flour, sand, tadpole, rainbow-dragon, windmill or
-  // dough sprite; these are custom flat icons. The rainbow dragon adapts the
-  // Fluent dragon body with a rainbow gradient. Replace them with an Iconify
-  // reference when a suitable set is added.
+  // Fluent Emoji has no forest, flour, sand, tadpole, rainbow-dragon, windmill
+  // or dough sprite; these are custom flat icons. The forest is a cluster of
+  // three deciduous trees. The rainbow dragon adapts the Fluent dragon body
+  // with a rainbow gradient. Replace them with an Iconify reference when a
+  // suitable set is added.
   flour: { custom: true },
   sand: { custom: true },
   amphibian: { custom: true },
