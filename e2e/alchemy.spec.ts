@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { ELEMENTS } from "../libs/entities/alchemy/model/elements";
 
 test.describe("mengelmoes op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -75,5 +76,35 @@ test.describe("mengelmoes slepen op een tablet", () => {
     await page.mouse.up();
 
     await expect(page.getByRole("heading", { name: "Stoom" })).toBeVisible();
+  });
+});
+
+test.describe("mengelmoes op een tablet in landschap", () => {
+  test.use({ viewport: { width: 1024, height: 768 } });
+
+  test("houdt het spel binnen één scherm en laat alleen het schap scrollen", async ({ page }) => {
+    await page.addInitScript(
+      (ids) => {
+        localStorage.setItem("games.mengelmoes.v1", JSON.stringify({ discovered: ids, board: [] }));
+      },
+      ELEMENTS.map((element) => element.id),
+    );
+
+    await page.goto("/mengelmoes");
+    await expect(page.getByRole("heading", { name: "Mengelmoes" })).toBeVisible();
+
+    const pageFits = await page.evaluate(() => ({
+      vertical: document.documentElement.scrollHeight <= window.innerHeight + 1,
+      horizontal: document.documentElement.scrollWidth <= window.innerWidth,
+    }));
+    expect(pageFits).toEqual({ vertical: true, horizontal: true });
+
+    const shelf = page.getByRole("region", { name: "Mijn elementen" });
+    await expect(shelf).toBeVisible();
+    const shelfScrolls = await shelf.evaluate((element) => {
+      const scroller = element.querySelector("[data-alchemy-shelf-scroll]");
+      return scroller ? scroller.scrollHeight > scroller.clientHeight : false;
+    });
+    expect(shelfScrolls).toBe(true);
   });
 });
