@@ -151,6 +151,22 @@ describe("alchemy rules", () => {
     expect(combine("dragon", "rainbow")).toBe("rainbowdragon");
   });
 
+  it("grows a farm-to-table chain", () => {
+    expect(combine("house", "wind")).toBe("mill");
+    expect(combine("mill", "wheat")).toBe("flour");
+    expect(combine("flour", "water")).toBe("dough");
+    expect(combine("dough", "fire")).toBe("bread");
+    expect(combine("sea", "sun")).toBe("salt");
+    expect(combine("milk", "salt")).toBe("cheese");
+    expect(combine("bread", "cheese")).toBe("tosti");
+    expect(combine("plant", "rain")).toBe("carrot");
+    expect(combine("water", "potato")).toBe("soup");
+    expect(combine("mammal", "mountain")).toBe("goat");
+    expect(combine("bird", "water")).toBe("duck");
+    expect(combine("horse", "farm")).toBe("donkey");
+    expect(combine("mammal", "carrot")).toBe("rabbit");
+  });
+
   it("takes a longer path where a direct combination felt figurative", () => {
     expect(combine("metal", "steam")).toBe("motor");
     expect(combine("motor", "wheel")).toBe("car");

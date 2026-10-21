@@ -71,6 +71,11 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   farm: fluent("house-with-garden"),
   wheat: fluent("sheaf-of-rice"),
   bread: fluent("bread"),
+  salt: fluent("salt"),
+  cheese: fluent("cheese-wedge"),
+  carrot: fluent("carrot"),
+  soup: fluent("pot-of-food"),
+  tosti: fluent("sandwich"),
   sugar: fluent("candy"),
   cake: fluent("birthday-cake"),
   tool: fluent("hammer-and-wrench"),
@@ -141,6 +146,10 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   elephant: fluent("elephant"),
   giraffe: fluent("giraffe"),
   chicken: fluent("chicken"),
+  goat: fluent("goat"),
+  duck: fluent("duck"),
+  donkey: fluent("donkey"),
+  rabbit: fluent("rabbit"),
   owl: fluent("owl"),
   snake: fluent("snake"),
   bear: fluent("bear"),
@@ -185,12 +194,14 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   insect: fluent("lady-beetle"),
   crocodile: fluent("crocodile"),
   ant: fluent("ant"),
-  // Fluent Emoji has no flour, sand, tadpole or rainbow-dragon sprite; these
-  // are custom flat icons. The rainbow dragon adapts the Fluent dragon body
-  // with a rainbow gradient. Replace them with an Iconify reference when a
-  // suitable set is added.
+  // Fluent Emoji has no flour, sand, tadpole, rainbow-dragon, windmill or
+  // dough sprite; these are custom flat icons. The rainbow dragon adapts the
+  // Fluent dragon body with a rainbow gradient. Replace them with an Iconify
+  // reference when a suitable set is added.
   flour: { custom: true },
   sand: { custom: true },
   amphibian: { custom: true },
   rainbowdragon: { custom: true },
+  mill: { custom: true },
+  dough: { custom: true },
 };
