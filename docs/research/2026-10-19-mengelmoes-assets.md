@@ -97,7 +97,7 @@ De gekozen SVG's komen eenmalig in `apps/games/public/elements/` en worden gecom
 Elk element is een grote ronde tegel:
 
 - 72 px op mobiel, 80–88 px op tablet.
-- Kleurverloop per categorie (water, vuur, aarde, lucht, leven, techniek, fantasie).
+- Kleurverloop per categorie (water, vuur, aarde, lucht, leven, eten, techniek, fantasie).
 - Een subtiele glans linksboven en een dunne binnenring, zodat het als een glazen munt of flesje voelt.
 - Het icoon vult ongeveer 60% van de tegel.
 - De naam staat eronder, vet en kort.
@@ -113,6 +113,7 @@ Categoriekleuren kunnen aansluiten bij de bestaande Tailwind-tokens:
 | aarde     | groen/bruin      | aarde, modder, steen, plant      |
 | lucht     | paars/lichtblauw | lucht, wolk, wind                |
 | leven     | emerald          | leven, vis, vogel, mens          |
+| eten      | roze/amber       | suiker, brood, taart, fruit      |
 | techniek  | leisteen         | metaal, gereedschap, robot, stad |
 | fantasie  | violet           | draak, toverstaf, eenhoorn       |
 

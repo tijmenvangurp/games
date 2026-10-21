@@ -7,6 +7,7 @@ const CATEGORY_STYLES: Record<ElementCategory, string> = {
   earth: "border-lime-300 from-lime-200 via-amber-100 to-yellow-50",
   air: "border-violet-300 from-violet-200 via-sky-100 to-white",
   life: "border-emerald-300 from-emerald-200 via-teal-100 to-lime-50",
+  food: "border-pink-300 from-pink-200 via-rose-100 to-amber-50",
   tech: "border-slate-300 from-slate-200 via-zinc-100 to-white",
   fantasy: "border-fuchsia-300 from-fuchsia-200 via-violet-100 to-purple-50",
 };
