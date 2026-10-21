@@ -236,7 +236,7 @@ Dit is het belangrijkste tabletrisico. **In de implementatie** scrollt het schap
 - verticaal schap: `touch-pan-y`, met dezelfde regel;
 - de scrollbar is met `game-scrollbar` zichtbaar waar de browser aangepaste scrollbars ondersteunt, zodat er ook met een muis of stylus een greep is om te scrollen;
 - gebruik een raster met categoriefilters, zodat het schap niet onnodig lang wordt;
-- houd de sleepafstand klein (6 px) en de touch-delay kort (150 ms);
+- gebruik `MouseSensor` (afstand 6 px) voor een muis en `TouchSensor` (delay 150 ms) voor een vinger; `PointerSensor` luistert ook naar touch en kan een veeg als sleep beginnen;
 - test op 390 px en 1024 px in Playwright, niet alleen in jsdom. jsdom heeft geen echte pointergeometrie.
 
 Tikken blijft de primaire en meest toegankelijke route. Een lange-druk-drag met een langere delay is niet nodig zolang de dwarsrichting vrij blijft voor slepen.

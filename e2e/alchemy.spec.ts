@@ -45,6 +45,7 @@ async function touchSwipe(
     type: "touchStart",
     touchPoints: [from],
   });
+  await page.waitForTimeout(50);
 
   for (let step = 1; step <= 8; step += 1) {
     await client.send("Input.dispatchTouchEvent", {
