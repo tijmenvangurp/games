@@ -39,6 +39,31 @@ De lijst is **geen**:
 | [Groep 7](#groep-7) |    180 | Rekenen en wiskunde (61), Nederlandse taal (23), Natuur (15)                   |
 | [Groep 8](#groep-8) |    178 | Rekenen en wiskunde (60), Nederlandse taal (23), Meerdere vakgebieden (15)     |
 
+## Verdeling per vak
+
+| Vak                             | Aantal |
+| ------------------------------- | -----: |
+| Rekenen en wiskunde             |     76 |
+| Lezen                           |     27 |
+| Nederlandse taal                |     26 |
+| Meerdere vakgebieden            |     20 |
+| Wereldoriëntatie                |     18 |
+| Natuur                          |     17 |
+| Techniek                        |     10 |
+| Zintuiglijke oefening           |      9 |
+| Geschiedenis                    |      8 |
+| Sociaal-emotionele ontwikkeling |      7 |
+| Engels                          |      5 |
+| Informatica                     |      4 |
+| Aardrijkskunde                  |      3 |
+| Filosofie                       |      3 |
+| Motorische oefening             |      3 |
+| Muziek                          |      3 |
+| Spaans                          |      2 |
+| Spel en beweging                |      1 |
+
+Rekenen en wiskunde is zo groot omdat de bron daar ook fysieke denkspellen als _Blokus_, _Katamino_ en _Set!_ onder schaart. Het aantal middelen zegt dus niet direct iets over de nadruk op rekenen in het onderwijs.
+
 ## Per leerjaar
 
 Elke tabel noemt de middelen die volgens de bron minstens één onderdeel voor die groep hebben. Een middel kan dus in meerdere jaargangen staan. De link op de titel gaat naar de uitgever of aanbieder; de link in de laatste kolom opent de bron-PDF op de PDF-pagina waar het middel begint. De eerste inhoudspagina is PDF-pagina 4; de gedrukte paginanummering begint daar op 1.
