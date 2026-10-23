@@ -23,7 +23,7 @@
 
 De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken, wereldoriëntatie en associëren**. Het grootste gat is nu **computationeel denken**.
 
-Externe verrijkingsmaterialen per leerjaar staan in [het SLO-overzicht](../research/2026-10-23-verrijkingsmaterialen-per-leerjaar.md). Dat overzicht is bronmateriaal en geen planning.
+Externe verrijkingsmaterialen per leerjaar staan in [het SLO-overzicht](../research/verrijkingsmaterialen/README.md). Dat overzicht is bronmateriaal en geen planning.
 
 ## Mengelmoes (verticale slice)
 
