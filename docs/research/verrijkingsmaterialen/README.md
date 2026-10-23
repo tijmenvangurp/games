@@ -102,7 +102,7 @@ De bron zelf is niet helemaal consistent: de inhoudsopgave noemt **sociale redza
 
 ## Beperkingen
 
-- **2011 is oud.** Prijzen, drukken en uitgevers zijn niet gecontroleerd. Van de URLs is alleen een HTTP-statusmomentopname gemaakt (zie [bronnen](bronnen.md)); de inhoud achter de links is niet gecontroleerd.
+- **2011 is oud.** Prijzen, drukken en uitgevers zijn niet gecontroleerd. Van de URLs is een Firecrawl-momentopname gemaakt (zie [bronnen](bronnen.md)); de inhoud achter de links is niet inhoudelijk beoordeeld.
 - **Het is een uitgeversclaim.** Dat een middel in de lijst staat, zegt niets over de effectiviteit of over de kwaliteit voor een specifiek kind.
 - **De groepsindeling is een indicatie.** Veel middelen overlappen meerdere groepen; de extractie telt een middel mee in elke groep waarvoor de bron een onderdeel noemt.
 - **Niet elk middel heeft een URL.** 231 van de 242 middelen hebben een bron-URL (70 unieke adressen); de overige verwijzen alleen naar een uitgever of leverancier. Zie [bronnen](bronnen.md) voor de URL-index en een statusmomentopname.
