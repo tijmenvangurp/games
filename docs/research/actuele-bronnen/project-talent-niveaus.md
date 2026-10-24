@@ -21,7 +21,7 @@ De PDF _Overzicht Verrijkingsmaterialen 2025_ markeert per materiaal de leerjare
 | S3/4   |          8 |
 | S5/6   |          6 |
 
-De lijst is het sterkst gevuld voor **L2–L6** (ruwweg groep 4–8) en veel minder voor **K1** en het secundair onderwijs. K1–K3 zijn kleuterniveaus, L1–L6 is lager onderwijs en S1/2–S5/6 is secundair; de koppeling aan Nederlandse groepen is indicatief.
+K1–K3 zijn kleuterniveaus, L1–L6 is lager onderwijs en S1/2–S5/6 is secundair onderwijs.
 
 Een materiaal telt mee in elk niveau waarvoor de PDF een markering heeft. Zes materialen hebben geen niveau-markering en staan in de tabel op `—`.
 
