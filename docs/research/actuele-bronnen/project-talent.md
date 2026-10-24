@@ -28,6 +28,7 @@ De PDF gebruikt Belgische niveau-aanduidingen:
 
 ## Uitwerkingen
 
+- [Alfabetische materialenindex](project-talent-index.md)
 - [Materialen per uitgever](project-talent-materialen.md)
 - [Materialen per niveau](project-talent-niveaus.md)
 - [Online tools](project-talent-online-tools.md)

@@ -2,7 +2,7 @@
 
 [← Project Talent](project-talent.md)
 
-De PDF _Tips voor binnenklasdifferentiatie 2022_ is een werkblad met concrete opdrachten per vak en leerjaar (L1–L6, plus een aparte sectie secundair). Per opdracht noemt de PDF een mogelijke evaluatievorm en soms een link of voorbeeld. Dit is een samenvatting van de belangrijkste ideeën.
+De PDF _Tips voor binnenklasdifferentiatie 2022_ is een werkblad met concrete opdrachten per vak en leerjaar (L1–L6, plus een aparte sectie secundair). Per opdracht noemt de PDF een mogelijke evaluatievorm en soms een link of voorbeeld. De samenvatting hieronder geeft de hoofdlijnen; de volledige tabellen staan per domein.
 
 | Domein             | Concrete opdrachten uit de PDF                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -14,6 +14,18 @@ De PDF _Tips voor binnenklasdifferentiatie 2022_ is een werkblad met concrete op
 | Wereldoriëntatie   | Presentaties met vooraf bepaalde criteria; een lesonderdeel voorbereiden voor klasgenoten; een samenvatting, studieposter of tijdlijn maken; Venndiagrammen; expertkennis tonen; een verdiepingsopdracht of eigen project; projecten uit _Acadin_, _Edubook_, _Ontdekkend leren_, _Ontdekklas_ en _Klimop_; de zes denkniveaus van Bloom.                                                                                                                               |
 | Leren studeren     | Portfolio bijhouden; coaching tijdens taaktijd of kindcontact; jezelf inschalen met rubrics; een week- of contractplanning maken; eigen doelen kiezen; executieve functies trainen; _Slim studeren_; denksleutels.                                                                                                                                                                                                                                                      |
 | Sociaal-emotioneel | Portfolio; coaching; leerkuil, leertrap en mindset; psycho-educatie met het model van talentontwikkeling; Covey's _7 eigenschappen van Happy Kids_ en _Circle of influence_; Axenroos; _Kikker en Dipper_; Blobboom; een emotionele check-in met zones.                                                                                                                                                                                                                 |
+
+## Volledige tabellen per domein
+
+- [Nederlands lezen](tips/lezen.md)
+- [Nederlands spelling](tips/spelling.md)
+- [Nederlands schrijven](tips/schrijven.md)
+- [Wiskunde](tips/wiskunde.md)
+- [Frans](tips/frans.md)
+- [Wereldoriëntatie](tips/wereldorientatie.md)
+- [Leren studeren](tips/leren-studeren.md)
+- [Sociaal-emotionele ontwikkeling](tips/sociaal-emotioneel.md)
+- [Secundair onderwijs](tips/secundair.md)
 
 ## Wat er nog meer in de PDF staat
 

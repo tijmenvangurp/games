@@ -13,10 +13,15 @@ Deze map ontsluit zes bronnen over verrijkingsmaterialen en hoogbegaafdheid. Per
 
 ## Uitwerkingen Project Talent
 
+- [Alfabetische materialenindex](project-talent-index.md) — alle 114 vermeldingen op naam.
 - [Materialen per uitgever](project-talent-materialen.md) — 114 vermeldingen van 25 uitgevers.
 - [Materialen per niveau](project-talent-niveaus.md) — de leerjaarmatrix van alle 114 vermeldingen.
 - [Online tools](project-talent-online-tools.md) — 27 tools met kosten, maximum aantal leerlingen en accounts.
 - [Tips voor binnenklasdifferentiatie](project-talent-tips.md) — concrete opdrachten per domein.
+
+## Naslag
+
+- [Begrippen](begrippen.md) — uitleg van niveaus, vakafkortingen, modellen en afkortingen.
 
 ## Peildatum
 
