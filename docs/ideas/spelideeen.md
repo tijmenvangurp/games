@@ -23,6 +23,8 @@
 
 De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken, wereldoriëntatie en associëren**. Het grootste gat is nu **computationeel denken**.
 
+Externe verrijkingsmaterialen per leerjaar staan in [het SLO-overzicht](../research/verrijkingsmaterialen/README.md). Bronnen over actuele verrijkingsmaterialen staan in [actuele bronnen](../research/actuele-bronnen/README.md). Deze overzichten zijn bronmateriaal en geen planning.
+
 ## Mengelmoes (verticale slice)
 
 **Leerdoel:** associëren, oorzaak-gevolg en nieuwsgierig experimenteren. Het kind sleept twee elementen op elkaar en ontdekt wat er ontstaat.
