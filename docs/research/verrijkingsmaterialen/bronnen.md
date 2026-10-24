@@ -71,7 +71,9 @@ Van de 48 pagina's met status 200 zijn er meerdere geparkeerd, te koop of doorge
 | [www.technika10.nl](http://www.technika10.nl)                                                                     | 200 → technika-10.nl             | Doorgestuurd.                                                      |
 | [www.neurocampus.com](http://www.neurocampus.com)                                                                 | 200 → neurocampus.nl             | Doorgestuurd.                                                      |
 
-De overige 200-pagina's zijn vooral algemene uitgevers- of leveranciershomepages. Ze bevestigen dat de organisatie nog bestaat, maar niet dat het in 2011 genoemde product nog wordt verkocht.
+Van de 48 pagina's met status 200 zijn er 11 duidelijk onbruikbaar (parkeer-, verkoop-, spam- of botcheckpagina). De overige 37 zijn meestal algemene uitgevers- of leveranciershomepages. Ze bevestigen dat de organisatie nog bestaat, maar niet dat het in 2011 genoemde product nog wordt verkocht.
+
+Een gerichte site-search vond wel twee concrete 2011-producten met een actuele productpagina: _Rekentijger_ bij [Zwijsen](https://www.zwijsen.nl/lesmethodes/rekentijger/) en _Levelwerk_ bij [Eduforce](https://www.eduforce.nl/levelwerk.html). Voor _Bolleboos_, _3D-brick_, _Piep_, _Plustaak_, _Klimba_ en _Blokus_ vonden we geen bevestiging; dat betekent niet dat ze verdwenen zijn.
 
 Geen bruikbare pagina gaven: `jufjo.nl`, `uitgeverijcallenbach.nl`, `cedicu.nl`, `creativekidsconcepts.com`, `innotechniek.nl`, `lekopro-polydron.nl`, `slimme-uilen.nl`, `lcowijzer.nl`, `plusklasdenbosch.nl`, `members.chello.nl/e.barnard/` en `iqspellen.nl` (DNS); `bazalt.nl`, `pravoo.com` en `spreekwoord.net` (timeout); `gipf.com/hetanderespel`, `fi.uu.nl` en `vierkantvoorwiskunde.nl/sikkepit` (engine).
 
