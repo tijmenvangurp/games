@@ -38,6 +38,7 @@
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.
 - `research/verrijkingsmaterialen/slo-leermiddelenlijst-hoogbegaafden-2011.pdf` — de bron-PDF van de SLO-lijst.
+- `research/verrijkingsmaterialen/actueel/README.md` — recente bronnen (SLO, Project Talent 2025, De Verrijking, Briljant en HBwebshop) als aanvulling op de SLO-lijst uit 2011.
 - `plans/2026-10-19-voorlezen-in-alle-games.md` — plan voor een gedeelde spraakspeler, een catalogus met teksthashes en gefaseerde audio in de Nederlandse games.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.

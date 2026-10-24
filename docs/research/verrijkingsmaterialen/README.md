@@ -6,7 +6,7 @@
 - **Vraag:** welke leermiddelen noemt de SLO-lijst per leerjaar (groep 1–8), en welke aanknopingspunten geeft dat voor de spellen-app?
 - **Kader:** dit is naslagmateriaal in `docs/`; het verandert niets aan de statische app, de CSP of de spellogica.
 
-De uitwerking staat per leerjaar in [groep 1](groep-1.md) tot en met [groep 8](groep-8.md). De herkomst van de PDF en de geëxtraheerde bronnen staan in [bronnen](bronnen.md).
+De uitwerking staat per leerjaar in [groep 1](groep-1.md) tot en met [groep 8](groep-8.md). De herkomst van de PDF en de geëxtraheerde bronnen staan in [bronnen](bronnen.md). Recentere bronnen van na 2011 staan in [actueel/README.md](actueel/README.md).
 
 ## Kort
 

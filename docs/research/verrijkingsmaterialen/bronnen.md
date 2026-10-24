@@ -27,6 +27,8 @@ De PDF is een uitgeversoverzicht, geen literatuurstudie. Er staat geen bibliogra
 - vaak een telefoonnummer en een URL;
 - de onderdelen en prijzen.
 
+Actuele bronnen van na 2011 staan in [actueel/README.md](actueel/README.md).
+
 Van de 242 middelen hebben 231 een URL; dat zijn 70 unieke adressen. De overige 11 verwijzen alleen naar een uitgever of leverancier. De adressen zijn uit 2011. Hieronder staat een Firecrawl-controle van de bereikbaarheid op 2026-10-23; de pagina-inhoud is niet inhoudelijk beoordeeld.
 
 ## Firecrawl-controle
