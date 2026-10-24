@@ -30,6 +30,7 @@ De SLO-lijst uit 2011 is verouderd. Deze map verzamelt zes recentere bronnen die
 - [project-talent.md](project-talent.md) — het project en de drie PDF's.
 - [project-talent-materialen.md](project-talent-materialen.md) — de materialenlijst 2025 per uitgever.
 - [project-talent-online-tools.md](project-talent-online-tools.md) — de 27 online tools uit 2025.
+- [project-talent-per-niveau.md](project-talent-per-niveau.md) — de leerjaarmatrix van alle 114 materialen.
 - [overlap-2011-2025.md](overlap-2011-2025.md) — namen die in beide lijsten terugkomen.
 - [de-verrijking.md](de-verrijking.md) — gratis materialen en de KlasCement-vermelding.
 - [briljant.md](briljant.md) — de drie verrijkingslijnen.

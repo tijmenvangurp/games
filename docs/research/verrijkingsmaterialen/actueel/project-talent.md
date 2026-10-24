@@ -34,5 +34,6 @@ Project Talent verzamelt differentiatie- en verrijkingsmaterialen voor cognitief
 ## Uitwerkingen
 
 - [Materialen 2025 per uitgever](project-talent-materialen.md)
+- [Materialen 2025 per niveau](project-talent-per-niveau.md)
 - [Online tools 2025](project-talent-online-tools.md)
 - [Overlap met de SLO-lijst uit 2011](overlap-2011-2025.md)
