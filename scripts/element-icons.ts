@@ -26,7 +26,6 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   air: fluent("wind-face"),
   mud: fluent("brown-circle"),
   steam: fluent("dashing-away"),
-  lava: fluent("volcano"),
   energy: fluent("high-voltage"),
   rain: fluent("cloud-with-rain"),
   dust: fluent("sparkles"),
@@ -194,15 +193,50 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   insect: fluent("lady-beetle"),
   crocodile: fluent("crocodile"),
   ant: fluent("ant"),
-  // Fluent Emoji has no forest, flour, sand, tadpole, rainbow-dragon, windmill
-  // or dough sprite; these are custom flat icons. The forest is a cluster of
-  // three deciduous trees. The rainbow dragon adapts the Fluent dragon body
-  // with a rainbow gradient. Replace them with an Iconify reference when a
-  // suitable set is added.
+  paint: fluent("artist-palette"),
+  painting: fluent("framed-picture"),
+  music: fluent("musical-notes"),
+  guitar: fluent("guitar"),
+  party: fluent("party-popper"),
+  balloon: fluent("balloon"),
+  cupcake: fluent("cupcake"),
+  chocolate: fluent("chocolate-bar"),
+  chocolatemilk: fluent("cup-with-straw"),
+  popcorn: fluent("popcorn"),
+  panda: fluent("panda"),
+  puzzle: fluent("puzzle-piece"),
+  candy: fluent("candy"),
+  wand: fluent("magic-wand"),
+  fairy: fluent("person-fairy"),
+  cave: fluent("hole"),
+  cavedweller: fluent("person-beard"),
+  seal: fluent("seal"),
+  parrot: fluent("parrot"),
+  camel: fluent("camel"),
+  volcano: fluent("volcano"),
+  geyser: fluent("hot-springs"),
+  bath: fluent("bathtub"),
+  brick: fluent("brick"),
+  flat: fluent("office-building"),
+  hospital: fluent("hospital"),
+  pilot: fluent("pilot"),
+  fireworks: fluent("fireworks"),
+  racecar: fluent("racing-car"),
+  troll: fluent("troll"),
+  statue: fluent("moai"),
+  museum: fluent("classical-building"),
+  // Fluent Emoji has no forest, flour, sand, tadpole, rainbow-dragon, windmill,
+  // dough, herd, lava or oven sprite; these are custom flat icons. The forest
+  // is a cluster of three deciduous trees. The rainbow dragon adapts the Fluent
+  // dragon body with a rainbow gradient. Replace them with an Iconify reference
+  // when a suitable set is added.
   flour: { custom: true },
   sand: { custom: true },
   amphibian: { custom: true },
   rainbowdragon: { custom: true },
   mill: { custom: true },
   dough: { custom: true },
+  herd: { custom: true },
+  lava: { custom: true },
+  oven: { custom: true },
 };

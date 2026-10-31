@@ -19,7 +19,7 @@
 | Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels   |
 | Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                    |
 | Vlaggenreis          | `/vlaggen`     | Vlaggen van landen per continent én van de Nederlandse provincies                 |
-| Mengelmoes           | `/mengelmoes`  | Associëren, combineren en ontdekken; 180 elementen, 203 recepten en 30 opdrachten |
+| Mengelmoes           | `/mengelmoes`  | Associëren, combineren en ontdekken; 214 elementen, 242 recepten en 30 opdrachten |
 
 De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken, wereldoriëntatie en associëren**. Het grootste gat is nu **computationeel denken**.
 
@@ -29,7 +29,7 @@ Externe verrijkingsmaterialen per leerjaar staan in [het SLO-overzicht](../resea
 
 **Leerdoel:** associëren, oorzaak-gevolg en nieuwsgierig experimenteren. Het kind sleept twee elementen op elkaar en ontdekt wat er ontstaat.
 
-**Vorm:** een vrije werkbank met een schap van ontdekte elementen. Water, vuur, aarde en lucht zijn het startpunt; de eerste slice heeft 180 elementen en 203 recepten. Een ongeldige combinatie is geen fout: de elementen wiebelen en blijven staan. Er is een hint, een labboek met categoriefilters, sortering en een detailview per element, en lokale opslag. Sommige elementen hebben meerdere recepten, zodat er meer dan één route naar hetzelfde resultaat is. Daarnaast zijn er 30 opdrachten in drie reeksen, van modder tot eenhoorn. De opdrachtkaart toont de volgende ontdekking en telt hoeveel je er al hebt gehaald; je kunt een opdracht ook overslaan. Op een telefoon is het schap een horizontale strook. Op een tablet in portret staat het schap onder de werkbank; in landschap en op een groot scherm staat het ernaast. Sleep het icoon van een element naar de werkbank, of tik erop.
+**Vorm:** een vrije werkbank met een schap van ontdekte elementen. Water, vuur, aarde en lucht zijn het startpunt; de eerste slice heeft 214 elementen en 242 recepten. Een ongeldige combinatie is geen fout: de elementen wiebelen en blijven staan. Er is een hint, een labboek met categoriefilters, sortering en een detailview per element, en lokale opslag. Sommige elementen hebben meerdere recepten, zodat er meer dan één route naar hetzelfde resultaat is. Daarnaast zijn er 30 opdrachten in drie reeksen, van modder tot eenhoorn. De opdrachtkaart toont de volgende ontdekking en telt hoeveel je er al hebt gehaald; je kunt een opdracht ook overslaan. Op een telefoon is het schap een horizontale strook. Op een tablet in portret staat het schap onder de werkbank; in landschap en op een groot scherm staat het ernaast. Sleep het icoon van een element naar de werkbank, of tik erop.
 
 **Techniek:** `entities/alchemy` bevat de pure elementen, recepten, missies en graafregels; `features/alchemy-lab` de Zustand-store, opslag en UI; `pages/alchemy` het scherm. Drag-and-drop gebruikt de al aanwezige `@dnd-kit/core` met een eigen collision-detector op middelpuntafstand. De iconen zijn lokale Fluent Emoji Flat SVG's (MIT). Zie [het onderzoek](../research/2026-10-19-mengelmoes-assets.md) voor de bronnen, licenties en de visuele richting.
 

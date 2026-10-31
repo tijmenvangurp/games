@@ -151,6 +151,48 @@ describe("alchemy rules", () => {
     expect(combine("dragon", "rainbow")).toBe("rainbowdragon");
   });
 
+  it("adds new discoveries for a six-year-old", () => {
+    expect(combine("flower", "water")).toBe("paint");
+    expect(combine("paper", "paint")).toBe("painting");
+    expect(combine("air", "energy")).toBe("music");
+    expect(combine("wood", "music")).toBe("guitar");
+    expect(combine("human", "music")).toBe("party");
+    expect(combine("party", "air")).toBe("balloon");
+    expect(combine("cake", "sugar")).toBe("cupcake");
+    expect(combine("milk", "sugar")).toBe("chocolate");
+    expect(combine("chocolate", "milk")).toBe("chocolatemilk");
+    expect(combine("wheat", "fire")).toBe("popcorn");
+    expect(combine("bear", "paint")).toBe("panda");
+    expect(combine("paper", "wood")).toBe("puzzle");
+    expect(combine("sugar", "rainbow")).toBe("candy");
+    expect(combine("magic", "wood")).toBe("wand");
+    expect(combine("magic", "butterfly")).toBe("fairy");
+    expect(combine("mountain", "water")).toBe("cave");
+    expect(combine("cave", "human")).toBe("cavedweller");
+    expect(combine("sea", "dog")).toBe("seal");
+    expect(combine("rainbow", "bird")).toBe("parrot");
+    expect(combine("desert", "horse")).toBe("camel");
+    expect(combine("mammal", "mammal")).toBe("herd");
+    expect(combine("sheep", "sheep")).toBe("herd");
+    expect(combine("mountain", "fire")).toBe("volcano");
+    expect(combine("volcano", "water")).toBe("geyser");
+    expect(combine("geyser", "human")).toBe("bath");
+    expect(combine("mud", "fire")).toBe("oven");
+    expect(combine("oven", "dough")).toBe("bread");
+    expect(combine("mud", "oven")).toBe("brick");
+    expect(combine("oven", "batter")).toBe("cake");
+    expect(combine("house", "metal")).toBe("flat");
+    expect(combine("house", "life")).toBe("hospital");
+    expect(combine("human", "airplane")).toBe("pilot");
+    expect(combine("rainbowdragon", "fire")).toBe("fireworks");
+    expect(combine("motor", "car")).toBe("racecar");
+    expect(combine("cave", "life")).toBe("troll");
+    expect(combine("troll", "sun")).toBe("stone");
+    expect(combine("stone", "human")).toBe("statue");
+    expect(combine("statue", "snow")).toBe("snowman");
+    expect(combine("statue", "house")).toBe("museum");
+  });
+
   it("grows a farm-to-table chain", () => {
     expect(combine("house", "wind")).toBe("mill");
     expect(combine("mill", "wheat")).toBe("flour");
