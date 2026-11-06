@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import {
   isFinished,
   type Dice,
@@ -7,7 +7,7 @@ import {
   type TurnEvent,
 } from "@entities/ganzenbord";
 import { Button, Play } from "@shared/ui";
-import type { TurnAnimation } from "../model/animation";
+import { eventCard, zoomPositionFor, type TurnAnimation } from "../model/animation";
 import { eventMessage, playerName, statusHint, turnText } from "../model/presentation";
 import { useGanzenbordStore } from "../model/use-ganzenbord-store";
 import { GanzenbordBoard } from "./ganzenbord-board";
@@ -213,6 +213,10 @@ function DicePanel() {
       return;
     }
     const step = animation.steps[animation.index];
+    // Een gebeurteniskaart blijft staan tot het kind op "Verder" tikt.
+    if (eventCard(step)) {
+      return;
+    }
     const timer = window.setTimeout(
       () => useGanzenbordStore.getState().advanceAnimation(),
       step?.delayMs ?? 300,
@@ -251,16 +255,38 @@ export function GanzenbordPlay() {
   const game = useGanzenbordStore((state) => state.game);
   const wins = useGanzenbordStore((state) => state.wins);
   const animation = useGanzenbordStore((state) => state.animation);
+  const [zoomTarget, setZoomTarget] = useState<number | null>(null);
+
+  const step = animation?.steps[animation.index];
+  const event = eventCard(step);
+  const focusPosition = zoomPositionFor(step);
+
+  // Houd de laatste gebeurtenis in beeld zolang de kaart openstaat en nog
+  // even nadat de volgende speler aan de beurt is.
+  useEffect(() => {
+    if (!animation) {
+      return;
+    }
+    if (animation.index === 0) {
+      setZoomTarget(null);
+    }
+    if (focusPosition !== undefined) {
+      setZoomTarget(focusPosition);
+    }
+  }, [animation, focusPosition]);
+
+  useEffect(() => {
+    if (animation || zoomTarget === null) {
+      return;
+    }
+    const timer = window.setTimeout(() => setZoomTarget(null), 1200);
+    return () => window.clearTimeout(timer);
+  }, [animation, zoomTarget]);
 
   if (!game) {
     return null;
   }
 
-  const step = animation?.steps[animation.index];
-  const event =
-    step?.event && step.event.kind !== "roll" && step.event.kind !== "move"
-      ? step.event
-      : undefined;
   const displayGame = animation
     ? {
         ...game,
@@ -275,7 +301,7 @@ export function GanzenbordPlay() {
   return (
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
       <div className="relative order-1 lg:order-none lg:col-start-1 lg:row-start-1">
-        <GanzenbordBoard game={displayGame} />
+        <GanzenbordBoard game={displayGame} zoomPosition={zoomTarget} />
         {animation && event ? (
           <GanzenbordEvent
             event={event}

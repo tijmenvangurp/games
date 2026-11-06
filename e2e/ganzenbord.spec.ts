@@ -1,7 +1,22 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 const NO_HORIZONTAL_OVERFLOW =
   "document.documentElement.scrollWidth > document.documentElement.clientWidth";
+
+async function waitForTurn(page: Page, name: RegExp): Promise<void> {
+  const target = page.getByText(name);
+  for (let attempt = 0; attempt < 60; attempt += 1) {
+    if (await target.isVisible().catch(() => false)) {
+      return;
+    }
+    const verder = page.getByRole("button", { name: "Verder" });
+    if (await verder.isVisible().catch(() => false)) {
+      await verder.click();
+    }
+    await page.waitForTimeout(250);
+  }
+  await expect(target).toBeVisible();
+}
 
 test.describe("ganzenbord op een telefoon", () => {
   test.use({ viewport: { width: 390, height: 844 } });
@@ -20,7 +35,7 @@ test.describe("ganzenbord op een telefoon", () => {
     await expect(page.getByText("Speler 2", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Gooi met de dobbelstenen" }).click();
-    await expect(page.getByText(/Speler 2 is aan de beurt/)).toBeVisible({ timeout: 10000 });
+    await waitForTurn(page, /Speler 2 is aan de beurt/);
 
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);

@@ -17,6 +17,7 @@ beforeEach(() => {
     game: null,
     rolling: false,
     pendingDice: null,
+    animation: null,
     events: [],
   });
 });
@@ -78,7 +79,14 @@ describe("ganzenbord", () => {
     fireEvent.click(rollButton());
 
     expect(useGanzenbordStore.getState().rolling).toBe(true);
-    expect(await screen.findByText(/Speler 2 is aan de beurt/, {}, { timeout: 6000 })).toBeTruthy();
+    await waitFor(
+      () => {
+        expect(useGanzenbordStore.getState().animation).not.toBeNull();
+      },
+      { timeout: 6000 },
+    );
+    finishAnimation();
+    expect(await screen.findByText(/Speler 2 is aan de beurt/, {}, { timeout: 3000 })).toBeTruthy();
 
     const game = useGanzenbordStore.getState().game;
     expect(game?.lastRoll?.player).toBe("one");
@@ -97,9 +105,12 @@ describe("ganzenbord", () => {
 
     await waitFor(
       () => {
+        if (useGanzenbordStore.getState().animation) {
+          finishAnimation();
+        }
         expect(useGanzenbordStore.getState().game?.lastRoll?.player).toBe("two");
       },
-      { timeout: 9000 },
+      { timeout: 12000 },
     );
     expect(useGanzenbordStore.getState().game?.current).toBe("one");
   }, 15_000);

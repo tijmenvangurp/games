@@ -57,49 +57,64 @@ function boardSummary(game: GanzenbordGame): string {
 
 interface GanzenbordBoardProps {
   game: GanzenbordGame;
+  /** Vak waarop ingezoomd wordt zolang een gebeurteniskaart openstaat. */
+  zoomPosition?: number | null;
 }
 
-export function GanzenbordBoard({ game }: GanzenbordBoardProps) {
+export function GanzenbordBoard({ game, zoomPosition = null }: GanzenbordBoardProps) {
   const [points] = useState(loadCellPoints);
   const groups = groupPlayers(game.players);
+  const focus =
+    zoomPosition === null ? null : zoomPosition === 0 ? START_POINT : points[zoomPosition];
 
   return (
     <div aria-label={boardSummary(game)} className="ganzenbord-board relative" role="img">
-      <div className="relative">
-        <img
-          alt=""
-          className="block h-auto w-full select-none"
-          draggable={false}
-          src="/ganzenbord/board.webp"
-        />
-        <div className="pointer-events-none absolute inset-0">
-          {[...groups.entries()].map(([position, players]) => {
-            const point = position === 0 ? START_POINT : points[position];
-            if (!point) {
-              return null;
-            }
-            const offsets = offsetsFor(players.length);
-            return players.map((player, index) => {
-              const offset = offsets[index] ?? offsets[0];
-              return (
-                <div
-                  key={player.id}
-                  className="ganzenbord-pawn-move absolute -translate-x-1/2 -translate-y-1/2"
-                  style={{
-                    left: `calc(${point.x}% + ${offset.x}px)`,
-                    top: `calc(${point.y}% + ${offset.y}px)`,
-                  }}
-                >
-                  <GanzenbordPawn
-                    active={player.id === game.current && game.status === "playing"}
-                    className={cn(players.length > 2 && "sm:scale-90")}
-                    compact={players.length > 2}
-                    player={player}
-                  />
-                </div>
-              );
-            });
-          })}
+      <div
+        className="ganzenbord-zoom"
+        style={
+          focus
+            ? {
+                transform: `translate(${1.32 * (50 - focus.x)}%, ${1.32 * (50 - focus.y)}%) scale(1.32)`,
+              }
+            : undefined
+        }
+      >
+        <div className="relative">
+          <img
+            alt=""
+            className="block h-auto w-full select-none"
+            draggable={false}
+            src="/ganzenbord/board.webp"
+          />
+          <div className="pointer-events-none absolute inset-0">
+            {[...groups.entries()].map(([position, players]) => {
+              const point = position === 0 ? START_POINT : points[position];
+              if (!point) {
+                return null;
+              }
+              const offsets = offsetsFor(players.length);
+              return players.map((player, index) => {
+                const offset = offsets[index] ?? offsets[0];
+                return (
+                  <div
+                    key={player.id}
+                    className="ganzenbord-pawn-move absolute -translate-x-1/2 -translate-y-1/2"
+                    style={{
+                      left: `calc(${point.x}% + ${offset.x}px)`,
+                      top: `calc(${point.y}% + ${offset.y}px)`,
+                    }}
+                  >
+                    <GanzenbordPawn
+                      active={player.id === game.current && game.status === "playing"}
+                      className={cn(players.length > 2 && "sm:scale-90")}
+                      compact={players.length > 2}
+                      player={player}
+                    />
+                  </div>
+                );
+              });
+            })}
+          </div>
         </div>
       </div>
     </div>

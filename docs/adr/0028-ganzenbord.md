@@ -29,7 +29,8 @@ Het eerdere [bibliotheekonderzoek](../research/2026-11-05-ganzenbord-libraries.m
 9. **2,5D in DOM/CSS, geen Three.js.** Het bord is een lokale WebP-afbeelding met CSS-hout, slagschaduw en absolute pionnen. Een WebGL-scene zou 160–340 kB gzip extra kosten en de geschilderde kaart niet beter maken. De klassieke kaart, de houten lijst en de schaduw geven al de fysieke indruk.
 10. **Twee witte dobbelstenen met groene stippen.** `react-dice-complete` 2.3.2 (ISC) rendert en animeert de dobbelstenen. De store geeft de waarden via `rollAll`; de bibliotheek doet geen eigen willekeurige worp. De peer-range noemt React 19 niet, maar de component rendert met React 19.3.1; dit is in het onderzoek en hier vastgelegd.
 11. **Twee tot vier spelers, per speler mens of computer.** De setup bewaart `playerCount` en de controller per speler in `localStorage` onder `games.ganzenbord.v1`. Een computer gooit na een korte denkpauze automatisch. De winst per speler blijft lokaal bewaard.
-12. **Geen spraakcatalogus.** Het spel is visueel; de catalogusentry gebruikt `speech: { kind: "visual" }` en de pagina verbergt de voorleesknop. Later kan een audio-opname worden toegevoegd.
+12. **Elke gebeurtenis krijgt een eigen moment.** De pion loopt vakje voor vakje. Bij een gans, brug, put, gevangenis, doolhof, dood of finish verschijnt een kaart op het vak waar de pion staat; die kaart blijft staan tot de speler op **Verder** tikt. Pas daarna springt of loopt de pion verder. Het bord zoomt daarbij in op het vak en blijft na de beurt nog heel even ingezoomd voordat het weer uitzoomt. Zo kan een kind de gebeurtenis lezen voordat het spel verdergaat.
+13. **Geen spraakcatalogus.** Het spel is visueel; de catalogusentry gebruikt `speech: { kind: "visual" }` en de pagina verbergt de voorleesknop. Later kan een audio-opname worden toegevoegd.
 
 ### Bordalternatieven
 

@@ -122,6 +122,11 @@
     overflow: hidden;
   }
 
+  .ganzenbord-zoom {
+    transform: scale(1);
+    transition: transform 450ms ease-out;
+  }
+
   .ganzenbord-pawn {
     box-shadow: 0 2px 5px rgb(40 25 10 / 0.45);
   }
@@ -133,6 +138,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .ganzenbord-zoom {
+      transition: none;
+    }
+
     .ganzenbord-pawn-move {
       transition: none;
     }
