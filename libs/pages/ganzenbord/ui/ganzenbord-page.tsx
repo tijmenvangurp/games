@@ -52,8 +52,8 @@ export function GanzenbordPage() {
 
       {setupVisible ? (
         <p className="text-center text-xs">
-          <Link className="underline" to="/kalibreren">
-            Bord kalibreren (tijdelijk)
+          <Link className="text-muted-foreground underline" to="/ganzenbord/bord">
+            Bord bijstellen
           </Link>
         </p>
       ) : null}

@@ -22,7 +22,7 @@ import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 import { WordSearchPage } from "@pages/word-search";
-import { CalibratePage } from "./calibrate-page";
+import { BoardEditorPage } from "./board-editor-page";
 
 export function createAppRouter(history?: RouterHistory) {
   const rootRoute = createRootRoute({
@@ -53,7 +53,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/vlaggen", FlagsPage),
     gameRoute("/vier-op-een-rij", FourInARowPage),
     gameRoute("/ganzenbord", GanzenbordPage),
-    gameRoute("/kalibreren", CalibratePage),
+    gameRoute("/ganzenbord/bord", BoardEditorPage),
     gameRoute("/mengelmoes", AlchemyPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),

@@ -1,6 +1,7 @@
+import { useState } from "react";
 import type { GanzenbordGame, PlayerState } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
-import { CELL_POINTS } from "../model/board-points";
+import { loadCellPoints } from "../model/board-points";
 import { playerName, positionText } from "../model/presentation";
 import { GanzenbordPawn } from "./ganzenbord-pawn";
 
@@ -59,6 +60,7 @@ interface GanzenbordBoardProps {
 }
 
 export function GanzenbordBoard({ game }: GanzenbordBoardProps) {
+  const [points] = useState(loadCellPoints);
   const groups = groupPlayers(game.players);
   const startPlayers = game.players.filter((player) => player.position === 0);
 
@@ -88,7 +90,7 @@ export function GanzenbordBoard({ game }: GanzenbordBoardProps) {
         />
         <div className="pointer-events-none absolute inset-0">
           {[...groups.entries()].map(([position, players]) => {
-            const point = CELL_POINTS[position];
+            const point = points[position];
             if (!point) {
               return null;
             }
