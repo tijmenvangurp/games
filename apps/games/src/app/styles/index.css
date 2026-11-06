@@ -117,12 +117,8 @@
   }
 
   .ganzenbord-board {
-    border: 6px solid #7a4a24;
-    border-radius: 0.875rem;
-    background-color: #f4e7cf;
-    box-shadow:
-      0 3px 0 #4d2c12,
-      0 18px 35px -18px rgb(40 25 10 / 0.8);
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 30px -22px rgb(40 25 10 / 0.55);
     overflow: hidden;
   }
 

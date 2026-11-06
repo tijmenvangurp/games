@@ -73,7 +73,7 @@ export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProp
   return (
     <div
       aria-live="polite"
-      className="absolute bottom-3 left-1/2 z-20 w-[min(92%,26rem)] -translate-x-1/2 rounded-xl border-2 border-[#c9a45c] bg-[#fff8e7] p-3 text-[#3f2a18] shadow-[0_10px_30px_-10px_rgba(40,25,10,0.8)]"
+      className="mx-auto mt-2 w-full max-w-md rounded-xl border-2 border-[#c9a45c] bg-[#fff8e7] p-3 text-[#3f2a18] shadow-[0_10px_30px_-10px_rgba(40,25,10,0.8)]"
     >
       <div className="flex items-start gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f0dfb8]">

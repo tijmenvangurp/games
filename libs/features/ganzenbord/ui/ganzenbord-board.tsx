@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { GanzenbordGame, PlayerState } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
-import { loadCellPoints } from "../model/board-points";
+import { loadCellPoints, START_POINT } from "../model/board-points";
 import { playerName, positionText } from "../model/presentation";
 import { GanzenbordPawn } from "./ganzenbord-pawn";
 
@@ -62,25 +62,9 @@ interface GanzenbordBoardProps {
 export function GanzenbordBoard({ game }: GanzenbordBoardProps) {
   const [points] = useState(loadCellPoints);
   const groups = groupPlayers(game.players);
-  const startPlayers = game.players.filter((player) => player.position === 0);
 
   return (
     <div aria-label={boardSummary(game)} className="ganzenbord-board relative" role="img">
-      <div className="flex min-h-9 items-center gap-2 border-b border-[#7a4a24]/30 bg-[#f4e7cf] px-2 py-1">
-        <span className="text-[10px] font-black uppercase tracking-wide text-[#6b4224]">Start</span>
-        {startPlayers.length > 0 ? (
-          startPlayers.map((player) => (
-            <GanzenbordPawn
-              key={player.id}
-              active={player.id === game.current && game.status === "playing"}
-              compact
-              player={player}
-            />
-          ))
-        ) : (
-          <span className="text-xs text-muted-foreground">Hier begin je</span>
-        )}
-      </div>
       <div className="relative">
         <img
           alt=""
@@ -90,7 +74,7 @@ export function GanzenbordBoard({ game }: GanzenbordBoardProps) {
         />
         <div className="pointer-events-none absolute inset-0">
           {[...groups.entries()].map(([position, players]) => {
-            const point = points[position];
+            const point = position === 0 ? START_POINT : points[position];
             if (!point) {
               return null;
             }

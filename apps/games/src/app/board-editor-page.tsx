@@ -120,7 +120,7 @@ export function BoardEditorPage() {
       </div>
 
       <div
-        className="relative w-full max-w-full touch-manipulation overflow-hidden rounded-lg border-4 border-[#7a4a24] bg-[#f4e7cf]"
+        className="relative w-full max-w-full touch-manipulation overflow-hidden rounded-lg"
         onClick={place}
       >
         <img

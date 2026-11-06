@@ -8,11 +8,18 @@ import {
 
 const KEY = "games.ganzenbord.board-points.v1";
 
-describe("ganzenbord: bordposities", () => {
-  beforeEach(() => {
-    localStorage.clear();
-  });
+function stored(): { revision: number; points: Record<string, unknown> } {
+  return JSON.parse(localStorage.getItem(KEY) ?? "{}") as {
+    revision: number;
+    points: Record<string, unknown>;
+  };
+}
 
+beforeEach(() => {
+  localStorage.clear();
+});
+
+describe("ganzenbord: bordposities", () => {
   it("gebruikt zonder aanpassing de vaste punten", () => {
     const points = loadCellPoints();
     expect(points[1]).toEqual(CELL_POINTS[1]);
@@ -22,9 +29,8 @@ describe("ganzenbord: bordposities", () => {
   it("bewaart alleen de vakjes die echt verschillen", () => {
     saveCellPoints({ ...CELL_POINTS, 5: { x: 12.5, y: 34.5 } });
 
-    expect(JSON.parse(localStorage.getItem(KEY) ?? "{}")).toEqual({
-      5: { x: 12.5, y: 34.5 },
-    });
+    expect(stored().revision).toBe(2);
+    expect(stored().points).toEqual({ 5: { x: 12.5, y: 34.5 } });
     expect(loadCellPoints()[5]).toEqual({ x: 12.5, y: 34.5 });
     expect(loadCellPoints()[6]).toEqual(CELL_POINTS[6]);
   });
@@ -33,11 +39,14 @@ describe("ganzenbord: bordposities", () => {
     localStorage.setItem(
       KEY,
       JSON.stringify({
-        2: { x: 10, y: 20 },
-        3: { x: -1, y: 20 },
-        4: { x: 10, y: "20" },
-        64: { x: 10, y: 20 },
-        hallo: { x: 10, y: 20 },
+        revision: 2,
+        points: {
+          2: { x: 10, y: 20 },
+          3: { x: -1, y: 20 },
+          4: { x: 10, y: "20" },
+          64: { x: 10, y: 20 },
+          hallo: { x: 10, y: 20 },
+        },
       }),
     );
 
@@ -46,6 +55,12 @@ describe("ganzenbord: bordposities", () => {
     expect(points[3]).toEqual(CELL_POINTS[3]);
     expect(points[4]).toEqual(CELL_POINTS[4]);
     expect(points[64]).toBeUndefined();
+  });
+
+  it("negeert aanpassingen van een oudere bordversie", () => {
+    localStorage.setItem(KEY, JSON.stringify({ revision: 1, points: { 2: { x: 10, y: 20 } } }));
+
+    expect(loadCellPoints()[2]).toEqual(CELL_POINTS[2]);
   });
 
   it("valt terug op de vaste punten bij kapotte opslag", () => {

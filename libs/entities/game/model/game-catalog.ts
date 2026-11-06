@@ -160,7 +160,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     description: "Gooi met de dobbelstenen en race met je gans naar 63.",
     status: "available",
     to: "/ganzenbord",
-    thumbnail: "/thumbnails/ganzenbord-f0bca903.jpg",
+    thumbnail: "/thumbnails/ganzenbord-500e8c19.jpg",
     speech: {
       kind: "visual",
       reason: "Het bord, de dobbelsteen en de ganzepionnen zijn visueel.",
