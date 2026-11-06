@@ -27,7 +27,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/frans"
           | "/letters"
           | "/vlaggen"
-          | "/vier-op-een-rij";
+          | "/vier-op-een-rij"
+          | "/ganzenbord";
         thumbnail: string;
         /** Elke game kiest expliciet hoe het met spraak omgaat. */
         speech: GameSpeech;
@@ -152,5 +153,17 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     to: "/vier-op-een-rij",
     thumbnail: "/thumbnails/four-in-a-row-fa19af46.jpg",
     speech: { kind: "visual", reason: "Het bord en de schijven zijn visueel." },
+  },
+  {
+    id: "ganzenbord",
+    name: "Ganzenbord",
+    description: "Gooi met de dobbelstenen en race met je gans naar 63.",
+    status: "available",
+    to: "/ganzenbord",
+    thumbnail: "/thumbnails/ganzenbord-f0bca903.jpg",
+    speech: {
+      kind: "visual",
+      reason: "Het bord, de dobbelsteen en de ganzepionnen zijn visueel.",
+    },
   },
 ];

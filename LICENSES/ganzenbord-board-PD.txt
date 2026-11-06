@@ -1,0 +1,9 @@
+Ganzenbord board
+https://commons.wikimedia.org/wiki/File:Ganzenbord_pd.svg
+
+The board in apps/games/public/ganzenbord/board.svg is based on
+"Ganzenbord_pd.svg" by Pmathijssen, published on Wikimedia Commons.
+The work is in the public domain.
+
+The SVG was optimized with SVGO (removing editor metadata and unused
+definitions). The board layout, numbers and illustrations are unchanged.

@@ -24,6 +24,7 @@
 - `adr/0025-vier-op-een-rij.md` — Vier op een Rij: twee bordgroottes, pure regels, een eerlijke starter, de kleuren van de spelers en de computer als tegenstander.
 - `adr/0026-adaptief-niveaumodel.md` — adaptieve niveaus per spel, de 70–85%-regel, hinttrap, herhaalqueue en foutvriendelijke feedback.
 - `adr/0027-schaakcoordinaten-buiten-het-bord.md` — de coördinaten buiten het bord, meedraaiend met de bordstand en een compactere paginakop tijdens een partij.
+- `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
@@ -35,6 +36,7 @@
 - `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
 - `research/2026-10-19-voorlezen-met-tts.md` — onderzoek naar vooraf gegenereerde Nederlandse TTS met de bestaande Nathalie-stem, leesafhankelijkheid per game en ontwerpprincipes voor audiofeedback.
 - `research/2026-10-20-boardgame-io.md` — of boardgame.io Vier op een Rij en latere bordspellen simpeler maakt: React 19-test, bundelmeting en herzieningsmomenten.
+- `research/2026-11-05-ganzenbord-libraries.md` — bibliotheken en bronnen voor Ganzenbord: dobbelsteen-componenten, spellogica, bordopbouw, iconen, historische borden en de regelvarianten.
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.
 - `research/verrijkingsmaterialen/slo-leermiddelenlijst-hoogbegaafden-2011.pdf` — de bron-PDF van de SLO-lijst.

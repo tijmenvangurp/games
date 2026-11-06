@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BOARD_SIZE_INFO,
@@ -16,7 +16,7 @@ import {
   winTitle,
   type FourInARowSettings,
 } from "@features/four-in-a-row-game";
-import { useGameSetupNavigation } from "@shared/lib";
+import { useDelayedVisible, useGameSetupState } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
 
@@ -25,23 +25,6 @@ const WIN_FLASH_MS = 600;
 
 /** De computer doet alsof hij nadenkt; zo blijft de beurtwissel leesbaar. */
 const COMPUTER_THINK_MS = 650;
-
-/** Toont de uitslag pas als de winnende rij even in beeld is. */
-function useResultVisible(finished: boolean): boolean {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!finished) {
-      setVisible(false);
-      return;
-    }
-
-    const timer = window.setTimeout(() => setVisible(true), WIN_FLASH_MS);
-    return () => window.clearTimeout(timer);
-  }, [finished]);
-
-  return visible;
-}
 
 /** Laat de computer zetten zodra het zijn beurt is. */
 function useComputerTurn(): void {
@@ -128,19 +111,10 @@ export function FourInARowPage() {
   const score = useFourInARowStore((state) => state.score);
   const settings = useFourInARowStore((state) => state.settings);
   const mode = useFourInARowStore((state) => state.match?.mode ?? settings.mode);
-  const [showSetup, setShowSetup] = useState(false);
-
   const finished = game ? isFinished(game) : false;
   const winner = game ? winnerOf(game) : null;
-  const resultVisible = useResultVisible(finished);
-  const setupVisible = showSetup || !game;
-  const gameSetup = useGameSetupNavigation({
-    setupVisible,
-    hasActiveGame: Boolean(game),
-    backToGameLabel: "Terug naar je spel",
-    onCloseSetup: () => setShowSetup(false),
-    onOpenSetup: () => setShowSetup(true),
-  });
+  const resultVisible = useDelayedVisible(finished, WIN_FLASH_MS);
+  const { setShowSetup, setupVisible, navigation: gameSetup } = useGameSetupState(Boolean(game));
 
   useComputerTurn();
 

@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-ganzenbord",
+  "projectType": "library",
+  "sourceRoot": "libs/features/ganzenbord",
+  "tags": ["layer:features", "scope:ganzenbord", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/ganzenbord"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-ganzenbord", "shared-lib", "shared-ui"]
+}
