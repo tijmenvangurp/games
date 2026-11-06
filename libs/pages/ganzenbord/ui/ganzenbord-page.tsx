@@ -1,4 +1,4 @@
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { isFinished } from "@entities/ganzenbord";
 import {
   GanzenbordPlay,
@@ -49,6 +49,14 @@ export function GanzenbordPage() {
       ) : (
         <GanzenbordPlay />
       )}
+
+      {setupVisible ? (
+        <p className="text-center text-xs">
+          <Link className="underline" to="/kalibreren">
+            Bord kalibreren (tijdelijk)
+          </Link>
+        </p>
+      ) : null}
 
       {resultVisible && game && !setupVisible ? (
         <CelebrationDialog

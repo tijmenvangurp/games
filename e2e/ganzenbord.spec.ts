@@ -20,7 +20,7 @@ test.describe("ganzenbord op een telefoon", () => {
     await expect(page.getByText("Speler 2", { exact: true })).toBeVisible();
 
     await page.getByRole("button", { name: "Gooi met de dobbelstenen" }).click();
-    await expect(page.getByText(/Speler 2 is aan de beurt/)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/Speler 2 is aan de beurt/)).toBeVisible({ timeout: 10000 });
 
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);

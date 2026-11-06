@@ -10,4 +10,6 @@ export type {
   PlayerSetup,
   PlayerState,
   TurnEvent,
+  TurnEventKind,
+  TurnResult,
 } from "./model/types";

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
@@ -45,6 +45,16 @@ function rollButton() {
   return screen.getByRole("button", { name: "Gooi met de dobbelstenen" });
 }
 
+function finishAnimation() {
+  act(() => {
+    let guard = 0;
+    while (useGanzenbordStore.getState().animation && guard < 200) {
+      useGanzenbordStore.getState().advanceAnimation();
+      guard += 1;
+    }
+  });
+}
+
 describe("ganzenbord", () => {
   it("is vanuit het menu te openen en toont het bord", async () => {
     renderApp("/");
@@ -68,7 +78,7 @@ describe("ganzenbord", () => {
     fireEvent.click(rollButton());
 
     expect(useGanzenbordStore.getState().rolling).toBe(true);
-    expect(await screen.findByText(/Speler 2 is aan de beurt/, {}, { timeout: 3000 })).toBeTruthy();
+    expect(await screen.findByText(/Speler 2 is aan de beurt/, {}, { timeout: 6000 })).toBeTruthy();
 
     const game = useGanzenbordStore.getState().game;
     expect(game?.lastRoll?.player).toBe("one");
@@ -89,10 +99,10 @@ describe("ganzenbord", () => {
       () => {
         expect(useGanzenbordStore.getState().game?.lastRoll?.player).toBe("two");
       },
-      { timeout: 4000 },
+      { timeout: 9000 },
     );
     expect(useGanzenbordStore.getState().game?.current).toBe("one");
-  });
+  }, 15_000);
 
   it("ondersteunt vier spelers met eigen keuzes", async () => {
     await openSetup();
@@ -141,6 +151,7 @@ describe("ganzenbord", () => {
     useGanzenbordStore.setState({ game: withOneAt61 });
 
     useGanzenbordStore.getState().commitRoll([1, 1]);
+    finishAnimation();
 
     expect(useGanzenbordStore.getState().game?.winner).toBe("one");
     expect(useGanzenbordStore.getState().wins.one).toBe(1);

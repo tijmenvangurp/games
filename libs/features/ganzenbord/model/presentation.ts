@@ -63,7 +63,7 @@ const SIMPLE_EVENT_TEXT: Partial<Record<TurnEvent["kind"], string>> = {
   death: "Dood: terug naar start.",
 };
 
-function eventText(game: GanzenbordGame, event: TurnEvent): string | null {
+export function eventMessage(game: GanzenbordGame, event: TurnEvent): string | null {
   if (event.kind === "first-throw") {
     return `Eerste worp 9: meteen naar ${event.to}.`;
   }
@@ -78,6 +78,12 @@ function eventText(game: GanzenbordGame, event: TurnEvent): string | null {
   }
   if (event.kind === "skip") {
     return `${nameOf(game, event.player)} slaat een beurt over.`;
+  }
+  if (event.kind === "win") {
+    return `${nameOf(game, event.player)} bereikt vakje 63!`;
+  }
+  if (event.kind === "draw") {
+    return "Alle spelers zitten vast.";
   }
   return SIMPLE_EVENT_TEXT[event.kind] ?? null;
 }
@@ -105,7 +111,7 @@ export function turnText(game: GanzenbordGame, events: readonly TurnEvent[]): st
   }
 
   for (const event of events) {
-    const text = eventText(game, event);
+    const text = eventMessage(game, event);
     if (text) {
       parts.push(text);
     }
