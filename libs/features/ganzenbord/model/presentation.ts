@@ -17,6 +17,13 @@ export function playerName(player: Pick<PlayerState, "id" | "controller">): stri
     : `Speler ${playerNumber(player.id)}`;
 }
 
+/** Korte naam voor de spelerskaarten; "Computer 2" wordt daar afgekapt. */
+export function playerShortName(player: Pick<PlayerState, "id" | "controller">): string {
+  return player.controller === "computer"
+    ? `CPU ${playerNumber(player.id)}`
+    : `Speler ${playerNumber(player.id)}`;
+}
+
 function nameOf(game: GanzenbordGame, id: PlayerId): string {
   const player = game.players.find((candidate) => candidate.id === id);
   return player ? playerName(player) : `Speler ${playerNumber(id)}`;

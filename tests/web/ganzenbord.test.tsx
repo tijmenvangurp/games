@@ -82,7 +82,7 @@ describe("ganzenbord", () => {
     fireEvent.click(screen.getByRole("button", { name: "Speler 2: computer" }));
     startGame();
 
-    expect(screen.getByText("Computer 2")).toBeTruthy();
+    expect(screen.getByText("CPU 2")).toBeTruthy();
     fireEvent.click(rollButton());
 
     await waitFor(
@@ -105,8 +105,8 @@ describe("ganzenbord", () => {
 
     expect(screen.getByText("Speler 1")).toBeTruthy();
     expect(screen.getByText("Speler 2")).toBeTruthy();
-    expect(screen.getByText("Computer 3")).toBeTruthy();
-    expect(screen.getByText("Computer 4")).toBeTruthy();
+    expect(screen.getByText("CPU 3")).toBeTruthy();
+    expect(screen.getByText("CPU 4")).toBeTruthy();
     expect(within(screen.getByLabelText("Spelers")).getAllByRole("listitem")).toHaveLength(4);
   });
 

@@ -8,6 +8,7 @@ import {
 import {
   playerColorClass,
   playerName,
+  playerShortName,
   playerNumber,
   positionText,
   statusHint,
@@ -39,6 +40,7 @@ describe("ganzenbord: presentatie", () => {
     expect(playerNumber("four")).toBe(4);
     expect(playerName({ id: "one", controller: "human" })).toBe("Speler 1");
     expect(playerName({ id: "two", controller: "computer" })).toBe("Computer 2");
+    expect(playerShortName({ id: "two", controller: "computer" })).toBe("CPU 2");
     expect(playerColorClass("three")).toBe("bg-player-three");
   });
 

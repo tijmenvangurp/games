@@ -2,7 +2,7 @@ import type { GanzenbordGame } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
 import { Lock, Trophy } from "@shared/ui";
 import type { Wins } from "../model/storage";
-import { playerColorClass, playerName, positionText } from "../model/presentation";
+import { playerColorClass, playerShortName, positionText } from "../model/presentation";
 
 interface PlayerCardProps {
   game: GanzenbordGame;
@@ -32,7 +32,7 @@ function PlayerCard({ game, playerId, wins }: PlayerCardProps) {
           aria-hidden="true"
           className={cn("size-2.5 shrink-0 rounded-full", playerColorClass(player.id))}
         />
-        <span className="truncate text-sm font-black">{playerName(player)}</span>
+        <span className="truncate text-sm font-black">{playerShortName(player)}</span>
         <span
           aria-label={`${wins[player.id]} gewonnen partijen`}
           className="ml-auto flex shrink-0 items-center gap-1 text-xs font-bold text-muted-foreground"

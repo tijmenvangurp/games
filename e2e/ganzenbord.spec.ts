@@ -41,8 +41,8 @@ test.describe("ganzenbord op een tablet", () => {
 
     await expect(page.getByRole("img", { name: /Ganzenbord met 63 vakjes/ })).toBeVisible();
     await expect(page.getByLabel("Spelers").getByRole("listitem")).toHaveCount(4);
-    await expect(page.getByText("Computer 3")).toBeVisible();
-    await expect(page.getByText("Computer 4")).toBeVisible();
+    await expect(page.getByText("CPU 3")).toBeVisible();
+    await expect(page.getByText("CPU 4")).toBeVisible();
 
     const board = page.getByRole("img", { name: /Ganzenbord met 63 vakjes/ });
     const box = await board.boundingBox();
