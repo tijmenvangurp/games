@@ -13,9 +13,21 @@ description: Onderzoek een nieuw kinderspel of een uitbreiding voor de games-rep
    welke feedback het krijgt en hoe het spel moeilijker wordt. Benoem
    aannames over leeftijd, taal en invoer. Baken een eerste versie af.
 
-3. Splits het spel op in onderdelen, zoals regels, invoer, lesinhoud, UI
-   en audio. Zoek eerst naar hergebruik in de repo. Zoek daarna per
-   onderdeel naar passende npm-packages, open datasets of voorbeeldspellen.
+3. Splits het spel op in onderdelen, zoals regels, spelmechanieken,
+   invoer, lesinhoud, UI, beeld en geluid. Het doel is het wiel niet
+   opnieuw uit te vinden: bestaande oplossingen versnellen de ontwikkeling.
+   Zoek per onderdeel eerst naar hergebruik in de repo (de tabel in
+   `AGENTS.md`, `libs/`, `package.json`). Zoek daarna per onderdeel naar
+   passende open-source libraries voor de spelmechanieken, npm-packages,
+   open datasets of voorbeeldspellen.
+
+   Zoek ook naar herbruikbaar beeld en geluid, eerst in de repo
+   (`apps/games/public/`, `LICENSES/`, iconensets, `docs/adr/` en eerdere
+   `docs/research/`-notities over assets), daarna in open bronnen. Gebruik
+   alleen bronnen met een licentie die hergebruik in een publieke site
+   toestaat (bijvoorbeeld CC0, publiek domein, MIT) en noteer licentie,
+   bron en attributieplicht. Beeld en geluid moeten lokaal meegeleverd
+   kunnen worden, zonder externe requests.
 
 4. Vergelijk serieuze kandidaten op API, versie, onderhoud, licentie,
    TypeScript-typen, ESM en React/Vite-compatibiliteit. Controleer of ze
@@ -41,6 +53,7 @@ Schrijf in het Nederlands. Gebruik als voorgesteld pad
 - Spelconcept en afbakening van de eerste versie
 - Bestaand hergebruik in de repo
 - Vergelijking van libraries en andere bronnen
+- Herbruikbaar beeld en geluid, met bron en licentie
 - Integratieschets en aansluiting op de bestaande frontend
 - Verificatie, risico’s en open vragen
 - Bronnen
