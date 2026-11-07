@@ -1,6 +1,6 @@
 # Tooling: Nx-daemon, cache en Fallow
 
-Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons.
+Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons. Zie `docs/agents.md` voor de skills en MCP's die hierbij horen.
 
 ## Geen `NX_DAEMON=false` als commandoprefix
 
@@ -96,7 +96,11 @@ De kaders en draaiingen staan in `scripts/build-ganzenbord-event-art.ts`, in pro
 
 ## Playwright
 
-De Playwright-browser heeft in deze omgeving extra libraries en fonts nodig. Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en `FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Gebruik bij voorkeur het bestaande script:
+Op sommige machines heeft de Playwright-browser extra libraries en fonts nodig.
+Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en
+`FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Op een
+normale machine zijn die niet nodig; `scripts/run-playwright.ts` zet ze alleen
+als de mappen bestaan. Gebruik bij voorkeur het bestaande script:
 
 ```sh
 corepack pnpm run e2e
@@ -106,7 +110,11 @@ corepack pnpm run e2e
 
 `scripts/generate-sounds.ts` genereert tijdelijke MP3's voor losse klanken in `prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de variant en stem, en zet pas daarna de gekozen bestanden in `apps/games/public/audio/letters/v2/sounds/`.
 
-Gebruik de private TTS-helper uit de skill `generate-game-audio`; die vult de endpoint en sleutel in. Zet die waarden nooit in de repo.
+De TTS-helper met de endpoint en sleutel is **alleen voor de eigenaar**. Die
+staat buiten de repo en wordt niet aan contributors gegeven. Vraag de eigenaar
+om nieuwe audio te genereren; commit alleen de gegenereerde bestanden, het
+manifest en het lockbestand. Zet endpoint, sleutel, hostname of `.env`-waarde
+nooit in de repo, een screenshot of een prompt.
 
 ```sh
 <private-helper> -- --generator=scripts/generate-sounds.ts \

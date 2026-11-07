@@ -1,6 +1,6 @@
 # AGENTS.md — Spellen
 
-Publieke, statische spelletjes-app voor kinderen. Lees `README.md` en de relevante `docs/adr/` voordat je iets verandert.
+Publieke, statische spelletjes-app voor kinderen. Lees `README.md`, `CONTRIBUTING.md`, `GLOSSARY.md` en de relevante `docs/adr/` voordat je iets verandert.
 
 ## Harde regels
 
@@ -82,6 +82,10 @@ Elke lib heeft een `project.json`, een `tsconfig.json` en een public API (`index
 
 De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/games/dist`.
 
+## Agent-harness
+
+Skills staan in `.opencode/skills` en `.agents/skills`; MCP's in `opencode.jsonc`. Lees `docs/agents.md` voor installatie, privé-scheiding en de data die een MCP deelt. MCP's zijn ontwikkeltooling: de app blijft statisch en doet geen externe requests.
+
 ## Werkwijze
 
 - Gebruik `corepack pnpm` voor alle commando's. Nx-taken staan in `project.json`; gebruik `pnpm run graph` voor de projectgraaf en `pnpm run affected` voor gerichte checks.
@@ -90,6 +94,7 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 - Forceer een verse build met `corepack pnpm exec nx run games:build --skipNxCache`, niet met `pnpm run build -- --skip-nx-cache` (die flag gaat naar Vite).
 - Draai `fallow` en Nx-taken niet parallel: Fallow schrijft `.fallow/` en kan de Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
+- Documentatie: `docs/README.md` is de index; gebruik `docs/game-checklist.md` voor een spel, `docs/testing.md` voor tests, `docs/architecture.md` voor lagen en `docs/design-system.md` voor UI. Werk `docs/README.md` en `docs/adr/README.md` bij als je een document of ADR toevoegt.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch en open een pull request; zie **Mergen** hieronder.
 - Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.
@@ -109,6 +114,6 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 
 - Cloudflare Worker `games` met static assets uit `apps/games/dist` (`wrangler.jsonc`).
 - **Cloudflare Workers Builds** bouwt en deployt bij een push naar `main`. Er zijn geen GitHub-deploysecrets of API-tokens nodig.
-- Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.9.1`.
+- Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.16.1`.
 - De workernaam in het dashboard moet exact `games` zijn.
 - `apps/games/public/_headers` bevat de CSP en `noindex`; verzwak die niet zonder ADR.

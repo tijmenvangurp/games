@@ -36,6 +36,15 @@ corepack pnpm affected         # gerichte checks voor de huidige branch
 
 Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet geen externe requests.
 
+## Bijdragen
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — setup, branch/PR-flow en definition of done.
+- [AGENTS.md](AGENTS.md) — de harde regels en werkwijze.
+- [GLOSSARY.md](GLOSSARY.md) — de domeintaal.
+- [docs/agents.md](docs/agents.md) — de gedeelde skills en MCP's.
+- [docs/game-checklist.md](docs/game-checklist.md) — een spel toevoegen.
+- [docs/testing.md](docs/testing.md) — tests en de kwaliteitsgate.
+
 ## Pokémon-assets
 
 De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. De geluiden komen uit de gesynthetiseerde `playSound`-set van de app. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
@@ -62,7 +71,7 @@ Eenmalig in Cloudflare instellen via **Workers & Pages → `games` → Settings 
 | Build command                 | `pnpm run build`      |
 | Deploy command                | `npx wrangler deploy` |
 | Buildvariabele `NODE_VERSION` | `24`                  |
-| Buildvariabele `PNPM_VERSION` | `12.9.1`              |
+| Buildvariabele `PNPM_VERSION` | `12.16.1`             |
 
 De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.workers.dev/>.
 
