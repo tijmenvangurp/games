@@ -293,6 +293,9 @@ importers:
       nx:
         specifier: 23.3.0
         version: 23.3.0
+      nx-mcp:
+        specifier: 0.25.3
+        version: 0.25.3
       oxfmt:
         specifier: ^0.73.0
         version: 0.73.0
@@ -2595,6 +2598,10 @@ packages:
   npm-run-path@4.0.1:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
+
+  nx-mcp@0.25.3:
+    resolution: {integrity: sha512-dMofFlK2VgSc2ME1NqcrkxRRCoqUWnX3BZWEO3W9BgRWP/HJuVuFjjLP3G3bsaAJBptpviaovZSn4V/NNu3X0A==}
+    hasBin: true
 
   nx@23.3.0:
     resolution: {integrity: sha512-R7Kl+hURSGiG9uEjc19Cg3o+vGCDHqCVp6mioiBMEsOSol/LgzP+K8TVF06TnnSC8uzxMeB0ymu+LGMJGXnbbw==}
@@ -5001,6 +5008,8 @@ snapshots:
   npm-run-path@4.0.1:
     dependencies:
       path-key: 3.1.1
+
+  nx-mcp@0.25.3: {}
 
   nx@23.3.0:
     dependencies:
