@@ -52,7 +52,7 @@ Controleer daarna:
 - De test `tests/node/speech-coverage.test.ts` faalt als een `available`-spel
   geen geldige spraakverklaring heeft of als een audiogroep nergens bij hoort.
 - Audio is lokaal en vooraf gegenereerd. Geen runtime-TTS. De privé-TTS-helper
-  is alleen voor de eigenaar; zie `docs/agents.md` en `docs/audio.md`.
+  is alleen voor de eigenaar; zie `docs/agent-harness.md` en `docs/audio.md`.
 
 ## 5. Tests
 

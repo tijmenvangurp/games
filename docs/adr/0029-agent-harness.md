@@ -31,7 +31,7 @@ tijdens het spelen geen externe requests doen.
    `firecrawl`, een privé-knowledgebase en TTS/Telegram-tools horen in de
    globale config van de eigenaar, niet in deze repo.
 5. **MCP's zijn ontwikkeltooling, geen app-runtime.** De app blijft statisch en
-   doet geen externe requests. `docs/agents.md` beschrijft per server welke data
+   doet geen externe requests. `docs/agent-harness.md` beschrijft per server welke data
    de machine verlaat.
 6. **Geen geheimen of privépaden.** Skills en docs bevatten geen tokens,
    `.env`-waarden, hostnames, tailnet-namen, IP-adressen of persoonsgegevens.

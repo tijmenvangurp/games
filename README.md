@@ -41,7 +41,7 @@ Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet
 - [CONTRIBUTING.md](CONTRIBUTING.md) — setup, branch/PR-flow en definition of done.
 - [AGENTS.md](AGENTS.md) — de harde regels en werkwijze.
 - [GLOSSARY.md](GLOSSARY.md) — de domeintaal.
-- [docs/agents.md](docs/agents.md) — de gedeelde skills en MCP's.
+- [docs/agent-harness.md](docs/agent-harness.md) — de gedeelde skills en MCP's.
 - [docs/game-checklist.md](docs/game-checklist.md) — een spel toevoegen.
 - [docs/testing.md](docs/testing.md) — tests en de kwaliteitsgate.
 

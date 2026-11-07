@@ -16,7 +16,7 @@ corepack pnpm install
 corepack pnpm dev
 ```
 
-De agent-harness (skills en MCP's) staat in `docs/agents.md`. Je hebt hem niet
+De agent-harness (skills en MCP's) staat in `docs/agent-harness.md`. Je hebt hem niet
 nodig om te kunnen bijdragen, maar het scheelt veel uitzoekwerk.
 
 ## Werkwijze
@@ -106,5 +106,5 @@ pull request en werk de tabel in `AGENTS.md` bij. Gebruik `spellen-deps` of
 - Architectuur: `docs/adr/` en `docs/architecture.md`.
 - Tests: `docs/testing.md`.
 - Tooling en Nx: `docs/tooling.md`.
-- Agent-harness: `docs/agents.md`.
+- Agent-harness: `docs/agent-harness.md`.
 - Iets stuk? Open een issue met route, toestel, browser en een screenshot.
