@@ -96,8 +96,8 @@ Een doel in Mengelmoes dat vraagt om een bepaald element te ontdekken.
 _Avoid_: opdracht, quest
 
 **Les**:
-Een Franse luisterles met woorden, voorbeeldzinnen en audio.
-_Avoid_: unit, chapter
+Een vaste leerstap met eigen inhoud: een Franse luisterles met woorden, voorbeeldzinnen en audio, of een Typepret-oefenstap met een eigen set toetsen of woorden.
+_Avoid_: unit, chapter, level
 
 **Klank**:
 De gesproken eenheid van een letter, zoals `/m/`, niet de letternaam "em".
@@ -127,3 +127,39 @@ _Avoid_: beheerder, admin
 De gedeelde skills, MCP's en permissions waarmee een agent in deze repo werkt;
 zie `CONTRIBUTING.md`.
 _Avoid_: tooling, setup
+
+## Typepret
+
+**Typepret**:
+Nederlandstalig spel waarmee een kind stap voor stap blind leert typen op een
+fysiek QWERTY-toetsenbord.
+_Avoid_: typeles, typecursus
+
+**Reeks**:
+De rij doeltekens die in één Typepret-ronde getypt moet worden: precies 20
+tekens, verdeeld in groepen zoals `fj` of `slak`.
+_Avoid_: opdracht, tekst
+
+**Doelteken**:
+Het ene teken dat nu getypt moet worden en op het scherm oplicht.
+_Avoid_: doeltoets, volgende letter
+
+**Toetsaanslag**:
+Eén ingedrukte toets, gelezen als de getypte letter (`event.key`),
+hoofdletterongevoelig. Goed als hij gelijk is aan het doelteken, anders fout.
+_Avoid_: klik, invoer
+
+**Vingerzone**:
+De vinger die bij een toets hoort in de QWERTY-grondhouding, met een vaste
+kleur én een tekstlabel ("linker wijsvinger").
+_Avoid_: vingerkleur, vingerhint
+
+**Nauwkeurigheid**:
+Het aandeel goede toetsaanslagen in een afgeronde Typepret-ronde; herhaalde
+fouten op hetzelfde doelteken tellen één keer.
+_Avoid_: score, cijfer
+
+**Ontgrendelen**:
+De volgende Typepret-les beschikbaar maken doordat een ronde nauwkeurig genoeg
+was.
+_Avoid_: winnen, behalen

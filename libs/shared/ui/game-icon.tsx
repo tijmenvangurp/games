@@ -9,6 +9,7 @@ import {
   CirclesFour,
   Flag,
   Flask,
+  Keyboard,
   MagnifyingGlass,
   PuzzlePiece,
   Question,
@@ -36,6 +37,7 @@ const GAME_ICONS = {
   alchemy: Flask,
   "four-in-a-row": CirclesFour,
   ganzenbord: Bird,
+  typepret: Keyboard,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;

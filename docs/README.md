@@ -16,7 +16,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 
 ## Beslissingen
 
-- `adr/README.md` — de volledige, genummerde ADR-index (0001–0029).
+- `adr/README.md` — de volledige, genummerde ADR-index (0001–0030).
 - `adr/template.md` — het template voor een nieuwe ADR.
 - `adr/0001-publieke-statische-spellen-app.md` — waarom een aparte publieke, statische repository.
 - `adr/0002-kwaliteitsgate.md` — dezelfde kwaliteitscontroles als `homelab-control`, inclusief de afwijking rond pnpm `minimumReleaseAge`.
@@ -47,6 +47,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0027-schaakcoordinaten-buiten-het-bord.md` — de coördinaten buiten het bord, meedraaiend met de bordstand en een compactere paginakop tijdens een partij.
 - `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
 - `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
+- `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
 
 ## Onderzoek
 
@@ -63,6 +64,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `research/2026-10-20-boardgame-io.md` — of boardgame.io Vier op een Rij en latere bordspellen simpeler maakt: React 19-test, bundelmeting en herzieningsmomenten.
 - `research/2026-10-21-mengelmoes-audio-en-sfeer.md` — audio, sfeer en feedback voor Mengelmoes.
 - `research/2026-11-05-ganzenbord-libraries.md` — bibliotheken en bronnen voor Ganzenbord: dobbelsteen-componenten, spellogica, bordopbouw, iconen, historische borden en de regelvarianten.
+- `research/2026-11-07-typepret-libraries.md` — welke library Typepret kan gebruiken: react-simple-keyboard voor het toetsenbord, en waarom er voor de typelogica geen bruikbare library is.
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.
 - `research/verrijkingsmaterialen/slo-leermiddelenlijst-hoogbegaafden-2011.pdf` — de bron-PDF van de SLO-lijst.

@@ -49,6 +49,8 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `stockfish.js`                                                     | lokale schaakengine in een worker (wasm)                            |
 | `sudoku-gen`                                                       | sudoku-generator                                                    |
 | `react-dice-complete`                                              | dobbelstenen en worpanimatie in Ganzenbord                          |
+| `react-simple-keyboard`                                            | toetsenbord als weergave in Typepret                                |
+| `react-hotkeys-hook`                                               | toetsaanslagen opvangen in Typepret                                 |
 | `sharp`                                                            | dev-time uitsneden van Ganzenbordprenten uit het bord               |
 | `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
 | `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
