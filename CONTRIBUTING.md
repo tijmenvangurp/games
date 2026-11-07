@@ -17,15 +17,27 @@ corepack pnpm run harness:install   # skills + MCP's voor Claude/Codex
 corepack pnpm dev
 ```
 
-De agent-harness (skills en MCP's) staat in `docs/agent-harness.md`. Je hebt hem niet
-nodig om te kunnen bijdragen, maar het scheelt veel uitzoekwerk.
+## Agent-harness
+
+De gedeelde skills en MCP's staan in de repo; je hebt ze niet nodig om te
+kunnen bijdragen.
+
+- **Skills:** APM leest `apm.yml` en `apm.lock.yaml`. Projectskills staan in
+  `.apm/skills/`; APM deployt ze naar `.agents/skills/` (OpenCode en Codex) en
+  `.claude/skills/` (Claude Code).
+- **MCP's:** Claude Code leest `.mcp.json`, Codex leest `.codex/config.toml`.
+  OpenCode leest `opencode.jsonc`; die blijft handmatig tot APM OpenCode V2
+  ondersteunt.
+- **Bijwerken:** `apm update --yes && corepack pnpm run harness:install`.
+- **Privé:** knowledgebases, TTS, Telegram en accountgebonden MCP's blijven in
+  je globale config. Geen secrets of kindgegevens in een prompt.
 
 ## Werkwijze
 
 1. Maak een branch vanaf `main`. Push nooit direct naar `main`.
 2. Houd de wijziging klein en gericht. Eén spel, één fix of één document per
    pull request.
-3. Schrijf tests bij nieuwe regels of gedrag. Zie `docs/testing.md`.
+3. Schrijf tests bij nieuwe regels of gedrag. Zie `README.md` en de scripts in `package.json`.
 4. Draai vóór je commit:
 
    ```sh
@@ -73,9 +85,9 @@ public API en de aliassen (`@app`, `@pages`, `@widgets`, `@features`,
 
 ## Nieuwe spellen
 
-Volg de checklist in `docs/game-checklist.md`. Een nieuw spel raakt bijna
-altijd meerdere lagen, de catalogus, een icoon, een thumbnail, spraak en tests.
-Leg een nieuwe mechanic of een nieuwe assetbron vast in een ADR.
+Volg de stappen in `AGENTS.md` en de relevante ADR's. Een nieuw spel raakt
+bijna altijd meerdere lagen, de catalogus, een icoon, een thumbnail, spraak en
+tests. Leg een nieuwe mechanic of een nieuwe assetbron vast in een ADR.
 
 ## UI en content
 
@@ -91,8 +103,7 @@ Leg een nieuwe mechanic of een nieuwe assetbron vast in een ADR.
 Zoek eerst of een bestaande bibliotheek het probleem oplost. Een nieuwe
 bibliotheek toevoegen mag, maar moet binnen de CSP werken en mag geen
 telemetrie, account of netwerkverbinding nodig hebben. Zet de keuze in de
-pull request en werk de tabel in `AGENTS.md` bij. Gebruik `spellen-deps` of
-`docs/game-checklist.md` als leidraad.
+pull request en werk de tabel in `AGENTS.md` bij.
 
 ## Geheimen en privacy
 
@@ -104,8 +115,7 @@ pull request en werk de tabel in `AGENTS.md` bij. Gebruik `spellen-deps` of
 
 ## Hulp nodig?
 
-- Architectuur: `docs/adr/` en `docs/architecture.md`.
-- Tests: `docs/testing.md`.
+- Architectuur: `AGENTS.md` en `docs/adr/`.
+- Tests: `README.md` en de scripts in `package.json`.
 - Tooling en Nx: `docs/tooling.md`.
-- Agent-harness: `docs/agent-harness.md`.
 - Iets stuk? Open een issue met route, toestel, browser en een screenshot.

@@ -569,7 +569,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:b8ef2ea6b674e122c3264fd99a5e8b23d839913f6c60068635548030a5de428a
+  content_hash: sha256:9ba35b34140abd95f7501e12e7e840024915d57abfb9d937fac2c870a404b6e3
 - kind: project-relative
   target: claude
   value: .claude/skills/spellen-deps
@@ -605,7 +605,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:a88b8dd29e238f0baf30d32fece49aab084888ef71e8d3b8bbf9fa923488787e
+  content_hash: sha256:cda17678d18cfa1fb85dfda67d441a62f8b7efbbc58766930f05f8597fa0d304
 - kind: project-relative
   target: claude
   value: .claude/skills/spellen-quality
@@ -623,7 +623,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:86a0ea2b1dde50dff24341cc5fa16d40c62dcf20017f25206733a1368183468e
+  content_hash: sha256:e82d323b697371eacda25175ea4db1e787196cea177b04351c25fde8c894b155
 - kind: project-relative
   target: claude
   value: .claude/skills/spellen-review
@@ -1172,7 +1172,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:b8ef2ea6b674e122c3264fd99a5e8b23d839913f6c60068635548030a5de428a
+  content_hash: sha256:9ba35b34140abd95f7501e12e7e840024915d57abfb9d937fac2c870a404b6e3
 - kind: project-relative
   target: codex
   value: .agents/skills/spellen-deps
@@ -1208,7 +1208,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:a88b8dd29e238f0baf30d32fece49aab084888ef71e8d3b8bbf9fa923488787e
+  content_hash: sha256:cda17678d18cfa1fb85dfda67d441a62f8b7efbbc58766930f05f8597fa0d304
 - kind: project-relative
   target: codex
   value: .agents/skills/spellen-quality
@@ -1226,7 +1226,7 @@ deployments:
   owners:
   - .
   active_owner: .
-  content_hash: sha256:86a0ea2b1dde50dff24341cc5fa16d40c62dcf20017f25206733a1368183468e
+  content_hash: sha256:e82d323b697371eacda25175ea4db1e787196cea177b04351c25fde8c894b155
 - kind: project-relative
   target: codex
   value: .agents/skills/spellen-review
@@ -1576,16 +1576,16 @@ local_deployed_files:
 - .claude/skills/spellen-ui/SKILL.md
 local_deployed_file_hashes:
   .agents/skills/spellen-adr/SKILL.md: sha256:cf2ae3ef91c65324d688740531d0bb4f2e90bc65191b4f238f231ade2ba3927b
-  .agents/skills/spellen-audio/SKILL.md: sha256:b8ef2ea6b674e122c3264fd99a5e8b23d839913f6c60068635548030a5de428a
+  .agents/skills/spellen-audio/SKILL.md: sha256:9ba35b34140abd95f7501e12e7e840024915d57abfb9d937fac2c870a404b6e3
   .agents/skills/spellen-deps/SKILL.md: sha256:a13ad7e47ada047066105e1c1c1d8cb1ebfbec38fa825e6e4c7c2d765cacd8c4
-  .agents/skills/spellen-game/SKILL.md: sha256:a88b8dd29e238f0baf30d32fece49aab084888ef71e8d3b8bbf9fa923488787e
-  .agents/skills/spellen-quality/SKILL.md: sha256:86a0ea2b1dde50dff24341cc5fa16d40c62dcf20017f25206733a1368183468e
+  .agents/skills/spellen-game/SKILL.md: sha256:cda17678d18cfa1fb85dfda67d441a62f8b7efbbc58766930f05f8597fa0d304
+  .agents/skills/spellen-quality/SKILL.md: sha256:e82d323b697371eacda25175ea4db1e787196cea177b04351c25fde8c894b155
   .agents/skills/spellen-review/SKILL.md: sha256:92bedcd5e82960ef9672c7b2db052ab46a34e9ee1fc63f0b64e206c6f62337d4
   .agents/skills/spellen-ui/SKILL.md: sha256:f92e4e72c2e2305a4a4b8172fedf5647153731f8fd14331854b1ac3aa7570133
   .claude/skills/spellen-adr/SKILL.md: sha256:cf2ae3ef91c65324d688740531d0bb4f2e90bc65191b4f238f231ade2ba3927b
-  .claude/skills/spellen-audio/SKILL.md: sha256:b8ef2ea6b674e122c3264fd99a5e8b23d839913f6c60068635548030a5de428a
+  .claude/skills/spellen-audio/SKILL.md: sha256:9ba35b34140abd95f7501e12e7e840024915d57abfb9d937fac2c870a404b6e3
   .claude/skills/spellen-deps/SKILL.md: sha256:a13ad7e47ada047066105e1c1c1d8cb1ebfbec38fa825e6e4c7c2d765cacd8c4
-  .claude/skills/spellen-game/SKILL.md: sha256:a88b8dd29e238f0baf30d32fece49aab084888ef71e8d3b8bbf9fa923488787e
-  .claude/skills/spellen-quality/SKILL.md: sha256:86a0ea2b1dde50dff24341cc5fa16d40c62dcf20017f25206733a1368183468e
+  .claude/skills/spellen-game/SKILL.md: sha256:cda17678d18cfa1fb85dfda67d441a62f8b7efbbc58766930f05f8597fa0d304
+  .claude/skills/spellen-quality/SKILL.md: sha256:e82d323b697371eacda25175ea4db1e787196cea177b04351c25fde8c894b155
   .claude/skills/spellen-review/SKILL.md: sha256:92bedcd5e82960ef9672c7b2db052ab46a34e9ee1fc63f0b64e206c6f62337d4
   .claude/skills/spellen-ui/SKILL.md: sha256:f92e4e72c2e2305a4a4b8172fedf5647153731f8fd14331854b1ac3aa7570133

@@ -5,7 +5,7 @@ description: "Draai en repareer de kwaliteitsgate van Spellen. Gebruik bij quali
 
 # Kwaliteitsgate
 
-Lees `docs/tooling.md` en `docs/testing.md` voordat je iets forceert.
+Lees `docs/tooling.md` voordat je iets forceert.
 
 ## Commando's
 

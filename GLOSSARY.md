@@ -125,5 +125,5 @@ _Avoid_: maintainer, admin
 
 **Agent-harness**:
 De gedeelde skills, MCP's en permissions waarmee een agent in deze repo werkt;
-zie `docs/agent-harness.md`.
+zie `CONTRIBUTING.md`.
 _Avoid_: tooling, setup

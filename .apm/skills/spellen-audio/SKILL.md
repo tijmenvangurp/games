@@ -5,7 +5,7 @@ description: "Voeg spraakregels toe, controleer de audiocatalogus of repareer de
 
 # Spraak en audio
 
-Lees `docs/audio.md`, `docs/design-system.md` (sectie Spraak) en ADR 0023.
+Lees `docs/design-system.md` (sectie Spraak), `docs/tooling.md` en ADR 0023.
 
 ## Regels
 

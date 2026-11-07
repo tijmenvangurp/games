@@ -1,6 +1,6 @@
 # Tooling: Nx-daemon, cache en Fallow
 
-Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons. Zie `docs/agent-harness.md` voor de skills en MCP's die hierbij horen.
+Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons. Zie de sectie **Agent-harness** in `CONTRIBUTING.md` voor de skills en MCP's die hierbij horen.
 
 ## Geen `NX_DAEMON=false` als commandoprefix
 

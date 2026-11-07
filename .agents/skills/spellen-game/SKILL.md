@@ -5,9 +5,8 @@ description: "Voeg een spel end-to-end toe of breid een bestaand spel uit in Spe
 
 # Een spel toevoegen of uitbreiden
 
-Lees eerst `docs/game-checklist.md`, `docs/architecture.md` en de relevante
-ADR's. Volg de checklist; sla een stap alleen over met een expliciete reden in
-de pull request.
+Lees eerst `AGENTS.md` en de relevante ADR's. Volg de stappen hieronder; sla
+een stap alleen over met een expliciete reden in de pull request.
 
 ## Werkwijze
 
@@ -24,7 +23,7 @@ de pull request.
    `SpeechLine` uit `@shared/lib`, en een expliciete `speech`-verklaring in de
    catalogus. Draai `corepack pnpm run audio:check`.
 5. **Test.** Pure regels in `tests/node`, UI in `tests/web`, de kernreis in
-   `e2e/`. Dekking minimaal 80%. Zie `docs/testing.md`.
+   `e2e/`. Dekking minimaal 80%. Zie `README.md` en `package.json`.
 6. **Leg de beslissing vast.** Een nieuwe mechanic, assetbron of privacykeuze
    krijgt een ADR volgens `spellen-adr`.
 7. **Controleer op een toestel.** 390 px en 1024 px, touch-targets ≥ 44 px,

@@ -82,10 +82,6 @@ Elke lib heeft een `project.json`, een `tsconfig.json` en een public API (`index
 
 De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/games/dist`.
 
-## Agent-harness
-
-Skills staan in `.apm/skills` en worden gedeployed naar `.agents/skills` en `.claude/skills`; MCP's staan in `opencode.jsonc`, `.mcp.json` en `.codex/config.toml`. Lees `docs/agent-harness.md` voor APM, de drie tools, privé-scheiding en de data die een MCP deelt. MCP's zijn ontwikkeltooling: de app blijft statisch en doet geen externe requests.
-
 ## Werkwijze
 
 - Gebruik `corepack pnpm` voor alle commando's. Nx-taken staan in `project.json`; gebruik `pnpm run graph` voor de projectgraaf en `pnpm run affected` voor gerichte checks.
@@ -94,7 +90,8 @@ Skills staan in `.apm/skills` en worden gedeployed naar `.agents/skills` en `.cl
 - Forceer een verse build met `corepack pnpm exec nx run games:build --skipNxCache`, niet met `pnpm run build -- --skip-nx-cache` (die flag gaat naar Vite).
 - Draai `fallow` en Nx-taken niet parallel: Fallow schrijft `.fallow/` en kan de Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
-- Documentatie: `docs/README.md` is de index; gebruik `docs/game-checklist.md` voor een spel, `docs/testing.md` voor tests, `docs/architecture.md` voor lagen en `docs/design-system.md` voor UI. Werk `docs/README.md` en `docs/adr/README.md` bij als je een document of ADR toevoegt.
+- Documentatie: `docs/README.md` is de index; zie `docs/design-system.md` voor UI en `docs/adr/` voor beslissingen. Werk de index bij als je een document of ADR toevoegt.
+- Agent-harness: skills via APM in `.apm/skills` en `apm.yml`; MCP's in `opencode.jsonc`, `.mcp.json` en `.codex/config.toml`. Zie `CONTRIBUTING.md`.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch en open een pull request; zie **Mergen** hieronder.
 - Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.
