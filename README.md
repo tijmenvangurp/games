@@ -2,6 +2,12 @@
 
 Publieke, statische spelletjes-app voor kinderen. De app is een Nx-monorepo met een Vite/React-frontend en Feature-Sliced Design.
 
+## Status
+
+[![Quality + e2e](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml)
+
+Productie: [games.tijmenvangurp.nl](https://games.tijmenvangurp.nl/)
+
 ## Structuur
 
 ```text
@@ -65,16 +71,17 @@ De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workern
 
 Eenmalig in Cloudflare instellen via **Workers & Pages → `games` → Settings → Build**:
 
-| Instelling                    | Waarde                |
-| ----------------------------- | --------------------- |
-| Git-repository                | `tijmenvangurp/games` |
-| Productiebranch               | `main`                |
-| Root directory                | `/`                   |
-| Build command                 | `pnpm run build`      |
-| Deploy command                | `npx wrangler deploy` |
-| Buildvariabele `NODE_VERSION` | `24`                  |
-| Buildvariabele `PNPM_VERSION` | `12.16.1`             |
+| Instelling                    | Waarde                   |
+| ----------------------------- | ------------------------ |
+| Git-repository                | `tijmenvangurp/games`    |
+| Productiebranch               | `main`                   |
+| Root directory                | `/`                      |
+| Build command                 | `pnpm run build`         |
+| Deploy command                | `npx wrangler deploy`    |
+| Buildvariabele `NODE_VERSION` | `24`                     |
+| Buildvariabele `PNPM_VERSION` | `12.16.1`                |
+| Custom domain                 | `games.tijmenvangurp.nl` |
 
-De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.workers.dev/>.
+De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.nl/>. De `workers.dev`-URL blijft als technische fallback beschikbaar.
 
 GitHub Actions draait de Quality-gate; de deploy-workflow is verwijderd zodat er één deploypad is. `pnpm deploy` blijft beschikbaar voor een handmatige deploy vanaf een machine met Cloudflare-toegang.
