@@ -83,6 +83,17 @@ en daarna `<prefix>:<name>` in de lijst zetten. Monochrome sets (zoals Phosphor)
 
 Een icoon dat echt niet bestaat, mag handmatig in dezelfde platte stijl in `apps/games/public/elements/` staan. Zet het element dan op `{ custom: true }`; de generator laat het bestand met rust en controleert alleen of het bestaat.
 
+## Ganzenbordprenten
+
+De popup bij een gebeurtenis toont de prent van dat vak uit `apps/games/public/ganzenbord/board.webp`. De uitsneden staan in `apps/games/public/ganzenbord/events/` en worden met `sharp` gemaakt:
+
+```sh
+corepack pnpm run ganzenbord:art        # snijd de prenten opnieuw
+corepack pnpm run ganzenbord:art:check  # controleer zonder te schrijven (zit in quality)
+```
+
+De kaders en draaiingen staan in `scripts/build-ganzenbord-event-art.ts`, in procenten van het bord. Prenten boven de evenaar staan ondersteboven en draaien 180°; de brug draait 90°. Het script bewaart een manifest met de hash van het bord, zodat een gewijzigd bord of een handmatig aangepaste prent de quality-check laat falen.
+
 ## Playwright
 
 De Playwright-browser heeft in deze omgeving extra libraries en fonts nodig. Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en `FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Gebruik bij voorkeur het bestaande script:
