@@ -64,5 +64,9 @@ dependencies:
       registry: false
       transport: http
       url: https://mcp.context7.com/mcp
+    - name: firecrawl
+      registry: false
+      transport: http
+      url: https://mcp.firecrawl.dev/v2/mcp-oauth
 includes: auto
 scripts: {}

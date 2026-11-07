@@ -1971,6 +1971,15 @@ deployments:
   content_hash: sha256:2d3f8a22977aae1d96b50d9ee4c85b774b41b8dae63f681635f7f55bf9c8ceeb
 - kind: uri
   target: mcp
+  value: firecrawl
+  runtime: claude
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:5a47dfac55d1df4d3e4cc59b54c930422d710e096cc2243ea6ceb787141e36a5
+- kind: uri
+  target: mcp
   value: nx
   runtime: claude
   scope: project
@@ -1998,6 +2007,15 @@ deployments:
   content_hash: sha256:e9f06426976e009603286154f46a0abeb2c1ab55ffeca4633ea437d367c809ca
 - kind: uri
   target: mcp
+  value: firecrawl
+  runtime: codex
+  scope: project
+  owners:
+  - .
+  active_owner: .
+  content_hash: sha256:99925cc6d08817e76d6e4cf2a64362e66e6c913b51da8a26d05dd24c5b148813
+- kind: uri
+  target: mcp
   value: nx
   runtime: codex
   scope: project
@@ -2008,6 +2026,7 @@ deployments:
 mcp_servers:
 - context7
 - fallow
+- firecrawl
 - nx
 mcp_configs:
   context7:
@@ -2024,6 +2043,11 @@ mcp_configs:
     - fallow-mcp
     registry: false
     command: corepack
+  firecrawl:
+    name: firecrawl
+    transport: http
+    registry: false
+    url: https://mcp.firecrawl.dev/v2/mcp-oauth
   nx:
     name: nx
     transport: stdio
@@ -2039,10 +2063,12 @@ mcp_target_servers:
   claude:
   - context7
   - fallow
+  - firecrawl
   - nx
   codex:
   - context7
   - fallow
+  - firecrawl
   - nx
 local_deployed_files:
 - .agents/skills/spellen-adr
