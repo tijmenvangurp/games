@@ -2,6 +2,12 @@
 
 Publieke, statische spelletjes-app voor kinderen. De app is een Nx-monorepo met een Vite/React-frontend en Feature-Sliced Design.
 
+## Status
+
+[![Quality + e2e](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml)
+
+Productie: [games.tijmenvangurp.workers.dev](https://games.tijmenvangurp.workers.dev/)
+
 ## Structuur
 
 ```text
