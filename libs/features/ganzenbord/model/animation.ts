@@ -24,11 +24,11 @@ export function eventCard(step: AnimationStep | undefined): TurnEvent | undefine
   return step.event;
 }
 
-const STEP_MS = 150;
-const LANDING_MS = 650;
-const JUMP_MS = 1100;
+const STEP_MS = 260;
+const LANDING_MS = 750;
+const JUMP_MS = 1300;
 const READ_MS = 2000;
-const ROLL_MS = 550;
+const ROLL_MS = 700;
 
 function movementSteps(from: number, to: number, event?: TurnEvent): AnimationStep[] {
   if (from === to) {
