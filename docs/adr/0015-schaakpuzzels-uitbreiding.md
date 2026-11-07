@@ -5,7 +5,7 @@
 
 ## Context
 
-ADR 0008 legde 34 Lichess-puzzels vast. Die set is vooral mat-in-één en een paar losse stukken slaan, meestal met toren of dame. De eigenaar wil veel meer puzzels, ook mat-in-twee en opdrachten waarin paarden, lopers, pionnen en dames de hoofdrol spelen. De runner ondersteunt al meerdere zetten, maar de data en tests gingen uit van één spelerszet.
+ADR 0008 legde 34 Lichess-puzzels vast. Die set is vooral mat-in-één en een paar losse stukken slaan, meestal met toren of dame. De maintainer wil veel meer puzzels, ook mat-in-twee en opdrachten waarin paarden, lopers, pionnen en dames de hoofdrol spelen. De runner ondersteunt al meerdere zetten, maar de data en tests gingen uit van één spelerszet.
 
 ## Beslissing
 

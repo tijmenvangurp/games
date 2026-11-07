@@ -242,7 +242,7 @@ De doelgroep is 6–12 jaar. Dat verandert de vraag: niet "welke login is handig
 - **E-mailveld:** Better Auth's core `user`-tabel heeft een verplicht, uniek `email`-veld ([Database](https://better-auth.com/docs/concepts/database)). Een passkey-only account heeft dus technisch een e-mailwaarde nodig. Gebruik een synthetische `@invalid`-waarde als je geen ouder-e-mail wilt, of vraag een e-mail voor herstel en verificatie; vul die waarde bij de user-creatie of via een database-hook in. Kies dit bewust: een synthetische e-mail betekent ook geen e-mailherstel.
 - **Passkey-first:** registratie zonder bestaande sessie kan met `registration.requireSession: false`; de user wordt dan in `resolveUser`/`afterVerification` aangemaakt. Dat past bij een ouderaccount dat meteen met een passkey begint. Vul daar wel een geldige `email`-waarde in, anders faalt de core-user ([Passkey-plugin](https://better-auth.com/docs/plugins/passkey)).
 - **Domeingebonden:** passkeys zijn gekoppeld aan de RP-ID, dus aan het domein. Verhuis je later van de `workers.dev`-origin naar een eigen domein, dan moeten passkeys opnieuw worden geregistreerd. Kies de definitieve origin vóór je passkeys uitrolt.
-- **Open registratie:** elke loginmethode op een publieke URL trekt bots en misbruik aan. Overweeg een gesloten registratie (uitnodigingscode of alleen accounts die de eigenaar aanmaakt) en houd de rate limits aan. Dat is ook goedkoper.
+- **Open registratie:** elke loginmethode op een publieke URL trekt bots en misbruik aan. Overweeg een gesloten registratie (uitnodigingscode of alleen accounts die de maintainer aanmaakt) en houd de rate limits aan. Dat is ook goedkoper.
 
 ### 3.2 Ouderaccount met e-mail en wachtwoord
 
@@ -257,7 +257,7 @@ De doelgroep is 6–12 jaar. Dat verandert de vraag: niet "welke login is handig
 - **Hoe:** de ouder vult een e-mailadres in; Better Auth genereert een token en roept `sendMagicLink` aan. De link is standaard 300 seconden geldig; het endpoint heeft een rate limit van 5 per 60 seconden ([Magic link](https://better-auth.com/docs/plugins/magic-link)).
 - **Waarom:** geen wachtwoord, ouder-vriendelijk.
 - **Nadelen:** elke login vereist toegang tot de inbox; e-maildeliverability; de e-mailprovider ziet het adres en de metadata. Dit is een **externe request** vanuit de Worker, ook al staat `connect-src 'none'` in de browser-CSP. De CSP regelt alleen de browser, niet server-side `fetch`.
-- **Conclusie:** alleen overwegen als de eigenaar expliciet een e-mailprovider als verwerker accepteert en de "geen externe requests"-regel voor server-side e-mail wil versoepelen. Dat vraagt een ADR en een DPA.
+- **Conclusie:** alleen overwegen als de maintainer expliciet een e-mailprovider als verwerker accepteert en de "geen externe requests"-regel voor server-side e-mail wil versoepelen. Dat vraagt een ADR en een DPA.
 
 ### 3.4 OAuth/social
 
@@ -528,7 +528,7 @@ Als `wrangler.jsonc` naar een TypeScript-`main` wijst, bundelt `wrangler deploy`
 
 - **Build-time flag:** `VITE_ACCOUNTS_ENABLED` is publiek (het staat in de bundle) en mag geen geheim bevatten. Zet de flag uit in de eerste deploy; de route en de account-UI blijven dan verborgen.
 - **Server-side flag:** `ACCOUNTS_ENABLED` als Workers-variabele; als die `false` is, geven `/api/auth/*` en `/api/progress/*` een 404 of 503. Zo kun je de Worker al deployen zonder de functie te openen.
-- **Uitrol:** deploy de Worker met de flag uit → test met het ouderaccount van de eigenaar → zet de flag aan voor de eigenaar → daarna pas de route zichtbaar maken. Een verborgen route is geen beveiliging, maar wel een rollback-mogelijkheid.
+- **Uitrol:** deploy de Worker met de flag uit → test met het ouderaccount van de maintainer → zet de flag aan voor de maintainer → daarna pas de route zichtbaar maken. Een verborgen route is geen beveiliging, maar wel een rollback-mogelijkheid.
 - **Previews:** `preview_urls` staat aan in de repo. Auth op previews vraagt een aparte D1, een aparte secret en `trustedOrigins` voor elke preview-origin. Doe dat niet in fase 1; zet auth op previews uit of gebruik een wegwerp-database.
 
 ### 5.7 Next.js of de huidige stack?
@@ -566,7 +566,7 @@ Waarom:
 
 ## 6. Privacy en compliance
 
-Dit is geen juridisch advies. De conclusies hieronder zijn ontwerpkeuzes; de eigenaar moet ze met de Autoriteit Persoonsgegevens, een jurist of in ieder geval met het eigen verwerkingsregister laten toetsen.
+Dit is geen juridisch advies. De conclusies hieronder zijn ontwerpkeuzes; de maintainer moet ze met de Autoriteit Persoonsgegevens, een jurist of in ieder geval met het eigen verwerkingsregister laten toetsen.
 
 ### 6.1 AVG en kinderen
 
@@ -601,7 +601,7 @@ De code is niet direct Nederlands recht, maar is een bruikbare ontwerpchecklist.
 | Sessies             | 7 dagen, sliding; direct intrekken bij logout              | Better Auth-default; korter kan                                           |
 | Ouderaccount        | Zolang het account bestaat                                 | E-mail alleen voor herstel/toestemming                                    |
 | Kindprofiel         | Zolang het account bestaat, of korter                      | Geen naam/e-mail; slot + avatar                                           |
-| Voortgang           | 12 maanden inactief, daarna verwijderen of anonimiseren    | Voorstel; de eigenaar moet dit vaststellen                                |
+| Voortgang           | 12 maanden inactief, daarna verwijderen of anonimiseren    | Voorstel; de maintainer moet dit vaststellen                              |
 | Toestemmingsbewijs  | Zolang het account bestaat + korte administratieve termijn | Bewijs dat de ouder toestemming gaf                                       |
 | Logs                | 7–30 dagen, zonder PII                                     | Alleen eventtype en pseudonieme id                                        |
 | Backups/Time Travel | D1 Time Travel: 7 dagen free, 30 dagen paid                | Verwijderen uit de live database betekent niet meteen weg uit Time Travel |
@@ -656,7 +656,7 @@ Toelichting:
 - **Firebase Auth** is gratis tot 50k MAU, maar de client praat met Google en de data staat bij Google. Dat botst met de CSP en met de wens om geen externe requests te doen ([Firebase-pricing](https://firebase.google.com/pricing), [Firebase Auth](https://firebase.google.com/docs/auth)).
 - **PocketBase** is een mooie self-hosted optie: één binary, SQLite, auth en realtime. Maar het is geen Workers-native oplossing; je hebt een VPS of container nodig. Dat is een veel grotere infrastructurele stap dan D1 ([PocketBase](https://pocketbase.io/)).
 - **Eigen sessie-cookie** is verleidelijk: een paar honderd regels TypeScript, geen dependency. Maar je moet dan zelf wachtwoord-hashing, CSRF, rotatie, rate limiting, e-mailverificatie en accountverwijdering goed doen. Better Auth doet dat al, met een D1-adapter. Tenzij je bewust een minimale passkey-only flow bouwt, is zelf doen meer risico dan winst.
-- **Geen auth** is geen "mindere" optie. Het is de enige optie die de huidige privacy- en CSP-belofte volledig houdt. Bouw lokale profielen en export/import; voeg pas een backend toe als de eigenaar een concrete functie wil die lokaal niet kan.
+- **Geen auth** is geen "mindere" optie. Het is de enige optie die de huidige privacy- en CSP-belofte volledig houdt. Bouw lokale profielen en export/import; voeg pas een backend toe als de maintainer een concrete functie wil die lokaal niet kan.
 - **Publieke repo en sleutels:** een publishable/anon key van een hosted provider is meestal geen geheim, maar een service-role- of server-key wel. Zet die nooit in de bundle of in de repo. Bij self-hosted Better Auth staat er geen vendor-key in de browser; alleen de Worker heeft een secret ([Supabase API-keys](https://supabase.com/docs/guides/getting-started/api-keys)).
 
 ## 8. Gefaseerd migratiepad
@@ -718,21 +718,21 @@ Toelichting:
 2. **Ouderaccount met passkey of met e-mail/wachtwoord?** Passkey is privacyvriendelijker en veiliger, maar herstel is lastiger. E-mail/wachtwoord is bekender, maar vraagt een e-mailprovider en een resetflow.
 3. **Mag er een externe e-mailprovider komen?** Magic link en wachtwoordreset zijn zonder e-mail niet mogelijk. Dat is een expliciete uitzondering op "geen externe requests" en vraagt een ADR, DPA en privacyverklaring.
 4. **Welke data syncen we?** Alleen instellingen en scores, of ook actieve borden en SRS? Elke extra categorie vergroot de merge-complexiteit en de privacy-impact.
-5. **Wie is de verwerkingsverantwoordelijke en wat is de grondslag?** De eigenaar is waarschijnlijk een particulier; dat maakt de AVG niet anders, maar wel de praktische invulling van het register en de privacyverklaring.
-6. **Wat is de bewaartermijn en wanneer is een account "inactief"?** 12 maanden is een voorstel, geen wet. De eigenaar moet dit vaststellen en kunnen uitleggen.
+5. **Wie is de verwerkingsverantwoordelijke en wat is de grondslag?** De maintainer is waarschijnlijk een particulier; dat maakt de AVG niet anders, maar wel de praktische invulling van het register en de privacyverklaring.
+6. **Wat is de bewaartermijn en wanneer is een account "inactief"?** 12 maanden is een voorstel, geen wet. De maintainer moet dit vaststellen en kunnen uitleggen.
 7. **Is de site op kinderen in de VS gericht?** Zo ja, dan is COPPA mogelijk van toepassing en is "verifieerbare ouderlijke toestemming" een strengere eis. Zo nee, dan nog steeds geen tracking of advertenties.
 8. **Mag de D1 `database_id` in de publieke repo?** Het is geen secret, maar wel infrastructuurmetadata. Kies een lijn en documenteer die.
 9. **Wat doen we met previews?** Auth op previews met dezelfde D1 en dezelfde secret is onverstandig. Zet auth daar uit of gebruik een wegwerp-database.
 10. **Willen we ooit multiplayer?** Zo ja, reserveer daar nu geen D1-architectuur voor; Durable Objects zijn een aparte laag en een aparte ADR.
 11. **Hoe koppelt een kindertoestel zonder volledige ouder-sessie?** Een gedeelde login is onveilig; een beperkte device-sessie of sync-only token is extra maatwerk bovenop Better Auth. Bepaal dit vóór fase 1.
 
-## 10. Beslissing voor de eigenaar
+## 10. Beslissing voor de maintainer
 
 **Beste optie nu:** fase 0.5. Bouw lokale profielen en export/import, zonder backend, zonder accounts en zonder CSP-wijziging. Daarmee lost de app de meest voorkomende situatie op en blijft de huidige belofte intact.
 
 **Beste optie als cross-device sync echt nodig is:** fase 1 met Better Auth 1.7.10 in dezelfde Worker, D1 in de EU, en een ouderaccount met passkey. Sync alleen instellingen, beste scores en grove voortgang. Geen kindlogin, geen kind-e-mail, geen magic link of OAuth in fase 1.
 
-De eigenaar moet dan expliciet het volgende beslissen:
+De maintainer moet dan expliciet het volgende beslissen:
 
 1. **ADR 0012 goedkeuren:** auth- en backendontwerp, zelfde origin, D1, `run_worker_first`, CSP-wijziging, secrets en rollback.
 2. **ADR 0013 goedkeuren:** privacy en gegevensverwerking, inclusief verwerkingsverantwoordelijke, grondslag, bewaartermijn, verwerkers (Cloudflare, eventueel e-mail), ouderlijke toestemming en verwijdering.
@@ -742,7 +742,7 @@ De eigenaar moet dan expliciet het volgende beslissen:
 6. **CPU en plankeuze:** meet de CPU van de gekozen auth-methode; het gratis plan volstaat als die onder 10 ms blijft, anders is Workers Paid (US$ 5/maand) nodig.
 7. **D1 `database_id` en previews beleid kiezen:** wat komt in de publieke repo, en is auth op previews uit of apart?
 
-**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0014 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0015 geen multiplayer.** Als de eigenaar deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
+**Zonder ADR 0012 en 0013 komt er geen productie-auth. Zonder ADR 0014 geen volledige voortgangssync of ouder-dashboard. Zonder ADR 0015 geen multiplayer.** Als de maintainer deze vragen nu niet wil beantwoorden, is dat een geldig antwoord: blijf bij fase 0.5.
 
 ## Bronnen
 

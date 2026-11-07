@@ -49,7 +49,7 @@ De gekozen vectorkaart is scherp op een tablet, heeft alle 63 vakjes en de klass
 - De game is beschikbaar op `/ganzenbord`, in de catalogus en in het spelmenu.
 - De bundel groeit met de dobbelsteencomponent (ongeveer 4 kB gzip) en het bord (ongeveer 63 kB gzip). Het bord wordt als statisch asset geladen, niet in de JS-bundel.
 - De engine is los testbaar: 18 regeltests, inclusief duizenden willekeurige partijen om vastlopers te vinden.
-- De eerste speler is altijd speler 1. Wil de eigenaar later een startworp of wisselende starter, dan kan dat in de engine worden toegevoegd zonder de UI te herschrijven.
+- De eerste speler is altijd speler 1. Wil de maintainer later een startworp of wisselende starter, dan kan dat in de engine worden toegevoegd zonder de UI te herschrijven.
 - Bij twee spelers kan een potje in een gelijkspel eindigen. De uitslag en de spelregels zeggen dat expliciet.
 - De put/gevangenis-regel kan onduidelijk zijn voor jonge kinderen; de popup/status en het spelregelblad leggen uit wat er gebeurt.
 - De licentie van `react-dice-complete` (ISC) en de hergebruikte assets staan in `LICENSES/`. De commerciële referentie-app is niet gebruikt.

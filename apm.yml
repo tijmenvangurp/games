@@ -1,0 +1,72 @@
+# APM beheert de skills voor OpenCode, Claude Code en Codex.
+# MCP's: APM schrijft ze voor Claude en Codex. Voor OpenCode staat de MCP-config
+# nog in opencode.jsonc, omdat APM 0.35 de V1-vorm schrijft en OpenCode V2
+# mcp.servers leest. Zie microsoft/apm#3112.
+name: games
+version: 0.3.0
+description: Agent-harness voor de publieke Spellen-app.
+author: Tijmen van Gurp
+targets:
+  - opencode
+  - claude
+  - codex
+dependencies:
+  apm:
+    - git: mattpocock/skills
+      ref: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
+      skills:
+        - tdd
+        - diagnosing-bugs
+        - prototype
+        - domain-modeling
+        - codebase-design
+        - research
+        - code-review
+        - writing-for-agents
+        - improve-codebase-architecture
+        - grilling
+        - retro
+        - triage
+        - to-spec
+        - to-tickets
+        - wayfinder
+        - implement
+        - implement-spec
+    - git: cloudflare/skills
+      path: skills/web-perf
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+    - git: cloudflare/skills
+      path: skills/workers-best-practices
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+    - git: cloudflare/skills
+      path: skills/wrangler
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+  mcp:
+    - name: fallow
+      registry: false
+      transport: stdio
+      command: corepack
+      args:
+        - pnpm
+        - exec
+        - fallow-mcp
+    - name: nx
+      registry: false
+      transport: stdio
+      command: corepack
+      args:
+        - pnpm
+        - exec
+        - nx-mcp
+        - --disableTelemetry
+        - --no-minimal
+    - name: context7
+      registry: false
+      transport: http
+      url: https://mcp.context7.com/mcp
+    - name: firecrawl-hosted
+      registry: false
+      transport: http
+      url: https://mcp.firecrawl.dev/v2/mcp-oauth
+includes: auto
+scripts: {}

@@ -9,7 +9,7 @@
 
 **Gebruik vooraf gegenereerde, lokale TTS-fragmenten met één Nederlandse stem, en bouw één gedeelde spraakspeler die per game alleen de kritieke woorden, vragen en feedback voorleest.**
 
-- De app heeft al een bewezen pipeline voor Frans: 175 lokale MP3's, gegenereerd met de private TTS-skill en gecommit in `apps/games/public/audio/fr`. Die aanpak past binnen de CSP en de regel “geen externe requests”.
+- De app heeft al een bewezen pipeline voor Frans: 175 lokale MP3's, gegenereerd en gecommit in `apps/games/public/audio/fr`. Die aanpak past binnen de CSP en de regel “geen externe requests”.
 - Gebruik **geen** `speechSynthesis` in de browser. Stemmen verschillen per toestel, sommige stemmen synthetiseren via een netwerkdienst en je kunt de uitspraak niet reviewen of vastleggen.
 - De TTS-dienst en de Nederlandse stem **Nathalie** bestaan al; Nathalie wordt gebruikt voor Letterpret. De Franse stem Tom is alleen voor Frans. Hergebruik Nathalie voor de andere games; een nieuwe stem kiezen is niet nodig.
 - Lees niet alles voor. Spreek de **opdracht, de vraag, de antwoordopties (op verzoek) en de feedback** uit. Elk gesproken element krijgt een herhaalknop. De tekst blijft zichtbaar, zodat dove en slechthorende kinderen en schermlezergebruikers niets verliezen.
@@ -95,7 +95,7 @@ De infrastructuur is er al en er is ook al een Nederlandse stem: **Nathalie** (`
 
 **Hergebruik Nathalie voor alle Nederlandse games.** Er is dus geen nieuwe stemkeuze nodig. Doe wel een korte steekproef met langere zinnen, getallen en leenwoorden, want de Letterpret-set is deels prototype en bestaat vooral uit losse klanken en korte woorden. Alleen als Nathalie daar duidelijk ongeschikt voor blijkt, vallen we terug op Pim of Ronnie.
 
-Met `scripts/generate-sounds.ts --list-models` kan de eigenaar zien welke stemmen de TTS-dienst aanbiedt; de private helper houdt de endpoint en sleutel buiten de chat.
+Met `scripts/generate-sounds.ts --list-models` kan de maintainer zien welke stemmen de TTS-dienst aanbiedt; endpoint en sleutel blijven buiten de chat.
 
 Piper is MIT-gelicenseerd. De Nederlandse stemmen staan in `rhasspy/piper-voices`:
 
@@ -230,7 +230,7 @@ Een scaffold (`pnpm new:game`) neemt `model/audio.ts`, de spraakverklaring en de
 | Licentie- of herkomstvraag                       | Bestaande CC0-stem Nathalie gebruiken; Piper-licentie en stembron in ADR en credits vastleggen                    |
 | Repo en CI worden traag                          | Audio niet in de bundel; CI controleert alleen bestanden, genereert niets; `--check` is een pure bestandscontrole |
 
-Open vragen voor de eigenaar:
+Open vragen voor de maintainer:
 
 - Nathalie als vaste stem voor alle Nederlandse games? Zo ja, dan vervalt de keuze tussen Pim en Ronnie en blijft alleen een steekproef met langere zinnen en getallen over.
 - Aparte voorleesknop naast de geluidseffecten, of één gecombineerde geluidsknop?

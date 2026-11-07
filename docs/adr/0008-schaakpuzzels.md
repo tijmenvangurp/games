@@ -5,7 +5,7 @@
 
 ## Context
 
-Na de schaaktutorial wil de eigenaar korte schaakpuzzels aanbieden. De app is statisch, doet geen externe requests en gebruikt al `chess.js` en `react-chessboard`. Een runtime-koppeling met de Lichess-API is daarom geen optie. De Lichess-puzzeldatabase is publiek beschikbaar onder CC0 en bevat FEN, oplossingen, rating en thema's.
+Na de schaaktutorial wil de maintainer korte schaakpuzzels aanbieden. De app is statisch, doet geen externe requests en gebruikt al `chess.js` en `react-chessboard`. Een runtime-koppeling met de Lichess-API is daarom geen optie. De Lichess-puzzeldatabase is publiek beschikbaar onder CC0 en bevat FEN, oplossingen, rating en thema's.
 
 ## Beslissing
 

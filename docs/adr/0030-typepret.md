@@ -1,4 +1,4 @@
-# ADR 0029: Typepret met eigen invoerlogica
+# ADR 0030: Typepret met eigen invoerlogica
 
 - **Status:** Aangenomen
 - **Datum:** 2026-11-07
