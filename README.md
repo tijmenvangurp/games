@@ -54,7 +54,7 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 ## Audio
 
-Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md).
+Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md). Zo draai je de TTS-server lokaal: [docs/tooling.md](docs/tooling.md#tts-lokaal-draaien).
 
 ## Deployment
 

@@ -106,6 +106,55 @@ als de mappen bestaan. Gebruik bij voorkeur het bestaande script:
 corepack pnpm run e2e
 ```
 
+## TTS lokaal draaien
+
+De audiogeneratoren praten met een OpenAI-compatibele TTS-server. De repo
+gebruikt [Speaches](https://github.com/speaches-ai/speaches) met Piper-stemmen.
+Je kunt die lokaal draaien met Docker:
+
+```sh
+docker run --rm --detach --publish 8000:8000 --name speaches \
+  --volume hf-hub-cache:/home/ubuntu/.cache/huggingface/hub \
+  ghcr.io/speaches-ai/speaches:latest-cpu
+```
+
+Download de stemmen eenmalig. `uvx` komt met [uv](https://docs.astral.sh/uv/);
+installeer dat eenmalig als je het nog niet hebt.
+
+```sh
+export SPEACHES_BASE_URL=http://localhost:8000
+uvx speaches-cli model download speaches-ai/piper-nl_BE-nathalie-medium
+uvx speaches-cli model download speaches-ai/piper-fr_FR-tom-medium
+```
+
+Zet daarna de omgeving voor de generatoren:
+
+```sh
+export TTS_BASE_URL=http://localhost:8000/v1
+# Nederlands (standaard):
+export TTS_MODEL=speaches-ai/piper-nl_BE-nathalie-medium
+export TTS_VOICE=nathalie
+# Frans gebruikt zijn eigen defaults; laat TTS_MODEL/TTS_VOICE dan weg.
+```
+
+`TTS_API_KEY` is optioneel; Speaches heeft lokaal geen key nodig. Zet waarden
+nooit in de repo, een screenshot of een prompt.
+
+Genereer en controleer:
+
+```sh
+corepack pnpm run audio:nl
+corepack pnpm run audio:french
+corepack pnpm run audio:check
+```
+
+`audio:check` controleert de catalogus, het lockbestand en de bestaande
+MP3-bestanden zonder TTS-server. De app gebruikt tijdens het spelen alleen de
+gecommitte bestanden; TTS is dev-tooling.
+
+Stop de server met `docker stop speaches`. Gebruik `latest-cuda` in plaats van
+`latest-cpu` als je een geschikte GPU hebt.
+
 ## Klankprototype voor TTS
 
 `scripts/generate-sounds.ts` genereert tijdelijke audio voor losse klanken in
@@ -113,9 +162,14 @@ corepack pnpm run e2e
 variant en stem, en zet pas daarna de gekozen bestanden in
 `apps/games/public/audio/letters/v2/sounds/`.
 
-Het script leest `TTS_BASE_URL`, `TTS_MODEL`, `TTS_VOICE` en optioneel
-`TTS_API_KEY` uit je omgeving. Zet die waarden nooit in de repo, een screenshot
-of een prompt. Heb je geen TTS-toegang, dan kun je de bestaande set beluisteren:
+```sh
+corepack pnpm exec tsx scripts/generate-sounds.ts \
+  --only=i,k,m,s,p,v,e,n,t,a \
+  --variant=letter,fonetisch,woord \
+  --label=nathalie
+```
+
+Beluisteren zonder opnieuw te genereren:
 
 ```sh
 corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
