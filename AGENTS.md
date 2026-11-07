@@ -48,6 +48,7 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `react-chessboard`                                                 | schaakbord                                                          |
 | `stockfish.js`                                                     | lokale schaakengine in een worker (wasm)                            |
 | `sudoku-gen`                                                       | sudoku-generator                                                    |
+| `react-dice-complete`                                              | dobbelstenen en worpanimatie in Ganzenbord                          |
 | `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
 | `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
 | `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react` | unit- en componenttests                                             |

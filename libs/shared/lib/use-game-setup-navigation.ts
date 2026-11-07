@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 interface GameSetupNavigationOptions {
@@ -29,4 +30,22 @@ export function useGameSetupNavigation({
     },
     onNewGame: setupVisible ? undefined : onOpenSetup,
   };
+}
+
+/**
+ * Combineert de lokale "setup open"-stand met de navigatie-opties die elke
+ * gamepagina nodig heeft. Houdt de pagina's vrij van dezelfde boilerplate.
+ */
+export function useGameSetupState(hasActiveGame: boolean) {
+  const [showSetup, setShowSetup] = useState(false);
+  const setupVisible = showSetup || !hasActiveGame;
+  const navigation = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame,
+    backToGameLabel: "Terug naar je spel",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
+
+  return { showSetup, setShowSetup, setupVisible, navigation };
 }

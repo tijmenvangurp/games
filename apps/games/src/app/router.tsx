@@ -11,6 +11,7 @@ import { ArrowsPage } from "@pages/arrow";
 import { ChessGamePage, ChessPage, ChessTutorialPage } from "@pages/chess";
 import { FlagsPage } from "@pages/flags";
 import { FourInARowPage } from "@pages/four-in-a-row";
+import { GanzenbordPage } from "@pages/ganzenbord";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
 import { HomePage } from "@pages/home";
 import { LettersPage } from "@pages/letter";
@@ -21,6 +22,7 @@ import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 import { WordSearchPage } from "@pages/word-search";
+import { BoardEditorPage } from "./board-editor-page";
 
 export function createAppRouter(history?: RouterHistory) {
   const rootRoute = createRootRoute({
@@ -50,6 +52,8 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/woordzoeker", WordSearchPage),
     gameRoute("/vlaggen", FlagsPage),
     gameRoute("/vier-op-een-rij", FourInARowPage),
+    gameRoute("/ganzenbord", GanzenbordPage),
+    gameRoute("/ganzenbord/bord", BoardEditorPage),
     gameRoute("/mengelmoes", AlchemyPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),

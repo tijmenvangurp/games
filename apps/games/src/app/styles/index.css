@@ -33,6 +33,8 @@
   --color-danger: var(--danger);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
+  --color-player-three: var(--player-three);
+  --color-player-four: var(--player-four);
 }
 
 :root {
@@ -54,6 +56,8 @@
    */
   --player-one: #4f5d9e;
   --player-two: oklch(0.58 0.2 30);
+  --player-three: oklch(0.55 0.11 190);
+  --player-four: oklch(0.56 0.13 305);
 }
 
 @layer base {
@@ -110,6 +114,37 @@
     box-shadow:
       0 1px 2px oklch(0.3 0.025 145 / 0.05),
       0 16px 36px -30px oklch(0.3 0.025 145 / 0.35);
+  }
+
+  .ganzenbord-board {
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 30px -22px rgb(40 25 10 / 0.55);
+    overflow: hidden;
+  }
+
+  .ganzenbord-zoom {
+    transform: scale(1);
+    transition: transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ganzenbord-pawn {
+    box-shadow: 0 2px 5px rgb(40 25 10 / 0.45);
+  }
+
+  .ganzenbord-pawn-move {
+    transition:
+      left 260ms ease-in-out,
+      top 260ms ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ganzenbord-zoom {
+      transition: none;
+    }
+
+    .ganzenbord-pawn-move {
+      transition: none;
+    }
   }
 
   .game-card:hover {

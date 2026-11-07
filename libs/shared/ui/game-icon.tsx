@@ -1,5 +1,6 @@
 import {
   ArrowsOutCardinal,
+  Bird,
   BookOpenText,
   Calculator,
   Cards,
@@ -34,6 +35,7 @@ const GAME_ICONS = {
   flags: Flag,
   alchemy: Flask,
   "four-in-a-row": CirclesFour,
+  ganzenbord: Bird,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;
