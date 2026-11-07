@@ -37,4 +37,4 @@ een stap alleen over met een expliciete reden in de pull request.
 - Geen nieuwe backend, analytics of externe request.
 - Geen `!important`; gebruik cascade layers of een specifiekere selector.
 - Geen geheimen, privépaden of kindgegevens in assets, tests of screenshots.
-- Merge nooit zelfstandig; vraag de eigenaar om akkoord.
+- Merge nooit zelfstandig; vraag de maintainer om akkoord.

@@ -118,10 +118,10 @@ De combinatie van `quality`, `quality:full` en CI-checks die een wijziging
 moet halen voordat hij gemerged mag worden.
 _Avoid_: CI, checks
 
-**Eigenaar**:
+**Maintainer**:
 De persoon die de repository beheert en expliciet toestemming geeft voor een
 merge of een deploy.
-_Avoid_: maintainer, admin
+_Avoid_: beheerder, admin
 
 **Agent-harness**:
 De gedeelde skills, MCP's en permissions waarmee een agent in deze repo werkt;

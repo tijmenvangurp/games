@@ -8,7 +8,7 @@ Publieke, statische spelletjes-app voor kinderen. Lees `README.md`, `CONTRIBUTIN
 - **Alleen TypeScript.** Geen `.js`, `.mjs`, `.cjs`, `.jsx` of Python. `pnpm run ts-only` en de commit-hook bewaken dit.
 - **Geen `!important` in CSS.** Gebruik cascade layers (`@layer`) of een specifiekere selector; de fallow-regel `css-selector-complexity` (op `error`) bewaakt dit, net als id-selectors en diepe nesting.
 - **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` of `@phosphor-icons/react` via `@shared/ui`, of uit `apps/games/public/`.
-- **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de eigenaar. Spellen zijn client-side en lokaal.
+- **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de maintainer. Spellen zijn client-side en lokaal.
 - **Bibliotheken eerst.** Zoek altijd eerst of een bestaande library het al oplost. Een nieuwe library toevoegen mag zonder toestemming, ook als de bundel daardoor groeit. Zie **Bibliotheken eerst**.
 
 ## Bibliotheken eerst
@@ -16,7 +16,7 @@ Publieke, statische spelletjes-app voor kinderen. Lees `README.md`, `CONTRIBUTIN
 **Zoek altijd eerst of een bestaande bibliotheek het probleem al oplost.** Een library toevoegen is de standaardroute; zelf code schrijven is de uitzondering.
 
 - Kijk eerst in de lijst hieronder en in `package.json`. Zoek daarna verder (npm, documentatie van het ecosysteem) naar een bewezen, onderhouden library met TypeScript-typen.
-- **Toevoegen mag zonder toestemming van de eigenaar.** Vraag niet om een ADR of akkoord, en wacht daar niet op.
+- **Toevoegen mag zonder toestemming van de maintainer.** Vraag niet om een ADR of akkoord, en wacht daar niet op.
 - **Een grotere bundel is geen bezwaar.** Minder eigen code om te onderhouden weegt zwaarder dan een paar KB extra. Kies bij twijfel de library die het minst eigen code kost, ook als die groter is of meer meebrengt.
 - Noem de library in de commit (`deps:`) en in de pull request, en werk de lijst hieronder bij zodat de volgende zoektocht hier begint.
 - Leg alleen iets vast als je een voor de hand liggende library bewust _niet_ neemt: één regel in de pull request of in `docs/research/`.
@@ -101,7 +101,7 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 
 ## Mergen
 
-- **De agent merget nooit zelfstandig.** Een pull request blijft open tot de eigenaar expliciet zegt dat hij gemerged mag worden. Geldige signalen zijn de letterlijke tekst _"merge mag"_, een GitHub-review met **Approve**, of het label `merge`.
+- **De agent merget nooit zelfstandig.** Een pull request blijft open tot de maintainer expliciet zegt dat hij gemerged mag worden. Geldige signalen zijn de letterlijke tekst _"merge mag"_, een GitHub-review met **Approve**, of het label `merge`.
 - **Groene CI is nodig, maar geen toestemming.** "De checks zijn groen" of "het is klaar" is géén mandaat om te mergen. Vraag altijd om bevestiging en wacht daarop.
 - **Nooit direct naar `main` pushen.** Altijd via een branch en een pull request — ook voor een wijziging aan deze regel zelf.
 - Laat een pull request liever open met een korte status ("klaar, wacht op jouw akkoord") dan hem zelf af te ronden.

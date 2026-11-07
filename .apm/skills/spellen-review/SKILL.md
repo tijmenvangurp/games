@@ -60,7 +60,7 @@ review alleen de Standards-as.
 
 - [ ] `corepack pnpm run quality:full` is groen.
 - [ ] CI is groen (`quality`, `e2e`, Workers Builds).
-- [ ] De eigenaar heeft expliciet merge-akkoord gegeven.
+- [ ] De maintainer heeft expliciet merge-akkoord gegeven.
 
 ## Rapporteren
 

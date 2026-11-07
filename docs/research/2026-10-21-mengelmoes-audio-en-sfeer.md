@@ -8,7 +8,7 @@
 ## Samenvatting
 
 1. **Dit is vooral een inkooplijst, geen gap-analyse.** Mengelmoes heeft voor de MVP geen externe audio of texturen nodig. De app heeft al een CSP-veilige synthesizer, een globale geluidstoggle, haptiek, confetti en een sparkle-icoon.
-2. **De stilte bij een fout is beleid, geen gap.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) zegt: fouten zijn informatie, geen straf. Geen foutgeluid dus. De winst zit in **vieringen**: de eigenaar keurt `canvas-confetti` goed, en die vervangt nu de handgeschreven CSS-burst in alle spellen.
+2. **De stilte bij een fout is beleid, geen gap.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) zegt: fouten zijn informatie, geen straf. Geen foutgeluid dus. De winst zit in **vieringen**: de maintainer keurt `canvas-confetti` goed, en die vervangt nu de handgeschreven CSS-burst in alle spellen.
 3. **Oppak-physics bestaat al.** De `DragOverlay` schaalt naar 105% en kantelt 3 graden ([`alchemy-play.tsx`](../../libs/features/alchemy-lab/ui/alchemy-play.tsx)). De voorgestelde 5% en 2–5 graden zijn dus al gehaald.
 4. **Vieren kan nu rijker.** `Confetti` gebruikt `canvas-confetti`, laadt de bibliotheek pas bij een viering en respecteert reduced motion. Het is gedeeld door Mengelmoes, de afsluitdialoog en sudoku; de oude CSS-burst is verwijderd. `Sparkles` blijft een icoon, geen deeltjessysteem. Daarnaast gebruiken de dialogen en de feedbackregel nu **Motion** (`motion.dev`) met `LazyMotion` + `m`, zodat de handgeschreven `animate-pop` daar weg is.
 5. **Voor audio is alleen CC0 probleemloos, en Kenney is de eenvoudigste bron.** Pixabay en Zapsplat verbieden herdistributie van losse bestanden; een publieke git-repo met de ruwe mp3's is precies dat. CC-BY-bronnen mogen wel, maar vragen attributie en administratie.
@@ -148,13 +148,13 @@ De suggestie (5% groter, 2–5 graden kantelen) is al geïmplementeerd:
 
 ### 5.1 Geen foutgeluid
 
-De eigenaar wil geen `wrong`-klank, en dat is precies wat [ADR 0026](../adr/0026-adaptief-niveaumodel.md) voorschrijft: **"Fouten zijn informatie, geen straf."** Geen foutgeluid, geen levens, geen scoreverlies en neutrale copy. De stilte bij een mislukte combinatie is dus geen gap maar beleid.
+De maintainer wil geen `wrong`-klank, en dat is precies wat [ADR 0026](../adr/0026-adaptief-niveaumodel.md) voorschrijft: **"Fouten zijn informatie, geen straf."** Geen foutgeluid, geen levens, geen scoreverlies en neutrale copy. De stilte bij een mislukte combinatie is dus geen gap maar beleid.
 
 De `wrong`-klank en de bijbehorende haptiek zijn verwijderd. Ze hoorden niet bij de MVP en druisten tegen ADR 0026 in. De neutrale tekst "Hm, dat mengt niet. Probeer iets anders." blijft de feedback.
 
 ### 5.2 Wel: rijkere vieringen met `canvas-confetti`
 
-De eigenaar keurt een confettidependency goed om vieringen in meerdere spellen sterker te maken. `canvas-confetti` 1.9.4 (ISC) vervangt de handgeschreven CSS-burst:
+De maintainer keurt een confettidependency goed om vieringen in meerdere spellen sterker te maken. `canvas-confetti` 1.9.4 (ISC) vervangt de handgeschreven CSS-burst:
 
 - **Lui geladen.** De component importeert de bibliotheek pas als er echt gevierd wordt, dus het startscherm blijft klein.
 - **Lokaal en CSP-veilig.** De bibliotheek beheert zelf een canvas op `document.body` met `zIndex: 60`; daardoor blijft de confetti boven de dialoogoverlay en de dimlaag. Er is geen afbeelding, fetch of worker nodig.
@@ -166,7 +166,7 @@ De `Confetti`-API blijft `pieces` en `data-confetti`, zodat bestaande tests en s
 
 ### 5.3 Motion voor dialogen en feedback
 
-De eigenaar wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (motion.dev, MIT) toegevoegd. De integratie blijft bewust klein:
+De maintainer wil minder zelfgeschreven animaties. Daarom is **`motion` 14.4.0** (motion.dev, MIT) toegevoegd. De integratie blijft bewust klein:
 
 - `MotionProvider` in `libs/shared/ui` wrapped de app met `LazyMotion features={domAnimation}` en `MotionConfig reducedMotion="user"`.
 - Componenten gebruiken de lichte `m`-primitive, niet de volledige `motion`-component. Zo blijft de feature-bundel beperkt.
@@ -223,7 +223,7 @@ Alle effecten respecteren `prefers-reduced-motion` via `MotionConfig` en de conf
 - Willen we überhaupt een ambience, of is stilte beter voor concentratie en ouderlijke acceptatie?
 - Is een neutrale visuele wiebel bij een mislukte combinatie wenselijk, of is de tekst genoeg?
 - Willen we per categorie variëren in toonhoogte (water hoog, aarde laag), of blijft elk geluid hetzelfde?
-- Wie luistert en keurt de klanken goed: de eigenaar, kinderen, of beiden?
+- Wie luistert en keurt de klanken goed: de maintainer, kinderen, of beiden?
 - Blijft de geluidstoggle globaal, of krijgt sfeer een eigen schakelaar?
 
 ## Bronnen

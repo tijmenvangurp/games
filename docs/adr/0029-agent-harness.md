@@ -6,7 +6,7 @@
 
 ## Context
 
-De repository wordt door meerdere personen en agents bewerkt. De eigenaar
+De repository wordt door meerdere personen en agents bewerkt. De maintainer
 gebruikt lokaal een set skills en MCP-servers die niet in de repo staan. Daardoor
 krijgt een andere contributor niet dezelfde werkwijze, kent hij de kwaliteitsgate
 niet en moet hij dezelfde fouten opnieuw uitzoeken.
@@ -40,7 +40,7 @@ en tijdens het spelen geen externe requests doen.
 6. **Geen geheimen of privépaden.** Skills en docs bevatten geen tokens,
    `.env`-waarden, interne hostnames, netwerknamen, IP-adressen of persoonsgegevens.
    Privé-workflows krijgen een publieke, veilige variant of een verwijzing naar
-   de eigenaar.
+   de maintainer.
 7. **Licenties en herkomst zijn vastgelegd.** De gebruikte upstream-bronnen zijn
    MIT (mattpocock/skills) en Apache 2.0 (cloudflare/skills); de teksten staan in
    `LICENSES/`. APM registreert de gedeclareerde licenties in de lockfile.

@@ -95,7 +95,7 @@ De infrastructuur is er al en er is ook al een Nederlandse stem: **Nathalie** (`
 
 **Hergebruik Nathalie voor alle Nederlandse games.** Er is dus geen nieuwe stemkeuze nodig. Doe wel een korte steekproef met langere zinnen, getallen en leenwoorden, want de Letterpret-set is deels prototype en bestaat vooral uit losse klanken en korte woorden. Alleen als Nathalie daar duidelijk ongeschikt voor blijkt, vallen we terug op Pim of Ronnie.
 
-Met `scripts/generate-sounds.ts --list-models` kan de eigenaar zien welke stemmen de TTS-dienst aanbiedt; de private helper houdt de endpoint en sleutel buiten de chat.
+Met `scripts/generate-sounds.ts --list-models` kan de maintainer zien welke stemmen de TTS-dienst aanbiedt; endpoint en sleutel blijven buiten de chat.
 
 Piper is MIT-gelicenseerd. De Nederlandse stemmen staan in `rhasspy/piper-voices`:
 
@@ -230,7 +230,7 @@ Een scaffold (`pnpm new:game`) neemt `model/audio.ts`, de spraakverklaring en de
 | Licentie- of herkomstvraag                       | Bestaande CC0-stem Nathalie gebruiken; Piper-licentie en stembron in ADR en credits vastleggen                    |
 | Repo en CI worden traag                          | Audio niet in de bundel; CI controleert alleen bestanden, genereert niets; `--check` is een pure bestandscontrole |
 
-Open vragen voor de eigenaar:
+Open vragen voor de maintainer:
 
 - Nathalie als vaste stem voor alle Nederlandse games? Zo ja, dan vervalt de keuze tussen Pim en Ronnie en blijft alleen een steekproef met langere zinnen en getallen over.
 - Aparte voorleesknop naast de geluidseffecten, of één gecombineerde geluidsknop?

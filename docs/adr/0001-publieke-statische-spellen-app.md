@@ -5,7 +5,7 @@
 
 ## Context
 
-De eigenaar wil spelletjes voor de kinderen publiceren op een openbare URL, te beginnen met sudoku. De bestaande interne repository bevat infrastructuur: hostnames, netwerknamen, poorten, paden en beheerprocedures. Publicatie vanuit die repository of met gedeelde geschiedenis zou interne informatie kunnen lekken. De app heeft geen serverdata nodig: sudoku's kunnen volledig in de browser worden gegenereerd en opgelost.
+De maintainer wil spelletjes voor de kinderen publiceren op een openbare URL, te beginnen met sudoku. De bestaande interne repository bevat infrastructuur: hostnames, netwerknamen, poorten, paden en beheerprocedures. Publicatie vanuit die repository of met gedeelde geschiedenis zou interne informatie kunnen lekken. De app heeft geen serverdata nodig: sudoku's kunnen volledig in de browser worden gegenereerd en opgelost.
 
 ## Beslissing
 

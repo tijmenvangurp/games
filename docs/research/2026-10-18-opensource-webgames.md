@@ -15,7 +15,7 @@
 2. **Geen engine.** De gemeten engines zijn 68–353 KB gzip en lossen niets op dat React + SVG + CSS + één canvas niet kan. Meerdere gebruiken `new Function` als feature-detectie (gemeten: PixiJS 5×, Phaser en Excalibur 1×). Bij Phaser en PixiJS zit dat in een `try/catch`, dus onder onze CSP valt de app stil terug op een alternatief pad — precies het soort verborgen gedrag dat je niet in een kinderspel wilt. WebAssembly is met `script-src 'self'` helemaal onbruikbaar. Zie [§3](#3-engines).
 3. **Complete games zijn geen bruikbare bouwstenen.** 2048 (MIT) is ongeveer 200 regels eigen logica; Hextris heeft geen eenduidige licentie; Lichess (AGPL-3.0), Scratch GUI/VM (AGPL-3.0), chessground (GPL-3.0) en GCompris (GPL-3.0-or-later) mogen we niet zonder licentiegevolgen overnemen. **Simon Tatham's Puzzle Collection** (MIT-achtige licentietekst) is de enige echte schatkist, maar het is C: overzetten van regels en generatorideeën, niet vendoren.
 4. **Computationeel denken kan zonder Blockly** (207 KB gzip, gemeten): eigen commando-blokken en een eigen interpreter passen beter bij de FSD-opzet en bij kinderen. Alleen als vrije code écht nodig is, is `JS-Interpreter` (Apache-2.0, `eval`-vrij) het overwegen waard.
-5. **Leg vóór het overnemen vast wat je overneemt**, onder welke licentie en met welke attributie ([§7](#7-licentie-en-attributie)). De repo heeft op dit moment **geen eigen `LICENSE`**; dat maakt het overnemen van GPL/AGPL-code een beslissing van de eigenaar in plaats van een detail.
+5. **Leg vóór het overnemen vast wat je overneemt**, onder welke licentie en met welke attributie ([§7](#7-licentie-en-attributie)). De repo heeft op dit moment **geen eigen `LICENSE`**; dat maakt het overnemen van GPL/AGPL-code een beslissing van de maintainer in plaats van een detail.
 
 ## 1. Methode en betrouwbaarheid
 
@@ -102,15 +102,15 @@ Dit is de categorie waarin een integratie écht tijd bespaart en direct aansluit
 
 ## 6. Afgeraden, met reden
 
-| Categorie                        | Voorbeelden                                                                              | Reden                                                                                                                                |
-| -------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Virale licenties                 | lila, Scratch GUI/VM (AGPL-3.0); chessground (GPL-3.0, npm); GCompris (GPL-3.0-or-later) | Zou de hele app onder die licentie brengen. Met een publieke repo en géén eigen LICENSE is dat een eigenaarsbesluit, geen bijeffect. |
-| Share-alike data                 | Open Trivia DB, Wikimedia-kaarten en -borden                                             | CC BY-SA plant zich voort in onze bundel.                                                                                            |
-| WebAssembly                      | Godot-webexport, WASM-ports                                                              | CSP heeft geen `wasm-unsafe-eval`; toevoegen zou de strengste regel van de app verzwakken.                                           |
-| Engines                          | Phaser, PixiJS, Excalibur, Three.js, LittleJS, Babylon, melonJS                          | 68–353 KB gzip voor speltypen die React + SVG al dekken.                                                                             |
-| Netwerkafhankelijke content      | Open Trivia DB, API-gedreven quizzen                                                     | Breekt offline spelen en stuurt bezoekers-IP's naar een derde partij.                                                                |
-| Verkeerde doelgroep of stijl     | commerciële HTML5-ports, retro-arcade                                                    | Geweld, timers, levens en advertenties horen niet bij een app voor 6–12 jaar.                                                        |
-| `eval`-gebaseerde gereedschappen | code-generatoren, JS-uitvoerders met `eval`                                              | Wordt door de CSP geblokkeerd; alleen `eval`-vrije varianten zijn bruikbaar.                                                         |
+| Categorie                        | Voorbeelden                                                                              | Reden                                                                                                                                            |
+| -------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Virale licenties                 | lila, Scratch GUI/VM (AGPL-3.0); chessground (GPL-3.0, npm); GCompris (GPL-3.0-or-later) | Zou de hele app onder die licentie brengen. Met een publieke repo en géén eigen LICENSE is dat een beslissing van de maintainer, geen bijeffect. |
+| Share-alike data                 | Open Trivia DB, Wikimedia-kaarten en -borden                                             | CC BY-SA plant zich voort in onze bundel.                                                                                                        |
+| WebAssembly                      | Godot-webexport, WASM-ports                                                              | CSP heeft geen `wasm-unsafe-eval`; toevoegen zou de strengste regel van de app verzwakken.                                                       |
+| Engines                          | Phaser, PixiJS, Excalibur, Three.js, LittleJS, Babylon, melonJS                          | 68–353 KB gzip voor speltypen die React + SVG al dekken.                                                                                         |
+| Netwerkafhankelijke content      | Open Trivia DB, API-gedreven quizzen                                                     | Breekt offline spelen en stuurt bezoekers-IP's naar een derde partij.                                                                            |
+| Verkeerde doelgroep of stijl     | commerciële HTML5-ports, retro-arcade                                                    | Geweld, timers, levens en advertenties horen niet bij een app voor 6–12 jaar.                                                                    |
+| `eval`-gebaseerde gereedschappen | code-generatoren, JS-uitvoerders met `eval`                                              | Wordt door de CSP geblokkeerd; alleen `eval`-vrije varianten zijn bruikbaar.                                                                     |
 
 ## 7. Licentie en attributie
 
@@ -119,8 +119,8 @@ De repo heeft **geen `LICENSE`-bestand** (gecontroleerd op 2026-10-18), en er is
 - **MIT, BSD, ISC, Apache-2.0:** overnemen mag, mits de copyright- en licentietekst meegaat in de distributie. Leg per overgenomen bestand vast: naam, versie, licentie, bron-URL, datum en wat je hebt aangepast. Eén `NOTICE.md` met die tabel is genoeg; een regel in de bijbehorende ADR verwijst ernaar. Bij Apache-2.0 komt daar de `NOTICE`-plicht bij als het project er een heeft.
 - **CC0 en publiek domein:** geen verplichtingen. Vermeld de bron alsnog, want dat is wat een latere update of correctie mogelijk maakt.
 - **CC BY / CC BY-SA:** naamsvermelding is verplicht; bij SA ook share-alike op afgeleiden. Voor de OpenTaal-lijst (CC BY 3.0 óf BSD, dus je kunt de BSD-variant kiezen) is dat te regelen; voor Wikimedia-materiaal liever niet.
-- **GPL/AGPL:** virale werking. Wil de eigenaar dat, dan hoort daar een expliciet ADR-besluit bij over de licentie van de hele app. Zolang dat besluit er niet is: niet overnemen.
-- **Code en assets zijn niet hetzelfde.** ADR 0005 laat zien dat de eigenaar bewust niet-vrije Pokémon-assets bundelt voor een niet-commercieel familiewerk. Die afweging geldt niet automatisch voor code: bij code is er geen praktische noodzaak en wél een reële verplichting.
+- **GPL/AGPL:** virale werking. Wil de maintainer dat, dan hoort daar een expliciet ADR-besluit bij over de licentie van de hele app. Zolang dat besluit er niet is: niet overnemen.
+- **Code en assets zijn niet hetzelfde.** ADR 0005 laat zien dat de maintainer bewust niet-vrije Pokémon-assets bundelt voor een niet-commercieel familiewerk. Die afweging geldt niet automatisch voor code: bij code is er geen praktische noodzaak en wél een reële verplichting.
 
 Controleer bij een overname ook de **transitieve** licenties (zoals de 23 dependencies van `tonal`): één LGPL- of GPL-pakket in de keten verandert het antwoord.
 

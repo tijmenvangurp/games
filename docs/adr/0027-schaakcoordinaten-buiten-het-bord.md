@@ -11,7 +11,7 @@ verdwenen achter het stuk dat erop stond. Op een telefoon was dat het duidelijks
 de "8" lag over de toren en de letters a tot en met h lagen onder de onderste
 rij. Kinderen konden daardoor niet zien welk veld welk vak is.
 
-Daarnaast vroeg de eigenaar om minder verticale ruimte boven het bord: de
+Daarnaast vroeg de maintainer om minder verticale ruimte boven het bord: de
 paginakop met titel en ondertitel nam ruimte in die het bord beter kon gebruiken.
 Een bord mag iets kleiner worden voor de coördinaten, als de cijfers en letters
 maar leesbaar blijven.
@@ -43,7 +43,7 @@ maar leesbaar blijven.
 
 - De coördinaten zijn altijd leesbaar, ook op een smal scherm. De velden zijn
   op een telefoon ongeveer 41 px in plaats van 44 px; dat is de prijs van de
-  goot en is met de eigenaar afgestemd.
+  goot en is met de maintainer afgestemd.
 - De e2e-tests vinden "a" en "8" nog steeds binnen de bordgroep, omdat de
   goot binnen hetzelfde `role="group"` valt.
 - De notatiekleuren (`lightSquareNotationStyle`, `darkSquareNotationStyle`) en

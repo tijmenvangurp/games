@@ -40,5 +40,5 @@ Lees `AGENTS.md` → **Bibliotheken eerst** en de tabel **Wat we al hebben**.
 - Geen Python, `.js`-config of een eigen script als een library het al doet.
 - Geen dependency die tijdens het spelen een netwerkrequest doet.
 - Geen licentie zonder bronvermelding; werk `LICENSES/` bij.
-- Geen nieuwe backend zonder ADR en akkoord van de eigenaar.
+- Geen nieuwe backend zonder ADR en akkoord van de maintainer.
 - Merge nooit zelfstandig.

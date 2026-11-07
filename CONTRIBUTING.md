@@ -47,7 +47,7 @@ kunnen bijdragen.
 5. Test op mobiel (390 px) en tablet (1024 px). Touch-targets zijn minimaal
    44 px en respecteren `env(safe-area-inset-*)`.
 6. Open een pull request met de template. Groene CI is nodig, maar **geen**
-   toestemming om te mergen. De eigenaar geeft expliciet akkoord; zie
+   toestemming om te mergen. De maintainer geeft expliciet akkoord; zie
    `AGENTS.md` → **Mergen**.
 
 ## Commits
