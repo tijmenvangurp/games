@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import type { GanzenbordGame, TurnEvent, TurnEventKind } from "@entities/ganzenbord";
 import { Button } from "@shared/ui";
+import { eventArt } from "../model/event-art";
 import { eventMessage } from "../model/presentation";
 import { GooseMark } from "./goose-mark";
 
@@ -69,6 +70,7 @@ interface GanzenbordEventProps {
 
 export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProps) {
   const message = eventMessage(game, event);
+  const art = eventArt(event);
 
   return (
     <div
@@ -76,9 +78,15 @@ export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProp
       className="mx-auto mt-2 w-full max-w-md rounded-xl border-2 border-[#c9a45c] bg-[#fff8e7] p-3 text-[#3f2a18] shadow-[0_10px_30px_-10px_rgba(40,25,10,0.8)]"
     >
       <div className="flex items-start gap-3">
-        <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f0dfb8]">
-          <EventIcon kind={event.kind} />
-        </span>
+        {art ? (
+          <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-[#c9a45c] bg-[#f0dfb8] sm:size-24">
+            <img alt="" className="size-full object-contain" src={art} />
+          </span>
+        ) : (
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f0dfb8]">
+            <EventIcon kind={event.kind} />
+          </span>
+        )}
         <div className="min-w-0">
           <p className="font-black">{TITLES[event.kind]}</p>
           {message ? <p className="text-sm leading-snug opacity-80">{message}</p> : null}
