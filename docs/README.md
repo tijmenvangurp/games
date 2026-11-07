@@ -8,7 +8,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `../CONTRIBUTING.md` — setup, branch/PR-flow, commit-scopes en definition of done.
 - `../AGENTS.md` — de harde regels en werkwijze voor mens en agent.
 - `../GLOSSARY.md` — de domeintaal van Spellen.
-- `agent-harness.md` — de gedeelde agent-harness: skills, MCP's, authenticatie en data.
+- `agent-harness.md` — de gedeelde agent-harness: APM, skills, MCP's, authenticatie en data.
 - `tooling.md` — Nx-daemon, cache, Fallow en de bijbehorende permission-regels.
 - `architecture.md` — de FSD-lagen, aliassen, grenzen en het toevoegen van een slice.
 - `game-checklist.md` — een spel end-to-end toevoegen of uitbreiden.
@@ -47,7 +47,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0026-adaptief-niveaumodel.md` — adaptieve niveaus per spel, de 70–85%-regel, hinttrap, herhaalqueue en foutvriendelijke feedback.
 - `adr/0027-schaakcoordinaten-buiten-het-bord.md` — de coördinaten buiten het bord, meedraaiend met de bordstand en een compactere paginakop tijdens een partij.
 - `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
-- `adr/0029-agent-harness.md` — gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
+- `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
 
 ## Onderzoek
 

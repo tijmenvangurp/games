@@ -1,0 +1,35 @@
+# APM beheert de skills. MCP's staan nog in opencode.jsonc: APM 0.35 schrijft
+# voor OpenCode de V1-vorm, die OpenCode V2 niet leest. Verplaats ze naar
+# dependencies.mcp zodra microsoft/apm#3112 in een release zit.
+name: games
+version: 0.3.0
+description: Agent-harness voor de publieke Spellen-app.
+author: Tijmen van Gurp
+targets:
+  - opencode
+dependencies:
+  apm:
+    - git: mattpocock/skills
+      ref: 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d
+      skills:
+        - tdd
+        - diagnosing-bugs
+        - prototype
+        - domain-modeling
+        - codebase-design
+        - research
+        - code-review
+        - writing-for-agents
+        - improve-codebase-architecture
+        - grilling
+    - git: cloudflare/skills
+      path: skills/web-perf
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+    - git: cloudflare/skills
+      path: skills/workers-best-practices
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+    - git: cloudflare/skills
+      path: skills/wrangler
+      ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d
+includes: auto
+scripts: {}

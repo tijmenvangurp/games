@@ -38,3 +38,6 @@ apps/games/public/stockfish/
 *.njsproj
 *.sln
 *.sw?
+
+# APM dependencies
+apm_modules/

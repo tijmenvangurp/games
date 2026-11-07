@@ -1,8 +1,8 @@
 # Agent-harness: skills en MCP's
 
-Deze repository is met OpenCode V2 ingericht. Deze pagina beschrijft welke
-skills en MCP-servers iedere contributor nodig heeft, welke data de deur uit
-gaat en wat privé blijft.
+Deze repository gebruikt **APM (Agent Package Manager)** voor de agent-skills
+en de MCP-declaraties. APM leest `apm.yml`, pint de herkomst in
+`apm.lock.yaml` en deployt de skills naar `.agents/skills/`.
 
 De app zelf is en blijft statisch: ze doet tijdens het spelen geen externe
 requests. MCP-servers zijn **ontwikkeltooling**. Ze draaien naast de agent en
@@ -10,34 +10,44 @@ veranderen niets aan de CSP of de runtime van de app.
 
 ## Eerste keer
 
+Installeer eerst de APM CLI. Gebruik de officiële installer, of op systemen
+waar de native binary niet start (glibc < 2.38, zoals Debian 12):
+
+```sh
+curl -sSL https://aka.ms/apm-unix | sh
+# of:
+uv tool install apm-cli==0.35.0
+```
+
+Daarna:
+
 ```sh
 corepack pnpm install
+corepack pnpm run harness:install
 opencode mcp list
 ```
 
-`corepack pnpm install` installeert ook `fallow-mcp` en `nx-mcp`. Daarna start
-OpenCode de servers uit `opencode.jsonc` automatisch. Gebruik `/mcps` in de TUI
-om de status te zien en om je aan te melden.
+`harness:install` draait `apm install --only apm` en zet de skills uit
+`apm.yml` in `.agents/skills/`. `corepack pnpm install` installeert de lokale
+MCP-binaries `fallow-mcp` en `nx-mcp`. De MCP's zelf staan in `opencode.jsonc`.
+Gebruik `/mcps` in de TUI om de status te zien en om je voor Context7 aan te
+melden.
 
 ## Skills
 
 Er zijn twee soorten skills:
 
-| Soort            | Locatie                            | Beheer                                           |
-| ---------------- | ---------------------------------- | ------------------------------------------------ |
-| Projectspecifiek | `.opencode/skills/<naam>/SKILL.md` | Handmatig, in deze repo                          |
-| Upstream         | `.agents/skills/<naam>/SKILL.md`   | Via `npx skills`, herkomst in `skills-lock.json` |
+| Soort            | Locatie                            | Beheer                               |
+| ---------------- | ---------------------------------- | ------------------------------------ |
+| Projectspecifiek | `.opencode/skills/<naam>/SKILL.md` | Handmatig, in deze repo              |
+| Upstream         | `.agents/skills/<naam>/SKILL.md`   | APM via `apm.yml` en `apm.lock.yaml` |
 
 OpenCode leest beide automatisch. `.opencode/skills` heeft voorrang op
 `.agents/skills` als dezelfde id twee keer bestaat.
 
-Gebruik je Claude Code? Maak dan eenmalig de links naar de gedeelde set:
-
-```sh
-npx --yes skills@latest experimental_sync -a claude-code -y
-```
-
-`.claude/skills/` staat in `.gitignore`; de inhoud blijft in `.agents/skills/`.
+APM beheert de upstream-set. De bronnen en hun commits staan in `apm.yml`; de
+resolved commits, hashes en gedeployde bestanden in `apm.lock.yaml`. Committeer
+beide. `apm_modules/` is een cache en staat in `.gitignore`.
 
 ### Projectspecifieke skills
 
@@ -53,29 +63,47 @@ npx --yes skills@latest experimental_sync -a claude-code -y
 
 ### Upstream-skills bijwerken
 
-De inhoud staat in de repo, zodat een clone direct dezelfde skills heeft. De
-herkomst en hashes staan in `skills-lock.json`.
-
-```sh
-npx --yes skills@latest list
-npx --yes skills@latest update -p -y
-git diff --stat
-```
-
-Controleer de diff vóór je commit. Upstream kan een skill hernoemen of een
-bestand toevoegen. Een upstream-skill die je lokaal aanpast, wordt bij de
-volgende update overschreven; zet eigen regels liever in een `spellen-*`-skill.
-
-Zet bij het installeren of bijwerken `DISABLE_TELEMETRY=1` en
-`DO_NOT_TRACK=1`. De CLI stuurt dan geen telemetrie.
-
-De gebruikte upstream-bronnen zijn [mattpocock/skills](https://github.com/mattpocock/skills)
+De gebruikte bronnen zijn [mattpocock/skills](https://github.com/mattpocock/skills)
 (MIT) en [cloudflare/skills](https://github.com/cloudflare/skills) (Apache 2.0).
 De licentieteksten staan in `LICENSES/`.
 
+```sh
+apm update --yes
+apm install --only apm --no-policy
+git diff --stat
+```
+
+Controleer de diff vóór je commit. APM kan een skill hernoemen of een bestand
+toevoegen; de lockfile maakt zichtbaar wat er precies is veranderd. Een
+upstream-skill die je lokaal aanpast, wordt bij de volgende update
+overschreven; zet eigen regels liever in een `spellen-*`-skill.
+
+De commits in `apm.yml` zijn bewust gepind. Verhoog een `ref` alleen bewust en
+laat `apm update` daarna de lockfile bijwerken.
+
+### Een upstream-skill toevoegen
+
+Voor een losse skill uit een repository:
+
+```sh
+apm install owner/repo/skills/<naam> --target opencode
+```
+
+Voor een bundel met een subset:
+
+```sh
+apm install owner/repo --skill <naam> --target opencode
+```
+
+Daarna staat de afhankelijkheid in `apm.yml`. Controleer de diff en commit
+`apm.yml`, `apm.lock.yaml` en de nieuwe bestanden in `.agents/skills/`.
+
 ## MCP-servers
 
-Deze drie staan in `opencode.jsonc` en zijn voor iedereen bruikbaar:
+De MCP's staan in `opencode.jsonc`. Dat is bewust nog niet naar `apm.yml`
+verhuisd: APM kan MCP's voor meerdere targets deployen, maar APM 0.35 schrijft
+voor OpenCode nog de V1-vorm (`mcp: { naam: ... }`). OpenCode V2 leest alleen
+`mcp.servers`.
 
 | Server     | Type   | Authenticatie | Waarvoor                                          |
 | ---------- | ------ | ------------- | ------------------------------------------------- |
@@ -85,6 +113,11 @@ Deze drie staan in `opencode.jsonc` en zijn voor iedereen bruikbaar:
 
 `context7` vraagt bij de eerste keer om een browser-login. Klik in `/mcps` op
 de server en doorloop de OAuth-flow. Er staat geen API-key in de repo.
+
+Zodra [microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) is
+opgelost en in een release zit, verhuizen dezelfde servers naar
+`dependencies.mcp` in `apm.yml` en kan de handmatige config vervallen. Zie ook
+[PR #3414](https://github.com/microsoft/apm/pull/3414).
 
 ### Optioneel en privé
 
@@ -115,15 +148,15 @@ verstuurt zelf nog steeds niets.
 
 ## Permissies
 
-De regels staan in `opencode.jsonc`. MCP-tools draaien standaard via Code Mode
-en vallen daarmee onder de bestaande `execute`-permissie. Voeg geen brede
-`allow`-regels toe voor een MCP die je niet nodig hebt; zet de server dan
+De regels staan in `.opencode/opencode.jsonc`. MCP-tools draaien standaard via
+Code Mode en vallen daarmee onder de bestaande `execute`-permissie. Voeg geen
+brede `allow`-regels toe voor een MCP die je niet nodig hebt; zet de server dan
 gewoon niet aan.
 
 Fallow en Nx niet tegelijk draaien: Fallow schrijft `.fallow/` en kan de
 Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 
-## Een skill toevoegen
+## Een projectspecifieke skill toevoegen
 
 1. Maak `.opencode/skills/<naam>/SKILL.md`.
 2. Zet bovenaan:

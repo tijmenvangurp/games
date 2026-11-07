@@ -21,9 +21,11 @@ tijdens het spelen geen externe requests doen.
    `.opencode/skills/<naam>/SKILL.md` en beschrijven alleen werk dat bij Spellen
    hoort: een spel toevoegen, de kwaliteitsgate, UI, audio, dependencies, review
    en ADR's.
-2. **Upstream-skills worden lokaal geïnstalleerd en gecommit.** De inhoud staat
-   in `.agents/skills/`, de herkomst en hashes in `skills-lock.json`. OpenCode
-   leest beide mappen automatisch; `.opencode/skills` heeft voorrang.
+2. **Upstream-skills worden via APM beheerd.** `apm.yml` declareert de bronnen
+   en de geselecteerde skills; `apm.lock.yaml` pint commits, hashes en
+   gedeployde bestanden. `apm install --only apm` deployt naar
+   `.agents/skills/`. OpenCode leest zowel `.agents/skills` als
+   `.opencode/skills`; het laatste heeft voorrang.
 3. **Alleen overdraagbare MCP's staan in `opencode.jsonc`:** `fallow`, `nx` en
    `context7`. `fallow` en `nx` draaien lokaal; `context7` gebruikt OAuth en
    heeft geen key in de repo.
@@ -39,16 +41,26 @@ tijdens het spelen geen externe requests doen.
    de eigenaar.
 7. **Licenties en herkomst zijn vastgelegd.** De gebruikte upstream-bronnen zijn
    MIT (mattpocock/skills) en Apache 2.0 (cloudflare/skills); de teksten staan in
-   `LICENSES/`.
+   `LICENSES/`. APM registreert de gedeclareerde licenties in de lockfile.
+8. **MCP's verhuizen later naar APM.** APM kan MCP's voor meerdere targets
+   deployen, maar APM 0.35 schrijft voor OpenCode nog de V1-vorm die OpenCode
+   V2 niet leest. Tot
+   [microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) in een
+   release zit, blijven de MCP's daarom in `opencode.jsonc`. Daarna verhuizen
+   ze naar `dependencies.mcp` in `apm.yml` en vervalt de handmatige config.
 
 ## Gevolgen
 
-- Een clone heeft direct dezelfde skills; alleen `corepack pnpm install` en
-  eventueel een OAuth-login voor Context7 zijn nodig.
+- Een clone heeft direct dezelfde skills; alleen `corepack pnpm install`,
+  `corepack pnpm run harness:install` en eventueel een OAuth-login voor
+  Context7 zijn nodig.
 - De repo groeit met ongeveer 350 KB aan skillbestanden. Updaten gaat via
-  `npx skills update -p -y`, waarna de diff wordt gecontroleerd en gecommit.
+  `apm update --yes` en `apm install --only apm --no-policy`, waarna de diff
+  wordt gecontroleerd en gecommit.
 - Een upstream-update kan een lokale aanpassing overschrijven. Eigen regels
   horen daarom in een `spellen-*`-skill, niet in een upstream-skill.
+- De MCP's staan nog handmatig in `opencode.jsonc`; dat is één extra stap tot
+  APM OpenCode V2 ondersteunt, maar het voorkomt een eigen vertaalscript.
 - Context7 verstuurt zoekvragen en codefragmenten naar context7.com. Daarom
   staan er geen secrets of kindgegevens in een prompt.
 - Nx-telemetrie staat uit. Fallow en Nx mogen niet parallel draaien vanwege de
@@ -59,6 +71,8 @@ tijdens het spelen geen externe requests doen.
 
 - [OpenCode skills](https://opencode.ai/v2/docs/skills)
 - [OpenCode MCP-servers](https://opencode.ai/v2/docs/mcp-servers)
+- [Agent Package Manager](https://microsoft.github.io/apm/) (MIT)
+- [microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) en
+  [PR #3414](https://github.com/microsoft/apm/pull/3414) — OpenCode V2 MCP-vorm
 - [mattpocock/skills](https://github.com/mattpocock/skills) (MIT)
 - [cloudflare/skills](https://github.com/cloudflare/skills) (Apache 2.0)
-- [skills CLI](https://github.com/vercel-labs/skills) (MIT)

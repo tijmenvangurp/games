@@ -13,6 +13,7 @@ Lees eerst `README.md`, `AGENTS.md` en de relevante ADR's in `docs/adr/`.
 ```sh
 corepack enable
 corepack pnpm install
+corepack pnpm run harness:install   # APM-skills uit apm.yml
 corepack pnpm dev
 ```
 

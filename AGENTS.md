@@ -84,7 +84,7 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 
 ## Agent-harness
 
-Skills staan in `.opencode/skills` en `.agents/skills`; MCP's in `opencode.jsonc`. Lees `docs/agent-harness.md` voor installatie, privé-scheiding en de data die een MCP deelt. MCP's zijn ontwikkeltooling: de app blijft statisch en doet geen externe requests.
+Skills staan in `.opencode/skills` en `.agents/skills`; MCP's in `opencode.jsonc`. Lees `docs/agent-harness.md` voor APM, privé-scheiding en de data die een MCP deelt. MCP's zijn ontwikkeltooling: de app blijft statisch en doet geen externe requests.
 
 ## Werkwijze
 

@@ -101,6 +101,7 @@
 
     // Agent tooling used while working in this repository.
     { "action": "execute", "resource": "*", "effect": "allow" },
+    { "action": "shell", "resource": "apm *", "effect": "allow" },
     { "action": "skill", "resource": "*", "effect": "allow" },
     { "action": "subagent", "resource": "*", "effect": "allow" },
     { "action": "webfetch", "resource": "*", "effect": "allow" },
@@ -117,23 +118,20 @@
   // Portable MCP servers for everyone working in this repository. Personal or
   // private servers (knowledge bases, TTS, Telegram) stay in the global config:
   // they must never end up in this public repository.
+  //
+  // APM manages the skills in apm.yml; its OpenCode MCP adapter still writes
+  // the V1 shape, which OpenCode V2 does not read. Keep MCP here until
+  // microsoft/apm#3112 is released.
   "mcp": {
     "servers": {
-      // Local: dead code, architecture boundaries and the CSS rules from
-      // .fallowrc.json. The binary comes with the `fallow` devDependency.
       "fallow": {
         "type": "local",
         "command": ["corepack", "pnpm", "exec", "fallow-mcp"],
       },
-      // Local: project graph, generators and workspace details. Telemetry is
-      // off because this repository does not send anything to Nx Cloud.
       "nx": {
         "type": "local",
         "command": ["corepack", "pnpm", "exec", "nx-mcp", "--disableTelemetry", "--no-minimal"],
       },
-      // Remote: current library documentation. OpenCode uses OAuth, so no API
-      // key is stored in the repository. Queries leave the machine; never paste
-      // secrets or personal data into a prompt.
       "context7": {
         "type": "remote",
         "url": "https://mcp.context7.com/mcp",
