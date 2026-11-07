@@ -1,4 +1,4 @@
-export { fingerForKey, HOME_ROW } from "./model/fingers";
+export { FINGERS, fingerForKey, HOME_ROW } from "./model/fingers";
 export { HINT_AFTER_MISTAKES, LESSON_BY_ID, LESSONS, ROUND_LENGTH } from "./model/lessons";
 export {
   applyResult,

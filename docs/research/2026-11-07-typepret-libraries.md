@@ -1,7 +1,7 @@
 # Typepret: welke library past?
 
 - **Datum:** 2026-11-07
-- **Status:** Onderzoek. Er is nog niets aangepast in de app; de keuze wacht op akkoord.
+- **Status:** Onderzoek, daarna doorgevoerd: Typepret gebruikt `react-simple-keyboard` (zie [ADR 0029](../adr/0029-typepret.md)).
 - **Aanleiding:** Typepret ([ADR 0029](../adr/0029-typepret.md)) is met eigen invoerlogica en een eigen SVG-toetsenbord gebouwd. De eigenaar wil toch een bestaande library gebruiken, volgens de regel "Bibliotheken eerst" in [AGENTS.md](../../AGENTS.md).
 - **Vraag:** welke library vervangt het meeste eigen werk in Typepret, zonder backend, externe requests of CSP-problemen?
 - **Kader:** [AGENTS.md](../../AGENTS.md), de [CSP](../../apps/games/public/_headers) (`style-src 'self' 'unsafe-inline'`, geen externe bronnen) en cascade layers zonder `!important`.

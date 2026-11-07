@@ -59,6 +59,7 @@
     "react-chessboard": "^5.12.1",
     "react-dice-complete": "2.3.2",
     "react-dom": "^19.3.1",
+    "react-simple-keyboard": "3.8.295",
     "stockfish.js": "10.0.2",
     "sudoku-gen": "1.0.3",
     "tailwind-merge": "^3.7.0",

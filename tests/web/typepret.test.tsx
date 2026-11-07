@@ -109,6 +109,19 @@ describe("typepret scherm", () => {
     expect(second.disabled).toBe(false);
   });
 
+  it("markeert het doelteken op het toetsenbord en verplaatst dat na een goede toets", async () => {
+    renderTypepret();
+    fireEvent.click(await screen.findByRole("button", { name: /F en J/ }));
+
+    const marked = () => document.querySelector(".tp-target")?.getAttribute("data-skbtn");
+    expect(marked()).toBe(target());
+    expect(document.querySelector(".typepret-keyboard")?.getAttribute("aria-hidden")).toBe("true");
+
+    const first = target();
+    press(first);
+    expect(marked()).toBe(target());
+  });
+
   it("negeert toetsen als er geen ronde loopt", () => {
     renderTypepret();
     press("f");

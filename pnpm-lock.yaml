@@ -211,6 +211,9 @@ importers:
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      react-simple-keyboard:
+        specifier: 3.8.295
+        version: 3.8.295(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       stockfish.js:
         specifier: 10.0.2
         version: 10.0.2
@@ -2746,6 +2749,12 @@ packages:
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
 
+  react-simple-keyboard@3.8.295:
+    resolution: {integrity: sha512-YEU4k08oPO+nmv4HC3FD+GNjmo53zRQqPDnyA/4NOZ75gwmqtNwyXJXWgbLOIf75kc+9yaoYZhP8TGFtsD5New==}
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   react@19.3.1:
     resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
     engines: {node: '>=0.10.0'}
@@ -5262,6 +5271,11 @@ snapshots:
       scheduler: 0.28.0
 
   react-is@17.0.2: {}
+
+  react-simple-keyboard@3.8.295(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
 
   react@19.3.1: {}
 

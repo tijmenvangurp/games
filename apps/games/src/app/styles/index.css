@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-simple-keyboard/build/css/index.css" layer(components);
 
 @source "../../..";
 @source "../../../../../libs";
@@ -475,5 +476,104 @@
     .maze-trail-dot {
       animation-delay: 0ms;
     }
+  }
+}
+
+@layer games {
+  /*
+   * Typepret: het toetsenbord van react-simple-keyboard als rustige weergave.
+   * De bibliotheek-CSS staat in `components`; deze regels staan erboven.
+   */
+  .typepret-keyboard {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .typepret-keyboard .hg-theme-default {
+    padding: 0;
+    background-color: transparent;
+  }
+
+  .typepret-keyboard .hg-button {
+    height: 2.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 0.6rem;
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-size: 1.05rem;
+    font-weight: 700;
+    box-shadow: none;
+  }
+
+  .typepret-keyboard .hg-row {
+    justify-content: center;
+  }
+
+  .typepret-keyboard .tp-dim {
+    opacity: 0.6;
+  }
+
+  .typepret-keyboard .tp-finger {
+    color: var(--foreground);
+  }
+
+  .typepret-keyboard .tp-linker-pink {
+    background-color: var(--finger-linker-pink);
+  }
+
+  .typepret-keyboard .tp-linker-ringvinger {
+    background-color: var(--finger-linker-ringvinger);
+  }
+
+  .typepret-keyboard .tp-linker-middelvinger {
+    background-color: var(--finger-linker-middelvinger);
+  }
+
+  .typepret-keyboard .tp-linker-wijsvinger {
+    background-color: var(--finger-linker-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-wijsvinger {
+    background-color: var(--finger-rechter-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-middelvinger {
+    background-color: var(--finger-rechter-middelvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-ringvinger {
+    background-color: var(--finger-rechter-ringvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-pink {
+    background-color: var(--finger-rechter-pink);
+  }
+
+  /* Het voelbare ribbeltje op F en J. */
+  .typepret-keyboard .tp-bump {
+    position: relative;
+  }
+
+  .tp-bump::after {
+    position: absolute;
+    bottom: 0.4rem;
+    left: 50%;
+    width: 0.9rem;
+    height: 0.2rem;
+    border-radius: 0.1rem;
+    background-color: var(--foreground);
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .typepret-keyboard .tp-target {
+    border-width: 3.5px;
+    border-color: var(--foreground);
+    font-weight: 900;
+  }
+
+  .typepret-keyboard[data-emphasize="true"] .tp-target {
+    border-width: 5px;
+    font-size: 1.4rem;
   }
 }

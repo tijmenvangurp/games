@@ -1,6 +1,6 @@
 import type { Finger, FingerId } from "./types";
 
-const FINGERS: readonly Finger[] = [
+export const FINGERS: readonly Finger[] = [
   { id: "linker-pink", label: "linker pink", hand: "links" },
   { id: "linker-ringvinger", label: "linker ringvinger", hand: "links" },
   { id: "linker-middelvinger", label: "linker middelvinger", hand: "links" },

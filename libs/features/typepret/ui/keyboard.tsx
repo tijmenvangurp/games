@@ -1,16 +1,37 @@
-import { fingerForKey, HOME_ROW } from "@entities/typepret";
+import type { CSSProperties } from "react";
+import KeyboardReact from "react-simple-keyboard";
+import { FINGERS, fingerForKey, HOME_ROW } from "@entities/typepret";
 import { FINGER_COLORS } from "../model/finger-colors";
 
-const ROWS: readonly (readonly string[])[] = [
-  ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-  ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"],
-  ["z", "x", "c", "v", "b", "n", "m", ","],
-];
-const ROW_OFFSET = [0, 14, 38] as const;
-const KEY = 44;
-const GAP = 6;
-const WIDTH = 10 * (KEY + GAP) + 38;
-const HEIGHT = 3 * (KEY + GAP);
+const LAYOUT = {
+  default: ["q w e r t y u i o p", "a s d f g h j k l ;", "z x c v b n m ,"],
+};
+
+const DISPLAY: Record<string, string> = Object.fromEntries(
+  LAYOUT.default.flatMap((row) => row.split(" ")).map((key) => [key, key.toUpperCase()]),
+);
+
+const OTHER_KEYS = LAYOUT.default
+  .flatMap((row) => row.split(" "))
+  .filter((key) => !HOME_ROW.includes(key));
+
+/** Eén CSS-variabele per vinger; de klassen in `index.css` lezen die uit. */
+const FINGER_VARS = Object.fromEntries(
+  FINGERS.map((finger) => [`--finger-${finger.id}`, FINGER_COLORS[finger.id]]),
+) as CSSProperties;
+
+function themesFor(target: string | undefined) {
+  const themes = FINGERS.map((finger) => ({
+    class: `tp-finger tp-${finger.id}`,
+    buttons: HOME_ROW.filter((key) => fingerForKey(key)?.id === finger.id).join(" "),
+  }));
+  themes.push({ class: "tp-dim", buttons: OTHER_KEYS.join(" ") });
+  themes.push({ class: "tp-bump", buttons: "f j" });
+  if (target) {
+    themes.push({ class: "tp-target", buttons: target });
+  }
+  return themes;
+}
 
 interface KeyboardProps {
   /** Het doelteken dat nu getypt moet worden. */
@@ -19,59 +40,27 @@ interface KeyboardProps {
   emphasize: boolean;
 }
 
-/** Eigen SVG-toetsenbord: alleen de basisrij is gekleurd, de rest staat rustig op de achtergrond. */
+/**
+ * Toetsenbord op het scherm met `react-simple-keyboard`, alleen als weergave:
+ * het neemt geen invoer aan en is voor schermlezers verborgen. De vingeraanwijzing
+ * staat als tekst in de speelweergave.
+ */
 export function Keyboard({ target, emphasize }: KeyboardProps) {
   return (
-    <svg
+    <div
       aria-hidden="true"
-      className="mx-auto h-auto w-full max-w-xl"
-      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      className="typepret-keyboard mx-auto w-full max-w-xl"
+      data-emphasize={emphasize}
+      style={FINGER_VARS}
     >
-      {ROWS.map((row, rowIndex) =>
-        row.map((key, keyIndex) => {
-          const x = ROW_OFFSET[rowIndex] + keyIndex * (KEY + GAP);
-          const y = rowIndex * (KEY + GAP);
-          const finger = fingerForKey(key);
-          const home = HOME_ROW.includes(key);
-          const active = key === target;
-          const fill = finger && home ? FINGER_COLORS[finger.id] : "var(--muted)";
-          return (
-            <g key={key} opacity={home || active ? 1 : 0.6}>
-              <rect
-                fill={fill}
-                height={KEY}
-                rx={9}
-                stroke={active ? "var(--foreground)" : "var(--border)"}
-                strokeWidth={active ? (emphasize ? 5 : 3.5) : 1.5}
-                width={KEY}
-                x={x}
-                y={y}
-              />
-              <text
-                dominantBaseline="central"
-                fill="var(--foreground)"
-                fontSize={active && emphasize ? 24 : 20}
-                fontWeight={active ? 900 : 700}
-                textAnchor="middle"
-                x={x + KEY / 2}
-                y={y + KEY / 2}
-              >
-                {key.toUpperCase()}
-              </text>
-              {key === "f" || key === "j" ? (
-                <rect
-                  fill="var(--foreground)"
-                  height={3}
-                  rx={1.5}
-                  width={14}
-                  x={x + KEY / 2 - 7}
-                  y={y + KEY - 9}
-                />
-              ) : null}
-            </g>
-          );
-        }),
-      )}
-    </svg>
+      <KeyboardReact
+        buttonTheme={themesFor(target)}
+        disableButtonHold
+        display={DISPLAY}
+        layout={LAYOUT}
+        layoutName="default"
+        onKeyPress={() => undefined}
+      />
+    </div>
   );
 }
