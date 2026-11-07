@@ -2,7 +2,7 @@
  * Kleine, gedeelde TTS-client voor de offline audiogeneratoren.
  *
  * De URL en sleutel komen uit environment variables en worden nooit gelogd.
- * De private helper uit de skill vult die variabelen in.
+ * Zet ze in je omgeving, nooit in de repo.
  */
 export interface TtsConfig {
   readonly baseUrl: string;

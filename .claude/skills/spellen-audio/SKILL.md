@@ -40,14 +40,13 @@ corepack pnpm run audio:nl
 corepack pnpm run audio:check
 ```
 
-De private TTS-helper is **alleen voor de eigenaar**. Contributors hebben geen
-toegang en mogen hem niet in de repo zetten. Vraag de eigenaar om nieuwe audio
-te genereren en commit alleen de gegenereerde bestanden, het manifest en het
-lockbestand.
+Nieuwe audio genereren vraagt TTS-toegang. Heb je die niet, vraag dan een
+maintainer om de audio te genereren. Commit alleen de gegenereerde bestanden,
+het manifest en het lockbestand.
 
 ## Grenzen
 
-- Geen URL, token, hostname, tailnet-naam of `.env`-waarde in een bestand,
+- Geen URL, token, interne hostnaam of `.env`-waarde in een bestand,
   commit, screenshot of chat.
 - Geen audiobestand zonder licentie of bronvermelding.
 - Geen `audioText` toevoegen zonder de uitgesproken tekst en de geschreven tekst

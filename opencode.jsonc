@@ -116,8 +116,7 @@
   ],
 
   // Portable MCP servers for everyone working in this repository. Personal or
-  // private servers (knowledge bases, TTS, Telegram) stay in the global config:
-  // they must never end up in this public repository.
+  // account-bound servers stay in your global config and never in this repo.
   //
   // APM manages the skills in apm.yml; its OpenCode MCP adapter still writes
   // the V1 shape, which OpenCode V2 does not read. Keep MCP here until

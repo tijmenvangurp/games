@@ -11,9 +11,9 @@ gebruikt lokaal een set skills en MCP-servers die niet in de repo staan. Daardoo
 krijgt een andere contributor niet dezelfde werkwijze, kent hij de kwaliteitsgate
 niet en moet hij dezelfde fouten opnieuw uitzoeken.
 
-De repo is openbaar. Privé-knowledgebases, TTS-endpoints, Telegram-bots en
-hostnames mogen hier niet terechtkomen. De app zelf moet statisch blijven en
-tijdens het spelen geen externe requests doen.
+De repo is openbaar. Persoonlijke integraties, tokens, hostnames en
+accountgegevens mogen hier niet terechtkomen. De app zelf moet statisch blijven
+en tijdens het spelen geen externe requests doen.
 
 ## Beslissing
 
@@ -31,14 +31,14 @@ tijdens het spelen geen externe requests doen.
    `.claude/skills/` en `.mcp.json`; Codex leest `AGENTS.md`,
    `.agents/skills/` en `.codex/config.toml`. OpenCode leest `AGENTS.md`,
    `.agents/skills/` en `opencode.jsonc`.
-4. **Private en optionele MCP's blijven globaal.** `cloudflare-api`,
-   `firecrawl`, een privé-knowledgebase en TTS/Telegram-tools horen in de
-   globale config van de eigenaar, niet in deze repo.
+4. **Persoonlijke en optionele MCP's blijven globaal.** `cloudflare-api`,
+   `firecrawl` en andere accountgebonden servers horen in de globale config van
+   de gebruiker, niet in deze repo.
 5. **MCP's zijn ontwikkeltooling, geen app-runtime.** De app blijft statisch en
    doet geen externe requests. `CONTRIBUTING.md` beschrijft per server welke data
    de machine verlaat.
 6. **Geen geheimen of privépaden.** Skills en docs bevatten geen tokens,
-   `.env`-waarden, hostnames, tailnet-namen, IP-adressen of persoonsgegevens.
+   `.env`-waarden, interne hostnames, netwerknamen, IP-adressen of persoonsgegevens.
    Privé-workflows krijgen een publieke, veilige variant of een verwijzing naar
    de eigenaar.
 7. **Licenties en herkomst zijn vastgelegd.** De gebruikte upstream-bronnen zijn

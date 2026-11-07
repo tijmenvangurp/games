@@ -29,8 +29,8 @@ kunnen bijdragen.
   OpenCode leest `opencode.jsonc`; die blijft handmatig tot APM OpenCode V2
   ondersteunt.
 - **Bijwerken:** `apm update --yes && corepack pnpm run harness:install`.
-- **Privé:** knowledgebases, TTS, Telegram en accountgebonden MCP's blijven in
-  je globale config. Geen secrets of kindgegevens in een prompt.
+- **Geheimen:** houd tokens, `.env`-waarden en persoonsgegevens buiten de repo
+  en buiten een prompt.
 
 ## Werkwijze
 
@@ -107,7 +107,7 @@ pull request en werk de tabel in `AGENTS.md` bij.
 
 ## Geheimen en privacy
 
-- Geen tokens, `.env`-waarden, privéhosts, tailnet-namen, IP-adressen of
+- Geen tokens, `.env`-waarden, interne hostnames, netwerknamen, IP-adressen of
   persoonsgegevens in code, assets, commits, screenshots of chat.
 - Geen analytics, trackers of externe requests toevoegen.
 - De app is voor kinderen: verzamel zo weinig data als mogelijk en leg een

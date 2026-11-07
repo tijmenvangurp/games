@@ -39,6 +39,6 @@ Een gewone bugfix, een nieuwe test of een kleine UI-wijziging krijgt geen ADR.
 ## Grenzen
 
 - Geen ADR als er geen echte afweging was; dan is het een notitie.
-- Geen geheimen, privéhosts of persoonsgegevens in de context of bronnen.
+- Geen geheimen, interne hostnames of persoonsgegevens in de context of bronnen.
 - Geen ADR die een beslissing achteraf goedpraat; beschrijf ook de nadelen.
 - Merge nooit zelfstandig.

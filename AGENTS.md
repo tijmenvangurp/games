@@ -4,7 +4,7 @@ Publieke, statische spelletjes-app voor kinderen. Lees `README.md`, `CONTRIBUTIN
 
 ## Harde regels
 
-- **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, tailnet-namen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
+- **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, netwerknamen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
 - **Alleen TypeScript.** Geen `.js`, `.mjs`, `.cjs`, `.jsx` of Python. `pnpm run ts-only` en de commit-hook bewaken dit.
 - **Geen `!important` in CSS.** Gebruik cascade layers (`@layer`) of een specifiekere selector; de fallow-regel `css-selector-complexity` (op `error`) bewaakt dit, net als id-selectors en diepe nesting.
 - **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` of `@phosphor-icons/react` via `@shared/ui`, of uit `apps/games/public/`.

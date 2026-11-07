@@ -108,22 +108,14 @@ corepack pnpm run e2e
 
 ## Klankprototype voor TTS
 
-`scripts/generate-sounds.ts` genereert tijdelijke MP3's voor losse klanken in `prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de variant en stem, en zet pas daarna de gekozen bestanden in `apps/games/public/audio/letters/v2/sounds/`.
+`scripts/generate-sounds.ts` genereert tijdelijke audio voor losse klanken in
+`prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de
+variant en stem, en zet pas daarna de gekozen bestanden in
+`apps/games/public/audio/letters/v2/sounds/`.
 
-De TTS-helper met de endpoint en sleutel is **alleen voor de eigenaar**. Die
-staat buiten de repo en wordt niet aan contributors gegeven. Vraag de eigenaar
-om nieuwe audio te genereren; commit alleen de gegenereerde bestanden, het
-manifest en het lockbestand. Zet endpoint, sleutel, hostname of `.env`-waarde
-nooit in de repo, een screenshot of een prompt.
-
-```sh
-<private-helper> -- --generator=scripts/generate-sounds.ts \
-  --only=i,k,m,s,p,v,e,n,t,a \
-  --variant=letter,fonetisch,woord \
-  --label=nathalie
-```
-
-Beluisteren zonder opnieuw te genereren:
+Het script leest `TTS_BASE_URL`, `TTS_MODEL`, `TTS_VOICE` en optioneel
+`TTS_API_KEY` uit je omgeving. Zet die waarden nooit in de repo, een screenshot
+of een prompt. Heb je geen TTS-toegang, dan kun je de bestaande set beluisteren:
 
 ```sh
 corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
@@ -131,12 +123,7 @@ corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
 
 Open daarna `http://localhost:4174/`. De pagina toont per klank alle varianten en stemmen.
 
-De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De 15 woordopnames staan in `apps/games/public/audio/letters/v2/words/` en zijn met dezelfde stem gegenereerd:
-
-```sh
-<private-helper> -- --generator=scripts/generate-sounds.ts --words \
-  --model=speaches-ai/piper-nl_BE-nathalie-medium --voice=nathalie
-```
+De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De 15 woordopnames staan in `apps/games/public/audio/letters/v2/words/`.
 
 De prototypepagina wordt niet gedeployed.
 

@@ -34,7 +34,7 @@ review alleen de Standards-as.
 - [ ] Geen analytics, tracker, CDN, webfont of remote image.
 - [ ] CSP in `apps/games/public/_headers` ongewijzigd of bewust aangepast.
 - [ ] Geen backend, account of netwerkdienst zonder ADR en akkoord.
-- [ ] Geen secrets, `.env`-waarden, privéhosts, tailnet-namen, IP's of
+- [ ] Geen secrets, `.env`-waarden, interne hostnames, netwerknamen, IP's of
       persoonsgegevens.
 - [ ] LocalStorage-keys zijn versiegebonden en opgeruimd waar nodig.
 

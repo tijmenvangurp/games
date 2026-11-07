@@ -53,6 +53,6 @@ nieuws maakt.
 
 - Screenshots horen nooit in de repo.
 - Geen pagina's met secrets, privédashboards of persoonsgegevens vastleggen.
-- Deel screenshots alleen via een owner-only kanaal; de publieke repo bevat
-  geen Telegram- of TTS-configuratie.
+- Deel screenshots alleen via een privékanaal; de publieke repo bevat geen
+  privéconfiguratie.
 - Verander geen functionele copy zonder de eigenaar te vragen.

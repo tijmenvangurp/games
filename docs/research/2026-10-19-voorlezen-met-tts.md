@@ -9,7 +9,7 @@
 
 **Gebruik vooraf gegenereerde, lokale TTS-fragmenten met één Nederlandse stem, en bouw één gedeelde spraakspeler die per game alleen de kritieke woorden, vragen en feedback voorleest.**
 
-- De app heeft al een bewezen pipeline voor Frans: 175 lokale MP3's, gegenereerd met de private TTS-skill en gecommit in `apps/games/public/audio/fr`. Die aanpak past binnen de CSP en de regel “geen externe requests”.
+- De app heeft al een bewezen pipeline voor Frans: 175 lokale MP3's, gegenereerd en gecommit in `apps/games/public/audio/fr`. Die aanpak past binnen de CSP en de regel “geen externe requests”.
 - Gebruik **geen** `speechSynthesis` in de browser. Stemmen verschillen per toestel, sommige stemmen synthetiseren via een netwerkdienst en je kunt de uitspraak niet reviewen of vastleggen.
 - De TTS-dienst en de Nederlandse stem **Nathalie** bestaan al; Nathalie wordt gebruikt voor Letterpret. De Franse stem Tom is alleen voor Frans. Hergebruik Nathalie voor de andere games; een nieuwe stem kiezen is niet nodig.
 - Lees niet alles voor. Spreek de **opdracht, de vraag, de antwoordopties (op verzoek) en de feedback** uit. Elk gesproken element krijgt een herhaalknop. De tekst blijft zichtbaar, zodat dove en slechthorende kinderen en schermlezergebruikers niets verliezen.
