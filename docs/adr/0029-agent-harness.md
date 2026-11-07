@@ -17,18 +17,20 @@ tijdens het spelen geen externe requests doen.
 
 ## Beslissing
 
-1. **Projectspecifieke skills staan in de repo.** Ze leven in
-   `.opencode/skills/<naam>/SKILL.md` en beschrijven alleen werk dat bij Spellen
-   hoort: een spel toevoegen, de kwaliteitsgate, UI, audio, dependencies, review
-   en ADR's.
+1. **Projectspecifieke skills staan in de repo.** De bron is
+   `.apm/skills/<naam>/SKILL.md`; APM deployt ze naar `.agents/skills/` voor
+   OpenCode en Codex en naar `.claude/skills/` voor Claude Code. Ze beschrijven
+   alleen werk dat bij Spellen hoort: een spel toevoegen, de kwaliteitsgate, UI,
+   audio, dependencies, review en ADR's.
 2. **Upstream-skills worden via APM beheerd.** `apm.yml` declareert de bronnen
    en de geselecteerde skills; `apm.lock.yaml` pint commits, hashes en
    gedeployde bestanden. `apm install --only apm` deployt naar
-   `.agents/skills/`. OpenCode leest zowel `.agents/skills` als
-   `.opencode/skills`; het laatste heeft voorrang.
-3. **Alleen overdraagbare MCP's staan in `opencode.jsonc`:** `fallow`, `nx` en
-   `context7`. `fallow` en `nx` draaien lokaal; `context7` gebruikt OAuth en
-   heeft geen key in de repo.
+   `.agents/skills/` en `.claude/skills/`.
+3. **Dezelfde skills en MCP's gelden voor OpenCode, Claude Code en Codex.**
+   `targets` staat op alle drie. Claude Code leest `CLAUDE.md`,
+   `.claude/skills/` en `.mcp.json`; Codex leest `AGENTS.md`,
+   `.agents/skills/` en `.codex/config.toml`. OpenCode leest `AGENTS.md`,
+   `.agents/skills/` en `opencode.jsonc`.
 4. **Private en optionele MCP's blijven globaal.** `cloudflare-api`,
    `firecrawl`, een privé-knowledgebase en TTS/Telegram-tools horen in de
    globale config van de eigenaar, niet in deze repo.
@@ -42,12 +44,12 @@ tijdens het spelen geen externe requests doen.
 7. **Licenties en herkomst zijn vastgelegd.** De gebruikte upstream-bronnen zijn
    MIT (mattpocock/skills) en Apache 2.0 (cloudflare/skills); de teksten staan in
    `LICENSES/`. APM registreert de gedeclareerde licenties in de lockfile.
-8. **MCP's verhuizen later naar APM.** APM kan MCP's voor meerdere targets
-   deployen, maar APM 0.35 schrijft voor OpenCode nog de V1-vorm die OpenCode
-   V2 niet leest. Tot
+8. **OpenCode MCP's verhuizen later naar APM.** APM schrijft de MCP's al voor
+   Claude Code (`.mcp.json`) en Codex (`.codex/config.toml`), maar APM 0.35
+   schrijft voor OpenCode nog de V1-vorm die OpenCode V2 niet leest. Tot
    [microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) in een
-   release zit, blijven de MCP's daarom in `opencode.jsonc`. Daarna verhuizen
-   ze naar `dependencies.mcp` in `apm.yml` en vervalt de handmatige config.
+   release zit, blijven de OpenCode MCP's daarom in `opencode.jsonc`. Daarna
+   verhuist ook OpenCode naar de APM-uitvoer en vervalt de handmatige config.
 
 ## Gevolgen
 
@@ -59,8 +61,9 @@ tijdens het spelen geen externe requests doen.
   wordt gecontroleerd en gecommit.
 - Een upstream-update kan een lokale aanpassing overschrijven. Eigen regels
   horen daarom in een `spellen-*`-skill, niet in een upstream-skill.
-- De MCP's staan nog handmatig in `opencode.jsonc`; dat is één extra stap tot
-  APM OpenCode V2 ondersteunt, maar het voorkomt een eigen vertaalscript.
+- Claude Code en Codex krijgen de MCP's uit APM; OpenCode staat nog handmatig
+  in `opencode.jsonc` tot APM OpenCode V2 ondersteunt. Dat voorkomt een eigen
+  vertaalscript.
 - Context7 verstuurt zoekvragen en codefragmenten naar context7.com. Daarom
   staan er geen secrets of kindgegevens in een prompt.
 - Nx-telemetrie staat uit. Fallow en Nx mogen niet parallel draaien vanwege de

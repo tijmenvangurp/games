@@ -1,12 +1,19 @@
 # Agent-harness: skills en MCP's
 
-Deze repository gebruikt **APM (Agent Package Manager)** voor de agent-skills
-en de MCP-declaraties. APM leest `apm.yml`, pint de herkomst in
-`apm.lock.yaml` en deployt de skills naar `.agents/skills/`.
+Deze repository ondersteunt **OpenCode, Claude Code en Codex**. **APM (Agent
+Package Manager)** beheert de skills: het leest `apm.yml`, pint de herkomst in
+`apm.lock.yaml` en deployt naar `.agents/skills/` (OpenCode en Codex) en
+`.claude/skills/` (Claude Code).
 
 De app zelf is en blijft statisch: ze doet tijdens het spelen geen externe
 requests. MCP-servers zijn **ontwikkeltooling**. Ze draaien naast de agent en
 veranderen niets aan de CSP of de runtime van de app.
+
+| Tool        | Instructies | Skills            | MCP                  |
+| ----------- | ----------- | ----------------- | -------------------- |
+| OpenCode    | `AGENTS.md` | `.agents/skills/` | `opencode.jsonc`     |
+| Claude Code | `CLAUDE.md` | `.claude/skills/` | `.mcp.json`          |
+| Codex       | `AGENTS.md` | `.agents/skills/` | `.codex/config.toml` |
 
 ## Eerste keer
 
@@ -27,23 +34,25 @@ corepack pnpm run harness:install
 opencode mcp list
 ```
 
-`harness:install` draait `apm install --only apm` en zet de skills uit
-`apm.yml` in `.agents/skills/`. `corepack pnpm install` installeert de lokale
-MCP-binaries `fallow-mcp` en `nx-mcp`. De MCP's zelf staan in `opencode.jsonc`.
-Gebruik `/mcps` in de TUI om de status te zien en om je voor Context7 aan te
-melden.
+`harness:install` draait twee APM-commando's: het installeert de skills voor
+alle drie de tools en schrijft de MCP's voor Claude Code en Codex.
+`corepack pnpm install` installeert de lokale MCP-binaries `fallow-mcp` en
+`nx-mcp`. Voor OpenCode staan de MCP's in `opencode.jsonc`; gebruik `/mcps` in
+de TUI om de status te zien en om je voor Context7 aan te melden. Claude Code
+leest `.mcp.json`; Codex leest `.codex/config.toml`.
 
 ## Skills
 
 Er zijn twee soorten skills:
 
-| Soort            | Locatie                            | Beheer                               |
-| ---------------- | ---------------------------------- | ------------------------------------ |
-| Projectspecifiek | `.opencode/skills/<naam>/SKILL.md` | Handmatig, in deze repo              |
-| Upstream         | `.agents/skills/<naam>/SKILL.md`   | APM via `apm.yml` en `apm.lock.yaml` |
+| Soort            | Bron                          | Gedeployed naar                        |
+| ---------------- | ----------------------------- | -------------------------------------- |
+| Projectspecifiek | `.apm/skills/<naam>/SKILL.md` | `.agents/skills/` en `.claude/skills/` |
+| Upstream         | `apm.yml` + `apm.lock.yaml`   | `.agents/skills/` en `.claude/skills/` |
 
-OpenCode leest beide automatisch. `.opencode/skills` heeft voorrang op
-`.agents/skills` als dezelfde id twee keer bestaat.
+OpenCode en Codex lezen `.agents/skills/`; Claude Code leest `.claude/skills/`.
+De bron is één keer `.apm/skills/`; pas die aan en draai `harness:install` om de
+doelen bij te werken.
 
 APM beheert de upstream-set. De bronnen en hun commits staan in `apm.yml`; de
 resolved commits, hashes en gedeployde bestanden in `apm.lock.yaml`. Committeer
@@ -100,10 +109,19 @@ Daarna staat de afhankelijkheid in `apm.yml`. Controleer de diff en commit
 
 ## MCP-servers
 
-De MCP's staan in `opencode.jsonc`. Dat is bewust nog niet naar `apm.yml`
-verhuisd: APM kan MCP's voor meerdere targets deployen, maar APM 0.35 schrijft
-voor OpenCode nog de V1-vorm (`mcp: { naam: ... }`). OpenCode V2 leest alleen
-`mcp.servers`.
+APM schrijft de MCP's uit `dependencies.mcp` naar de tools die het ondersteunt:
+
+| Tool        | Bestand              | Beheer                            |
+| ----------- | -------------------- | --------------------------------- |
+| OpenCode    | `opencode.jsonc`     | Handmatig, tot APM #3112 klaar is |
+| Claude Code | `.mcp.json`          | APM                               |
+| Codex       | `.codex/config.toml` | APM                               |
+
+OpenCode staat er bewust nog buiten: APM 0.35 schrijft voor OpenCode de
+V1-vorm (`mcp: { naam: ... }`), terwijl OpenCode V2 `mcp.servers` leest. Zodra
+[microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) is opgelost
+en in een release zit, verhuist OpenCode ook naar de APM-uitvoer. Zie ook
+[PR #3414](https://github.com/microsoft/apm/pull/3414).
 
 | Server     | Type   | Authenticatie | Waarvoor                                          |
 | ---------- | ------ | ------------- | ------------------------------------------------- |
@@ -113,11 +131,6 @@ voor OpenCode nog de V1-vorm (`mcp: { naam: ... }`). OpenCode V2 leest alleen
 
 `context7` vraagt bij de eerste keer om een browser-login. Klik in `/mcps` op
 de server en doorloop de OAuth-flow. Er staat geen API-key in de repo.
-
-Zodra [microsoft/apm#3112](https://github.com/microsoft/apm/issues/3112) is
-opgelost en in een release zit, verhuizen dezelfde servers naar
-`dependencies.mcp` in `apm.yml` en kan de handmatige config vervallen. Zie ook
-[PR #3414](https://github.com/microsoft/apm/pull/3414).
 
 ### Optioneel en privé
 
@@ -148,17 +161,18 @@ verstuurt zelf nog steeds niets.
 
 ## Permissies
 
-De regels staan in `.opencode/opencode.jsonc`. MCP-tools draaien standaard via
+De OpenCode-regels staan in `opencode.jsonc`. MCP-tools draaien standaard via
 Code Mode en vallen daarmee onder de bestaande `execute`-permissie. Voeg geen
 brede `allow`-regels toe voor een MCP die je niet nodig hebt; zet de server dan
-gewoon niet aan.
+gewoon niet aan. Claude Code en Codex hebben hun eigen configuratie in
+`.mcp.json` en `.codex/config.toml`.
 
 Fallow en Nx niet tegelijk draaien: Fallow schrijft `.fallow/` en kan de
 Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 
 ## Een projectspecifieke skill toevoegen
 
-1. Maak `.opencode/skills/<naam>/SKILL.md`.
+1. Maak `.apm/skills/<naam>/SKILL.md` en draai `corepack pnpm run harness:install`.
 2. Zet bovenaan:
 
    ```md

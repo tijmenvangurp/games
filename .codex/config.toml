@@ -1,0 +1,14 @@
+[mcp_servers.fallow]
+command = "corepack"
+args = ["pnpm", "exec", "fallow-mcp"]
+
+[mcp_servers.fallow.env]
+
+[mcp_servers.nx]
+command = "corepack"
+args = ["pnpm", "exec", "nx-mcp", "--disableTelemetry", "--no-minimal"]
+
+[mcp_servers.nx.env]
+
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"

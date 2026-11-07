@@ -25,7 +25,7 @@
     "affected": "nx affected -t lint,typecheck,test,build",
     "graph": "nx graph",
     "check": "pnpm run ts-only && pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run build",
-    "harness:install": "apm install --only apm --no-policy",
+    "harness:install": "apm install --only apm --no-policy && apm install --only mcp --target claude,codex --no-policy",
     "quality": "pnpm run ts-only && pnpm run format:check && pnpm run elements:check && pnpm run ganzenbord:art:check && pnpm run typecheck && pnpm run test:coverage && pnpm run build && pnpm run boundaries && pnpm run fallow",
     "quality:full": "pnpm run quality && pnpm run lint && pnpm run fsd",
     "quality:ci": "pnpm run quality:full && pnpm run e2e",

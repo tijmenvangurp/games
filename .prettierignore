@@ -1,9 +1,12 @@
 # Upstream-skills: houd de bestanden gelijk aan de bron, zodat een update een
 # schone diff geeft.
 .agents/skills/
+.claude/skills/
 
-# APM-lockfile: gegenereerd door APM, niet formatteren.
+# APM-uitvoer: gegenereerd, niet formatteren.
 apm.lock.yaml
+.mcp.json
+.codex/config.toml
 
 # Gegenereerde wereldkaart (minified JSON van world-atlas); niet formatteren.
 libs/entities/geography/model/world-110m.json

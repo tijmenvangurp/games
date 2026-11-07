@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "fallow": {
+      "type": "stdio",
+      "command": "corepack",
+      "args": [
+        "pnpm",
+        "exec",
+        "fallow-mcp"
+      ]
+    },
+    "nx": {
+      "type": "stdio",
+      "command": "corepack",
+      "args": [
+        "pnpm",
+        "exec",
+        "nx-mcp",
+        "--disableTelemetry",
+        "--no-minimal"
+      ]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
