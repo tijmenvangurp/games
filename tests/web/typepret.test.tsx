@@ -28,7 +28,7 @@ function renderTypepret() {
 
 function press(key: string, init: KeyboardEventInit = {}) {
   act(() => {
-    fireEvent.keyDown(window, { key, ...init });
+    fireEvent.keyDown(document.body, { key, ...init });
   });
 }
 
@@ -120,6 +120,15 @@ describe("typepret scherm", () => {
     const first = target();
     press(first);
     expect(marked()).toBe(target());
+  });
+
+  it("blokkeert losse tekens zodat Safari geen snelzoekbalk opent, maar Cmd-combinaties niet", async () => {
+    renderTypepret();
+    fireEvent.click(await screen.findByRole("button", { name: /F en J/ }));
+
+    // fireEvent geeft false terug als de standaardactie is geblokkeerd.
+    expect(fireEvent.keyDown(document.body, { key: "'" })).toBe(false);
+    expect(fireEvent.keyDown(document.body, { key: "f", metaKey: true })).toBe(true);
   });
 
   it("negeert toetsen als er geen ronde loopt", () => {

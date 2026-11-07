@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { currentTarget, fingerForKey, needsHint } from "@entities/typepret";
 import { cn } from "@shared/lib";
 import { useNeedsKeyboard } from "../model/use-keyboard-hint";
 import { FINGER_COLORS } from "../model/finger-colors";
 import { useTypepretStore } from "../model/use-typepret-store";
 import { Keyboard } from "./keyboard";
+
+function isTypingKey(event: KeyboardEvent): boolean {
+  return (
+    !event.ctrlKey && !event.metaKey && !event.altKey && !event.repeat && event.key.length === 1
+  );
+}
 
 function useWindowFocus(): boolean {
   const [focused, setFocused] = useState(true);
@@ -26,20 +33,18 @@ export function TypepretPlay() {
   const needsKeyboard = useNeedsKeyboard();
   const focused = useWindowFocus();
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey || event.metaKey || event.altKey || event.repeat) {
+  // Elke losse toets, op de getypte letter (`useKey`). Ctrl, Cmd, Alt en herhaalde
+  // toetsen tellen niet mee; losse tekens blokkeren we, zodat ' of / geen snelzoekbalk opent.
+  useHotkeys(
+    "*",
+    (event) => {
+      if (!isTypingKey(event)) {
         return;
       }
-      if (event.key.length === 1) {
-        // Voorkom dat ' of / een snelzoekbalk opent terwijl het kind typt.
-        event.preventDefault();
-      }
       useTypepretStore.getState().press(event.key);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+    },
+    { useKey: true, keydown: true, preventDefault: isTypingKey },
+  );
 
   if (!round) {
     return null;

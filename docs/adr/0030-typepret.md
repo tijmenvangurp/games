@@ -18,7 +18,7 @@ Het onderzoek stelde `react-typing-game-hook` 1.4.2 voor voor de typestatus. Een
 ## Beslissing
 
 1. **Geen typing-library; een kleine pure engine in `libs/entities/typepret`.** `pressKey(state, key)` verwerkt één toets en geeft een nieuwe toestand terug. De library zou de eis "alleen ESM" breken en bespaart weinig: de logica is een paar tientallen regels.
-2. **Invoer via `event.key`, hoofdletterongevoelig.** Dat werkt ook op een AZERTY-toetsenbord. De vingerzones gaan uit van QWERTY en dat zeggen we op het scherm. Shift, Backspace, spatie en functietoetsen doen niets.
+2. **Toetsen opvangen met `react-hotkeys-hook`** (MIT, ESM, `useKey` en `"*"`), invoer via `event.key`, hoofdletterongevoelig. Dat werkt ook op een AZERTY-toetsenbord. De vingerzones gaan uit van QWERTY en dat zeggen we op het scherm. Shift, Backspace, spatie en functietoetsen doen niets.
 3. **Acht lessen:** F/J, D/K, S/L, A/`;`, G/H, de hele basisrij en twee woordlessen. Een ronde heeft precies 20 doeltekens. Oefenreeksen bestaan uit groepen van twee tekens; woordrondes uit eigen woorden die alleen basisrij-letters bevatten.
 4. **Fout = informatie.** Het doelteken blijft staan, de tekst blijft rustig en er is geen geluid. Een fout telt één keer mee per doelteken. Na drie fouten op hetzelfde doelteken komt de vingerzone groter in beeld.
 5. **Ontgrendelen bij minstens 80% nauwkeurigheid in één ronde.** Onder 70% stellen we dezelfde les nog eens voor; ertussen zeggen we "bijna". Geen sterren of cijfers in de UI.
@@ -29,7 +29,7 @@ Het onderzoek stelde `react-typing-game-hook` 1.4.2 voor voor de typestatus. Een
 
 ## Gevolgen
 
-- Eén nieuwe dependency: `react-simple-keyboard` 3.8.295 (ongeveer 12 KB gzip plus 1 KB CSS). De typelogica blijft eigen code, want er bestaat geen bruikbare library voor.
+- Twee nieuwe dependencies: `react-simple-keyboard` 3.8.295 (ongeveer 12 KB gzip plus 1 KB CSS) en `react-hotkeys-hook` 5.3.3. De typelogica blijft eigen code, want er bestaat geen bruikbare library voor.
 - Spaties, zinnen, de bovenste en onderste rij en hoofdletters horen niet bij deze versie.
 - De drempels (`UNLOCK_ACCURACY`, `RETRY_ACCURACY`) staan als constanten in de entity en zijn na een speelsessie met kinderen aan te passen.
 - Keybr (AGPL-3.0) blijft alleen een referentie voor een latere adaptieve lesopbouw; er is niets van overgenomen.
