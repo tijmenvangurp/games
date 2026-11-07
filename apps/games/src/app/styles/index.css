@@ -124,11 +124,7 @@
 
   .ganzenbord-zoom {
     transform: scale(1);
-    transition: transform 450ms ease-out;
-  }
-
-  .ganzenbord-zoom-active {
-    transform: scale(1.32);
+    transition: transform 260ms ease-out;
   }
 
   .ganzenbord-pawn {

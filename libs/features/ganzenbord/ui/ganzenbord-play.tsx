@@ -7,7 +7,7 @@ import {
   type TurnEvent,
 } from "@entities/ganzenbord";
 import { Button, Play } from "@shared/ui";
-import { eventCard, zoomPositionFor, type TurnAnimation } from "../model/animation";
+import { eventCard, type TurnAnimation } from "../model/animation";
 import { eventMessage, playerName, statusHint, turnText } from "../model/presentation";
 import { useGanzenbordStore } from "../model/use-ganzenbord-store";
 import { GanzenbordBoard } from "./ganzenbord-board";
@@ -259,21 +259,14 @@ export function GanzenbordPlay() {
 
   const step = animation?.steps[animation.index];
   const event = eventCard(step);
-  const focusPosition = zoomPositionFor(step);
+  const targetPosition = animation ? step?.position : undefined;
 
-  // Houd de laatste gebeurtenis in beeld zolang de kaart openstaat en nog
-  // even nadat de volgende speler aan de beurt is.
+  // De camera volgt de pion bij elke stap, niet alleen bij een gebeurtenis.
   useEffect(() => {
-    if (!animation) {
-      return;
+    if (targetPosition !== undefined) {
+      setZoomTarget(targetPosition);
     }
-    if (animation.index === 0) {
-      setZoomTarget(null);
-    }
-    if (focusPosition !== undefined) {
-      setZoomTarget(focusPosition);
-    }
-  }, [animation, focusPosition]);
+  }, [targetPosition]);
 
   useEffect(() => {
     if (animation || zoomTarget === null) {

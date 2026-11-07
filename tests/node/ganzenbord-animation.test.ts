@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createGame, playTurn, type GanzenbordGame, type PlayerId } from "@entities/ganzenbord";
-import {
-  buildTurnAnimation,
-  eventCard,
-  zoomPositionFor,
-} from "../../libs/features/ganzenbord/model/animation";
+import { buildTurnAnimation, eventCard } from "../../libs/features/ganzenbord/model/animation";
 
 const SETUPS = [
   { id: "one", controller: "human" },
@@ -113,19 +109,5 @@ describe("ganzenbord: animatiestappen", () => {
     expect(
       eventCard({ position: 5, delayMs: 1, event: { kind: "goose", player: "one", to: 9 } }),
     ).toMatchObject({ kind: "goose" });
-  });
-
-  it("zoomt alleen op gebeurtenissen die bij een vak horen", () => {
-    expect(
-      zoomPositionFor({ position: 5, delayMs: 1, event: { kind: "goose", player: "one", to: 9 } }),
-    ).toBe(5);
-    expect(
-      zoomPositionFor({
-        position: 12,
-        delayMs: 1,
-        event: { kind: "skip", player: "two", value: 1 },
-      }),
-    ).toBeUndefined();
-    expect(zoomPositionFor({ position: 1, delayMs: 1 })).toBeUndefined();
   });
 });

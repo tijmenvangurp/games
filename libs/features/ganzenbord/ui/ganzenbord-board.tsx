@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { GanzenbordGame, PlayerState } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
-import { loadCellPoints, START_POINT } from "../model/board-points";
+import { loadCellPoints, START_POINT, type BoardPoint } from "../model/board-points";
 import { playerName, positionText } from "../model/presentation";
 import { GanzenbordPawn } from "./ganzenbord-pawn";
 
@@ -55,6 +55,17 @@ function boardSummary(game: GanzenbordGame): string {
   return `Ganzenbord met 63 vakjes. ${positions}.`;
 }
 
+const ZOOM_SCALE = 1.8;
+const CAMERA_LIMIT = (ZOOM_SCALE - 1) * 50;
+
+/** De camera volgt de pion en blijft altijd binnen het bord: geen lege randen. */
+function cameraTransform(focus: BoardPoint): string {
+  const clamp = (value: number) => Math.max(-CAMERA_LIMIT, Math.min(CAMERA_LIMIT, value));
+  const tx = clamp(ZOOM_SCALE * (50 - focus.x));
+  const ty = clamp(ZOOM_SCALE * (50 - focus.y));
+  return `translate(${tx}%, ${ty}%) scale(${ZOOM_SCALE})`;
+}
+
 interface GanzenbordBoardProps {
   game: GanzenbordGame;
   /** Vak waarop ingezoomd wordt zolang een gebeurteniskaart openstaat. */
@@ -70,8 +81,8 @@ export function GanzenbordBoard({ game, zoomPosition = null }: GanzenbordBoardPr
   return (
     <div aria-label={boardSummary(game)} className="ganzenbord-board relative" role="img">
       <div
-        className={cn("ganzenbord-zoom", focus && "ganzenbord-zoom-active")}
-        style={focus ? { transformOrigin: `${focus.x}% ${focus.y}%` } : undefined}
+        className="ganzenbord-zoom"
+        style={focus ? { transform: cameraTransform(focus) } : undefined}
       >
         <div className="relative">
           <img

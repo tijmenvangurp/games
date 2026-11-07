@@ -24,30 +24,6 @@ export function eventCard(step: AnimationStep | undefined): TurnEvent | undefine
   return step.event;
 }
 
-/** Alleen gebeurtenissen op een vak zijn de moeite van het inzoomen waard. */
-const ZOOM_KINDS: ReadonlySet<TurnEvent["kind"]> = new Set([
-  "first-throw",
-  "goose",
-  "bounce",
-  "bridge",
-  "inn",
-  "well",
-  "prison",
-  "maze",
-  "death",
-  "free",
-  "win",
-]);
-
-/** Het vak waarop de kaart betrekking heeft, of niets bij een algemene melding. */
-export function zoomPositionFor(step: AnimationStep | undefined): number | undefined {
-  const event = eventCard(step);
-  if (!event || !ZOOM_KINDS.has(event.kind)) {
-    return undefined;
-  }
-  return step?.position;
-}
-
 const STEP_MS = 150;
 const LANDING_MS = 650;
 const JUMP_MS = 1100;
