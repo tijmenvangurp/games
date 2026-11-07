@@ -61,6 +61,7 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `fallow`                                                           | dead code, layer boundaries en CSS-regels                           |
 | `husky`, `@commitlint/cli`                                         | git-hooks en commitconventies                                       |
 | `tsx`                                                              | TypeScript-scripts in `scripts/`                                    |
+| `varlock`                                                          | env-schema, validatie en lokale secrets                             |
 | `wrangler`                                                         | deploy naar Cloudflare Workers                                      |
 
 Ontbreekt er iets? Voeg het toe en zet het in deze tabel.

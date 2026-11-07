@@ -5,6 +5,9 @@
 
 # APM-uitvoer: gegenereerd, niet formatteren.
 apm.lock.yaml
+
+# Varlock-schema gebruikt zijn eigen env-spec-opmaak.
+.env.schema
 .mcp.json
 .codex/config.toml
 

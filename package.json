@@ -26,7 +26,8 @@
     "graph": "nx graph",
     "check": "pnpm run ts-only && pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run build",
     "harness:install": "apm install --only apm --no-policy && apm install --only mcp --target claude,codex --no-policy",
-    "quality": "pnpm run ts-only && pnpm run format:check && pnpm run elements:check && pnpm run ganzenbord:art:check && pnpm run typecheck && pnpm run test:coverage && pnpm run build && pnpm run boundaries && pnpm run fallow",
+    "env:check": "VARLOCK_TELEMETRY_DISABLED=1 varlock load --agent",
+    "quality": "pnpm run ts-only && pnpm run format:check && pnpm run env:check && pnpm run elements:check && pnpm run ganzenbord:art:check && pnpm run typecheck && pnpm run test:coverage && pnpm run build && pnpm run boundaries && pnpm run fallow",
     "quality:full": "pnpm run quality && pnpm run lint && pnpm run fsd",
     "quality:ci": "pnpm run quality:full && pnpm run e2e",
     "ts-only": "pnpm exec tsx scripts/check-ts-only.ts",
@@ -97,6 +98,7 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
+    "varlock": "^1.24.0",
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "wrangler": "^4.156.0"

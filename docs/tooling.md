@@ -181,6 +181,21 @@ De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keu
 
 De prototypepagina wordt niet gedeployed.
 
+## Env-variabelen (Varlock)
+
+`.env.schema` staat in de repo en beschrijft de optionele variabelen zonder
+waarden. `.env.local` is gitignored en bevat je eigen waarden. Zo houd je
+secrets uit de repo en krijgt een agent alleen de schema-context.
+
+```sh
+corepack pnpm run env:check              # valideert het schema
+varlock run -- corepack pnpm run audio:nl # draait met jouw lokale waarden
+```
+
+De MCP's voor Firecrawl en Context7 gebruiken OAuth; hun API-keys zijn alleen
+nodig als je bewust voor API-key-authenticatie kiest. TTS gebruikt
+`TTS_BASE_URL` en optioneel `TTS_API_KEY`; zie **TTS lokaal draaien**.
+
 ## Kort
 
 | Doel                     | Commando                                              |

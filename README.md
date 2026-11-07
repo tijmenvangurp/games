@@ -22,6 +22,7 @@ Elke slice is een eigen Nx-project met een `project.json`, `tsconfig.json` en ee
 ```sh
 corepack pnpm install
 corepack pnpm harness:install  # skills + MCP's voor Claude/Codex
+corepack pnpm env:check        # valideer .env.schema
 corepack pnpm dev              # nx run games:serve
 corepack pnpm build            # output: apps/games/dist
 corepack pnpm test:run         # Vitest zonder coverage

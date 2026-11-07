@@ -8,7 +8,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `../CONTRIBUTING.md` — setup, branch/PR-flow, commit-scopes en definition of done.
 - `../AGENTS.md` — de harde regels en werkwijze voor mens en agent.
 - `../GLOSSARY.md` — de domeintaal van Spellen.
-- `tooling.md` — Nx-daemon, cache, Fallow, TTS en de bijbehorende permission-regels.
+- `tooling.md` — Nx-daemon, cache, Fallow, TTS, Varlock en de bijbehorende permission-regels.
 - `design-system.md` — de visuele basis, gedeelde componenten en spraak.
 - `agents/issue-tracker.md` — GitHub Issues via `gh`.
 - `agents/triage-labels.md` — de labels voor de triage-skills.
