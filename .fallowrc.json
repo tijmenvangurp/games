@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/fallow/schema.json",
+  "ignoreDependencies": ["nx-mcp"],
   "entry": [
     "apps/games/src/app/main.tsx",
     "steiger.config.ts",

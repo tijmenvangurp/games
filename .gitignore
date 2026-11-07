@@ -25,6 +25,9 @@ test-results
 # Gegenereerd uit de stockfish.js-dependency; nooit committen (.js-bestand).
 apps/games/public/stockfish/
 
+# Agent-specific links to the shared skills in .agents/skills/
+.claude/skills/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
