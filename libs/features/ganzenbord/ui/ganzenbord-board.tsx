@@ -70,14 +70,8 @@ export function GanzenbordBoard({ game, zoomPosition = null }: GanzenbordBoardPr
   return (
     <div aria-label={boardSummary(game)} className="ganzenbord-board relative" role="img">
       <div
-        className="ganzenbord-zoom"
-        style={
-          focus
-            ? {
-                transform: `translate(${1.32 * (50 - focus.x)}%, ${1.32 * (50 - focus.y)}%) scale(1.32)`,
-              }
-            : undefined
-        }
+        className={cn("ganzenbord-zoom", focus && "ganzenbord-zoom-active")}
+        style={focus ? { transformOrigin: `${focus.x}% ${focus.y}%` } : undefined}
       >
         <div className="relative">
           <img
