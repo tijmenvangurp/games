@@ -92,6 +92,7 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
 - Documentatie: `docs/README.md` is de index; zie `docs/design-system.md` voor UI en `docs/adr/` voor beslissingen. Werk de index bij als je een document of ADR toevoegt.
 - Agent-harness: skills via APM in `.apm/skills` en `apm.yml`; MCP's in `opencode.jsonc`, `.mcp.json` en `.codex/config.toml`. Zie `CONTRIBUTING.md`.
+- Issues en specs: GitHub Issues via `gh`; zie `docs/agents/issue-tracker.md`.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
 - Nooit direct naar `main` pushen. Maak een branch en open een pull request; zie **Mergen** hieronder.
 - Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.

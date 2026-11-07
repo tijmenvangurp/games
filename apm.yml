@@ -25,6 +25,13 @@ dependencies:
         - writing-for-agents
         - improve-codebase-architecture
         - grilling
+        - retro
+        - triage
+        - to-spec
+        - to-tickets
+        - wayfinder
+        - implement
+        - implement-spec
     - git: cloudflare/skills
       path: skills/web-perf
       ref: 6eb6c781aa9b6438e0c7307bd102788a75fe1a6d

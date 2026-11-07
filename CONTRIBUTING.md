@@ -118,4 +118,5 @@ pull request en werk de tabel in `AGENTS.md` bij.
 - Architectuur: `AGENTS.md` en `docs/adr/`.
 - Tests: `README.md` en de scripts in `package.json`.
 - Tooling en Nx: `docs/tooling.md`.
+- Issues en specs: `docs/agents/issue-tracker.md`.
 - Iets stuk? Open een issue met route, toestel, browser en een screenshot.
