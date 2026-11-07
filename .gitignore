@@ -35,3 +35,11 @@ apps/games/public/stockfish/
 *.njsproj
 *.sln
 *.sw?
+
+# Varlock: lokale waarden nooit committen
+.env
+.env.local
+.env.*.local
+
+# APM dependencies
+apm_modules/

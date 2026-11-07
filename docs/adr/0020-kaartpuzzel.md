@@ -33,7 +33,7 @@ De geometrie, de licentie en de lazy chunk komen uit [ADR 0019](0019-wereldkaart
 
 Afgevallen:
 
-- **Een los menu-item.** De eigenaar wil de puzzel als variant van Vlaggenreis; een eigen pagina zou dezelfde store, opslag en setup dupliceren.
+- **Een los menu-item.** De maintainer wil de puzzel als variant van Vlaggenreis; een eigen pagina zou dezelfde store, opslag en setup dupliceren.
 - **`@dnd-kit/core` voor de drop.** De botsingsdetectie werkt met rechthoeken; landvormen zijn geen rechthoeken en de tray staat los van de kaart. Pointer-events plus `elementFromPoint` is nauwkeuriger en heeft geen extra laag.
 - **Een vaste kaart per continent.** Zonder ankerland staan de stukken willekeurig over het continent verspreid en worden de vlakken op een telefoon te klein.
 - **De hele wereld als vaste kaart.** Zelfde probleem, en de stukken zouden onherkenbaar klein worden.

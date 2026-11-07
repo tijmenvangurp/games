@@ -262,9 +262,9 @@ Er zijn complete Ganzenbord-vectorbestanden in het publieke domein en onder CC0.
 
 De Rijksmuseum-collectie bevat meerdere CC0-ganzenborden van 5.600 tot 10.600 px; de bovenstaande zijn de meest bruikbare voorbeelden. Ze zijn allemaal te zwaar en te druk voor de app zelf, maar uitstekend om de vakindeling, de ganzenposities en de sfeer op te zoeken.
 
-**Gekozen op 2026-11-06: het Oud Hollands Ganzenbord uit het Rijksmuseum.** De eigenaar koos deze scan als mooiste bord: Nederlands, warm gedrukt en met alle klassieke vakken. Het beeld is uitgesneden tot `apps/games/public/ganzenbord/board.webp` (1800 px breed, ca. 630 kB). De 63 celposities zijn met de hand gekalibreerd en staan in `board-points.ts`; via `/ganzenbord/bord` kunnen ze per toestel worden bijgesteld. `Ganzenbord_pd.svg` blijft in de tabel staan als vectorterugvaloptie, net als de andere borden.
+**Gekozen op 2026-11-06: het Oud Hollands Ganzenbord uit het Rijksmuseum.** De maintainer koos deze scan als mooiste bord: Nederlands, warm gedrukt en met alle klassieke vakken. Het beeld is uitgesneden tot `apps/games/public/ganzenbord/board.webp` (1800 px breed, ca. 630 kB). De 63 celposities zijn met de hand gekalibreerd en staan in `board-points.ts`; via `/ganzenbord/bord` kunnen ze per toestel worden bijgesteld. `Ganzenbord_pd.svg` blijft in de tabel staan als vectorterugvaloptie, net als de andere borden.
 
-**Advies voor het bord:** het oorspronkelijke advies was een eigen SVG/HTML-bord te tekenen. Dat is niet gevolgd: de eigenaar koos de Oud-Hollandse scan, en die bleek na uitsnijden en handmatige kalibratie goedkoper en mooier dan een eigen vectorkaart. De les voor een volgende kaart: kies eerst het beeld, kalibreer de cellen daarna met een kleine klik- of schuiftool, en houd de posities als percentages zodat ze onafhankelijk van de schermgrootte blijven.
+**Advies voor het bord:** het oorspronkelijke advies was een eigen SVG/HTML-bord te tekenen. Dat is niet gevolgd: de maintainer koos de Oud-Hollandse scan, en die bleek na uitsnijden en handmatige kalibratie goedkoper en mooier dan een eigen vectorkaart. De les voor een volgende kaart: kies eerst het beeld, kalibreer de cellen daarna met een kleine klik- of schuiftool, en houd de posities als percentages zodat ze onafhankelijk van de schermgrootte blijven.
 
 ### 7.4 Kant-en-klare assets
 
@@ -286,7 +286,7 @@ Een audiofragment van Kenney is niet nodig en zou de bestaande mute-instelling o
 
 ## 8. Aanbevolen opzet
 
-Als de eigenaar na dit onderzoek wil bouwen, is dit de kleinste opzet die bij de repo past:
+Als de maintainer na dit onderzoek wil bouwen, is dit de kleinste opzet die bij de repo past:
 
 | Laag                                       | Inhoud                                                                                                                                      |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |

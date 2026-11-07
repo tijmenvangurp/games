@@ -4,7 +4,7 @@
  * TTS leest losse letters vaak als letternamen. Daarom heeft elke klank
  * meerdere varianten: de kale letter, een fonetische spelling ("buh"), een
  * aangehouden of herhaalde klank, een voorbeeldwoord en eventueel IPA/SSML.
- * De eigenaar beluistert de varianten en kiest wat het beste werkt.
+ * De maintainer beluistert de varianten en kiest wat het beste werkt.
  *
  * De `filename` is de canonieke naam van de standaardvariant. De generator zet
  * de stem erbij in de uiteindelijke bestandsnaam.

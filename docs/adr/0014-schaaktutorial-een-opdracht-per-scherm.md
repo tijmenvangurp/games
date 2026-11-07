@@ -7,7 +7,7 @@
 
 De tutorial uit ADR 0006 en 0007 toonde per les een titel, een beschrijving, een hintkaart, een doelbadge, een statusbalk met uitleg en een levelkiezer met negen volledige titels. Het bord stond daardoor pas na veel tekst in beeld. Jonge kinderen moeten eerst lezen voordat ze kunnen spelen, en de statusbalk verwees na een foute zet naar groene stippen die op dat moment niet zichtbaar waren.
 
-De eigenaar wil dat de tutorial kinderen laagdrempeliger meeneemt in schaakideeën: minder lezen, sneller doen en visueel leren.
+De maintainer wil dat de tutorial kinderen laagdrempeliger meeneemt in schaakideeën: minder lezen, sneller doen en visueel leren.
 
 ## Beslissing
 

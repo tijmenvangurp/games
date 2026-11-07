@@ -269,7 +269,7 @@ Voorbeelden:
 
 Dat is iets anders dan de andere lagen:
 
-| Soort         | Voorbeeld              | Wat het overneemt                            | React blijft eigenaar van                       |
+| Soort         | Voorbeeld              | Wat het overneemt                            | Wat React zelf blijft doen                      |
 | ------------- | ---------------------- | -------------------------------------------- | ----------------------------------------------- |
 | Engine        | Phaser, PixiJS, Kaplay | Renderloop, canvas, scenes, input, assets    | Weinig; meestal alleen de mount en communicatie |
 | Animatie      | Motion, AutoAnimate    | Overgangen en gestures binnen de DOM         | De DOM, state en componenten                    |

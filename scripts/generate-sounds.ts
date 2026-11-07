@@ -16,13 +16,8 @@ import { looksLikeWav, trimWav } from "./wav.ts";
  * Genereert prototype-audio voor losse Nederlandse klanken.
  *
  * Het script leest de endpoint-URL, het model, de stem en de sleutel uit
- * environment variables. Zet die nooit in de repo. Gebruik de private
- * TTS-helper uit de skill `generate-game-audio`; die vult de variabelen in
- * zonder dat de waarden in de chat of in een proceslijst komen.
- *
- * Voorbeeld (via de helper):
- *   generate-audio.ts -- --generator=scripts/generate-sounds.ts \
- *     --only=i,k,m,s,p,v,e,n,t,a --variant=fonetisch --label=nathalie
+ * environment variables. Zet die nooit in de repo. Zie `docs/tooling.md` voor
+ * de audioworkflow.
  */
 
 type ManifestType = KlankType;
@@ -163,9 +158,7 @@ function readOptions(): Options {
 function readBaseUrl(): string {
   const baseUrl = process.env.TTS_BASE_URL?.replace(/\/+$/, "");
   if (!baseUrl) {
-    console.error(
-      "TTS_BASE_URL ontbreekt. Gebruik de private TTS-helper; zet de waarde nooit in de repo.",
-    );
+    console.error("TTS_BASE_URL ontbreekt. Zet de waarde in je omgeving, nooit in de repo.");
     process.exit(1);
   }
   return baseUrl;
@@ -297,7 +290,7 @@ async function requestSpeech(
   try {
     return new Uint8Array(await response.arrayBuffer());
   } catch {
-    // Never include the private endpoint, IP addresses or stack in the error.
+    // Never include the endpoint, IP addresses or stack in the error.
     throw new Error("TTS-verzoek mislukt (netwerk).");
   }
 }
@@ -540,8 +533,7 @@ Opties:
   --port=<getal>       Poort voor --serve (standaard ${DEFAULT_PORT})
   --help               Deze uitleg
 
-Gebruik de private TTS-helper uit de skill generate-game-audio voor de
-endpoint en sleutel. Zet die waarden nooit in de repo.`);
+Zet TTS_BASE_URL en TTS_API_KEY in je omgeving, nooit in de repo.`);
 }
 
 function selectKlanken(options: Options): readonly KlankMapping[] {

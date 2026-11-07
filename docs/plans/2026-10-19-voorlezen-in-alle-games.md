@@ -290,7 +290,7 @@ Voorlezen krijgt een eigen sleutel, bijvoorbeeld `games.speech.v1`, naast `games
 - De voorkeur staat standaard aan, met een zichtbare knop om hem uit te zetten.
 - De toggle is minimaal 44 × 44 px en heeft een expliciet label: “Voorlezen uitzetten” / “Voorlezen aanzetten”.
 
-Als de eigenaar één gecombineerde knop prettiger vindt, kan dat later; de speler houdt de twee voorkeuren dan alsnog intern gescheiden.
+Als de maintainer één gecombineerde knop prettiger vindt, kan dat later; de speler houdt de twee voorkeuren dan alsnog intern gescheiden.
 
 ## Interactiepatronen
 
@@ -329,7 +329,7 @@ Er zijn drie patronen. Niet meer, anders wordt de UI onvoorspelbaar.
 - [x] Voeg de stem en licentie toe aan de credits in `README.md` of de audiodocumentatie.
 - [x] Geen testbestanden committen.
 
-**Klaar als:** de Nederlandse stem, snelheid, licentie en het voorleesgedrag zijn vastgelegd en door de eigenaar goedgekeurd. De technische set staat; de luistertest op echte toestellen is nog open.
+**Klaar als:** de Nederlandse stem, snelheid, licentie en het voorleesgedrag zijn vastgelegd en door de maintainer goedgekeurd. De technische set staat; de luistertest op echte toestellen is nog open.
 
 ### Fase 1 — gedeelde basis
 
@@ -487,7 +487,7 @@ Deze fase draait om de zinnen die een kind nodig heeft om te weten wat het moet 
 - [x] Bepalen of de release “Schaakles + Rekenen” is of dat Schaakpuzzels en Woordzoeker eerst af moeten zijn. **P1 is nu compleet.**
 - [x] De voorleesknop verbergen of uitleggen in games zonder spraak (`visual`, `pending`, `legacy`).
 - [x] Cachebeleid vastleggen: audio cachet één dag (`max-age=86400`). Bij een nieuwe stem is een oude clip daardoor maximaal één dag zichtbaar; voor een volgende stem kunnen we de paden versieren.
-- [ ] Branch, pull request, groene CI en expliciete toestemming van de eigenaar (“merge mag”).
+- [ ] Branch, pull request, groene CI en expliciete toestemming van de maintainer (“merge mag”).
 - [ ] Na de deploy de productie-URL op telefoon en tablet controleren.
 
 **Belangrijk, maar niet blokkerend**

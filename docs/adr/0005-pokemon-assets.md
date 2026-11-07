@@ -6,13 +6,13 @@
 
 ## Context
 
-De eigenaar wil van Monster Memory een Pokémon Memory maken voor jonge kinderen. Dezelfde lokale assets worden gebruikt door de quiz **Wie is deze Pokémon?**. De game gebruikt officiële artwork, cries en animated sprites. Die bestanden staan al publiek online, maar de app mag ze niet tijdens het spelen bij een derde partij ophalen:
+De maintainer wil van Monster Memory een Pokémon Memory maken voor jonge kinderen. Dezelfde lokale assets worden gebruikt door de quiz **Wie is deze Pokémon?**. De game gebruikt officiële artwork, cries en animated sprites. Die bestanden staan al publiek online, maar de app mag ze niet tijdens het spelen bij een derde partij ophalen:
 
 - `apps/games/public/_headers` heeft een strikte CSP (`img-src 'self' data:`, `connect-src 'none'`).
 - De app moet offline en zonder tracking blijven werken.
 - Een runtime-koppeling zou het IP-adres van bezoekers naar een externe host sturen.
 
-De eigenaar heeft daarom expliciet goedgekeurd dat de assets één keer worden gedownload en lokaal in deze openbare repository worden gebundeld.
+De maintainer heeft daarom expliciet goedgekeurd dat de assets één keer worden gedownload en lokaal in deze openbare repository worden gebundeld.
 
 ## Beslissing
 
@@ -37,7 +37,7 @@ De gebruikte bestanden zijn afkomstig van deze publieke bronnen:
 
 ## Auteursrecht en merken
 
-Pokémon en alle bijbehorende namen, personages en afbeeldingen zijn eigendom van Nintendo, Creatures Inc. en GAME FREAK inc. Deze app is een niet-commercieel fanproject zonder officiële band met de rechthebbenden. De eigenaar heeft de risico's van publicatie in een openbare repository expliciet geaccepteerd. Als de rechthebbenden bezwaar maken, moeten de assets worden verwijderd en moet ADR 0003 weer gaan gelden.
+Pokémon en alle bijbehorende namen, personages en afbeeldingen zijn eigendom van Nintendo, Creatures Inc. en GAME FREAK inc. Deze app is een niet-commercieel fanproject zonder officiële band met de rechthebbenden. De maintainer heeft de risico's van publicatie in een openbare repository expliciet geaccepteerd. Als de rechthebbenden bezwaar maken, moeten de assets worden verwijderd en moet ADR 0003 weer gaan gelden.
 
 ## Gevolgen
 
@@ -48,7 +48,7 @@ Pokémon en alle bijbehorende namen, personages en afbeeldingen zijn eigendom va
 
 ## Update 2026-10-21: cries vervangen door app-geluidjes
 
-De eigenaar vond de ingebouwde Pokémon-cries niet mooi genoeg. Na het beluisteren van alternatieven (PokeAPI `latest` en `legacy`, zachter afspelen en dieper afspelen) is gekozen voor de gesynthetiseerde geluidjes die de rest van de app al gebruikt.
+De maintainer vond de ingebouwde Pokémon-cries niet mooi genoeg. Na het beluisteren van alternatieven (PokeAPI `latest` en `legacy`, zachter afspelen en dieper afspelen) is gekozen voor de gesynthetiseerde geluidjes die de rest van de app al gebruikt.
 
 1. **Geen Pokémon-audiobestanden meer.** De 151 MP3's in `apps/games/public/pokemon/cries/` zijn verwijderd, samen met `pokemonCrySrc` en `usePokemonCry`. De repository wordt daarmee ongeveer 1,5 MB kleiner.
 2. **Memory** speelt `tap` bij een omgedraaide kaart, `match` bij een gevonden paar en `win` bij de laatste pair. **Wie is deze Pokémon?** speelt `match` bij een goed antwoord en `tap` bij de knop naar de volgende vraag.

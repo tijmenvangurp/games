@@ -13,6 +13,6 @@
 
 ## Merge-akkoord
 
-- [ ] De eigenaar heeft **expliciet** gezegd dat deze PR gemerged mag worden.
+- [ ] De maintainer heeft **expliciet** gezegd dat deze PR gemerged mag worden.
 
-> Een pull request blijft open tot de eigenaar toestemming geeft. Groene CI is nodig, maar geen akkoord. De agent merget nooit zelfstandig; zie `AGENTS.md` → **Mergen**.
+> Een pull request blijft open tot de maintainer toestemming geeft. Groene CI is nodig, maar geen akkoord. De agent merget nooit zelfstandig; zie `AGENTS.md` → **Mergen**.
