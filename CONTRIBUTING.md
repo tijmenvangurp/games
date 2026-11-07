@@ -28,9 +28,9 @@ kunnen bijdragen.
 - **MCP's:** Claude Code leest `.mcp.json`, Codex leest `.codex/config.toml`.
   OpenCode leest `opencode.jsonc`; die blijft handmatig tot APM OpenCode V2
   ondersteunt.
-- **Firecrawl:** remote MCP met OAuth. De gratis tier geeft 1.000 credits per
-  maand; meld je via `/mcps` aan. Een API-key kan ook, maar staat nooit in de
-  repo.
+- **Firecrawl:** de hosted MCP heet `firecrawl-hosted` en gebruikt OAuth. De
+  gratis tier geeft 1.000 credits per maand; meld je via `/mcps` aan. Een
+  API-key kan ook, maar staat nooit in de repo.
 - **Bijwerken:** `apm update --yes && corepack pnpm run harness:install`.
 - **Geheimen:** houd tokens, `.env`-waarden en persoonsgegevens buiten de repo
   en buiten een prompt.

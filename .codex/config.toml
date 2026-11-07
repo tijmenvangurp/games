@@ -13,5 +13,5 @@ args = ["pnpm", "exec", "nx-mcp", "--disableTelemetry", "--no-minimal"]
 [mcp_servers.context7]
 url = "https://mcp.context7.com/mcp"
 
-[mcp_servers.firecrawl]
+[mcp_servers.firecrawl-hosted]
 url = "https://mcp.firecrawl.dev/v2/mcp-oauth"
