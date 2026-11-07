@@ -19,6 +19,8 @@ Elke slice is een eigen Nx-project met een `project.json`, `tsconfig.json` en ee
 
 ## Commando's
 
+`harness:install` vereist de [APM CLI](https://microsoft.github.io/apm/getting-started/installation/); op Debian 12 werkt `uv tool install apm-cli==0.35.0`.
+
 ```sh
 corepack pnpm install
 corepack pnpm harness:install  # skills + MCP's voor Claude/Codex

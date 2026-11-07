@@ -9,6 +9,7 @@ Lees eerst `README.md`, `AGENTS.md` en de relevante ADR's in `docs/adr/`.
 - Node.js 24 (zie `.nvmrc`)
 - Corepack; gebruik daarna `corepack pnpm` voor elk commando
 - Git en een GitHub-account
+- [APM CLI](https://microsoft.github.io/apm/getting-started/installation/) voor de agent-harness; op Debian 12 werkt `uv tool install apm-cli==0.35.0`
 
 ```sh
 corepack enable

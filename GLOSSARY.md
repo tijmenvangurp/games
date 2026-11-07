@@ -28,7 +28,7 @@ De laag die een scherm samenstelt uit widgets en features.
 _Avoid_: view, screen
 
 **Widget**:
-Een samengesteld UI-blok dat door meerdere pages of features wordt gebruikt.
+Een samengesteld UI-blok dat pages gebruiken en dat zelf features samenstelt.
 _Avoid_: component, block
 
 **Spelcatalogus**:
@@ -52,8 +52,8 @@ en regels, met teksthashes en het lockbestand.
 _Avoid_: audio index, manifest
 
 **Sterren**:
-De beloning per ronde of puzzel. Eén ster per goed antwoord of opdracht; een
-fout kost een ster, maar het spel gaat door.
+De beloning per ronde of puzzel. Alleen een goed antwoord op de eerste poging
+levert een ster op; een fout verandert verdiende sterren niet.
 _Avoid_: score, punten
 
 **Ronde**:
