@@ -28,7 +28,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/letters"
           | "/vlaggen"
           | "/vier-op-een-rij"
-          | "/ganzenbord";
+          | "/ganzenbord"
+          | "/typepret";
         thumbnail: string;
         /** Elke game kiest expliciet hoe het met spraak omgaat. */
         speech: GameSpeech;
@@ -164,6 +165,18 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     speech: {
       kind: "visual",
       reason: "Het bord, de dobbelsteen en de ganzepionnen zijn visueel.",
+    },
+  },
+  {
+    id: "typepret",
+    name: "Typepret",
+    description: "Leer blind typen: vinger op de basisrij en tik de letter die oplicht.",
+    status: "available",
+    to: "/typepret",
+    thumbnail: "/thumbnails/typepret-9e07ea14.jpg",
+    speech: {
+      kind: "visual",
+      reason: "Het toetsenbord en de doeltekens zijn visueel.",
     },
   },
 ];

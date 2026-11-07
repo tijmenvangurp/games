@@ -25,6 +25,7 @@
 - `adr/0026-adaptief-niveaumodel.md` — adaptieve niveaus per spel, de 70–85%-regel, hinttrap, herhaalqueue en foutvriendelijke feedback.
 - `adr/0027-schaakcoordinaten-buiten-het-bord.md` — de coördinaten buiten het bord, meedraaiend met de bordstand en een compactere paginakop tijdens een partij.
 - `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
+- `adr/0029-typepret.md` — eigen invoerlogica in plaats van een typing-library, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
 - `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
