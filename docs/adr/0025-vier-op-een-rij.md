@@ -5,7 +5,7 @@
 
 ## Context
 
-De app had alleen spellen voor één speler. De kinderen van de eigenaar (6 en 8 jaar) spelen
+De app had alleen spellen voor één speler. De kinderen (6 en 8 jaar) spelen
 graag samen op één tablet of telefoon. Gevraagd is een klassiek bordspel met eigen, Nederlandse
 namen, zonder merknamen of logo's, met de spellogica in de vorm van boardgame.io's `G` en
 `Moves`: een pure toestand en pure functies, zodat een engine er later omheen kan.

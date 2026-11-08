@@ -1,6 +1,6 @@
 # ADR 0012: Optionele accounts en gesynchroniseerde voortgang per profiel
 
-- **Status:** Proposed — ter goedkeuring door de eigenaar
+- **Status:** Proposed — ter goedkeuring door de maintainer
 - **Datum:** 2026-10-18
 - **Gerelateerd:** [ADR 0001](0001-publieke-statische-spellen-app.md) (statische app), [ADR 0013](0013-privacy-optionele-accounts.md) (privacy), [onderzoek](../research/2026-10-18-auth-backend-betterauth.md)
 
@@ -8,7 +8,7 @@
 
 De app is vandaag volledig statisch. Elk spel bewaart zijn eigen voortgang in `localStorage` onder een versiekey (`games.sudoku.v1`, `games.math.v1`, enzovoort). Er zijn geen accounts, profielen, servers of externe requests. [ADR 0001](0001-publieke-statische-spellen-app.md) zegt dat accounts, gedeelde scores en multiplayer een nieuwe ADR met een expliciet privacy- en beveiligingsontwerp vereisen.
 
-De eigenaar wil nu:
+De maintainer wil nu:
 
 - **Zonder login blijven spelen.** Alle spellen moeten volledig werken zonder account, zonder loginmuur en zonder ingekorte functionaliteit.
 - **Met login voortgang per persoon.** Na inloggen krijgt elke persoon een eigen state en kan de voortgang op meerdere toestellen beschikbaar komen.
@@ -26,15 +26,15 @@ Het technische onderzoek staat in [research/2026-10-18-auth-backend-betterauth.m
 3. **Kindprofielen zijn rijen, geen accounts.** Onder het ouderaccount staan profielen (voorstel: maximaal vier). Een profiel heeft een slot, een avatar uit een vaste lokale set en een `id`. Een naam is optioneel en blijft lokaal; de server slaat geen naam, e-mail, geboortedatum, foto of locatie van het kind op.
 4. **Profiel switchen zoals Netflix.** De app toont een profielkeuze zodra een ouder is ingelogd. Het actieve profiel bepaalt welke state de games lezen en schrijven. Wisselen gebeurt zonder opnieuw in te loggen.
 5. **Twee gescheiden namespaces.** Gastmodus gebruikt `local:<slot>` (de bestaande `games.<spel>.v1`-keys gelden als slot 1); ingelogd gebruikt `account:<player_id>`. Bij inloggen wordt de lokale state **niet** verwijderd of geüpload. Het account begint leeg. Na uitloggen is de lokale state weer beschikbaar. Zo gaat er geen voortgang verloren en is er geen stille merge.
-6. **Geen automatische merge in versie 1.** De eigenaar heeft gekozen voor "account start leeg". Een latere "neem lokale voortgang mee"-actie is een aparte feature met eigen merge-regels en een eigen ADR. De UI meldt bij de eerste login duidelijk: "Je account begint leeg; je lokale voortgang blijft op dit toestel."
+6. **Geen automatische merge in versie 1.** De maintainer heeft gekozen voor "account start leeg". Een latere "neem lokale voortgang mee"-actie is een aparte feature met eigen merge-regels en een eigen ADR. De UI meldt bij de eerste login duidelijk: "Je account begint leeg; je lokale voortgang blijft op dit toestel."
 7. **Sync-scope.** In versie 1 synchroniseren we alleen instellingen, beste scores en grove voortgang (bijvoorbeeld `unlocked` en sterren). Geen actieve sudoku-borden, woordzoeker-grids, `selected`-velden of SRS-state. Die zijn groot, apparaatgebonden en conflictgevoelig.
 8. **Zelfde origin, zelfde Worker.** De auth- en progress-API draaien in de bestaande Cloudflare Worker onder `/api/auth/*` en `/api/progress/*`, naast de static assets. Geen aparte API-subdomein en geen CORS.
 9. **Better Auth en D1.** We gebruiken Better Auth 1.7.x (exact gepind) met de ingebouwde D1-ondersteuning en een D1-database in de `eu`-jurisdictie. De tabellen `user`, `session`, `account` en `verification` zijn van Better Auth; `player`, `progress`, `progress_mutation` en `consent` zijn van ons.
 10. **State-model.** Eén `progress`-rij per `player_id` + `game_id` met een JSON-envelop (`schema_version`, `revision`, `data_json`, `client_updated_at`, `server_updated_at`). Schrijven gebeurt met een idempotente upsert plus een `progress_mutation`-insert in dezelfde D1-batch. De client houdt een outbox bij en probeert opnieuw met backoff.
 11. **Conflictregels.** Instellingen: last-write-wins op `client_updated_at`. Beste scores en `unlocked`: `max(existing, incoming)`. Er is geen server-authoritative anti-cheat; de client berekent de score en dat is voor een familie-app acceptabel.
-12. **Loginmethode is nog open.** De voorkeur is een **passkey** voor de ouder: geen wachtwoord, phishing-resistent en geen externe request. **Google OAuth** is alleen toegestaan als de eigenaar de uitzondering op "geen externe requests" expliciet accepteert; dan gelden de voorwaarden uit [ADR 0013](0013-privacy-optionele-accounts.md). E-mail met wachtwoord is een derde optie, maar vraagt een e-mailprovider voor herstel en verificatie. Deze ADR legt het accountmodel vast, niet de methode.
+12. **Loginmethode is nog open.** De voorkeur is een **passkey** voor de ouder: geen wachtwoord, phishing-resistent en geen externe request. **Google OAuth** is alleen toegestaan als de maintainer de uitzondering op "geen externe requests" expliciet accepteert; dan gelden de voorwaarden uit [ADR 0013](0013-privacy-optionele-accounts.md). E-mail met wachtwoord is een derde optie, maar vraagt een e-mailprovider voor herstel en verificatie. Deze ADR legt het accountmodel vast, niet de methode.
 13. **Geen remote avatars.** Ook bij Google OAuth renderen we geen Google-avatar-URL. Het profiel gebruikt een avatar uit de lokale set. Dat voorkomt een `img-src`-uitzondering en een externe request.
-14. **Feature-flag en uitrol.** `ACCOUNTS_ENABLED` (Worker-variabele) en `VITE_ACCOUNTS_ENABLED` (build-time, publiek) staan standaard uit. Previews krijgen geen auth. Uitrol: Worker deployen met de flag uit, testen met het ouderaccount van de eigenaar, daarna de flag aan en pas dan de accountroute zichtbaar maken.
+14. **Feature-flag en uitrol.** `ACCOUNTS_ENABLED` (Worker-variabele) en `VITE_ACCOUNTS_ENABLED` (build-time, publiek) staan standaard uit. Previews krijgen geen auth. Uitrol: Worker deployen met de flag uit, testen met het ouderaccount van de maintainer, daarna de flag aan en pas dan de accountroute zichtbaar maken.
 15. **Verwijderen.** De ouder kan een kindprofiel verwijderen (cascade naar `progress`) en het hele account verwijderen (cascade naar `player`, `progress`, `progress_mutation`, `consent`, sessies en Better Auth-user). Lokale state blijft daarna staan. De verwijderactie vraagt een verse sessie of extra bevestiging.
 16. **Geen publieke profielen, ranglijsten, chat of vriendenlijsten.** Dat zijn aparte producten met een eigen privacy- en veiligheidsontwerp. Ze vallen buiten deze ADR.
 
@@ -76,20 +76,20 @@ De server begrijpt alleen de envelop, niet de inhoud van `data_json`. Elk spel l
 - **De CSP wordt verzwakt.** `connect-src 'none'` wordt `'self'`. Dat is een bewuste wijziging en moet in de headers en in de ADR zichtbaar blijven.
 - **De publieke repo blijft schoon.** Geen secrets, `.dev.vars`, productie-exports of echte gezinsdata. Testdata gebruikt `example.invalid`.
 - **Account en lokaal kunnen uit elkaar lopen.** Omdat het account leeg begint, kan een gebruiker twee soorten voortgang hebben. Dat is geaccepteerd voor versie 1; de UI moet het uitleggen.
-- **Google OAuth is geen detail.** Het voegt een externe redirect, een derde partij en een verwerker toe. Als de eigenaar Google wil, moet dat expliciet in [ADR 0013](0013-privacy-optionele-accounts.md) worden vastgelegd; anders blijft passkey de route.
+- **Google OAuth is geen detail.** Het voegt een externe redirect, een derde partij en een verwerker toe. Als de maintainer Google wil, moet dat expliciet in [ADR 0013](0013-privacy-optionele-accounts.md) worden vastgelegd; anders blijft passkey de route.
 - **Geen schermtijdbeleid.** Dagbudgetten, blokkades en ouderpincodes vallen buiten deze ADR. OS-ouderscontrole (Digital Wellbeing, Family Link) is daar de juiste plek. Een ouderoverzicht met bestede tijd zonder limiet kan later als dashboardfeature worden toegevoegd.
 - **Latere fases.** Een ouder-dashboard, volledige SRS-sync en multiplayer vragen eigen ADR's. Deze ADR reserveert daar geen architectuur voor.
 
 ## Alternatieven
 
-| Alternatief                             | Waarom niet                                                                         |
-| --------------------------------------- | ----------------------------------------------------------------------------------- |
-| Geen accounts, alleen lokale profielen  | Lost "per persoon op meerdere toestellen" niet op; blijft de fallback voor gasten   |
-| Hosted auth (Supabase, Clerk, Firebase) | Externe requests, vendor-relatie en meer data bij een derde partij                  |
-| Eigen sessie-cookie zonder Better Auth  | Meer eigen beveiligingsrisico: hashing, CSRF, rotatie, rate limiting                |
-| Eén account per kind                    | Meer persoonsgegevens, ouderlijke toestemming en herstelwerk per kind               |
-| Automatische merge bij eerste login     | Door de eigenaar afgewezen; geeft onvoorspelbaar gedrag en verlies van lokale state |
-| Actieve borden en SRS ook syncen        | Conflictgevoelig en groot; geen duidelijke winst in versie 1                        |
+| Alternatief                             | Waarom niet                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------- |
+| Geen accounts, alleen lokale profielen  | Lost "per persoon op meerdere toestellen" niet op; blijft de fallback voor gasten     |
+| Hosted auth (Supabase, Clerk, Firebase) | Externe requests, vendor-relatie en meer data bij een derde partij                    |
+| Eigen sessie-cookie zonder Better Auth  | Meer eigen beveiligingsrisico: hashing, CSRF, rotatie, rate limiting                  |
+| Eén account per kind                    | Meer persoonsgegevens, ouderlijke toestemming en herstelwerk per kind                 |
+| Automatische merge bij eerste login     | Door de maintainer afgewezen; geeft onvoorspelbaar gedrag en verlies van lokale state |
+| Actieve borden en SRS ook syncen        | Conflictgevoelig en groot; geen duidelijke winst in versie 1                          |
 
 ## Open vragen
 
@@ -103,4 +103,4 @@ De server begrijpt alleen de envelop, niet de inhoud van `data_json`. Elk spel l
 
 ## Status en vervolg
 
-Deze ADR is **Proposed**. Zonder goedkeuring van de eigenaar en zonder [ADR 0013](0013-privacy-optionele-accounts.md) komt er geen productie-auth. Na goedkeuring: ADR's accepteren, D1 en Worker inrichten, migraties toevoegen en fase 1 achter de feature-flag uitrollen.
+Deze ADR is **Proposed**. Zonder goedkeuring van de maintainer en zonder [ADR 0013](0013-privacy-optionele-accounts.md) komt er geen productie-auth. Na goedkeuring: ADR's accepteren, D1 en Worker inrichten, migraties toevoegen en fase 1 achter de feature-flag uitrollen.

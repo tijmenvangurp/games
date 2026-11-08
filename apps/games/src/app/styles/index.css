@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-simple-keyboard/build/css/index.css" layer(components);
 
 @source "../../..";
 @source "../../../../../libs";
@@ -33,6 +34,8 @@
   --color-danger: var(--danger);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
+  --color-player-three: var(--player-three);
+  --color-player-four: var(--player-four);
 }
 
 :root {
@@ -54,6 +57,8 @@
    */
   --player-one: #4f5d9e;
   --player-two: oklch(0.58 0.2 30);
+  --player-three: oklch(0.55 0.11 190);
+  --player-four: oklch(0.56 0.13 305);
 }
 
 @layer base {
@@ -110,6 +115,37 @@
     box-shadow:
       0 1px 2px oklch(0.3 0.025 145 / 0.05),
       0 16px 36px -30px oklch(0.3 0.025 145 / 0.35);
+  }
+
+  .ganzenbord-board {
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 30px -22px rgb(40 25 10 / 0.55);
+    overflow: hidden;
+  }
+
+  .ganzenbord-zoom {
+    transform: scale(1);
+    transition: transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ganzenbord-pawn {
+    box-shadow: 0 2px 5px rgb(40 25 10 / 0.45);
+  }
+
+  .ganzenbord-pawn-move {
+    transition:
+      left 260ms ease-in-out,
+      top 260ms ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ganzenbord-zoom {
+      transition: none;
+    }
+
+    .ganzenbord-pawn-move {
+      transition: none;
+    }
   }
 
   .game-card:hover {
@@ -440,5 +476,104 @@
     .maze-trail-dot {
       animation-delay: 0ms;
     }
+  }
+}
+
+@layer games {
+  /*
+   * Typepret: het toetsenbord van react-simple-keyboard als rustige weergave.
+   * De bibliotheek-CSS staat in `components`; deze regels staan erboven.
+   */
+  .typepret-keyboard {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .typepret-keyboard .hg-theme-default {
+    padding: 0;
+    background-color: transparent;
+  }
+
+  .typepret-keyboard .hg-button {
+    height: 2.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 0.6rem;
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-size: 1.05rem;
+    font-weight: 700;
+    box-shadow: none;
+  }
+
+  .typepret-keyboard .hg-row {
+    justify-content: center;
+  }
+
+  .typepret-keyboard .tp-dim {
+    opacity: 0.6;
+  }
+
+  .typepret-keyboard .tp-finger {
+    color: var(--foreground);
+  }
+
+  .typepret-keyboard .tp-linker-pink {
+    background-color: var(--finger-linker-pink);
+  }
+
+  .typepret-keyboard .tp-linker-ringvinger {
+    background-color: var(--finger-linker-ringvinger);
+  }
+
+  .typepret-keyboard .tp-linker-middelvinger {
+    background-color: var(--finger-linker-middelvinger);
+  }
+
+  .typepret-keyboard .tp-linker-wijsvinger {
+    background-color: var(--finger-linker-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-wijsvinger {
+    background-color: var(--finger-rechter-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-middelvinger {
+    background-color: var(--finger-rechter-middelvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-ringvinger {
+    background-color: var(--finger-rechter-ringvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-pink {
+    background-color: var(--finger-rechter-pink);
+  }
+
+  /* Het voelbare ribbeltje op F en J. */
+  .typepret-keyboard .tp-bump {
+    position: relative;
+  }
+
+  .tp-bump::after {
+    position: absolute;
+    bottom: 0.4rem;
+    left: 50%;
+    width: 0.9rem;
+    height: 0.2rem;
+    border-radius: 0.1rem;
+    background-color: var(--foreground);
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .typepret-keyboard .tp-target {
+    border-width: 3.5px;
+    border-color: var(--foreground);
+    font-weight: 900;
+  }
+
+  .typepret-keyboard[data-emphasize="true"] .tp-target {
+    border-width: 5px;
+    font-size: 1.4rem;
   }
 }

@@ -205,9 +205,18 @@ importers:
       react-chessboard:
         specifier: ^5.12.1
         version: 5.12.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react-dice-complete:
+        specifier: 2.3.2
+        version: 2.3.2(react@19.3.1)
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      react-hotkeys-hook:
+        specifier: 5.3.3
+        version: 5.3.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      react-simple-keyboard:
+        specifier: 3.8.295
+        version: 3.8.295(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       stockfish.js:
         specifier: 10.0.2
         version: 10.0.2
@@ -290,12 +299,18 @@ importers:
       nx:
         specifier: 23.3.0
         version: 23.3.0
+      nx-mcp:
+        specifier: 0.25.3
+        version: 0.25.3
       oxfmt:
         specifier: ^0.73.0
         version: 0.73.0
       oxlint:
         specifier: ^1.90.0
         version: 1.90.0
+      sharp:
+        specifier: ^0.35.5
+        version: 0.35.5(@types/node@26.6.6)
       steiger:
         specifier: ^0.7.0
         version: 0.7.0(typescript@7.0.2)
@@ -308,6 +323,9 @@ importers:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+      varlock:
+        specifier: ^1.24.0
+        version: 1.24.0
       vite:
         specifier: ^8.3.5
         version: 8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0)
@@ -1756,6 +1774,24 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@varlock/native-helper-darwin@1.24.0':
+    resolution: {integrity: sha512-/uMRBzTZxdtlwyszdPbamFojDfRQYTNY0l20SoX8UoTXrI+Kq7B3tt2ZDP0WfOhb9EAP1egAewBuGLj8NzemMQ==}
+    os: [darwin]
+
+  '@varlock/native-helper-linux-arm64@1.24.0':
+    resolution: {integrity: sha512-o2cMTiRtFNMNijxQxb8I7L6aQnEOTxB4QKYIZKAqbjoUCAFhStCwl1n2hj1J/rvCegSSaJT040T7r4culNZEqg==}
+    cpu: [arm64]
+    os: [linux]
+
+  '@varlock/native-helper-linux-x64@1.24.0':
+    resolution: {integrity: sha512-gToIgVYiYBf5rEdgM2nUV+r/5pPdQWZu6/GW4uZQqYQ0ApRL3ZTPXF2D9FWnDXDhI5CyXnckxokzP5azcSRDBA==}
+    cpu: [x64]
+    os: [linux]
+
+  '@varlock/native-helper-win32-x64@1.24.0':
+    resolution: {integrity: sha512-qudkH54KfX8dBmsQyAlC8BYlPwrxF0Drg6q4MHHVC7l7taTClYNqf6M6xRdIoNynyPDKTTPNjpOvoHwvRanEpg==}
+    os: [win32, linux]
+
   '@vitejs/plugin-react@6.1.2':
     resolution: {integrity: sha512-fhJNGUdscQa4HkI0xFxwonWyhnVReCPDbXI7FH7jmzpnVCrFQI7PRrhWecO263610vOrs9tr2Y4xcf8uAdFxbw==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -2590,6 +2626,10 @@ packages:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
+  nx-mcp@0.25.3:
+    resolution: {integrity: sha512-dMofFlK2VgSc2ME1NqcrkxRRCoqUWnX3BZWEO3W9BgRWP/HJuVuFjjLP3G3bsaAJBptpviaovZSn4V/NNu3X0A==}
+    hasBin: true
+
   nx@23.3.0:
     resolution: {integrity: sha512-R7Kl+hURSGiG9uEjc19Cg3o+vGCDHqCVp6mioiBMEsOSol/LgzP+K8TVF06TnnSC8uzxMeB0ymu+LGMJGXnbbw==}
     hasBin: true
@@ -2727,13 +2767,30 @@ packages:
       react: ^19.0.0
       react-dom: ^19.0.0
 
+  react-dice-complete@2.3.2:
+    resolution: {integrity: sha512-SO5mo+WSHd3K1wQYiTzIBa5sw5TDiGC5MbMjPo9C4RtZqUmS7VcqQVKvRryBbBH33dQFvmLVxeJwR0LQF36v9A==}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+
   react-dom@19.3.1:
     resolution: {integrity: sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==}
     peerDependencies:
       react: ^19.3.1
 
+  react-hotkeys-hook@5.3.3:
+    resolution: {integrity: sha512-aswgyWUnE25hmhzHTfKDmKzsaSE5DJ4LKaU/o6rQSXkDd/1Bh9TfAFQbHkf6fLy11HvlYkp+cDDarGdhmCDhoQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   react-is@17.0.2:
     resolution: {integrity: sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==}
+
+  react-simple-keyboard@3.8.295:
+    resolution: {integrity: sha512-YEU4k08oPO+nmv4HC3FD+GNjmo53zRQqPDnyA/4NOZ75gwmqtNwyXJXWgbLOIf75kc+9yaoYZhP8TGFtsD5New==}
+    peerDependencies:
+      react: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react@19.3.1:
     resolution: {integrity: sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==}
@@ -3014,6 +3071,11 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  varlock@1.24.0:
+    resolution: {integrity: sha512-BSns65LcQUfW8jzx/4wKfL7CYlfEzK8YwhGBS5OOzzmAyK/zooNCERvDhnjVOcFqWDcZVBSxB3tmo1FWeHRqMA==}
+    engines: {bun: '>=1.3.3', node: '>=22.3.0'}
+    hasBin: true
 
   verkit@0.5.0:
     resolution: {integrity: sha512-u4J1hr6Y+C/hit34GwL3eIcUf3wngT8TlYUjK7tk0jxydKLAq3sYvifjdTDA6U3KCKRcQCQDGf/srjxfZF3l7g==}
@@ -4282,6 +4344,18 @@ snapshots:
   '@typescript/typescript-win32-x64@7.0.2':
     optional: true
 
+  '@varlock/native-helper-darwin@1.24.0':
+    optional: true
+
+  '@varlock/native-helper-linux-arm64@1.24.0':
+    optional: true
+
+  '@varlock/native-helper-linux-x64@1.24.0':
+    optional: true
+
+  '@varlock/native-helper-win32-x64@1.24.0':
+    optional: true
+
   '@vitejs/plugin-react@6.1.2(vite@8.3.5(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
@@ -4991,6 +5065,8 @@ snapshots:
     dependencies:
       path-key: 3.1.1
 
+  nx-mcp@0.25.3: {}
+
   nx@23.3.0:
     dependencies:
       '@clack/core': 1.4.3
@@ -5241,12 +5317,26 @@ snapshots:
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
 
+  react-dice-complete@2.3.2(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+
   react-dom@19.3.1(react@19.3.1):
     dependencies:
       react: 19.3.1
       scheduler: 0.28.0
 
+  react-hotkeys-hook@5.3.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
+
   react-is@17.0.2: {}
+
+  react-simple-keyboard@3.8.295(react-dom@19.3.1(react@19.3.1))(react@19.3.1):
+    dependencies:
+      react: 19.3.1
+      react-dom: 19.3.1(react@19.3.1)
 
   react@19.3.1: {}
 
@@ -5542,6 +5632,13 @@ snapshots:
       react: 19.3.1
 
   util-deprecate@1.0.2: {}
+
+  varlock@1.24.0:
+    optionalDependencies:
+      '@varlock/native-helper-darwin': 1.24.0
+      '@varlock/native-helper-linux-arm64': 1.24.0
+      '@varlock/native-helper-linux-x64': 1.24.0
+      '@varlock/native-helper-win32-x64': 1.24.0
 
   verkit@0.5.0: {}
 

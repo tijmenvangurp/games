@@ -27,7 +27,7 @@ De app is publiek en statisch. De CSP staat geen externe requests toe, en de app
 - De generator en de UI lezen dezelfde catalogus. Een tekstwijziging zonder nieuwe audio faalt in CI.
 - Audio is lazy: het zit niet in de JavaScript-bundel en vertraagt de eerste paginalading niet.
 - De repository groeit met de audio. De huidige Nederlandse set is ongeveer 2,5 MB voor 222 fragmenten. Audio cachet één dag; bij een nieuwe stem is een oude clip daardoor maximaal één dag zichtbaar.
-- De eerste generatie vraagt de private TTS-helper. Daarna is alles lokaal en statisch.
+- De eerste generatie gebeurt buiten de repo met een TTS-endpoint. Daarna is alles lokaal en statisch.
 - Uitspraakoverrides en de luistertest op echte toestellen blijven menselijk werk.
 - De CSP en de regel “geen externe requests” blijven ongewijzigd.
 - De Franse en Letterpret-audiospeler kunnen later op dezelfde gedeelde speler worden aangesloten; dat is een migratie, geen nieuwe architectuur.

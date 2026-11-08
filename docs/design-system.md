@@ -20,18 +20,18 @@ door een regenboog aan decoratie te navigeren. Kleur en beweging hebben een func
 
 De waarden staan in `apps/games/src/app/styles/index.css`.
 
-| Token                            | Gebruik                             |
-| -------------------------------- | ----------------------------------- |
-| `--background`                   | Ivoor papier achter alles           |
-| `--foreground`                   | Inkt voor tekst                     |
-| `--card`                         | Panelen en kaarten                  |
-| `--muted` / `--muted-foreground` | Rustige vlakken en secundaire tekst |
-| `--border`                       | Hairline-randen                     |
-| `--primary`                      | Actie, selectie, actieve staat      |
-| `--player-one` / `--player-two`  | Spelerskleuren: indigo en rood      |
-| `--success`                      | Goed, gevonden, opgelost            |
-| `--warning`                      | Hint, aandacht, bijna               |
-| `--danger`                       | Fout, conflict, verloren            |
+| Token                            | Gebruik                                     |
+| -------------------------------- | ------------------------------------------- |
+| `--background`                   | Ivoor papier achter alles                   |
+| `--foreground`                   | Inkt voor tekst                             |
+| `--card`                         | Panelen en kaarten                          |
+| `--muted` / `--muted-foreground` | Rustige vlakken en secundaire tekst         |
+| `--border`                       | Hairline-randen                             |
+| `--primary`                      | Actie, selectie, actieve staat              |
+| `--player-one` … `--player-four` | Spelerskleuren: indigo, rood, teal en paars |
+| `--success`                      | Goed, gevonden, opgelost                    |
+| `--warning`                      | Hint, aandacht, bijna                       |
+| `--danger`                       | Fout, conflict, verloren                    |
 
 Typografie: één systeem-sans voor tekst en een systeem-serif voor schermkoppen en
 spelnamen. Geen externe fonts.

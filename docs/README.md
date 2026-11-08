@@ -1,8 +1,23 @@
 # Documentatie
 
-- `../README.md` — wat de app is, scripts, deployment en privacyregels.
-- `tooling.md` — Nx-daemon, cache, Fallow en de bijbehorende permission-regels.
-- `design-system.md` — de visuele basis, gedeelde componenten en de afspraken voor spraak.
+Begin bij `../README.md` voor wat de app is, de scripts en deployment. Deze map
+bevat de afspraken, beslissingen en het onderzoek.
+
+## Samenwerken en tooling
+
+- `../CONTRIBUTING.md` — setup, branch/PR-flow, commit-scopes en definition of done.
+- `../AGENTS.md` — de harde regels en werkwijze voor mens en agent.
+- `../GLOSSARY.md` — de domeintaal van Spellen.
+- `tooling.md` — Nx-daemon, cache, Fallow, TTS, Varlock en de bijbehorende permission-regels.
+- `design-system.md` — de visuele basis, gedeelde componenten en spraak.
+- `agents/issue-tracker.md` — GitHub Issues via `gh`.
+- `agents/triage-labels.md` — de labels voor de triage-skills.
+- `agents/domain.md` — hoe de skills `GLOSSARY.md` en de ADR's lezen.
+
+## Beslissingen
+
+- `adr/README.md` — de volledige, genummerde ADR-index (0001–0030).
+- `adr/template.md` — het template voor een nieuwe ADR.
 - `adr/0001-publieke-statische-spellen-app.md` — waarom een aparte publieke, statische repository.
 - `adr/0002-kwaliteitsgate.md` — dezelfde kwaliteitscontroles als `homelab-control`, inclusief de afwijking rond pnpm `minimumReleaseAge`.
 - `adr/0003-originele-spelassets.md` — waarom de games originele personages gebruiken en geen beschermde of externe assets.
@@ -19,29 +34,51 @@
 - `adr/0014-schaaktutorial-een-opdracht-per-scherm.md` — minder tekst, een coachbubbel en een visuele hint in de schaaktutorial.
 - `adr/0015-schaakpuzzels-uitbreiding.md` — 90 extra Lichess-puzzels, mat-in-twee, tactieken en meer stukvariatie.
 - `adr/0016-schaakpuzzeloverzicht.md` — het puzzeloverzicht en lokaal bewaarde opgeloste puzzels.
+- `adr/0017-letterklanken-en-audio.md` — de klank-letterkoppeling, de Nathalie-stem en de prototype-woordaudio.
+- `adr/0018-vlaggenspel.md` — lokale vlaggen, landennamen, continenten en de licentieketen.
+- `adr/0019-wereldkaart.md` — de wereldkaart met d3-geo en Natural Earth.
+- `adr/0020-kaartpuzzel.md` — de kaartpuzzel als tweede speelwijze van Vlaggenreis.
+- `adr/0021-provinciegeometrie.md` — de provinciegeometrie uit Natural Earth.
+- `adr/0022-schaakbord-tikken-is-kijken.md` — tikken is kijken, slepen is zetten.
 - `adr/0023-voorlezen-met-tts.md` — de gedeelde spraakspeler, Nathalie-audio, catalogusontdekking en de coverage-poort voor nieuwe games.
 - `adr/0024-schaakpartij-en-lokale-stockfish.md` — de schaakhub, pass-and-play, de lokale Stockfish-wasm, de CSP-uitbreiding en lokale opslag.
-- `adr/0025-vier-op-een-rij.md` — Vier op een Rij: twee bordgroottes, pure regels, een eerlijke starter, de kleuren van de spelers en de computer als tegenstander.
+- `adr/0025-vier-op-een-rij.md` — twee bordgroottes, pure regels, een eerlijke starter, de kleuren van de spelers en de computer als tegenstander.
 - `adr/0026-adaptief-niveaumodel.md` — adaptieve niveaus per spel, de 70–85%-regel, hinttrap, herhaalqueue en foutvriendelijke feedback.
 - `adr/0027-schaakcoordinaten-buiten-het-bord.md` — de coördinaten buiten het bord, meedraaiend met de bordstand en een compactere paginakop tijdens een partij.
-- `research/2026-10-17-game-stack-dependencies.md` — onderzoek naar drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
+- `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
+- `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
+- `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
+
+## Onderzoek
+
+- `research/2026-10-17-game-stack-dependencies.md` — drag-and-drop, animatie en geluid binnen de statische/CSP-regels.
 - `research/2026-10-17-arrows-puzzle-escape.md` — mechanica, levelvorm en implementatiemodel voor de echte _Arrows – Puzzle Escape_-lijnenmaze.
+- `research/2026-10-18-opensource-webgames.md` — open-source webgames als inspiratie voor wereldoriëntatie en nieuwe spellen.
 - `research/2026-10-18-woordzoeker-libraries.md` — vergelijking van woordzoeker-bibliotheken en de keuze voor `@aydee-app/word-search`.
 - `research/2026-10-18-frans-luisterspel.md` — bestaande content, TTS-stemmen en spelconcept voor een Frans luisterspel met flipcards en sorteren.
 - `research/2026-10-18-letters-leren-basisschool.md` — methodiek voor letters leren in groep 1–3, de lettervolgordes van VLL en Lijn 3, en ontwerpimplicaties voor een letter-spel.
 - `research/2026-10-18-letterdidactiek-en-spelletjes.md` — didactische principes, klassenspelletjes, digitale letter-apps en concrete spelmodi voor een letter-spel.
-- `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
 - `research/2026-10-18-auth-backend-betterauth.md` — onderzoek naar Better Auth, een Workers/D1-backend en gefaseerde sync van voortgang binnen de statische/CSP-regels.
 - `research/2026-10-19-mengelmoes-assets.md` — spritebronnen, dnd-kit en visuele richting voor een Little Alchemy-achtig combinatiespel.
 - `research/2026-10-19-voorlezen-met-tts.md` — onderzoek naar vooraf gegenereerde Nederlandse TTS met de bestaande Nathalie-stem, leesafhankelijkheid per game en ontwerpprincipes voor audiofeedback.
 - `research/2026-10-20-boardgame-io.md` — of boardgame.io Vier op een Rij en latere bordspellen simpeler maakt: React 19-test, bundelmeting en herzieningsmomenten.
+- `research/2026-10-21-mengelmoes-audio-en-sfeer.md` — audio, sfeer en feedback voor Mengelmoes.
+- `research/2026-11-05-ganzenbord-libraries.md` — bibliotheken en bronnen voor Ganzenbord: dobbelsteen-componenten, spellogica, bordopbouw, iconen, historische borden en de regelvarianten.
+- `research/2026-11-07-typepret-libraries.md` — welke library Typepret kan gebruiken: react-simple-keyboard voor het toetsenbord, en waarom er voor de typelogica geen bruikbare library is.
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.
 - `research/verrijkingsmaterialen/slo-leermiddelenlijst-hoogbegaafden-2011.pdf` — de bron-PDF van de SLO-lijst.
 - `research/actuele-bronnen/README.md` — zelfstandige ontsluiting van zes bronnen over verrijkingsmaterialen: SLO, Project Talent, De Verrijking, KlasCement, Briljant en HBwebshop.
+
+## Plannen en ideeën
+
+- `plans/2026-10-18-franse-lessen.md` — plan om de Franse lessen schaalbaar te maken met een curriculum, validator, dynamische route en audio-check.
 - `plans/2026-10-19-voorlezen-in-alle-games.md` — plan voor een gedeelde spraakspeler, een catalogus met teksthashes en gefaseerde audio in de Nederlandse games.
 - `ideas/sudoku-speelser.md` — backlog met kindvriendelijke sudoku-ideeën en de gekozen eerste stap.
 - `ideas/letter-spelletjes.md` — spelconcepten voor een letter-spel: de Letterronde, zes engines en een gefaseerde roadmap.
 - `ideas/spelideeen.md` — verzamelde educatieve spelideeën, prioriteiten en aandachtspunten.
+- `prototype/README.md` — het klankprototype en de bijbehorende tar.
 
-Nieuwe architectuur-, privacy-, routing- of deploymentbeslissingen krijgen een eigen ADR in `adr/`.
+Nieuwe architectuur-, privacy-, routing- of deploymentbeslissingen krijgen een
+eigen ADR in `adr/`. Werk bij het toevoegen zowel `adr/README.md` als deze
+index bij.

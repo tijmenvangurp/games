@@ -12,11 +12,13 @@ export { SpeechButton } from "./speech-button";
 export { SpeechToggle } from "./speech-toggle";
 export { SpokenText } from "./spoken-text";
 export {
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
   BookOpen,
   Check,
+  Copy,
   Ear,
   Eraser,
   Eye,
@@ -30,6 +32,7 @@ export {
   Plus,
   Puzzle,
   RotateCcw,
+  Save,
   Search,
   Sparkles,
   Star,

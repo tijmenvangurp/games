@@ -2,6 +2,12 @@
 
 Publieke, statische spelletjes-app voor kinderen. De app is een Nx-monorepo met een Vite/React-frontend en Feature-Sliced Design.
 
+## Status
+
+[![Quality + e2e](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/tijmenvangurp/games/actions/workflows/quality.yml)
+
+Productie: [games.tijmenvangurp.nl](https://games.tijmenvangurp.nl/)
+
 ## Structuur
 
 ```text
@@ -19,8 +25,12 @@ Elke slice is een eigen Nx-project met een `project.json`, `tsconfig.json` en ee
 
 ## Commando's
 
+`harness:install` vereist de [APM CLI](https://microsoft.github.io/apm/getting-started/installation/); op Debian 12 werkt `uv tool install apm-cli==0.35.0`.
+
 ```sh
 corepack pnpm install
+corepack pnpm harness:install  # skills + MCP's voor Claude/Codex
+corepack pnpm env:check        # valideer .env.schema
 corepack pnpm dev              # nx run games:serve
 corepack pnpm build            # output: apps/games/dist
 corepack pnpm test:run         # Vitest zonder coverage
@@ -36,6 +46,13 @@ corepack pnpm affected         # gerichte checks voor de huidige branch
 
 Nx gebruikt alleen een lokale cache (`.nx/`). Er is geen Nx Cloud en de app doet geen externe requests.
 
+## Bijdragen
+
+- [CONTRIBUTING.md](CONTRIBUTING.md) — setup, branch/PR-flow en definition of done.
+- [AGENTS.md](AGENTS.md) — de harde regels en werkwijze.
+- [GLOSSARY.md](GLOSSARY.md) — de domeintaal.
+- [docs/README.md](docs/README.md) — de documentatie-index.
+
 ## Pokémon-assets
 
 De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Generatie 1. Artwork en animated sprites staan lokaal in `apps/games/public/pokemon/`, zodat de app geen runtime-API of CDN nodig heeft. De geluiden komen uit de gesynthetiseerde `playSound`-set van de app. Herkomst, bronlinks en de auteursrechtelijke afweging staan in [ADR 0005](docs/adr/0005-pokemon-assets.md).
@@ -46,7 +63,7 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 ## Audio
 
-Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md).
+Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md). Zo draai je de TTS-server lokaal: [docs/tooling.md](docs/tooling.md#tts-lokaal-draaien).
 
 ## Deployment
 
@@ -54,16 +71,17 @@ De app draait als Cloudflare Worker met static assets (`wrangler.jsonc`, workern
 
 Eenmalig in Cloudflare instellen via **Workers & Pages → `games` → Settings → Build**:
 
-| Instelling                    | Waarde                |
-| ----------------------------- | --------------------- |
-| Git-repository                | `tijmenvangurp/games` |
-| Productiebranch               | `main`                |
-| Root directory                | `/`                   |
-| Build command                 | `pnpm run build`      |
-| Deploy command                | `npx wrangler deploy` |
-| Buildvariabele `NODE_VERSION` | `24`                  |
-| Buildvariabele `PNPM_VERSION` | `12.9.1`              |
+| Instelling                    | Waarde                   |
+| ----------------------------- | ------------------------ |
+| Git-repository                | `tijmenvangurp/games`    |
+| Productiebranch               | `main`                   |
+| Root directory                | `/`                      |
+| Build command                 | `pnpm run build`         |
+| Deploy command                | `npx wrangler deploy`    |
+| Buildvariabele `NODE_VERSION` | `24`                     |
+| Buildvariabele `PNPM_VERSION` | `12.16.1`                |
+| Custom domain                 | `games.tijmenvangurp.nl` |
 
-De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.workers.dev/>.
+De workernaam in het dashboard moet exact `games` zijn, anders weigert de build. Na een geslaagde build staat de nieuwste versie op <https://games.tijmenvangurp.nl/>. De `workers.dev`-URL blijft als technische fallback beschikbaar.
 
 GitHub Actions draait de Quality-gate; de deploy-workflow is verwijderd zodat er één deploypad is. `pnpm deploy` blijft beschikbaar voor een handmatige deploy vanaf een machine met Cloudflare-toegang.

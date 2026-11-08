@@ -1,6 +1,6 @@
 # Tooling: Nx-daemon, cache en Fallow
 
-Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons.
+Deze repository gebruikt Nx als lokale taakrunner. Er is geen Nx Cloud. Onderstaande afspraken voorkomen onnodige prompts, cacheverwarring en vastlopende daemons. Zie de sectie **Agent-harness** in `CONTRIBUTING.md` voor de skills en MCP's die hierbij horen.
 
 ## Geen `NX_DAEMON=false` als commandoprefix
 
@@ -83,22 +83,87 @@ en daarna `<prefix>:<name>` in de lijst zetten. Monochrome sets (zoals Phosphor)
 
 Een icoon dat echt niet bestaat, mag handmatig in dezelfde platte stijl in `apps/games/public/elements/` staan. Zet het element dan op `{ custom: true }`; de generator laat het bestand met rust en controleert alleen of het bestaat.
 
+## Ganzenbordprenten
+
+De popup bij een gebeurtenis toont de prent van dat vak uit `apps/games/public/ganzenbord/board.webp`. De uitsneden staan in `apps/games/public/ganzenbord/events/` en worden met `sharp` gemaakt:
+
+```sh
+corepack pnpm run ganzenbord:art        # snijd de prenten opnieuw
+corepack pnpm run ganzenbord:art:check  # controleer zonder te schrijven (zit in quality)
+```
+
+De kaders en draaiingen staan in `scripts/build-ganzenbord-event-art.ts`, in procenten van het bord. Prenten boven de evenaar staan ondersteboven en draaien 180°; de brug draait 90°. Het script bewaart een manifest met de hash van het bord, zodat een gewijzigd bord of een handmatig aangepaste prent de quality-check laat falen.
+
 ## Playwright
 
-De Playwright-browser heeft in deze omgeving extra libraries en fonts nodig. Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en `FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Gebruik bij voorkeur het bestaande script:
+Op sommige machines heeft de Playwright-browser extra libraries en fonts nodig.
+Daarvoor staan de prefixen `LD_LIBRARY_PATH=* corepack *` en
+`FONTCONFIG_PATH=* corepack *` expliciet toegestaan in `opencode.jsonc`. Op een
+normale machine zijn die niet nodig; `scripts/run-playwright.ts` zet ze alleen
+als de mappen bestaan. Gebruik bij voorkeur het bestaande script:
 
 ```sh
 corepack pnpm run e2e
 ```
 
-## Klankprototype voor TTS
+## TTS lokaal draaien
 
-`scripts/generate-sounds.ts` genereert tijdelijke MP3's voor losse klanken in `prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de variant en stem, en zet pas daarna de gekozen bestanden in `apps/games/public/audio/letters/v2/sounds/`.
-
-Gebruik de private TTS-helper uit de skill `generate-game-audio`; die vult de endpoint en sleutel in. Zet die waarden nooit in de repo.
+De audiogeneratoren praten met een OpenAI-compatibele TTS-server. De repo
+gebruikt [Speaches](https://github.com/speaches-ai/speaches) met Piper-stemmen.
+Je kunt die lokaal draaien met Docker:
 
 ```sh
-<private-helper> -- --generator=scripts/generate-sounds.ts \
+docker run --rm --detach --publish 8000:8000 --name speaches \
+  --volume hf-hub-cache:/home/ubuntu/.cache/huggingface/hub \
+  ghcr.io/speaches-ai/speaches:latest-cpu
+```
+
+Download de stemmen eenmalig. `uvx` komt met [uv](https://docs.astral.sh/uv/);
+installeer dat eenmalig als je het nog niet hebt.
+
+```sh
+export SPEACHES_BASE_URL=http://localhost:8000
+uvx speaches-cli model download speaches-ai/piper-nl_BE-nathalie-medium
+uvx speaches-cli model download speaches-ai/piper-fr_FR-tom-medium
+```
+
+Zet daarna de omgeving voor de generatoren:
+
+```sh
+export TTS_BASE_URL=http://localhost:8000/v1
+# Nederlands (standaard):
+export TTS_MODEL=speaches-ai/piper-nl_BE-nathalie-medium
+export TTS_VOICE=nathalie
+# Frans gebruikt zijn eigen defaults; laat TTS_MODEL/TTS_VOICE dan weg.
+```
+
+`TTS_API_KEY` is optioneel; Speaches heeft lokaal geen key nodig. Zet waarden
+nooit in de repo, een screenshot of een prompt.
+
+Genereer en controleer:
+
+```sh
+corepack pnpm run audio:nl
+corepack pnpm run audio:french
+corepack pnpm run audio:check
+```
+
+`audio:check` controleert de catalogus, het lockbestand en de bestaande
+MP3-bestanden zonder TTS-server. De app gebruikt tijdens het spelen alleen de
+gecommitte bestanden; TTS is dev-tooling.
+
+Stop de server met `docker stop speaches`. Gebruik `latest-cuda` in plaats van
+`latest-cpu` als je een geschikte GPU hebt.
+
+## Klankprototype voor TTS
+
+`scripts/generate-sounds.ts` genereert tijdelijke audio voor losse klanken in
+`prototype/sounds/` (gitignored). De audio is een prototype: kies eerst de
+variant en stem, en zet pas daarna de gekozen bestanden in
+`apps/games/public/audio/letters/v2/sounds/`.
+
+```sh
+corepack pnpm exec tsx scripts/generate-sounds.ts \
   --only=i,k,m,s,p,v,e,n,t,a \
   --variant=letter,fonetisch,woord \
   --label=nathalie
@@ -112,14 +177,24 @@ corepack pnpm exec tsx scripts/generate-sounds.ts --serve-only
 
 Open daarna `http://localhost:4174/`. De pagina toont per klank alle varianten en stemmen.
 
-De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De 15 woordopnames staan in `apps/games/public/audio/letters/v2/words/` en zijn met dezelfde stem gegenereerd:
-
-```sh
-<private-helper> -- --generator=scripts/generate-sounds.ts --words \
-  --model=speaches-ai/piper-nl_BE-nathalie-medium --voice=nathalie
-```
+De definitieve set staat in `apps/games/public/audio/letters/v2/sounds/`; de keuzes en het manifest staan in `manifest.json` in dezelfde map. De 15 woordopnames staan in `apps/games/public/audio/letters/v2/words/`.
 
 De prototypepagina wordt niet gedeployed.
+
+## Env-variabelen (Varlock)
+
+`.env.schema` staat in de repo en beschrijft de optionele variabelen zonder
+waarden. `.env.local` is gitignored en bevat je eigen waarden. Zo houd je
+secrets uit de repo en krijgt een agent alleen de schema-context.
+
+```sh
+corepack pnpm run env:check              # valideert het schema
+varlock run -- corepack pnpm run audio:nl # draait met jouw lokale waarden
+```
+
+De MCP's voor Firecrawl en Context7 gebruiken OAuth; hun API-keys zijn alleen
+nodig als je bewust voor API-key-authenticatie kiest. TTS gebruikt
+`TTS_BASE_URL` en optioneel `TTS_API_KEY`; zie **TTS lokaal draaien**.
 
 ## Kort
 
