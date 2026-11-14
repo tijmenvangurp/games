@@ -9,6 +9,7 @@ import {
 import { AlchemyPage } from "@pages/alchemy";
 import { ArrowsPage } from "@pages/arrow";
 import { ChessGamePage, ChessPage, ChessTutorialPage } from "@pages/chess";
+import { DraaiwerkPage } from "@pages/draaiwerk";
 import { FlagsPage } from "@pages/flags";
 import { FourInARowPage } from "@pages/four-in-a-row";
 import { GanzenbordPage } from "@pages/ganzenbord";
@@ -56,6 +57,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/ganzenbord", GanzenbordPage),
     gameRoute("/ganzenbord/bord", BoardEditorPage),
     gameRoute("/mengelmoes", AlchemyPage),
+    gameRoute("/draaiwerk", DraaiwerkPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),

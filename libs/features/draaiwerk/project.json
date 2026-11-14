@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-draaiwerk",
+  "projectType": "library",
+  "sourceRoot": "libs/features/draaiwerk",
+  "tags": ["layer:features", "scope:draaiwerk", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/draaiwerk"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-gear", "shared-lib", "shared-ui"]
+}

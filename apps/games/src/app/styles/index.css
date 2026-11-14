@@ -577,3 +577,145 @@
     font-size: 1.4rem;
   }
 }
+
+@layer games {
+  /*
+   * Draaiwerk: rustige pegboard-kaart. De rotor draait om zijn eigen midden;
+   * de buitenste groep houdt de tandstand vast, zodat de tanden blijven passen.
+   */
+  .draaiwerk-rotor {
+    animation: draaiwerk-spin 6s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .draaiwerk-rotor[data-direction="-1"] {
+    animation-direction: reverse;
+  }
+
+  .draaiwerk-rotor[data-spin="off"] {
+    animation: none;
+  }
+
+  .draaiwerk-gear {
+    pointer-events: none;
+  }
+
+  .draaiwerk-gear-hit {
+    cursor: pointer;
+  }
+
+  .draaiwerk-gear-hit:focus-visible {
+    outline: none;
+    stroke: var(--primary);
+    stroke-width: 2;
+  }
+
+  .draaiwerk-gear-shadow {
+    filter: drop-shadow(0 1.5px 1px rgb(43 37 28 / 0.16));
+  }
+
+  .draaiwerk-direction {
+    display: none;
+  }
+
+  .draaiwerk-hole {
+    cursor: pointer;
+  }
+
+  .draaiwerk-hole:focus,
+  .draaiwerk-gear-hit:focus {
+    outline: none;
+  }
+
+  .draaiwerk-hole:focus-visible {
+    outline: none;
+  }
+
+  .draaiwerk-hole:focus-visible .draaiwerk-focus-ring {
+    opacity: 1;
+  }
+
+  .draaiwerk-focus-ring {
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .draaiwerk-hint {
+    animation: draaiwerk-pulse 1600ms ease-in-out infinite;
+  }
+
+  .draaiwerk-belt-dash {
+    animation: draaiwerk-dash 1800ms linear infinite;
+  }
+
+  .draaiwerk-lamp-glow {
+    animation: draaiwerk-glow 2200ms ease-in-out infinite;
+  }
+
+  .draaiwerk-lift-platform {
+    transition: transform 500ms ease;
+  }
+
+  @keyframes draaiwerk-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes draaiwerk-dash {
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+
+  @keyframes draaiwerk-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes draaiwerk-glow {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: reduce) {
+    .draaiwerk-rotor {
+      animation: none;
+    }
+
+    .draaiwerk-belt-dash {
+      animation: none;
+    }
+
+    .draaiwerk-hint {
+      animation: none;
+      opacity: 1;
+    }
+
+    .draaiwerk-lamp-glow {
+      animation: none;
+      opacity: 1;
+    }
+
+    .draaiwerk-lift-platform {
+      transition: none;
+    }
+
+    .draaiwerk-direction {
+      display: inline;
+    }
+  }
+}

@@ -1,0 +1,82 @@
+import { Check } from "@shared/ui";
+import { cn } from "@shared/lib";
+import { trayLabel } from "@entities/gear";
+import { trayShortLabel } from "../model/labels";
+import { useDraaiwerkStore } from "../model/use-draaiwerk-store";
+import { TrayArt } from "./gear-art";
+
+export function DraaiwerkTray() {
+  const level = useDraaiwerkStore((state) => state.level);
+  const usedTrayIds = useDraaiwerkStore((state) => state.usedTrayIds);
+  const selectedTrayId = useDraaiwerkStore((state) => state.selectedTrayId);
+  const status = useDraaiwerkStore((state) => state.status);
+  const solving = status === "solved";
+
+  return (
+    <section
+      aria-label="Onderdelen"
+      className="game-panel flex min-h-0 min-w-0 flex-col p-2.5 sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
+    >
+      <div className="mb-2 flex shrink-0 items-baseline justify-between gap-2">
+        <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          Onderdelen
+        </h2>
+        <p className="text-[10px] font-bold text-muted-foreground">
+          {level.tray.length - usedTrayIds.length} over
+        </p>
+      </div>
+
+      <div
+        className={cn(
+          "game-scrollbar flex min-h-0 min-w-0 gap-2 overflow-x-auto pb-1 md:portrait:overflow-y-hidden md:landscape:flex-1 md:landscape:grid md:landscape:overflow-x-hidden md:landscape:overflow-y-auto md:landscape:pr-1",
+          level.tray.length <= 2
+            ? "md:landscape:grid-cols-1 md:landscape:content-center"
+            : "md:landscape:grid-cols-2 md:landscape:content-start",
+        )}
+      >
+        {level.tray.length === 0 ? (
+          <p className="py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
+        ) : null}
+
+        {level.tray.map((item) => {
+          const used = usedTrayIds.includes(item.id);
+          const selected = selectedTrayId === item.id;
+          const label = trayLabel(item);
+
+          return (
+            <button
+              key={item.id}
+              aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
+              aria-pressed={selected}
+              className={cn(
+                "relative flex min-h-16 min-w-28 shrink-0 flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] md:landscape:min-w-0 md:landscape:shrink",
+                used
+                  ? "border-dashed border-border bg-muted/30 opacity-50"
+                  : "border-border bg-card hover:bg-muted/40",
+                selected && "border-primary bg-primary/5 ring-2 ring-primary/25",
+              )}
+              data-selected={selected ? "true" : "false"}
+              data-tray-id={item.id}
+              data-used={used ? "true" : "false"}
+              disabled={used || solving}
+              type="button"
+              onClick={() => useDraaiwerkStore.getState().selectTray(item.id)}
+            >
+              <span className="grid flex-1 place-items-center rounded-lg bg-muted/50 py-1">
+                <TrayArt item={item} />
+              </span>
+              <span className="mt-1 block px-0.5 text-[10px] font-bold leading-tight">
+                {trayShortLabel(item)}
+              </span>
+              {used ? (
+                <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-success text-white">
+                  <Check aria-hidden="true" className="size-2.5" />
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

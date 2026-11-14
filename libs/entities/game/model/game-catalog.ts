@@ -24,6 +24,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/schaken"
           | "/woordzoeker"
           | "/mengelmoes"
+          | "/draaiwerk"
           | "/frans"
           | "/letters"
           | "/vlaggen"
@@ -91,6 +92,15 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     to: "/mengelmoes",
     thumbnail: "/thumbnails/alchemy-0cda3400.jpg",
     speech: { kind: "visual", reason: "Sleep- en combinatiespel; de elementen zijn visueel." },
+  },
+  {
+    id: "draaiwerk",
+    name: "Draaiwerk",
+    description: "Verbind tandwielen, riemen en kettingen. Laat de lamp branden en de lift omhoog.",
+    status: "available",
+    to: "/draaiwerk",
+    thumbnail: "/thumbnails/draaiwerk-a86e4c8b.jpg",
+    speech: { kind: "visual", reason: "Het bord, de tandwielen en de beweging zijn visueel." },
   },
   {
     id: "memory",
