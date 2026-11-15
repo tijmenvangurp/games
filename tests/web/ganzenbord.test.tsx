@@ -196,7 +196,7 @@ describe("ganzenbord", () => {
     const stored = loadGanzenbordState().settings;
     expect(stored.names.one).toEqual({ human: "Saar", computer: "" });
     expect(stored.names.two).toEqual({ human: "", computer: "" });
-    expect(stored.colors.one).toBe("indigo");
+    expect(stored.colors.one).toBe("blue");
   });
 
   it("bewaart de instellingen", async () => {

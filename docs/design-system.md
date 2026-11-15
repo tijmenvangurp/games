@@ -28,7 +28,7 @@ De waarden staan in `apps/games/src/app/styles/index.css`.
 | `--muted` / `--muted-foreground` | Rustige vlakken en secundaire tekst                            |
 | `--border`                       | Hairline-randen                                                |
 | `--primary`                      | Actie, selectie, actieve staat                                 |
-| `--pawn-indigo` … `--pawn-brown` | Pionkleuren: blauw, rood, turquoise, paars, roze en bruin      |
+| `--pawn-red` … `--pawn-pink`     | Pionkleuren: rood, oranje, groen, blauw, paars en roze         |
 | `--player-one` / `--player-two`  | Vaste kleuren voor Vier op een Rij; aliassen van blauw en rood |
 | `--success`                      | Goed, gevonden, opgelost                                       |
 | `--warning`                      | Hint, aandacht, bijna                                          |
@@ -40,7 +40,8 @@ spelnamen. Geen externe fonts.
 Spelerskleuren zijn voor speelstukken, niet voor UI-status. Een actieve speler krijgt daarom
 neutrale nadruk (een donkere rand en het `muted`-vlak) in plaats van `--primary`; groen en amber
 blijven feedback. Het feedback-rood (`--danger`) is een eigen, donkerder token dan de spelerskleur,
-zodat een rode schijf nooit als fout leest.
+zodat een rode schijf nooit als fout leest. De pionkleuren zijn bewust vrolijker dan de
+feedbackkleuren; de gans en het nummer op de pion maken de speler herkenbaar, niet de kleur alleen.
 
 ## Componenten
 

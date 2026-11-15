@@ -41,21 +41,21 @@ function nameOf(game: GanzenbordGame, id: PlayerId): string {
 }
 
 const COLOR_CLASSES: Readonly<Record<PlayerColor, string>> = {
-  indigo: "bg-pawn-indigo",
   red: "bg-pawn-red",
-  teal: "bg-pawn-teal",
+  orange: "bg-pawn-orange",
+  green: "bg-pawn-green",
+  blue: "bg-pawn-blue",
   violet: "bg-pawn-violet",
   pink: "bg-pawn-pink",
-  brown: "bg-pawn-brown",
 };
 
 export const PLAYER_COLOR_OPTIONS: readonly { value: PlayerColor; label: string }[] = [
-  { value: "indigo", label: "Blauw" },
   { value: "red", label: "Rood" },
-  { value: "teal", label: "Turquoise" },
+  { value: "orange", label: "Oranje" },
+  { value: "green", label: "Groen" },
+  { value: "blue", label: "Blauw" },
   { value: "violet", label: "Paars" },
   { value: "pink", label: "Roze" },
-  { value: "brown", label: "Bruin" },
 ];
 
 export function playerColorClass(color: PlayerColor): string {

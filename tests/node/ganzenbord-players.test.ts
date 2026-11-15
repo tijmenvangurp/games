@@ -19,7 +19,7 @@ describe("ganzenbord: spelersnaam en kleur", () => {
       { id: "two", controller: "computer" },
     ]);
 
-    expect(game.players[0]).toMatchObject({ color: "indigo", name: undefined });
+    expect(game.players[0]).toMatchObject({ color: "blue", name: undefined });
     expect(game.players[1]).toMatchObject({ color: "red", name: undefined });
     expect(DEFAULT_PLAYER_COLORS.four).toBe("violet");
   });
@@ -27,11 +27,11 @@ describe("ganzenbord: spelersnaam en kleur", () => {
   it("neemt een eigen naam en kleur mee de partij in", () => {
     const game = createGame([
       { id: "one", controller: "human", name: "  Saar  ", color: "pink" },
-      { id: "two", controller: "human", name: "   ", color: "brown" },
+      { id: "two", controller: "human", name: "   ", color: "orange" },
     ]);
 
     expect(game.players[0]).toMatchObject({ name: "Saar", color: "pink" });
-    expect(game.players[1]).toMatchObject({ name: undefined, color: "brown" });
+    expect(game.players[1]).toMatchObject({ name: undefined, color: "orange" });
   });
 
   it("kort een te lange naam in en leegt een naam met alleen spaties", () => {
@@ -74,8 +74,8 @@ describe("ganzenbord: spelersnaam en kleur", () => {
     const swapped = withPlayerColor(DEFAULT_SETTINGS, "one", "violet");
 
     expect(swapped.colors.one).toBe("violet");
-    expect(swapped.colors.four).toBe("indigo");
-    expect(DEFAULT_SETTINGS.colors.one).toBe("indigo");
+    expect(swapped.colors.four).toBe("blue");
+    expect(DEFAULT_SETTINGS.colors.one).toBe("blue");
 
     // Dezelfde kleur nog eens kiezen verandert niets.
     expect(withPlayerColor(swapped, "one", "violet")).toBe(swapped);

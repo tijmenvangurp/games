@@ -5,9 +5,9 @@ export const MAX_PLAYER_NAME_LENGTH = 12;
 
 /** De vaste kleur per spelersplek, zodat een partij zonder keuze altijd klopt. */
 export const DEFAULT_PLAYER_COLORS: Readonly<Record<PlayerId, PlayerColor>> = {
-  one: "indigo",
+  one: "blue",
   two: "red",
-  three: "teal",
+  three: "green",
   four: "violet",
 };
 

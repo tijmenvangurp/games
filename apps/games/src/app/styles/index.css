@@ -34,12 +34,12 @@
   --color-danger: var(--danger);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
-  --color-pawn-indigo: var(--pawn-indigo);
   --color-pawn-red: var(--pawn-red);
-  --color-pawn-teal: var(--pawn-teal);
+  --color-pawn-orange: var(--pawn-orange);
+  --color-pawn-green: var(--pawn-green);
+  --color-pawn-blue: var(--pawn-blue);
   --color-pawn-violet: var(--pawn-violet);
   --color-pawn-pink: var(--pawn-pink);
-  --color-pawn-brown: var(--pawn-brown);
 }
 
 :root {
@@ -56,18 +56,19 @@
   --warning: oklch(0.56 0.13 72);
   --danger: oklch(0.53 0.17 25);
   /*
-   * Rustige pionkleuren voor bordspellen. Ze staan los van de
-   * feedbackkleuren: groen, amber en rood blijven betekenis houden.
-   * De eerste vier zijn de vaste kleuren van de spelersplekken.
+   * Vrolijke pionkleuren voor bordspellen: rood, oranje, groen, blauw, paars
+   * en roze. Ze staan los van de feedbackkleuren; de gans en het nummer op de
+   * pion maken de speler herkenbaar, niet de kleur alleen.
    */
-  --pawn-indigo: #4f5d9e;
-  --pawn-red: oklch(0.58 0.2 30);
-  --pawn-teal: oklch(0.55 0.11 190);
-  --pawn-violet: oklch(0.56 0.13 305);
-  --pawn-pink: oklch(0.62 0.16 350);
-  --pawn-brown: oklch(0.5 0.07 55);
-  --player-one: var(--pawn-indigo);
-  --player-two: var(--pawn-red);
+  --pawn-red: oklch(0.6 0.21 22);
+  --pawn-orange: oklch(0.66 0.17 55);
+  --pawn-green: oklch(0.62 0.16 148);
+  --pawn-blue: oklch(0.58 0.19 255);
+  --pawn-violet: oklch(0.56 0.2 300);
+  --pawn-pink: oklch(0.64 0.2 350);
+  /* De vaste kleuren van Vier op een Rij blijven rustiger van toon. */
+  --player-one: #4f5d9e;
+  --player-two: oklch(0.58 0.2 30);
 }
 
 @layer base {

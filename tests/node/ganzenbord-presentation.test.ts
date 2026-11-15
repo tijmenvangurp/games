@@ -43,7 +43,7 @@ describe("ganzenbord: presentatie", () => {
     expect(playerName({ id: "two", controller: "computer" })).toBe("Computer 2");
     expect(playerShortName({ id: "two", controller: "computer" })).toBe("CPU 2");
     expect(playerColorClass("violet")).toBe("bg-pawn-violet");
-    expect(playerColorClass(DEFAULT_PLAYER_COLORS.three)).toBe("bg-pawn-teal");
+    expect(playerColorClass(DEFAULT_PLAYER_COLORS.three)).toBe("bg-pawn-green");
   });
 
   it("gebruikt een eigen naam als die is ingevuld", () => {

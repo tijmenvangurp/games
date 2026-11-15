@@ -13,9 +13,9 @@ export type Controller = (typeof CONTROLLERS)[number];
 
 /**
  * De beschikbare pionkleuren. Ze staan los van de feedbackkleuren: het zijn
- * rustige, goed onderscheidbare tinten voor de speelstukken.
+ * vrolijke, goed onderscheidbare tinten voor de speelstukken.
  */
-export const PLAYER_COLORS = ["indigo", "red", "teal", "violet", "pink", "brown"] as const;
+export const PLAYER_COLORS = ["red", "orange", "green", "blue", "violet", "pink"] as const;
 
 export type PlayerColor = (typeof PLAYER_COLORS)[number];
 
