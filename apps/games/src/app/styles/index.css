@@ -672,8 +672,26 @@
     animation: draaiwerk-pulse 1600ms ease-in-out infinite;
   }
 
-  .draaiwerk-belt-dash {
-    animation: draaiwerk-dash 1800ms linear infinite;
+  /*
+   * Een riem is twee rechte banden. De groef is een dash van 5 + 11 = 16
+   * board-eenheden; de keyframe reist precies die periodelengte, anders
+   * springt het loopvlak bij elke herhaling.
+   */
+  .draaiwerk-belt,
+  .draaiwerk-chain {
+    pointer-events: none;
+  }
+
+  .draaiwerk-belt-tread {
+    stroke-dasharray: 5 11;
+  }
+
+  .draaiwerk-belt-tread[data-moving="true"] {
+    animation: draaiwerk-tread var(--belt-duration, 1s) linear infinite;
+  }
+
+  .draaiwerk-belt-tread[data-moving="true"][data-direction="reverse"] {
+    animation-direction: reverse;
   }
 
   .draaiwerk-lamp-glow {
@@ -690,9 +708,9 @@
     }
   }
 
-  @keyframes draaiwerk-dash {
+  @keyframes draaiwerk-tread {
     to {
-      stroke-dashoffset: -24;
+      stroke-dashoffset: -16;
     }
   }
 
@@ -729,7 +747,7 @@
       animation: none;
     }
 
-    .draaiwerk-belt-dash {
+    .draaiwerk-belt-tread {
       animation: none;
     }
 

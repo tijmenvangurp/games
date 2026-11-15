@@ -1,8 +1,10 @@
-import type { KeyboardEvent } from "react";
+import { memo, type CSSProperties, type KeyboardEvent } from "react";
+import { useReducedMotion } from "motion/react";
 import {
   gearPath,
   gearRadius,
   holeCenter,
+  type BeltRun,
   type ConnectionPose,
   type GearPose,
   type GearSize,
@@ -364,33 +366,231 @@ export function LiftGlyph({ output, size }: { output: OutputPose; size: GearSize
   );
 }
 
+/** Below this surface speed the band is drawn as if the machine stands still. */
+const MIN_SURFACE_SPEED = 0.5;
+/**
+ * The tread dash is 5 on, 11 off, so the period is 16 board units. The CSS
+ * keyframe must travel exactly that far, otherwise the band visibly jumps.
+ */
+const BELT_TREAD_CYCLE = 16;
+/** Only a degenerate chain without a measured pitch falls back to this. */
+const FALLBACK_CHAIN_PITCH = 12;
+
+function beltSegment(run: BeltRun): string {
+  return `M ${run.from.x} ${run.from.y} L ${run.to.x} ${run.to.y}`;
+}
+
+function beltDuration(speed: number): number {
+  const seconds = BELT_TREAD_CYCLE / Math.max(MIN_SURFACE_SPEED, Math.abs(speed));
+  return Math.round(seconds * 1000) / 1000;
+}
+
+interface BeltRibbonProps {
+  runs: readonly [BeltRun, BeltRun];
+  active: boolean;
+  speed: number;
+  /** The drag ghost is a little lighter and never animates. */
+  preview?: boolean;
+}
+
+/**
+ * A belt is two straight bands, not a closed capsule: each band starts and ends
+ * at the pulley rim and the gear drawn on top hides the join. Three strokes per
+ * band give it a body: a dark rubber edge, the light band and a coarse tread.
+ */
+function BeltRibbon({ runs, active, speed, preview = false }: BeltRibbonProps) {
+  const moving = active && !preview && Math.abs(speed) >= MIN_SURFACE_SPEED;
+  const reversed = speed < 0;
+
+  return (
+    <g
+      className="draaiwerk-belt"
+      data-speed={speed}
+      data-moving={moving ? "true" : "false"}
+      data-preview={preview ? "true" : "false"}
+      data-reverse={reversed ? "true" : "false"}
+      opacity={preview ? 0.72 : active ? 1 : 0.45}
+      style={{ "--belt-duration": `${beltDuration(speed)}s` } as CSSProperties}
+    >
+      {runs.map((run, index) => {
+        const segment = beltSegment(run);
+        // The two runs are one loop. Both runs point from the first pulley to
+        // the second, so for a clockwise first pulley the lower run carries the
+        // belt back: only that band flips its animation direction.
+        const direction = reversed === (index === 0) ? "forward" : "reverse";
+        return (
+          <g data-belt-run={index} key={`belt-run-${index}`}>
+            <path d={segment} fill="none" stroke="#3f4652" strokeLinecap="round" strokeWidth={11} />
+            <path d={segment} fill="none" stroke="#e2dbc9" strokeLinecap="round" strokeWidth={7} />
+            <path
+              className="draaiwerk-belt-tread"
+              d={segment}
+              data-direction={direction}
+              data-moving={moving ? "true" : "false"}
+              fill="none"
+              stroke="#8b8477"
+              strokeLinecap="round"
+              strokeWidth={2.4}
+            />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+function ChainLink({ outer, span }: { outer: boolean; span: number }) {
+  const plateHeight = outer ? 4.8 : 3.2;
+  const roller = Math.max(1.3, span * 0.14);
+  // Leave a visible gap between plates: the plates are shorter than the pitch,
+  // so the chain reads as links instead of one continuous track.
+  const plateWidth = Math.max(5, span * 0.62);
+
+  return (
+    <g>
+      <rect
+        fill={outer ? "#79828e" : "#d5dbe2"}
+        height={plateHeight}
+        rx={plateHeight / 2}
+        stroke={outer ? "#4f5761" : "#8a929c"}
+        strokeWidth={0.9}
+        width={plateWidth}
+        x={-plateWidth / 2}
+        y={-plateHeight / 2}
+      />
+      {outer ? (
+        <rect
+          fill="none"
+          height={plateHeight - 1.8}
+          rx={(plateHeight - 1.8) / 2}
+          stroke="#a7afb9"
+          strokeWidth={0.7}
+          width={plateWidth - 1.8}
+          x={-(plateWidth - 1.8) / 2}
+          y={-(plateHeight - 1.8) / 2}
+        />
+      ) : null}
+      {[-span / 2, span / 2].map((x, rollerIndex) => (
+        <g key={`roller-${rollerIndex}`}>
+          <circle cx={x} cy={0} fill="#3f4652" r={roller} />
+          <circle cx={x} cy={0} fill="#eef1f4" r={roller * 0.4} />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+export function StaticChain({ path, spacing }: { path: string; spacing: number }) {
+  const plate = Math.max(2.5, Math.min(spacing - 2, spacing * 0.62));
+
+  return (
+    <g data-chain-static="true">
+      <path
+        d={path}
+        fill="none"
+        stroke="#79828e"
+        strokeDasharray={`${plate} ${Math.max(1, spacing - plate)}`}
+        strokeLinecap="round"
+        strokeWidth={4.6}
+      />
+      <path
+        d={path}
+        fill="none"
+        stroke="#3f4652"
+        strokeDasharray={`2 ${Math.max(1, spacing - 2)}`}
+        strokeLinecap="round"
+        strokeWidth={2}
+      />
+    </g>
+  );
+}
+
+/**
+ * The links are expensive to reconcile and SMIL runs outside React, so the
+ * chain only re-renders when its own pose changes.
+ */
+const ChainBand = memo(function ChainBand({ connection }: { connection: ConnectionPose }) {
+  const reduced = useReducedMotion() === true;
+  const length = Math.max(0, connection.length);
+  const pitch = Math.max(1, connection.chainPitch ?? FALLBACK_CHAIN_PITCH);
+  const count = Math.max(8, Math.round(length / pitch));
+  const spacing = length / count;
+  const speed = Math.abs(connection.surfaceSpeed);
+  const moving = connection.active && !reduced && length > 0.01 && speed >= MIN_SURFACE_SPEED;
+  const loop = Math.round((length / Math.max(MIN_SURFACE_SPEED, speed)) * 1000) / 1000;
+  const reverse = connection.surfaceSpeed < 0;
+
+  return (
+    <g
+      className="draaiwerk-chain"
+      data-chain-links={count}
+      data-moving={moving ? "true" : "false"}
+      data-speed={connection.surfaceSpeed}
+      opacity={connection.active ? 1 : 0.5}
+    >
+      {moving ? (
+        Array.from({ length: count }, (_, index) => {
+          const offset =
+            Math.round(((index * spacing) / Math.max(MIN_SURFACE_SPEED, speed)) * 1000) / 1000;
+          return (
+            <g data-chain-link={index} key={`chain-link-${index}`}>
+              <animateMotion
+                begin={index === 0 ? undefined : `${-offset}s`}
+                calcMode="linear"
+                dur={`${loop}s`}
+                keyPoints={reverse ? "1;0" : undefined}
+                keyTimes={reverse ? "0;1" : undefined}
+                path={connection.path}
+                repeatCount="indefinite"
+                rotate="auto"
+              />
+              <ChainLink outer={index % 2 === 0} span={spacing} />
+            </g>
+          );
+        })
+      ) : (
+        <StaticChain path={connection.path} spacing={spacing} />
+      )}
+    </g>
+  );
+});
+
 export function ConnectionBand({ connection }: { connection: ConnectionPose }) {
-  const chain = connection.kind === "chain";
   return (
     <g
       data-active={connection.active ? "true" : "false"}
       data-connection-key={connection.key}
       data-kind={connection.kind}
-      opacity={connection.active ? 1 : 0.5}
     >
-      <path
-        d={connection.path}
-        fill="none"
-        stroke={chain ? "#9aa1ab" : "#d6cfbf"}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={chain ? 5 : 7}
-      />
-      <path
-        className={connection.active ? "draaiwerk-belt-dash" : undefined}
-        d={connection.path}
-        fill="none"
-        stroke={chain ? "#5b6470" : "#8a91a1"}
-        strokeDasharray={chain ? "1.5 6" : "5 7"}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={chain ? 2.6 : 1.5}
-      />
+      {connection.kind === "chain" ? (
+        <ChainBand connection={connection} />
+      ) : connection.runs ? (
+        <BeltRibbon
+          active={connection.active}
+          runs={connection.runs}
+          speed={connection.surfaceSpeed}
+        />
+      ) : null}
+    </g>
+  );
+}
+
+/** The drag ghost for a loose belt: the same band, lighter and without motion. */
+export function BeltPreview({
+  runs,
+  active = true,
+}: {
+  runs: readonly [BeltRun, BeltRun];
+  active?: boolean;
+}) {
+  return <BeltRibbon active={active} preview runs={runs} speed={0} />;
+}
+
+/** The drag ghost for a loose chain: static links along the would-be path. */
+export function ChainPreview({ path }: { path: string }) {
+  return (
+    <g data-chain-preview="true" opacity={0.78}>
+      <StaticChain path={path} spacing={FALLBACK_CHAIN_PITCH} />
     </g>
   );
 }
