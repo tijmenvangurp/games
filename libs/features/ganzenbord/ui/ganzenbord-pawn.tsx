@@ -1,7 +1,7 @@
 import type { PlayerState } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
-import { playerColorClass, playerName, playerNumber, positionText } from "../model/presentation";
-import { GooseMark } from "./goose-mark";
+import { playerName, playerNumber, positionText } from "../model/presentation";
+import { PlayerToken } from "./player-token";
 
 interface GanzenbordPawnProps {
   player: PlayerState;
@@ -19,16 +19,17 @@ export function GanzenbordPawn({
   return (
     <span
       aria-hidden="true"
-      className={cn(
-        "ganzenbord-pawn relative grid place-items-center rounded-full border-2 border-white/90",
-        playerColorClass(player.color),
-        active && "ring-2 ring-foreground/55 ring-offset-1 ring-offset-white/70",
-        compact ? "size-4 sm:size-6" : "size-5 sm:size-8",
-        className,
-      )}
+      className={cn("relative inline-flex", className)}
       title={`${playerName(player)}: ${positionText(player)}`}
     >
-      <GooseMark className="size-[64%] text-white drop-shadow-sm" />
+      <PlayerToken
+        className={cn(
+          "ganzenbord-pawn",
+          active && "ring-2 ring-foreground/55 ring-offset-1 ring-offset-white/70",
+          compact ? "size-4 sm:size-6" : "size-5 sm:size-8",
+        )}
+        color={player.color}
+      />
       <span className="absolute -right-1 -bottom-1 grid size-3 place-items-center rounded-full bg-white text-[8px] font-black leading-none text-foreground shadow-sm sm:size-3.5 sm:text-[9px]">
         {playerNumber(player.id)}
       </span>

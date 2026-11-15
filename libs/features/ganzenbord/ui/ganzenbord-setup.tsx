@@ -12,13 +12,9 @@ import {
   PLAYER_COUNT_OPTIONS,
   type GanzenbordSettings,
 } from "../model/settings";
-import {
-  PLAYER_COLOR_OPTIONS,
-  playerColorClass,
-  playerName,
-  playerNumber,
-} from "../model/presentation";
+import { PLAYER_COLOR_OPTIONS, playerName, playerNumber } from "../model/presentation";
 import { GanzenbordRules } from "./ganzenbord-rules";
+import { PlayerToken } from "./player-token";
 
 interface GanzenbordSetupProps {
   settings: GanzenbordSettings;
@@ -61,10 +57,7 @@ export function GanzenbordSetup({
           return (
             <div key={id} className="rounded-lg border border-border bg-card px-2.5 py-2">
               <div className="flex items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={cn("size-3.5 shrink-0 rounded-full", playerColorClass(color))}
-                />
+                <PlayerToken color={color} className="size-5" />
                 <input
                   aria-label={`Naam van speler ${number}`}
                   autoComplete="off"
@@ -111,10 +104,7 @@ export function GanzenbordSetup({
                     type="button"
                     onClick={() => onColorChange(id, option.value)}
                   >
-                    <span
-                      aria-hidden="true"
-                      className={cn("size-6 rounded-full", playerColorClass(option.value))}
-                    />
+                    <PlayerToken color={option.value} className="size-7" />
                   </button>
                 ))}
               </div>
