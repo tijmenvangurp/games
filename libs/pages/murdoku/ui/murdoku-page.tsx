@@ -28,6 +28,9 @@ export function MurdokuPage() {
     check,
     showHint,
     focusClue,
+    setAutoCross,
+    setCrossOnBlocked,
+    settings,
     storedPlay,
     historyLength,
     hint,
@@ -43,6 +46,9 @@ export function MurdokuPage() {
       check: state.check,
       showHint: state.showHint,
       focusClue: state.focusClue,
+      setAutoCross: state.setAutoCross,
+      setCrossOnBlocked: state.setCrossOnBlocked,
+      settings: state.settings,
       storedPlay: state.play,
       historyLength: state.history.length,
       hint: state.hint,
@@ -91,6 +97,7 @@ export function MurdokuPage() {
         }}
         play={play}
         revealSentence={revealSentence}
+        settingsView={{ settings, onAutoCross: setAutoCross, onCrossOnBlocked: setCrossOnBlocked }}
         onCellTap={tapCell}
         onCheck={() => check(solution)}
         onHelp={() => navigate({ to: "/mysterie/les" })}

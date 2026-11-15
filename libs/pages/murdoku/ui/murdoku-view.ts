@@ -1,5 +1,10 @@
 import type { Puzzle } from "@entities/murdoku";
-import type { MurdokuClueFocus, MurdokuHintState, MurdokuText } from "@features/murdoku-game";
+import type {
+  MurdokuClueFocus,
+  MurdokuHintState,
+  MurdokuSettings,
+  MurdokuText,
+} from "@features/murdoku-game";
 
 /**
  * De zaak die de pagina toont: het bord, de tekstlaag en de titel. Eén bundel
@@ -24,4 +29,11 @@ export interface MurdokuHintView {
   clueMessage: string | null;
   onHint: () => void;
   onFocusWord: (focus: MurdokuClueFocus, label: string) => void;
+}
+
+/** De instellingen van het kind en de twee schakelaars. */
+export interface MurdokuSettingsView {
+  settings: MurdokuSettings;
+  onAutoCross: (enabled: boolean) => void;
+  onCrossOnBlocked: (enabled: boolean) => void;
 }

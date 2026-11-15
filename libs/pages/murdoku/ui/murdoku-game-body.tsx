@@ -11,12 +11,14 @@ import { Button, CelebrationDialog } from "@shared/ui";
 import { MurdokuBoardSection } from "./murdoku-board-section";
 import { feedbackFor } from "./murdoku-copy";
 import { MurdokuReveal } from "./murdoku-reveal";
-import type { MurdokuCaseView, MurdokuHintView } from "./murdoku-view";
+import { MurdokuSettingsSection } from "./murdoku-settings";
+import type { MurdokuCaseView, MurdokuHintView, MurdokuSettingsView } from "./murdoku-view";
 
 interface MurdokuGameBodyProps {
   /** De zaak: bord, tekstlaag, titel en intro. */
   caseView: MurdokuCaseView;
   play: MurdokuPlayState;
+  settingsView: MurdokuSettingsView;
   canCheck: boolean;
   historyLength: number;
   revealSentence: string | null;
@@ -107,6 +109,7 @@ function MurdokuSolvedDialog({
 export function MurdokuGameBody({
   caseView,
   play,
+  settingsView,
   canCheck,
   historyLength,
   revealSentence,
@@ -122,6 +125,7 @@ export function MurdokuGameBody({
 }: MurdokuGameBodyProps) {
   const [showCelebration, setShowCelebration] = useState(true);
   const { puzzle, text, title, intro } = caseView;
+  const { settings, onAutoCross, onCrossOnBlocked } = settingsView;
   const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
   const restart = () => {
     setShowCelebration(true);
@@ -142,6 +146,7 @@ export function MurdokuGameBody({
         </div>
 
         <MurdokuBoardSection
+          autoCross={settings.autoCross}
           canCheck={canCheck}
           canUndo={historyLength > 0}
           clueFocus={clueFocus}
@@ -159,15 +164,18 @@ export function MurdokuGameBody({
           onToggleCross={onToggleCross}
           onUndo={onUndo}
         />
-
         {revealSentence ? <MurdokuReveal sentence={revealSentence} onRestart={restart} /> : null}
-
         <MurdokuInfoSections
           caseView={caseView}
           clueFocus={clueFocus}
           play={play}
           onFocusWord={onFocusWord}
           onSelectPerson={onSelectPerson}
+        />
+        <MurdokuSettingsSection
+          settings={settings}
+          onAutoCross={onAutoCross}
+          onCrossOnBlocked={onCrossOnBlocked}
         />
       </div>
 
