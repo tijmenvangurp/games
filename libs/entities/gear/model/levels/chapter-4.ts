@@ -31,7 +31,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         minSpeed: 0.9,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 2, 1, 0.5)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.5)],
     solution: [beltAt("open-belt", [0, 2], [9, 2])],
   },
   {
@@ -54,8 +54,8 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         maxSpeed: 0.75,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 1, 2, 0.25)],
-    solution: [wormAt([2, 2], [6, 2], 1, 2, 0.25)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.25, 1)],
+    solution: [wormAt([0, 2], [9, 2], 0.25, 1)],
   },
   {
     id: "twee-kanten-op",
@@ -114,19 +114,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         maxSpeed: 0.75,
       },
     ],
-    tray: [
-      trayGear("tandwiel-1", 1),
-      trayGear("tandwiel-2", 1),
-      trayGear("tandwiel-3", 1),
-      trayBelt("riem-1"),
-      trayWorm("worm-1", 1, 1, 0.5),
-    ],
-    solution: [
-      gearAt(2, 4, 1),
-      gearAt(2, 6, 1),
-      gearAt(4, 6, 1),
-      beltAt("open-belt", [2, 6], [11, 2]),
-      wormAt([6, 6], [9, 6], 1, 1, 0.5),
-    ],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.5, 1)],
+    solution: [beltAt("open-belt", [0, 4], [11, 2]), wormAt([0, 4], [11, 6], 0.5, 1)],
   },
 ];

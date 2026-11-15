@@ -54,8 +54,8 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
         direction: -1,
       },
     ],
-    tray: [trayWorm("worm-1", 1, 1, 0.5)],
-    solution: [wormAt([2, 2], [6, 2], 1, 1, 0.5)],
+    tray: [trayWorm("worm-1", 0.5, -1)],
+    solution: [wormAt([0, 2], [8, 2], 0.5, -1)],
   },
   {
     id: "wormas-sterk",
@@ -77,8 +77,8 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
         direction: -1,
       },
     ],
-    tray: [trayWorm("worm-1", 1, 1, 0.25)],
-    solution: [wormAt([2, 2], [6, 2], 1, 1, 0.25)],
+    tray: [trayWorm("worm-1", 0.25, -1)],
+    solution: [wormAt([0, 2], [8, 2], 0.25, -1)],
   },
   {
     id: "de-meter",
@@ -102,7 +102,7 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
         maxSpeed: 1.1,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 2, 1, 0.5, 1)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.5, 1)],
     solution: [beltAt("open-belt", [0, 2], [9, 2])],
   },
 ];

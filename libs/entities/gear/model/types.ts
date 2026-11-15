@@ -31,10 +31,6 @@ export type TrayItem =
   | {
       id: string;
       kind: "worm";
-      /** The driven worm shaft. */
-      shaftSize: GearSize;
-      /** The worm wheel that drives the rest of the machine. */
-      wheelSize: GearSize;
       /** Wheel speed per shaft turn. Always a reduction, so 0 < ratio <= 1. */
       ratio: number;
       /** Turns the wheel the other way when -1. */
@@ -47,10 +43,10 @@ export type Placement =
   | { kind: "gear"; holeId: string; size: GearSize }
   | {
       kind: "worm";
-      shaftHoleId: string;
-      wheelHoleId: string;
-      shaftSize: GearSize;
-      wheelSize: GearSize;
+      /** The gear that drives the shaft. */
+      fromHoleId: string;
+      /** The gear the shaft drives. */
+      toHoleId: string;
       ratio: number;
       direction: 1 | -1;
     }
@@ -83,8 +79,6 @@ export interface GearPose {
   speed: number;
   /** Radians. */
   phase: number;
-  /** A worm shaft end or worm wheel, used by the Draaiwerk art. */
-  visual?: "worm-shaft" | "worm-wheel";
   layer: "back" | "front";
   driven: boolean;
   jammed: boolean;
