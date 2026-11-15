@@ -5,7 +5,13 @@ export {
   DRAAIWERK_STORAGE_VERSION,
   normalizeDraaiwerkProgress,
 } from "./model/storage";
-export { chapterName } from "./model/labels";
+export { chapterName, formatSpeed, outputName, trayShortLabel } from "./model/labels";
 export { statusMessage } from "./model/feedback";
+export {
+  holesForPlacement,
+  looseBeltTarget,
+  occupiedHoleIds,
+  rejectionFor,
+} from "./model/placement";
 export { DraaiwerkLevelSelect } from "./ui/draaiwerk-level-select";
 export { DraaiwerkPlay } from "./ui/draaiwerk-play";
