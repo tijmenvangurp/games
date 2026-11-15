@@ -7,6 +7,8 @@ export {
   findRecipeFor,
   findRecipesFor,
   getHint,
+  hintCandidates,
+  hintIngredient,
   pairKey,
   reachableElementIds,
   recipesUsing,

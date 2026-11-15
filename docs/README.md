@@ -65,6 +65,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `research/2026-10-21-mengelmoes-audio-en-sfeer.md` — audio, sfeer en feedback voor Mengelmoes.
 - `research/2026-11-05-ganzenbord-libraries.md` — bibliotheken en bronnen voor Ganzenbord: dobbelsteen-componenten, spellogica, bordopbouw, iconen, historische borden en de regelvarianten.
 - `research/2026-11-07-typepret-libraries.md` — welke library Typepret kan gebruiken: react-simple-keyboard voor het toetsenbord, en waarom er voor de typelogica geen bruikbare library is.
+- `research/2026-11-15-murdoku.md` — regels, aanwijzingensemantiek, een MIT-engine en procedurele art, spritebronnen en een afgebakende eerste versie voor een Murdoku-achtig logicamysterie.
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.
 - `research/verrijkingsmaterialen/slo-leermiddelenlijst-hoogbegaafden-2011.pdf` — de bron-PDF van de SLO-lijst.
