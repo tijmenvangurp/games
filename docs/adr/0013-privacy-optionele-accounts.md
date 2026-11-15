@@ -1,6 +1,6 @@
 # ADR 0013: Privacy en gegevensverwerking voor optionele accounts
 
-- **Status:** Proposed — ter goedkeuring door de eigenaar
+- **Status:** Proposed — ter goedkeuring door de maintainer
 - **Datum:** 2026-10-18
 - **Gerelateerd:** [ADR 0012](0012-optionele-accounts-en-sync.md) (auth en sync), [ADR 0001](0001-publieke-statische-spellen-app.md), [onderzoek](../research/2026-10-18-auth-backend-betterauth.md)
 
@@ -8,7 +8,7 @@
 
 De app is gericht op kinderen van ongeveer 6–12 jaar en is publiek toegankelijk. Zonder account worden er geen persoonsgegevens naar een server gestuurd. [ADR 0012](0012-optionele-accounts-en-sync.md) voegt een **optioneel** ouderaccount met interne kindprofielen en gesynchroniseerde voortgang toe. Daarmee ontstaat een verwerking van persoonsgegevens, ook al blijven kindgegevens minimaal.
 
-Deze ADR legt het privacy- en beveiligingsontwerp vast dat [ADR 0001](0001-publieke-statische-spellen-app.md) eist. Het is een ontwerpbeslissing, geen juridisch advies. De eigenaar moet de gekozen lijn laten toetsen aan de AVG en, als de site op kinderen in de VS is gericht, aan COPPA.
+Deze ADR legt het privacy- en beveiligingsontwerp vast dat [ADR 0001](0001-publieke-statische-spellen-app.md) eist. Het is een ontwerpbeslissing, geen juridisch advies. De maintainer moet de gekozen lijn laten toetsen aan de AVG en, als de site op kinderen in de VS is gericht, aan COPPA.
 
 ## Uitgangspunten
 
@@ -23,13 +23,13 @@ Deze ADR legt het privacy- en beveiligingsontwerp vast dat [ADR 0001](0001-publi
 
 | Rol                                 | Partij                                   | Toelichting                                                           |
 | ----------------------------------- | ---------------------------------------- | --------------------------------------------------------------------- |
-| Verwerkingsverantwoordelijke        | De eigenaar van de app                   | Publiek contactadres in de privacyverklaring, niet in deze repo       |
+| Verwerkingsverantwoordelijke        | De maintainer van de app                 | Publiek contactadres in de privacyverklaring, niet in deze repo       |
 | Verwerker                           | Cloudflare                               | Workers, static assets en D1; verwerkersovereenkomst en subprocessors |
 | Verwerker (alleen bij Google OAuth) | Google                                   | OAuth-login; aparte verwerkersovereenkomst en doorgiftegronden        |
 | Verwerker (alleen bij e-maillogin)  | E-mailprovider                           | Verzenden van verificatie- en herstelmail                             |
 | Geen verwerker                      | Analytics-, advertentie- of CDN-partijen | Worden niet toegevoegd                                                |
 
-Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die rechtspersoon de verwerkingsverantwoordelijke. De eigenaar moet dit vóór de eerste productie-login vastleggen.
+Als de app door een stichting of andere rechtspersoon wordt gepubliceerd, is die rechtspersoon de verwerkingsverantwoordelijke. De maintainer moet dit vóór de eerste productie-login vastleggen.
 
 ## Gegevensinventaris
 
@@ -113,7 +113,7 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 
 ## COPPA en ICO Age Appropriate Design Code
 
-- **COPPA (VS):** de site is Nederlandstalig en op Nederland/EU gericht. Ze is niet gericht op kinderen in de VS en er zijn geen advertenties of tracking. Als de eigenaar de site bewust op de VS richt, wordt COPPA mogelijk van toepassing en is verifieerbare ouderlijke toestemming nodig; dat vraagt een nieuwe beoordeling. Zie [16 CFR 312.2](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312/section-312.2) en [16 CFR 312.5](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312/section-312.5).
+- **COPPA (VS):** de site is Nederlandstalig en op Nederland/EU gericht. Ze is niet gericht op kinderen in de VS en er zijn geen advertenties of tracking. Als de maintainer de site bewust op de VS richt, wordt COPPA mogelijk van toepassing en is verifieerbare ouderlijke toestemming nodig; dat vraagt een nieuwe beoordeling. Zie [16 CFR 312.2](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312/section-312.2) en [16 CFR 312.5](https://www.ecfr.gov/current/title-16/chapter-I/subchapter-C/part-312/section-312.5).
 - **ICO AADC (VK):** de code is niet direct Nederlands recht, maar bruikbaar als ontwerpchecklist. Deze app voldoet aan de belangrijkste punten: geen advertenties, geen profiling, geen geolocatie, geen publieke profielen en geen verslavende meldingen. Zie de [ICO AADC](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/childrens-information/childrens-code-guidance-and-resources/age-appropriate-design-a-code-of-practice-for-online-services/).
 
 ## Transparantie
@@ -127,9 +127,9 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 ## Gevolgen
 
 - **Het ouder-e-mailadres is persoonsgegeven.** Daarmee zijn een privacyverklaring, een verwerkingsregister en een DPA met Cloudflare nodig, ook bij een kleine app.
-- **Google OAuth voegt een verwerker en een externe request toe.** Dat is alleen acceptabel als de eigenaar die uitzondering expliciet vastlegt. Zonder Google blijft de app dichter bij de oorspronkelijke "geen externe requests"-regel.
+- **Google OAuth voegt een verwerker en een externe request toe.** Dat is alleen acceptabel als de maintainer die uitzondering expliciet vastlegt. Zonder Google blijft de app dichter bij de oorspronkelijke "geen externe requests"-regel.
 - **Verwijderen en exporteren moeten vanaf dag één werken.** Achteraf inbouwen is duurder en foutgevoeliger.
-- **Geen analytics betekent minder productinzicht.** De eigenaar moet genoegen nemen met kwalitatieve feedback en geanonimiseerde operationele metrieken.
+- **Geen analytics betekent minder productinzicht.** De maintainer moet genoegen nemen met kwalitatieve feedback en geanonimiseerde operationele metrieken.
 - **Multiplayer, chat en ranglijsten vallen buiten deze ADR.** Die vragen een nieuwe DPIA en een apart veiligheidsontwerp.
 - **De lokale modus blijft de privacyvriendelijkste optie.** De app mag nooit suggereren dat een account nodig is om volledig te spelen.
 
@@ -140,7 +140,7 @@ Passkeys zijn geen biometrische gegevens voor de server: de private sleutel en d
 3. **Is 12 maanden inactiviteit de juiste bewaartermijn voor voortgang?**
 4. **Mag de ouder een dashboard met voortgang per profiel zien, en vanaf welke leeftijd?**
 5. **Is de site (ooit) op kinderen in de VS gericht?** Zo ja, dan is een COPPA-beoordeling nodig.
-6. **Wordt de app door een rechtspersoon gepubliceerd of door de eigenaar als particulier?**
+6. **Wordt de app door een rechtspersoon gepubliceerd of door de maintainer als particulier?**
 7. **Komt er een aparte functionaris of externe jurist voor de privacytoets?**
 
 ## Status en vervolg

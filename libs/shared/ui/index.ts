@@ -1,16 +1,29 @@
 export { Button } from "./button";
 export { CelebrationDialog } from "./celebration-dialog";
+export { ChessBoard } from "./chess-board";
+export { Confetti } from "./confetti";
+export { GameIcon } from "./game-icon";
+export { MotionProvider } from "./motion-provider";
 export { OptionPicker } from "./option-picker";
 export { PageHeader } from "./page-header";
 export { SetupActions } from "./setup-actions";
 export { SoundToggle } from "./sound-toggle";
+export { SpeechButton } from "./speech-button";
+export { SpeechToggle } from "./speech-toggle";
+export { SpokenText } from "./spoken-text";
 export {
+  ArrowDown,
   ArrowLeft,
+  ArrowRight,
   ArrowUp,
+  BookOpen,
   Check,
+  Copy,
+  Ear,
   Eraser,
-  Gamepad2,
-  Heart,
+  Eye,
+  Flame,
+  Flag,
   Home,
   LayoutGrid,
   Lightbulb,
@@ -19,9 +32,11 @@ export {
   Plus,
   Puzzle,
   RotateCcw,
+  Save,
   Search,
   Sparkles,
   Star,
+  TrainFront,
   Trophy,
   Undo2,
   Volume2,

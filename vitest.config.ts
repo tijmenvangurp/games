@@ -27,7 +27,7 @@ export default defineConfig({
     ],
     coverage: {
       provider: "v8",
-      reporter: ["text", "html"],
+      reporter: ["text", "html", "json"],
       include: ["apps/games/src/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}"],
       exclude: ["apps/games/src/app/main.tsx", "libs/entities/sudoku/model/types.ts", "**/*.d.ts"],
       thresholds: {

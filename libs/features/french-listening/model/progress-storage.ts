@@ -4,23 +4,12 @@ import {
   type FrenchItemProgress,
   type FrenchProgressState,
 } from "@entities/french";
+import { isFiniteNumber, isNonNegativeInteger, isNonNegativeNumber, isRecord } from "@shared/lib";
 
 const STORAGE_KEY = "games.french.v1";
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
-}
-
-function isCount(value: unknown): value is number {
-  return isFiniteNumber(value) && value >= 0;
-}
-
 function isBox(value: unknown): value is number {
-  return isCount(value) && value <= 5 && Number.isInteger(value);
+  return isNonNegativeInteger(value) && value <= 5;
 }
 
 function isEntry(value: unknown): value is FrenchItemProgress {
@@ -30,8 +19,8 @@ function isEntry(value: unknown): value is FrenchItemProgress {
   return [
     isBox(value.box),
     isFiniteNumber(value.dueAt),
-    isCount(value.correct),
-    isCount(value.seen),
+    isNonNegativeNumber(value.correct),
+    isNonNegativeNumber(value.seen),
   ].every(Boolean);
 }
 

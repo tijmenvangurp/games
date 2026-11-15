@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-letter",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/letter",
+  "tags": ["layer:entities", "scope:letter", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/letter"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}

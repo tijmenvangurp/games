@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-simple-keyboard/build/css/index.css" layer(components);
 
 @source "../../..";
 @source "../../../../../libs";
@@ -14,8 +15,10 @@
   --font-sans:
     ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI",
     sans-serif;
+  --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.25s ease-out;
+  --animate-drop: drop 0.45s cubic-bezier(0.3, 0.7, 0.4, 1);
 }
 
 @theme inline {
@@ -28,18 +31,45 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
   --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-player-one: var(--player-one);
+  --color-player-two: var(--player-two);
+  --color-pawn-red: var(--pawn-red);
+  --color-pawn-orange: var(--pawn-orange);
+  --color-pawn-green: var(--pawn-green);
+  --color-pawn-blue: var(--pawn-blue);
+  --color-pawn-violet: var(--pawn-violet);
+  --color-pawn-pink: var(--pawn-pink);
 }
 
 :root {
-  --background: oklch(0.985 0.012 85);
-  --foreground: oklch(0.27 0.03 265);
-  --card: oklch(1 0 0);
-  --primary: oklch(0.58 0.16 255);
-  --primary-foreground: oklch(0.99 0 0);
-  --muted: oklch(0.95 0.012 85);
-  --muted-foreground: oklch(0.5 0.02 265);
-  --border: oklch(0.9 0.012 85);
-  --success: oklch(0.66 0.15 155);
+  /* Eén rustige basis: ivoor papier, inkt en indigo als enige accent. */
+  --background: oklch(0.965 0.02 88);
+  --foreground: oklch(0.3 0.025 145);
+  --card: oklch(0.992 0.008 88);
+  --primary: #4f5d9e;
+  --primary-foreground: #f8f9ff;
+  --muted: oklch(0.935 0.02 88);
+  --muted-foreground: oklch(0.48 0.027 120);
+  --border: oklch(0.84 0.023 88);
+  --success: oklch(0.5 0.1 150);
+  --warning: oklch(0.56 0.13 72);
+  --danger: oklch(0.53 0.17 25);
+  /*
+   * Vrolijke pionkleuren voor bordspellen: rood, oranje, groen, blauw, paars
+   * en roze. Ze staan los van de feedbackkleuren; de gans en het nummer op de
+   * pion maken de speler herkenbaar, niet de kleur alleen.
+   */
+  --pawn-red: oklch(0.6 0.21 22);
+  --pawn-orange: oklch(0.66 0.17 55);
+  --pawn-green: oklch(0.62 0.16 148);
+  --pawn-blue: oklch(0.58 0.19 255);
+  --pawn-violet: oklch(0.56 0.2 300);
+  --pawn-pink: oklch(0.64 0.2 350);
+  /* De vaste kleuren van Vier op een Rij blijven rustiger van toon. */
+  --player-one: #4f5d9e;
+  --player-two: oklch(0.58 0.2 30);
 }
 
 @layer base {
@@ -53,6 +83,12 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
+    background-image: radial-gradient(
+      circle at 50% -18%,
+      oklch(0.93 0.04 78 / 0.45),
+      transparent 38rem
+    );
+    background-attachment: fixed;
     overscroll-behavior-y: none;
   }
 
@@ -70,6 +106,107 @@
 }
 
 @layer games {
+  /*
+   * Eén surface voor panelen, kaarten en HUD's. Hairline-rand, vaste radius
+   * en nauwelijks schaduw, zodat kleur alleen voor betekenis wordt gebruikt.
+   */
+  .game-panel {
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background-color: var(--card);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.05),
+      0 16px 36px -30px oklch(0.3 0.025 145 / 0.4);
+  }
+
+  .game-card {
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background-color: var(--card);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.05),
+      0 16px 36px -30px oklch(0.3 0.025 145 / 0.35);
+  }
+
+  .ganzenbord-board {
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 30px -22px rgb(40 25 10 / 0.55);
+    overflow: hidden;
+  }
+
+  .ganzenbord-zoom {
+    transform: scale(1);
+    transition: transform 380ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ganzenbord-pawn {
+    box-shadow: 0 2px 5px rgb(40 25 10 / 0.45);
+  }
+
+  .ganzenbord-pawn-move {
+    transition:
+      left 260ms ease-in-out,
+      top 260ms ease-in-out;
+  }
+
+  /* Dezelfde tussenruimte als de kolom (gap-0.5 en sm:gap-1). */
+  .four-in-a-row-column {
+    --four-in-a-row-gap: 0.125rem;
+  }
+
+  @media (min-width: 40rem) {
+    .four-in-a-row-column {
+      --four-in-a-row-gap: 0.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ganzenbord-zoom {
+      transition: none;
+    }
+
+    .ganzenbord-pawn-move {
+      transition: none;
+    }
+  }
+
+  .game-card:hover {
+    border-color: oklch(0.72 0.05 55);
+    box-shadow:
+      0 1px 2px oklch(0.3 0.025 145 / 0.06),
+      0 20px 40px -30px oklch(0.3 0.025 145 / 0.45);
+  }
+
+  /*
+   * Zichtbare, dunne scrollbar voor scrollende speelvlakken zoals het
+   * elementenschap van Mengelmoes. De styling maakt de browser-scrollbar
+   * klassiek in plaats van overlay, zodat er ook met een muis een zichtbare
+   * greep is om te scrollen.
+   */
+  .game-scrollbar {
+    scrollbar-color: var(--primary) var(--muted);
+    scrollbar-width: thin;
+  }
+
+  .game-scrollbar::-webkit-scrollbar {
+    height: 0.5rem;
+    width: 0.5rem;
+  }
+
+  .game-scrollbar::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: var(--muted);
+  }
+
+  .game-scrollbar::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--primary) 55%, var(--muted));
+  }
+
+  .game-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
   .memory-card {
     perspective: 900px;
   }
@@ -212,6 +349,28 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /*
+   * Een muntje valt van boven de kolom naar zijn vakje. `--drop-rows` telt de
+   * lege vakjes boven het muntje plus één, zodat de val altijd boven het bord
+   * begint. De kolom levert de tussenruimte via `--four-in-a-row-gap`.
+   */
+  @keyframes drop {
+    from {
+      transform: translateY(
+        calc(-1 * var(--drop-rows, 1) * (100% + var(--four-in-a-row-gap, 0.125rem)))
+      );
+    }
+    78% {
+      transform: translateY(0) scale(1);
+    }
+    88% {
+      transform: translateY(0) scale(1.04, 0.94);
+    }
+    to {
+      transform: translateY(0) scale(1);
     }
   }
 
@@ -361,5 +520,104 @@
     .maze-trail-dot {
       animation-delay: 0ms;
     }
+  }
+}
+
+@layer games {
+  /*
+   * Typepret: het toetsenbord van react-simple-keyboard als rustige weergave.
+   * De bibliotheek-CSS staat in `components`; deze regels staan erboven.
+   */
+  .typepret-keyboard {
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .typepret-keyboard .hg-theme-default {
+    padding: 0;
+    background-color: transparent;
+  }
+
+  .typepret-keyboard .hg-button {
+    height: 2.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: 0.6rem;
+    background-color: var(--muted);
+    color: var(--foreground);
+    font-size: 1.05rem;
+    font-weight: 700;
+    box-shadow: none;
+  }
+
+  .typepret-keyboard .hg-row {
+    justify-content: center;
+  }
+
+  .typepret-keyboard .tp-dim {
+    opacity: 0.6;
+  }
+
+  .typepret-keyboard .tp-finger {
+    color: var(--foreground);
+  }
+
+  .typepret-keyboard .tp-linker-pink {
+    background-color: var(--finger-linker-pink);
+  }
+
+  .typepret-keyboard .tp-linker-ringvinger {
+    background-color: var(--finger-linker-ringvinger);
+  }
+
+  .typepret-keyboard .tp-linker-middelvinger {
+    background-color: var(--finger-linker-middelvinger);
+  }
+
+  .typepret-keyboard .tp-linker-wijsvinger {
+    background-color: var(--finger-linker-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-wijsvinger {
+    background-color: var(--finger-rechter-wijsvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-middelvinger {
+    background-color: var(--finger-rechter-middelvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-ringvinger {
+    background-color: var(--finger-rechter-ringvinger);
+  }
+
+  .typepret-keyboard .tp-rechter-pink {
+    background-color: var(--finger-rechter-pink);
+  }
+
+  /* Het voelbare ribbeltje op F en J. */
+  .typepret-keyboard .tp-bump {
+    position: relative;
+  }
+
+  .tp-bump::after {
+    position: absolute;
+    bottom: 0.4rem;
+    left: 50%;
+    width: 0.9rem;
+    height: 0.2rem;
+    border-radius: 0.1rem;
+    background-color: var(--foreground);
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .typepret-keyboard .tp-target {
+    border-width: 3.5px;
+    border-color: var(--foreground);
+    font-weight: 900;
+  }
+
+  .typepret-keyboard[data-emphasize="true"] .tp-target {
+    border-width: 5px;
+    font-size: 1.4rem;
   }
 }

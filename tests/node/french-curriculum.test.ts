@@ -85,6 +85,15 @@ describe("Frans curriculum", () => {
     expect(result).toContain("Word needs an example sentence.");
   });
 
+  it("meldt een voorbeeldzin die het woord niet gebruikt", () => {
+    const word = {
+      ...LESSON_ANIMAUX.items[0],
+      example: { fr: "Le chien dort.", nl: "De hond slaapt." },
+    };
+    const result = messages(fixture({}, [word, ...LESSON_ANIMAUX.items.slice(1)]));
+    expect(result).toContain("Example sentence must use the word.");
+  });
+
   it("meldt lege voorbeeldzin en vertaling", () => {
     const item = LESSON_ANIMAUX.items[0];
     if (!item.example) {

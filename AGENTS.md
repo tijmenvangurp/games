@@ -1,14 +1,72 @@
 # AGENTS.md — Spellen
 
-Publieke, statische spelletjes-app voor kinderen. Lees `README.md` en de relevante `docs/adr/` voordat je iets verandert.
+Publieke, statische spelletjes-app voor kinderen. Lees `README.md`, `CONTRIBUTING.md`, `GLOSSARY.md` en de relevante `docs/adr/` voordat je iets verandert.
 
 ## Harde regels
 
-- **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, tailnet-namen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
+- **Openbare repository en site.** Geen secrets, tokens, `.env`-waarden, interne hostnames, netwerknamen, IP-adressen of persoonsgegevens in code, assets, commits of chat.
 - **Alleen TypeScript.** Geen `.js`, `.mjs`, `.cjs`, `.jsx` of Python. `pnpm run ts-only` en de commit-hook bewaken dit.
 - **Geen `!important` in CSS.** Gebruik cascade layers (`@layer`) of een specifiekere selector; de fallow-regel `css-selector-complexity` (op `error`) bewaakt dit, net als id-selectors en diepe nesting.
-- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` via `@shared/ui` of uit `apps/games/public/`.
-- **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de eigenaar. Spellen zijn client-side en lokaal.
+- **Geen externe requests.** Geen analytics, CDN's, webfonts, trackers of remote images. Iconen komen uit `lucide-react` of `@phosphor-icons/react` via `@shared/ui`, of uit `apps/games/public/`.
+- **Geen backend toevoegen** zonder ADR en expliciete goedkeuring van de maintainer. Spellen zijn client-side en lokaal.
+- **Bibliotheken eerst.** Zoek altijd eerst of een bestaande library het al oplost. Een nieuwe library toevoegen mag zonder toestemming, ook als de bundel daardoor groeit. Zie **Bibliotheken eerst**.
+
+## Bibliotheken eerst
+
+**Zoek altijd eerst of een bestaande bibliotheek het probleem al oplost.** Een library toevoegen is de standaardroute; zelf code schrijven is de uitzondering.
+
+- Kijk eerst in de lijst hieronder en in `package.json`. Zoek daarna verder (npm, documentatie van het ecosysteem) naar een bewezen, onderhouden library met TypeScript-typen.
+- **Toevoegen mag zonder toestemming van de maintainer.** Vraag niet om een ADR of akkoord, en wacht daar niet op.
+- **Een grotere bundel is geen bezwaar.** Minder eigen code om te onderhouden weegt zwaarder dan een paar KB extra. Kies bij twijfel de library die het minst eigen code kost, ook als die groter is of meer meebrengt.
+- Noem de library in de commit (`deps:`) en in de pull request, en werk de lijst hieronder bij zodat de volgende zoektocht hier begint.
+- Leg alleen iets vast als je een voor de hand liggende library bewust _niet_ neemt: één regel in de pull request of in `docs/research/`.
+
+Wat blijft gelden:
+
+- **Geen backend en geen netwerk tijdens gebruik.** Een library moet in de statische app en binnen de CSP werken (`apps/games/public/_headers`): geen telemetrie, analytics, trackers, CDN's, externe fonts of runtime-calls. Iets dat een server, account of netwerkverbinding nodig heeft, valt onder de backend-regel en vraagt wél een ADR en expliciete goedkeuring.
+- Alleen TypeScript/ESM. `pnpm run ts-only` blijft bewaken dat er geen `.js`, `.mjs`, `.cjs` of `.jsx` in de repo komt.
+- `pnpm run quality` moet groen blijven; een library die de build, de tests of de CSP breekt, gaat eruit.
+
+## Wat we al hebben
+
+Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
+
+| Library                                                            | Waarvoor                                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| `react`, `react-dom`                                               | UI en rendering                                                     |
+| `@tanstack/react-router`                                           | routes en type-safe navigatie (`apps/games/src/app/router.tsx`)     |
+| `zustand`                                                          | spel- en UI-state per feature (`libs/features/*/model/`)            |
+| `tailwindcss`, `@tailwindcss/vite`                                 | styling, tokens en `@layer` (`apps/games/src/app/styles/index.css`) |
+| `clsx`, `tailwind-merge`                                           | `cn()` in `@shared/lib` voor conditionele classes                   |
+| `class-variance-authority`                                         | varianten van `Button` en verwanten                                 |
+| `@radix-ui/react-slot`                                             | `asChild` op `Button`                                               |
+| `lucide-react`                                                     | UI-iconen, geëxporteerd via `@shared/ui`                            |
+| `@phosphor-icons/react`                                            | spelidentiteit via `GameIcon`                                       |
+| `@iconify-json/fluent-emoji-flat`, `@iconify-json/ph`              | elementiconen voor Mengelmoes, dev-time gegenereerd uit Iconify     |
+| `@dnd-kit/core`                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)          |
+| `chess.js`                                                         | schaakregels en zetgeneratie                                        |
+| `react-chessboard`                                                 | schaakbord                                                          |
+| `stockfish.js`                                                     | lokale schaakengine in een worker (wasm)                            |
+| `sudoku-gen`                                                       | sudoku-generator                                                    |
+| `react-dice-complete`                                              | dobbelstenen en worpanimatie in Ganzenbord                          |
+| `react-simple-keyboard`                                            | toetsenbord als weergave in Typepret                                |
+| `react-hotkeys-hook`                                               | toetsaanslagen opvangen in Typepret                                 |
+| `sharp`                                                            | dev-time uitsneden van Ganzenbordprenten uit het bord               |
+| `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
+| `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
+| `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react` | unit- en componenttests                                             |
+| `@playwright/test`                                                 | e2e in `e2e/`                                                       |
+| `nx`                                                               | taken, cache en projectgraaf                                        |
+| `typescript`                                                       | typecheck                                                           |
+| `oxlint`, `oxfmt`                                                  | lint en formatting                                                  |
+| `steiger`, `@feature-sliced/steiger-plugin`                        | FSD-grenzen                                                         |
+| `fallow`                                                           | dead code, layer boundaries en CSS-regels                           |
+| `husky`, `@commitlint/cli`                                         | git-hooks en commitconventies                                       |
+| `tsx`                                                              | TypeScript-scripts in `scripts/`                                    |
+| `varlock`                                                          | env-schema, validatie en lokale secrets                             |
+| `wrangler`                                                         | deploy naar Cloudflare Workers                                      |
+
+Ontbreekt er iets? Voeg het toe en zet het in deze tabel.
 
 ## Architectuur
 
@@ -35,16 +93,28 @@ De app wordt gebouwd met Vite vanuit `apps/games`; de output staat in `apps/game
 - Forceer een verse build met `corepack pnpm exec nx run games:build --skipNxCache`, niet met `pnpm run build -- --skip-nx-cache` (die flag gaat naar Vite).
 - Draai `fallow` en Nx-taken niet parallel: Fallow schrijft `.fallow/` en kan de Nx-daemon laten stoppen. Zie `docs/tooling.md`.
 - Draai vóór commit of push: `pnpm run quality` (of `quality:full`). E2E is optioneel lokaal en verplicht in CI.
+- Documentatie: `docs/README.md` is de index; zie `docs/design-system.md` voor UI en `docs/adr/` voor beslissingen. Werk de index bij als je een document of ADR toevoegt.
+- Agent-harness: skills via APM in `.apm/skills` en `apm.yml`; MCP's in `opencode.jsonc`, `.mcp.json` en `.codex/config.toml`. Zie `CONTRIBUTING.md`.
+- Issues en specs: GitHub Issues via `gh`; zie `docs/agents/issue-tracker.md`.
 - Commit volgens Conventional Commits met verplichte scope: `app`, `pages`, `widgets`, `features`, `entities`, `shared`, `tests`, `quality`, `ci`, `tooling`, `docs`, `deps` of `infra`.
-- Nooit direct naar `main` pushen. Maak een branch, open een pull request en merge pas als alle CI-checks groen zijn.
+- Nooit direct naar `main` pushen. Maak een branch en open een pull request; zie **Mergen** hieronder.
 - Pin GitHub Actions op een volledige 40-tekens commit-SHA met een versiecommentaar (bijvoorbeeld `# v7.1.0`). Gebruik nooit bewegende tags of branches.
 - Na een wijziging aan het spel: test op mobiel (390 px) en tablet (1024 px). Behoud veilige marges (`env(safe-area-inset-*)`) en touch-targets van minimaal 44 px.
 - Dokumenteer architectuur-, privacy- of deploymentbeslissingen in `docs/adr/`.
+
+## Mergen
+
+- **De agent merget nooit zelfstandig.** Een pull request blijft open tot de maintainer expliciet zegt dat hij gemerged mag worden. Geldige signalen zijn de letterlijke tekst _"merge mag"_, een GitHub-review met **Approve**, of het label `merge`.
+- **Groene CI is nodig, maar geen toestemming.** "De checks zijn groen" of "het is klaar" is géén mandaat om te mergen. Vraag altijd om bevestiging en wacht daarop.
+- **Nooit direct naar `main` pushen.** Altijd via een branch en een pull request — ook voor een wijziging aan deze regel zelf.
+- Laat een pull request liever open met een korte status ("klaar, wacht op jouw akkoord") dan hem zelf af te ronden.
+- Na expliciete toestemming: squash-merge (zoals de bestaande historie) en verwijder de branch.
+- Twijfel je of je toestemming hebt? Niet mergen en het vragen.
 
 ## Deployment
 
 - Cloudflare Worker `games` met static assets uit `apps/games/dist` (`wrangler.jsonc`).
 - **Cloudflare Workers Builds** bouwt en deployt bij een push naar `main`. Er zijn geen GitHub-deploysecrets of API-tokens nodig.
-- Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.9.1`.
+- Dashboardinstellingen: branch `main`, root `/`, build `pnpm run build`, deploy `npx wrangler deploy`, `NODE_VERSION=24`, `PNPM_VERSION=12.16.1`.
 - De workernaam in het dashboard moet exact `games` zijn.
 - `apps/games/public/_headers` bevat de CSP en `noindex`; verzwak die niet zonder ADR.

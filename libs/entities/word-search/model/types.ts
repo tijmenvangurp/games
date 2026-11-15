@@ -1,4 +1,4 @@
-export const WORD_SEARCH_THEMES = ["tuin", "onderwater"] as const;
+export const WORD_SEARCH_THEMES = ["tuin", "onderwater", "pokemon"] as const;
 
 export type WordSearchTheme = (typeof WORD_SEARCH_THEMES)[number];
 

@@ -1,5 +1,6 @@
 {
   "$schema": "./node_modules/fallow/schema.json",
+  "ignoreDependencies": ["nx-mcp"],
   "entry": [
     "apps/games/src/app/main.tsx",
     "steiger.config.ts",
@@ -10,7 +11,11 @@
     "tools/aliases.ts",
     "scripts/check-ts-only.ts",
     "scripts/generate-app-icons.ts",
+    "scripts/generate-chess-puzzles.ts",
+    "scripts/generate-geography.ts",
     "scripts/generate-french-audio.ts",
+    "scripts/generate-sounds.ts",
+    "scripts/generate-audio.ts",
     "scripts/run-playwright.ts",
     "scripts/hooks/commit-msg.ts",
     "scripts/hooks/pre-commit.ts",
@@ -18,6 +23,48 @@
   ],
   "rules": {
     "css-selector-complexity": "error"
+  },
+  "duplicates": {
+    "ignore": ["scripts/generate-sounds.ts"]
+  },
+  "health": {
+    "coverage": "coverage/coverage-final.json",
+    "thresholdOverrides": [
+      {
+        "files": ["scripts/wav.ts"],
+        "maxCyclomatic": 25,
+        "maxCognitive": 32,
+        "maxCrap": 650,
+        "maxUnitSize": 110,
+        "reason": "Dev-only WAV-parser voor het klankprototype; geen runtime-code en nog geen unit-tests."
+      },
+      {
+        "files": ["scripts/generate-geography.ts"],
+        "maxCyclomatic": 12,
+        "maxCognitive": 12,
+        "maxCrap": 150,
+        "reason": "Eenmalig generatiescript: het parseert externe data (Wikidata, Wikimedia Commons, TopoJSON) en heeft geen unit-coverage. De uitvoer wordt bewaakt door tests/node/flags-generator.test.ts en pnpm run geography:check."
+      },
+      {
+        "files": ["libs/features/flag-game/ui/**", "libs/pages/flags/**"],
+        "maxCyclomatic": 14,
+        "maxCognitive": 22,
+        "maxCrap": 60,
+        "reason": "React-schermen met veel voorwaardelijke SVG-attributen; de CRAP-schatting telt JSX-takken mee. Gedekt door tests/web/puzzle.test.tsx, tests/web/flags.test.tsx en de mobiele e2e-ronde."
+      },
+      {
+        "files": [
+          "scripts/generate-audio.ts",
+          "scripts/lib/audio-catalog.ts",
+          "scripts/lib/tts.ts",
+          "scripts/generate-french-audio.ts"
+        ],
+        "maxCyclomatic": 14,
+        "maxCognitive": 26,
+        "maxCrap": 120,
+        "reason": "Dev-only audiogeneratoren en de catalogusscanner; de uitvoer wordt bewaakt door pnpm run audio:check en tests/node/speech-audio.test.ts."
+      }
+    ]
   },
   "boundaries": {
     "zones": [

@@ -15,6 +15,8 @@ import type { WordSearchSettings } from "./settings";
 interface Hint {
   word: string;
   cells: readonly Cell[];
+  /** 1 = first letter only, 2 = the whole placement. */
+  stage: 1 | 2;
 }
 
 interface WordSearchStore {
@@ -81,9 +83,7 @@ function resolveSelection(set: StoreSet, get: StoreGet, cells: readonly Cell[]):
 
   const matched = puzzle.placements.find((placement) => selectionMatches(placement, cells));
   if (!matched) {
-    set({ selected: cells, dragStart: null, wrong: true });
-    playSound("wrong");
-    playHaptic("wrong");
+    set({ selected: cells, dragStart: null, wrong: true, lastFound: null });
     return;
   }
 
@@ -115,7 +115,7 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
   }
 
   if (selected.length === 0) {
-    set({ selected: [cell], dragStart: null, wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false, lastFound: null });
     playSound("tap");
     return;
   }
@@ -126,13 +126,13 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
   }
 
   if (start.row === cell.row && start.col === cell.col) {
-    set({ selected: [], dragStart: null, wrong: false });
+    set({ selected: [], dragStart: null, wrong: false, lastFound: null });
     return;
   }
 
   const cells = cellsBetween(start, cell);
   if (cells.length === 0) {
-    set({ selected: [cell], dragStart: null, wrong: false });
+    set({ selected: [cell], dragStart: null, wrong: false, lastFound: null });
     playSound("tap");
     return;
   }
@@ -141,7 +141,7 @@ function handleTap(set: StoreSet, get: StoreGet, cell: Cell): void {
 }
 
 function startDrag(set: StoreSet, cell: Cell): void {
-  set({ selected: [cell], dragStart: cell, wrong: false });
+  set({ selected: [cell], dragStart: cell, wrong: false, lastFound: null });
 }
 
 function dragTo(set: StoreSet, get: StoreGet, cell: Cell): void {
@@ -167,11 +167,11 @@ function commitDrag(set: StoreSet, get: StoreGet): void {
 }
 
 function cancelDrag(set: StoreSet): void {
-  set({ selected: [], dragStart: null, wrong: false });
+  set({ selected: [], dragStart: null, wrong: false, lastFound: null });
 }
 
 function handleHint(set: StoreSet, get: StoreGet, word: string): void {
-  const { puzzle, found } = get();
+  const { puzzle, found, hint } = get();
   if (!puzzle || found.includes(word)) {
     return;
   }
@@ -179,7 +179,11 @@ function handleHint(set: StoreSet, get: StoreGet, word: string): void {
   if (!placement) {
     return;
   }
-  set({ hint: { word, cells: placement.cells } });
+  // First click shows only the first letter; a second click on the same word
+  // shows the placement. The child still has to trace the word.
+  const stage = hint?.word === word ? 2 : 1;
+  const cells = stage === 1 ? placement.cells.slice(0, 1) : placement.cells;
+  set({ hint: { word, cells, stage } });
   playSound("hint");
 }
 

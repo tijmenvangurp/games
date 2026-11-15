@@ -8,10 +8,20 @@ interface MemoryCardProps {
   index: number;
   faceUp: boolean;
   matched: boolean;
+  hinted: boolean;
+  hintLevel: 1 | 2 | 3 | null;
   onFlip: (index: number) => void;
 }
 
-export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCardProps) {
+export function MemoryCard({
+  pokemon,
+  index,
+  faceUp,
+  matched,
+  hinted,
+  hintLevel,
+  onFlip,
+}: MemoryCardProps) {
   const label = faceUp
     ? matched
       ? `${pokemon.name}, gevonden`
@@ -23,9 +33,14 @@ export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCa
       type="button"
       aria-label={label}
       aria-pressed={faceUp}
-      className="memory-card aspect-square w-full rounded-2xl p-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+      className={cn(
+        "memory-card aspect-square w-full rounded-2xl p-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+        hinted && "ring-4 ring-amber-300 ring-offset-2",
+        hinted && hintLevel === 3 && "ring-amber-400",
+      )}
       data-card-index={index}
       data-flipped={faceUp}
+      data-hinted={hinted || undefined}
       data-matched={matched}
       onClick={() => onFlip(index)}
     >
@@ -35,10 +50,8 @@ export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCa
         </span>
         <span
           className={cn(
-            "memory-card-face memory-card-face--pokemon border-2 bg-white",
-            matched
-              ? "border-emerald-400 bg-emerald-50 ring-2 ring-emerald-300"
-              : "border-slate-200 shadow-sm",
+            "memory-card-face memory-card-face--pokemon border bg-card",
+            matched ? "border-success/50 bg-success/10 ring-1 ring-success/30" : "border-border",
           )}
         >
           <span className="flex h-full w-full flex-col items-center justify-center gap-0.5 p-1.5">
@@ -52,14 +65,14 @@ export function MemoryCard({ pokemon, index, faceUp, matched, onFlip }: MemoryCa
               loading="eager"
               src={matched ? pokemonAnimatedSrc(pokemon) : pokemonArtworkSrc(pokemon)}
             />
-            <span className="memory-card-name max-w-full font-black text-slate-700">
+            <span className="memory-card-name max-w-full font-black text-foreground">
               {pokemon.name}
             </span>
           </span>
           {matched ? (
             <Sparkles
               aria-hidden="true"
-              className="animate-pulse absolute right-1 top-1 size-4 text-emerald-500"
+              className="animate-pulse absolute right-1 top-1 size-4 text-success"
             />
           ) : null}
         </span>

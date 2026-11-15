@@ -23,6 +23,15 @@ describe("word search storage", () => {
     expect(loadWordSearchState()).toEqual({ settings, puzzle, found });
   });
 
+  it("round-trips a capitalized Pokémon puzzle", () => {
+    const puzzle = createWordSearch("pokemon", "makkelijk", 11);
+    const settings = { theme: "pokemon" as const, difficulty: "makkelijk" as const };
+
+    saveWordSearchState({ settings, puzzle, found: [] });
+
+    expect(loadWordSearchState()).toEqual({ settings, puzzle, found: [] });
+  });
+
   it("falls back to defaults for corrupt JSON", () => {
     localStorage.setItem(STORAGE_KEY, "{not json");
 

@@ -67,7 +67,7 @@ Per les: 10 woorden, 5 zinnen, een contextzin per woord, Nederlandse vertalingen
 
 - **Geen backend of CMS.** De app blijft statisch; content staat in TypeScript-bestanden.
 - **Geen les-specifieke UI.** Eén leskeuze, één quiz, één flipcard- en sorteerfeature voor alle lessen.
-- **Geen audio in CI of runtime.** Audio wordt lokaal gegenereerd met de private TTS-skill en gecommit; CI controleert alleen de bestanden.
+- **Geen audio in CI of runtime.** Audio wordt lokaal gegenereerd en gecommit; CI controleert alleen de bestanden.
 - **Geen nieuwe dependency zonder noodzaak.** De validator is een pure TypeScript-functie; geen Zod of schema-library. Voor slepen is `@dnd-kit/core` de enige gerichte toevoeging; tikken blijft werken.
 - **Afleiders zijn beleid, geen content per vraag.** Woorden gebruiken `contrastWith`/tags; zinnen houden handmatige afleiders.
 - **Review is een status, geen aanname.** Alleen `reviewed` lessen komen in de app en in de audio-check.

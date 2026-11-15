@@ -1,5 +1,5 @@
 import { Chess, type Color, type Move, type Piece, type Square } from "chess.js";
-import { isChessSquare } from "@shared/lib";
+import { isChessSquare, movesForPiece } from "@shared/lib";
 import type { ChessPuzzle, PuzzleMove, PuzzleState } from "./types";
 
 export type PuzzleAttemptError =
@@ -24,7 +24,7 @@ export type PuzzleAttempt =
       readonly reason: PuzzleAttemptError;
     };
 
-function parseUci(value: string): {
+export function parseUci(value: string): {
   readonly from: Square;
   readonly to: Square;
   readonly promotion?: string;
@@ -67,19 +67,13 @@ export function createPuzzleState(puzzle: ChessPuzzle): PuzzleState {
   };
 }
 
+/**
+ * Geeft de zetten van het stuk op dit veld, ongeacht kleur. Tikken is alleen
+ * kijken: het kind mag ook de stukken van de tegenstander aantikken. Een echte
+ * zet gaat altijd via slepen en neerzetten.
+ */
 export function legalPuzzleMoves(state: PuzzleState, square: string): readonly Square[] {
-  if (!isChessSquare(square)) {
-    return [];
-  }
-
-  const chess = new Chess(state.fen);
-  const piece = chess.get(square);
-
-  if (!piece || piece.color !== state.playerColor) {
-    return [];
-  }
-
-  return chess.moves({ square, verbose: true }).map((move) => move.to);
+  return movesForPiece(state.fen, square);
 }
 
 type PlayerMoveResult =

@@ -20,11 +20,12 @@ export function MazeResult({
 }: MazeResultProps) {
   return (
     <CelebrationDialog
+      confetti
       againLabel={hasNext ? "Volgende level" : "Opnieuw spelen"}
       chooseLabel="Kies level"
       description={`Level ${levelIndex + 1} · ${level.name} is opgelost.`}
       homeLabel="Naar het menu"
-      title="Excellent!"
+      title="Gelukt!"
       onAgain={onNext}
       onChoose={onLevels}
       onHome={onHome}

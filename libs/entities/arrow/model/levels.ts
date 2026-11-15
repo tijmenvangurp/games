@@ -1,7 +1,7 @@
 import { buildContourArrows } from "./contour";
 import { solveMaze } from "./geometry";
 import { createShapeMask, type ShapeMask, type ShapeName } from "./shapes";
-import type { MazeDifficulty, MazeLevel } from "./types";
+import type { MazeLevel } from "./types";
 
 interface LevelSpec {
   id: string;
@@ -12,7 +12,6 @@ interface LevelSpec {
   minChunk: number;
   maxChunk: number;
   seed: number;
-  difficulty: MazeDifficulty;
 }
 
 const LEVEL_SPECS: readonly LevelSpec[] = [
@@ -25,7 +24,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 4,
     maxChunk: 7,
     seed: 11,
-    difficulty: "makkelijk",
   },
   {
     id: "ster-1",
@@ -36,7 +34,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 4,
     maxChunk: 6,
     seed: 12,
-    difficulty: "makkelijk",
   },
   {
     id: "vis-1",
@@ -47,7 +44,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 4,
     maxChunk: 6,
     seed: 13,
-    difficulty: "gemiddeld",
   },
   {
     id: "huis-1",
@@ -58,7 +54,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 6,
     seed: 14,
-    difficulty: "gemiddeld",
   },
   {
     id: "boom-1",
@@ -69,7 +64,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 6,
     seed: 15,
-    difficulty: "moeilijk",
   },
   {
     id: "raket-1",
@@ -80,7 +74,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 6,
     seed: 16,
-    difficulty: "moeilijk",
   },
   {
     id: "kat-1",
@@ -91,7 +84,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 5,
     seed: 17,
-    difficulty: "moeilijk",
   },
   {
     id: "bloem-1",
@@ -102,7 +94,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 5,
     seed: 18,
-    difficulty: "super-hard",
   },
   {
     id: "maan-1",
@@ -113,7 +104,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 5,
     seed: 19,
-    difficulty: "super-hard",
   },
   {
     id: "hart-2",
@@ -124,7 +114,6 @@ const LEVEL_SPECS: readonly LevelSpec[] = [
     minChunk: 3,
     maxChunk: 5,
     seed: 20,
-    difficulty: "super-hard",
   },
 ];
 
@@ -144,7 +133,6 @@ function buildLevel(spec: LevelSpec): MazeLevel {
   const level: MazeLevel = {
     id: spec.id,
     name: spec.name,
-    difficulty: spec.difficulty,
     width: spec.size,
     height: spec.size,
     arrows,

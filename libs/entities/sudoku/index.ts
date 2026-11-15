@@ -1,5 +1,5 @@
 export { clueCount, generatePuzzle } from "./model/generator";
-export { findHint } from "./model/hints";
+export { findHint, hintDetailCells } from "./model/hints";
 export { countSolutions, generateSolution, solveSudoku } from "./model/solver";
 export { CLUE_TARGETS, boxIndexFor, geometryFor, isPeer, isSudokuSize } from "./model/geometry";
 export { DIFFICULTIES, SUDOKU_SIZES } from "./model/types";

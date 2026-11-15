@@ -93,12 +93,12 @@ describe("math trainer", () => {
     playRoundCorrectly();
 
     expect(useMathStore.getState().stars).toBe(10);
-    expect(await screen.findByRole("heading", { name: "Perfect!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Je bleef scherp!" })).toBeTruthy();
     expect(screen.getByText("Je haalde 10 van de 10 sterren.")).toBeTruthy();
     expect(loadMathState().best["keer:gemiddeld"]).toBe(10);
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Perfect!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Je bleef scherp!" })).toBeNull();
     expect(useMathStore.getState().finished).toBe(false);
     expect(useMathStore.getState().stars).toBe(0);
     expect(useMathStore.getState().round).not.toBe(round);
@@ -129,6 +129,37 @@ describe("math trainer", () => {
     expect(useMathStore.getState().stars).toBe(0);
     expect(screen.getByText("Goed gerekend!")).toBeTruthy();
     expect(screen.getByText(/Tel verder vanaf/)).toBeTruthy();
+  });
+
+  it("shows a division as quotient groups of the divisor", async () => {
+    useMathStore.setState({
+      round: {
+        mode: "deel",
+        level: "makkelijk",
+        seed: 1,
+        questions: [
+          {
+            id: 0,
+            mode: "deel",
+            level: "makkelijk",
+            left: 15,
+            right: 5,
+            answer: 3,
+            prompt: "15 ÷ 5",
+            choices: [3, 4, 6],
+          },
+        ],
+      },
+      questionIndex: 0,
+    });
+    renderApp();
+    await screen.findByText(/Som 1 van 1/);
+
+    clickAnswer(3);
+
+    expect(screen.getByText("3 groepjes van 5")).toBeTruthy();
+    expect(screen.queryByText("5 groepjes van 3")).toBeNull();
+    expect(screen.getByText("15 ÷ 5 = 3. Dat zijn 3 groepjes van 5.")).toBeTruthy();
   });
 
   it("can open the setup again and return to the round", async () => {

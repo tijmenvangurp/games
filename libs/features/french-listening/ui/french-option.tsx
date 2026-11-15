@@ -1,20 +1,20 @@
-import { Check, X } from "@shared/ui";
+import { Check, RotateCcw } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { frenchAnswerState } from "../lib/answer-state";
 
 const OPTION_LETTERS = ["A", "B", "C", "D", "E"] as const;
 
 const OPTION_CLASSES = {
-  idle: "border-border bg-card hover:bg-muted",
-  correct: "border-emerald-400 bg-emerald-50 text-emerald-900",
-  wrong: "border-rose-400 bg-rose-50 text-rose-900",
+  idle: "border-border bg-card hover:bg-muted/60",
+  correct: "border-success/45 bg-success/10 text-success",
+  wrong: "border-warning/45 bg-warning/10 text-warning",
   muted: "border-border bg-muted/40 text-muted-foreground opacity-70",
 } as const;
 
 const BADGE_CLASSES = {
   idle: "bg-muted text-muted-foreground",
-  correct: "bg-emerald-500 text-white",
-  wrong: "bg-rose-500 text-white",
+  correct: "bg-success text-white",
+  wrong: "bg-warning text-white",
   muted: "bg-muted text-muted-foreground",
 } as const;
 
@@ -42,7 +42,7 @@ export function FrenchOption({
       aria-label={option}
       aria-pressed={option === selected}
       className={cn(
-        "flex min-h-14 w-full items-center gap-3 rounded-2xl border-2 px-3 py-2 text-left text-base font-bold leading-snug transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:active:scale-100",
+        "flex min-h-14 w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-base font-bold leading-snug transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:active:scale-100",
         OPTION_CLASSES[state],
       )}
       data-answer-state={state}
@@ -60,7 +60,7 @@ export function FrenchOption({
       </span>
       <span className="min-w-0 flex-1">{option}</span>
       {state === "correct" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      {state === "wrong" ? <X aria-hidden="true" className="size-5 shrink-0" /> : null}
+      {state === "wrong" ? <RotateCcw aria-hidden="true" className="size-5 shrink-0" /> : null}
     </button>
   );
 }

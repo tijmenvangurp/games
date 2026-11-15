@@ -77,7 +77,9 @@ export function useSentenceBuilder(lesson: FrenchLesson): SentenceBuilderState {
       setScore((value) => value + 1);
     }
     useFrenchProgressStore.getState().record(item.id, isCorrect);
-    playSound(isCorrect ? "match" : "wrong");
+    if (isCorrect) {
+      playSound("match");
+    }
   };
 
   const next = () => {

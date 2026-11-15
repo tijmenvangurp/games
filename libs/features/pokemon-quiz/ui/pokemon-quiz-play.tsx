@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { getPokemon, usePokemonCry, type Pokemon } from "@entities/pokedex";
+import { getPokemon, type Pokemon } from "@entities/pokedex";
 import { playHaptic, playSound } from "@shared/lib";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
@@ -13,7 +12,6 @@ export function PokemonQuizPlay() {
   const answered = usePokemonQuizStore((state) => state.answered);
   const correctCount = usePokemonQuizStore((state) => state.correctCount);
   const rounds = usePokemonQuizStore((state) => state.rounds);
-  const playCry = usePokemonCry();
 
   const target = question ? getPokemon(question.targetId) : undefined;
   const options = question
@@ -22,12 +20,6 @@ export function PokemonQuizPlay() {
         .filter((pokemon): pokemon is Pokemon => Boolean(pokemon))
     : [];
   const correct = answered && question ? selectedId === question.targetId : false;
-
-  useEffect(() => {
-    if (answered && target) {
-      playCry(target);
-    }
-  }, [answered, target, playCry]);
 
   if (!question || !target) {
     return null;
@@ -39,8 +31,10 @@ export function PokemonQuizPlay() {
     const next = usePokemonQuizStore.getState();
     if (!wasAnswered && next.answered && next.question) {
       const correctAnswer = pokemonId === next.question.targetId;
-      playSound(correctAnswer ? "match" : "wrong");
-      playHaptic(correctAnswer ? "match" : "wrong");
+      if (correctAnswer) {
+        playSound("match");
+        playHaptic("match");
+      }
     }
   };
 
@@ -62,16 +56,11 @@ export function PokemonQuizPlay() {
       </div>
 
       <aside className="order-2 space-y-3 lg:col-span-2">
-        <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card p-4 shadow-sm">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Raad de Pokémon
-            </p>
-            <p className="text-base font-black leading-tight">Kies de juiste naam</p>
-            <p className="text-xs text-muted-foreground">
-              {correctCount} van {rounds} goed
-            </p>
-          </div>
+        <div className="game-panel flex items-center justify-between gap-3 p-4">
+          <p className="text-sm font-black">
+            {correctCount} van {rounds} goed
+          </p>
+
           <div className="text-right">
             <p className="text-3xl font-black leading-none">{rounds}</p>
             <p className="text-xs text-muted-foreground">rondes</p>
@@ -96,7 +85,7 @@ export function PokemonQuizPlay() {
           <QuizFeedback correct={correct} targetName={target.name} onNext={handleNext} />
         ) : (
           <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-            Kies een naam. Daarna hoor je de Pokémon.
+            Kies een naam.
           </p>
         )}
       </aside>

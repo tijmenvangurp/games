@@ -1,0 +1,53 @@
+{
+  "board": "474ea3da658180d433d056b0a2a254dc90695d0688fae73e0ef6bbe94336f9be",
+  "crops": [
+    {
+      "file": "goose.webp",
+      "width": 124,
+      "height": 102,
+      "sha256": "c96ffdb4ddd7deed56e5c09c9b39d9c1dc21fdfd6f504c48aa216db14194e6ae"
+    },
+    {
+      "file": "bridge.webp",
+      "width": 122,
+      "height": 85,
+      "sha256": "a8b52ba1c197fc3ea63118f20ffa6d1b12eca0e89957b7a88d9cc59fcc28cd2b"
+    },
+    {
+      "file": "inn.webp",
+      "width": 122,
+      "height": 115,
+      "sha256": "49b057efd89c2ae91dc48ecdcf62f7fdcb202c61d0ff2fb87c07c6153485800c"
+    },
+    {
+      "file": "well.webp",
+      "width": 124,
+      "height": 122,
+      "sha256": "9a662f93b05d1a5e9a5bc72cd4186934a47f6a9dd768617897aa141d3bad42d7"
+    },
+    {
+      "file": "maze.webp",
+      "width": 112,
+      "height": 127,
+      "sha256": "76ff5cca1a11cee43d5a647737c2604fae672b49df634fd0df6accf1a1852c51"
+    },
+    {
+      "file": "prison.webp",
+      "width": 124,
+      "height": 109,
+      "sha256": "8db84578cee0543b374da5603c4ec019df283af82bdedca9ec499fc07d141d81"
+    },
+    {
+      "file": "death.webp",
+      "width": 95,
+      "height": 94,
+      "sha256": "9cf7f1909cb3c809f148b83082406256820c043a64804f6d8040753fe5a62647"
+    },
+    {
+      "file": "treasure.webp",
+      "width": 225,
+      "height": 210,
+      "sha256": "fbaf8dc6387c45e566d369b9baf69bc15b995422763246c6f96600a750feab5b"
+    }
+  ]
+}

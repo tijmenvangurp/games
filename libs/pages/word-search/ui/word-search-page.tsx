@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { WordSearchPlay, WordSearchSetup, useWordSearchStore } from "@features/word-search";
 import { CelebrationDialog } from "@shared/ui";
+import { useGameSetupNavigation } from "@shared/lib";
 import { GameShell } from "@widgets/game-shell";
 
 const THEME_LABELS = {
   tuin: "in de tuin",
   onderwater: "onder water",
+  pokemon: "Pokémon",
 } as const;
 
 export function WordSearchPage() {
@@ -17,6 +19,13 @@ export function WordSearchPage() {
   const [showSetup, setShowSetup] = useState(false);
 
   const setupVisible = showSetup || !puzzle;
+  const gameSetup = useGameSetupNavigation({
+    setupVisible,
+    hasActiveGame: Boolean(puzzle),
+    backToGameLabel: "Terug naar je woordzoeker",
+    onCloseSetup: () => setShowSetup(false),
+    onOpenSetup: () => setShowSetup(true),
+  });
   const complete =
     puzzle !== null && puzzle.placements.length > 0 && found.length === puzzle.placements.length;
 
@@ -27,8 +36,7 @@ export function WordSearchPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
-      onNewGame={puzzle ? () => setShowSetup(true) : undefined}
+      {...gameSetup}
       subtitle={
         puzzle
           ? `${puzzle.difficulty} · ${puzzle.size} × ${puzzle.size} · ${THEME_LABELS[puzzle.theme]}`
@@ -39,9 +47,7 @@ export function WordSearchPage() {
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <WordSearchSetup
-            hasActiveGame={Boolean(puzzle)}
             settings={settings}
-            onBack={() => setShowSetup(false)}
             onDifficultyChange={(difficulty) =>
               useWordSearchStore.getState().chooseDifficulty(difficulty)
             }
@@ -55,8 +61,9 @@ export function WordSearchPage() {
 
       {complete && !setupVisible ? (
         <CelebrationDialog
+          confetti
           description={`Je vond alle ${puzzle.placements.length} woorden.`}
-          title="Knap gedaan!"
+          title="Gevonden!"
           onAgain={() => useWordSearchStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

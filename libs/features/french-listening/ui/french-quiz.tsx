@@ -56,7 +56,9 @@ export function FrenchQuiz() {
     if (!wasAnswered && next.answered && next.question) {
       const correctAnswer = option === next.question.item.nl;
       useFrenchProgressStore.getState().record(next.question.item.id, correctAnswer);
-      playSound(correctAnswer ? "match" : "wrong");
+      if (correctAnswer) {
+        playSound("match");
+      }
     }
   };
 

@@ -85,7 +85,9 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
     }
     const correct = round.words.filter((word) => placements[word.item.id] === word.lessonId).length;
     setChecked(true);
-    playSound(correct === round.words.length ? "match" : "wrong");
+    if (correct === round.words.length) {
+      playSound("match");
+    }
   };
 
   const restart = () => {
@@ -97,10 +99,10 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card px-4 py-3 shadow-sm">
+      <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Sorteer de woorden
+            Voortgang
           </p>
           <p className="text-sm font-bold">
             {round.words.length - unplaced.length} van {round.words.length} geplaatst
@@ -145,7 +147,7 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
 
         <DragOverlay>
           {activeWord ? (
-            <div className="rounded-xl border-2 border-primary bg-card px-3 py-2 font-bold shadow-lg">
+            <div className="rounded-xl border border-primary bg-card px-3 py-2 font-bold shadow-lg">
               {activeWord.item.fr}
             </div>
           ) : null}
@@ -153,16 +155,16 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       </DndContext>
 
       {checked ? (
-        <div aria-live="polite" className="space-y-2 rounded-3xl border bg-card p-4 shadow-sm">
+        <div aria-live="polite" className="game-panel space-y-2 p-4">
           <p
             className={
               score === round.words.length
-                ? "flex items-center justify-center gap-1.5 font-black text-emerald-700"
-                : "flex items-center justify-center gap-1.5 font-black text-rose-700"
+                ? "flex items-center justify-center gap-1.5 font-black text-success"
+                : "flex items-center justify-center gap-1.5 font-black text-warning"
             }
           >
             <Sparkles aria-hidden="true" className="size-5" />
-            {score === round.words.length ? "Alles goed!" : "Bijna!"}
+            {score === round.words.length ? "Alles goed!" : "Nog niet."}
           </p>
           <p className="text-center text-sm text-muted-foreground">
             Je had {score} van {round.words.length} goed.

@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self'; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
   X-Robots-Tag: noindex, nofollow
@@ -10,7 +10,16 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+/stockfish/*
+  Cache-Control: public, max-age=31536000, immutable
+
 /audio/*
+  Cache-Control: public, max-age=86400
+
+/thumbnails/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/flags/*
   Cache-Control: public, max-age=604800
 
 /favicon.svg

@@ -84,7 +84,7 @@ describe("seek and find", () => {
     fireEvent.click(creatureNode(scene.targetId));
     expect(useSeekStore.getState().found).toBe(true);
     expect(await screen.findByRole("heading", { name: "Gevonden!" })).toBeTruthy();
-    expect(screen.getByText(/1 keer mis/)).toBeTruthy();
+    expect(screen.getByText(/1 keer verder gekeken/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
     expect(screen.queryByRole("heading", { name: "Gevonden!" })).toBeNull();
@@ -97,7 +97,7 @@ describe("seek and find", () => {
     expect(await screen.findByRole("group", { name: /Zoek de Wobbel met de ster/i })).toBeTruthy();
   });
 
-  it("gives haptic feedback on a wrong tap, a hint and a find", async () => {
+  it("gives haptic feedback on a hint and a find, not on a wrong tap", async () => {
     const vibrate = vi.fn(() => true);
     Object.defineProperty(navigator, "vibrate", {
       configurable: true,
@@ -115,7 +115,7 @@ describe("seek and find", () => {
     }
 
     fireEvent.click(creatureNode(decoy.id));
-    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+    expect(vibrate).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
     expect(vibrate).toHaveBeenLastCalledWith(20);

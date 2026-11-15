@@ -85,6 +85,18 @@ function validateTranslations(lesson: FrenchLesson): CurriculumIssue[] {
   return issues;
 }
 
+function normalizeFrench(value: string): string {
+  return value.toLocaleLowerCase("fr").replaceAll("’", "'");
+}
+
+function exampleUsesWord(item: FrenchItem): boolean {
+  if (!item.example) {
+    return true;
+  }
+  const stem = item.fr.replace(/^(le |la |les |l’|l')/u, "");
+  return normalizeFrench(item.example.fr).includes(normalizeFrench(stem));
+}
+
 function validateExample(item: FrenchItem, path: string): CurriculumIssue[] {
   if (!item.example) {
     return [];
@@ -95,6 +107,9 @@ function validateExample(item: FrenchItem, path: string): CurriculumIssue[] {
   }
   if (!item.example.nl.trim()) {
     issues.push(issue(path, "Example translation is empty."));
+  }
+  if (item.kind === "word" && !exampleUsesWord(item)) {
+    issues.push(issue(path, "Example sentence must use the word."));
   }
   return issues;
 }

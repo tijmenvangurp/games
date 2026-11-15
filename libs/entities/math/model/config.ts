@@ -2,27 +2,25 @@ import type { MathLevel, MathMode } from "./types";
 
 interface MathModeInfo {
   label: string;
-  emoji: string;
   hint: string;
   symbol: string;
 }
 
 export const MATH_MODE_INFO: Record<MathMode, MathModeInfo> = {
-  plus: { label: "Optellen", emoji: "➕", hint: "Erbij doen", symbol: "+" },
-  min: { label: "Aftrekken", emoji: "➖", hint: "Eraf halen", symbol: "−" },
-  keer: { label: "Keer", emoji: "✖️", hint: "Groepjes maken", symbol: "×" },
-  deel: { label: "Delen", emoji: "➗", hint: "Eerlijk verdelen", symbol: "÷" },
+  plus: { label: "Optellen", hint: "Erbij doen", symbol: "+" },
+  min: { label: "Aftrekken", hint: "Eraf halen", symbol: "−" },
+  keer: { label: "Keer", hint: "Groepjes maken", symbol: "×" },
+  deel: { label: "Delen", hint: "Eerlijk verdelen", symbol: "÷" },
 };
 
 interface MathLevelInfo {
   label: string;
-  emoji: string;
 }
 
 export const MATH_LEVEL_INFO: Record<MathLevel, MathLevelInfo> = {
-  makkelijk: { label: "Makkelijk", emoji: "🌱" },
-  gemiddeld: { label: "Gemiddeld", emoji: "🌤️" },
-  moeilijk: { label: "Moeilijk", emoji: "🔥" },
+  makkelijk: { label: "Makkelijk" },
+  gemiddeld: { label: "Gemiddeld" },
+  moeilijk: { label: "Moeilijk" },
 };
 
 export function levelHint(mode: MathMode, level: MathLevel): string {

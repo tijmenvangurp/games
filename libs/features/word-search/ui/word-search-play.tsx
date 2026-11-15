@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { playSound } from "@shared/lib";
+import { playSound, useAutoSpeech } from "@shared/lib";
+import { wordSearchFeedbackSpeech } from "../model/audio";
 import { useWordSearchStore } from "../model/use-word-search-store";
 import { WordSearchBoard } from "./word-search-board";
 import { WordSearchSidebar } from "./word-search-sidebar";
@@ -17,7 +18,7 @@ export function WordSearchPlay() {
     if (!wrong) {
       return;
     }
-    const timer = window.setTimeout(() => useWordSearchStore.getState().clearWrong(), 800);
+    const timer = window.setTimeout(() => useWordSearchStore.getState().clearWrong(), 2200);
     return () => window.clearTimeout(timer);
   }, [wrong]);
 
@@ -29,12 +30,24 @@ export function WordSearchPlay() {
     return () => window.clearTimeout(timer);
   }, [hint]);
 
+  const words = puzzle?.placements.map((placement) => placement.word) ?? [];
+  const complete = puzzle !== null && found.length === words.length;
+  const puzzleId = puzzle
+    ? `${puzzle.theme}:${puzzle.difficulty}:${puzzle.grid.map((row) => row.join("")).join("")}`
+    : "geen";
+  const feedback = wordSearchFeedbackSpeech({
+    puzzleId,
+    complete,
+    wrong,
+    selectedCount: selected.length,
+    lastFound,
+  });
+  useAutoSpeech(feedback.key, feedback.lines);
+
   if (!puzzle) {
     return null;
   }
 
-  const words = puzzle.placements.map((placement) => placement.word);
-  const complete = found.length === words.length;
   const nextWord = words.find((word) => !found.includes(word));
 
   const handleNew = () => {
@@ -59,12 +72,10 @@ export function WordSearchPlay() {
 
       <WordSearchSidebar
         complete={complete}
+        feedback={feedback}
         found={found}
-        lastFound={lastFound}
         nextWord={nextWord}
-        selectedCount={selected.length}
         words={words}
-        wrong={wrong}
         zoomed={zoomed}
         onHint={(word) => useWordSearchStore.getState().showHint(word)}
         onNew={handleNew}

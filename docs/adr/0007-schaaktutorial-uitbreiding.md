@@ -5,7 +5,7 @@
 
 ## Context
 
-ADR 0006 introduceerde drie geïsoleerde lessen: toren, paard en pion. De eigenaar wil de tutorial doortrekken naar de complete schaakbasis. Naast de ontbrekende stukken moet het kind ook kennismaken met rokade, schaak zetten en schaakmat.
+ADR 0006 introduceerde drie geïsoleerde lessen: toren, paard en pion. De maintainer wil de tutorial doortrekken naar de complete schaakbasis. Naast de ontbrekende stukken moet het kind ook kennismaken met rokade, schaak zetten en schaakmat.
 
 De bestaande levelvorm had één doelmechanisme: een doelveld plus een minimumaantal zetten. Dat is niet genoeg voor opdrachten als “zet schaak” of “zet schaakmat”, waarbij het resultaat van de zet belangrijker is dan het veld.
 

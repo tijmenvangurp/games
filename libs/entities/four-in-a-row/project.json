@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-four-in-a-row",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/four-in-a-row",
+  "tags": ["layer:entities", "scope:four-in-a-row", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/four-in-a-row"
+      }
+    }
+  },
+  "implicitDependencies": []
+}

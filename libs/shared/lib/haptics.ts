@@ -7,15 +7,15 @@
  * web API exposes intensity or a waveform. Any buzz should simply mean
  * "something happened".
  */
-export type HapticName = "tap" | "select" | "match" | "wrong" | "hint" | "almost" | "win";
+export type HapticName = "tap" | "select" | "match" | "hint" | "almost" | "surprise" | "win";
 
 const HAPTIC_PATTERNS: Record<HapticName, number | number[]> = {
   tap: 10,
   select: 10,
   match: [10, 30, 10],
-  wrong: [30, 40, 30],
   hint: 20,
   almost: 20,
+  surprise: [15, 25, 15],
   win: [20, 40, 20],
 };
 

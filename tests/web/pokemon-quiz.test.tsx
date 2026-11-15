@@ -56,6 +56,14 @@ function artworkImage(): HTMLImageElement {
   return image;
 }
 
+function artworkLabel(): string {
+  const label = document.querySelector<HTMLElement>("[data-artwork-label]");
+  if (!label) {
+    throw new Error("No artwork label");
+  }
+  return label.textContent ?? "";
+}
+
 async function startHardGame(): Promise<void> {
   renderApp();
   expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
@@ -93,8 +101,8 @@ describe("wie is deze pokémon", () => {
     expect(usePokemonQuizStore.getState().answered).toBe(true);
     expect(usePokemonQuizStore.getState().correctCount).toBe(1);
     expect(usePokemonQuizStore.getState().rounds).toBe(1);
-    expect(screen.getByText("Goed gedaan!")).toBeTruthy();
-    expect(screen.getByText(`${name} is goed!`)).toBeTruthy();
+    expect(screen.getByText("Je vond het!")).toBeTruthy();
+    expect(screen.getByText(`Het is ${name}.`)).toBeTruthy();
     expect(screen.getByRole("img", { name })).toBeTruthy();
     expect(screen.getByRole("button", { name }).getAttribute("data-answer-state")).toBe("correct");
 
@@ -122,7 +130,7 @@ describe("wie is deze pokémon", () => {
 
     expect(usePokemonQuizStore.getState().correctCount).toBe(0);
     expect(usePokemonQuizStore.getState().rounds).toBe(1);
-    expect(screen.getByText("Bijna!")).toBeTruthy();
+    expect(screen.getByText("Nog niet.")).toBeTruthy();
     expect(screen.getByText(`Het juiste antwoord is ${name}.`)).toBeTruthy();
     expect(screen.getByRole("button", { name: wrong }).getAttribute("data-answer-state")).toBe(
       "wrong",
@@ -130,7 +138,7 @@ describe("wie is deze pokémon", () => {
     expect(screen.getByRole("button", { name }).getAttribute("data-answer-state")).toBe("correct");
   });
 
-  it("gives haptic feedback on a correct and a wrong answer", async () => {
+  it("gives haptic feedback on a correct answer but not on a wrong one", async () => {
     const vibrate = vi.fn(() => true);
     Object.defineProperty(navigator, "vibrate", {
       configurable: true,
@@ -152,8 +160,10 @@ describe("wie is deze pokémon", () => {
       throw new Error("No wrong option found");
     }
 
+    const callsBeforeWrong = vibrate.mock.calls.length;
     fireEvent.click(screen.getByRole("button", { name: wrong }));
-    expect(vibrate).toHaveBeenLastCalledWith([30, 40, 30]);
+    expect(vibrate.mock.calls).toHaveLength(callsBeforeWrong);
+    expect(vibrate).not.toHaveBeenCalledWith([30, 40, 30]);
   });
 
   it("stores the chosen difficulty and shows five names", async () => {
@@ -169,6 +179,19 @@ describe("wie is deze pokémon", () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}")).toEqual({
       difficulty: "moeilijk",
     });
+  });
+
+  it("hides the name on the artwork until an answer is picked", async () => {
+    await startGame();
+
+    expect(artworkLabel()).toBe("Wie is deze Pokémon?");
+    expect(artworkImage().getAttribute("alt")).toBe("");
+
+    const name = targetName();
+    fireEvent.click(screen.getByRole("button", { name }));
+
+    expect(artworkLabel()).toBe(name);
+    expect(artworkImage().getAttribute("alt")).toBe(name);
   });
 
   it("shows only a silhouette on hard until an answer is picked", async () => {

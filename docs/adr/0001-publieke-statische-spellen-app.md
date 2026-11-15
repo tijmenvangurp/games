@@ -5,13 +5,13 @@
 
 ## Context
 
-De eigenaar wil spelletjes voor de kinderen publiceren op een openbare URL, te beginnen met sudoku. De bestaande repository `athena-homelab-control` bevat interne infrastructuur: hostnames, tailnet-namen, poorten, paden en beheerprocedures. Publicatie vanuit die repository of met gedeelde geschiedenis zou interne informatie kunnen lekken. De app heeft geen serverdata nodig: sudoku's kunnen volledig in de browser worden gegenereerd en opgelost.
+De maintainer wil spelletjes voor de kinderen publiceren op een openbare URL, te beginnen met sudoku. De bestaande interne repository bevat infrastructuur: hostnames, netwerknamen, poorten, paden en beheerprocedures. Publicatie vanuit die repository of met gedeelde geschiedenis zou interne informatie kunnen lekken. De app heeft geen serverdata nodig: sudoku's kunnen volledig in de browser worden gegenereerd en opgelost.
 
 ## Beslissing
 
 1. **Nieuwe, zelfstandige publieke repository** (`games`) zonder gedeelde geschiedenis met `homelab-control`.
 2. **Volledig statische SPA.** Geen backend, database, accounts, API-keys of environment variables. De sudoku-generator en -solver draaien in de browser; elke puzzel heeft precies één oplossing.
-3. **Cloudflare Workers static assets.** De workernaam `games` levert `games.tijmenvangurp.workers.dev`. Deploy gebeurt vanuit GitHub Actions met een eigen, beperkt token dat alleen als repository-secret bestaat.
+3. **Cloudflare Workers static assets.** De workernaam `games` levert `games.tijmenvangurp.nl`; de `workers.dev`-URL blijft als technische fallback. Deploy gebeurt via Cloudflare Workers Builds.
 4. **Geen externe requests.** Geen analytics, trackers, CDN's of externe fonts. `apps/games/public/_headers` zet een strikte CSP, `noindex` en `nosniff`.
 5. **Publieke-repo-hygiëne.** Commits gebruiken het GitHub `noreply`-adres; er komen geen namen, foto's of andere persoonsgegevens in de repository.
 6. **Lokale opslag alleen.** Voortgang en instellingen staan in `localStorage` op het apparaat en worden nergens naartoe gestuurd.

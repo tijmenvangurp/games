@@ -1,44 +1,61 @@
-import type { MemoryDifficulty } from "@entities/memory";
 import { PokemonAssetsCredits } from "@entities/pokedex";
+import { pairsForLevel } from "@entities/memory";
 import { OptionPicker, SetupActions } from "@shared/ui";
-import { MEMORY_DIFFICULTY_OPTIONS, type MemorySettings } from "../model/settings";
+import {
+  MEMORY_MODE_OPTIONS,
+  memoryLevelOptions,
+  type MemoryMode,
+  type MemorySettings,
+} from "../model/settings";
 
 interface MemorySetupProps {
   settings: MemorySettings;
-  hasActiveGame: boolean;
-  onDifficultyChange: (difficulty: MemoryDifficulty) => void;
+  onModeChange: (mode: MemoryMode) => void;
+  onLevelChange: (levelIndex: number) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
-export function MemorySetup({
-  settings,
-  hasActiveGame,
-  onDifficultyChange,
-  onStart,
-  onBack,
-}: MemorySetupProps) {
+export function MemorySetup({ settings, onModeChange, onLevelChange, onStart }: MemorySetupProps) {
+  const autoPairs = pairsForLevel(settings.adaptive.levelIndex);
+
   return (
-    <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <section className="game-panel animate-rise p-4 sm:p-6">
       <div className="mb-5">
-        <h2 className="text-xl font-black">Nieuw spel</h2>
+        <h2 className="font-display text-2xl">Nieuw spel</h2>
         <p className="text-sm text-muted-foreground">
-          Hoeveel Pokémon-paren wil je zoeken? Alle kaarten komen uit Generatie 1.
+          Zoek de Pokémon-paren. De app kan het aantal paren laten meegroeien.
         </p>
       </div>
 
       <OptionPicker
-        legend="Moeilijkheid"
-        options={MEMORY_DIFFICULTY_OPTIONS}
-        selected={settings.difficulty}
-        onSelect={onDifficultyChange}
+        columns={2}
+        legend="Hoe kies je het niveau?"
+        options={MEMORY_MODE_OPTIONS}
+        selected={settings.mode}
+        onSelect={onModeChange}
       />
 
-      <SetupActions
-        backLabel="Terug naar je spel"
-        onBack={hasActiveGame ? onBack : undefined}
-        onStart={onStart}
-      />
+      {settings.mode === "auto" ? (
+        <div className="mt-4 rounded-lg bg-success/10 px-4 py-3 text-sm text-success">
+          <p className="font-bold">Je begint bij {autoPairs} paren.</p>
+          <p className="opacity-80">
+            Twee goede paren op een rij en je gaat een stapje verder. Soms is het weer even zoeken;
+            dat hoort erbij.
+          </p>
+        </div>
+      ) : (
+        <div className="mt-4">
+          <OptionPicker
+            columns={3}
+            legend="Aantal paren"
+            options={memoryLevelOptions()}
+            selected={settings.manualIndex}
+            onSelect={onLevelChange}
+          />
+        </div>
+      )}
+
+      <SetupActions onStart={onStart} />
 
       <PokemonAssetsCredits />
     </section>

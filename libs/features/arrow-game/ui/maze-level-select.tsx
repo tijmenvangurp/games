@@ -1,7 +1,6 @@
 import type { MazeLevel } from "@entities/arrow";
 import { ArrowLeft, Button, Check, Lock, SoundToggle } from "@shared/ui";
 import { cn } from "@shared/lib";
-import { MAZE_DIFFICULTY_LABELS } from "../model/labels";
 
 interface MazeLevelSelectProps {
   levels: readonly MazeLevel[];
@@ -36,17 +35,15 @@ export function MazeLevelSelect({
             <button
               key={level.id}
               aria-label={
-                locked
-                  ? `Level ${index + 1}, vergrendeld`
-                  : `Level ${index + 1}, ${level.name}, ${MAZE_DIFFICULTY_LABELS[level.difficulty]}`
+                locked ? `Level ${index + 1}, vergrendeld` : `Level ${index + 1}, ${level.name}`
               }
               aria-disabled={locked}
               className={cn(
-                "relative flex min-h-24 flex-col items-start justify-between rounded-2xl border-2 p-3 text-left transition active:scale-95",
+                "relative flex min-h-24 flex-col items-start justify-between rounded-lg border p-3 text-left transition active:scale-[0.99]",
                 locked
                   ? "border-border bg-muted/40 text-muted-foreground"
-                  : "border-border bg-card hover:bg-muted",
-                index === current && !locked && "border-primary ring-2 ring-primary/20",
+                  : "border-border bg-card hover:bg-muted/60",
+                index === current && !locked && "border-primary ring-1 ring-primary/20",
               )}
               disabled={locked}
               type="button"
@@ -54,13 +51,13 @@ export function MazeLevelSelect({
             >
               <span className="text-sm font-black">Level {index + 1}</span>
               <span className="text-xs text-muted-foreground">
-                {level.name} · {MAZE_DIFFICULTY_LABELS[level.difficulty]}
+                {level.name} · {level.arrows.length} pijlen
               </span>
               <span className="absolute right-2 top-2">
                 {locked ? (
                   <Lock aria-hidden="true" className="size-4" />
                 ) : completed ? (
-                  <span className="grid size-5 place-items-center rounded-full bg-emerald-500 text-white">
+                  <span className="grid size-5 place-items-center rounded-full bg-success text-white">
                     <Check aria-hidden="true" className="size-3" />
                   </span>
                 ) : null}

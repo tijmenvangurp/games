@@ -161,7 +161,7 @@ describe("word search words", () => {
       expect(pool.length).toBeGreaterThanOrEqual(WORD_SEARCH_CONFIG.moeilijk.wordCount);
 
       for (const word of pool) {
-        expect(word).toMatch(/^[a-z]{3,8}$/);
+        expect(word).toMatch(/^[A-Za-z]{3,9}$/);
       }
     }
   });
@@ -196,10 +196,12 @@ describe("createWordSearch", () => {
   });
 
   it("places every word across many seeds", () => {
-    for (const difficulty of WORD_SEARCH_DIFFICULTIES) {
-      for (let seed = 1; seed <= 30; seed += 1) {
-        const puzzle = createWordSearch("onderwater", difficulty, seed);
-        expect(puzzle.placements).toHaveLength(WORD_SEARCH_CONFIG[difficulty].wordCount);
+    for (const theme of WORD_SEARCH_THEMES) {
+      for (const difficulty of WORD_SEARCH_DIFFICULTIES) {
+        for (let seed = 1; seed <= 30; seed += 1) {
+          const puzzle = createWordSearch(theme, difficulty, seed);
+          expect(puzzle.placements).toHaveLength(WORD_SEARCH_CONFIG[difficulty].wordCount);
+        }
       }
     }
   });

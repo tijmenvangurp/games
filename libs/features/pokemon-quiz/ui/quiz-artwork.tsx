@@ -11,15 +11,16 @@ interface QuizArtworkProps {
 }
 
 export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtworkProps) {
+  // Easy and medium show the colours right away; hard waits for the answer.
   const revealed = !silhouette || answered;
   const fragmentVisible = fragment && !answered;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/80 bg-gradient-to-br from-sky-100 via-amber-50 to-rose-100 p-3 shadow-sm sm:p-5">
+    <div className="game-panel relative overflow-hidden p-3 sm:p-5">
       <PokeballMark className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-10 sm:size-56" />
-      <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center overflow-hidden rounded-2xl">
+      <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center overflow-hidden rounded-lg">
         <img
-          alt={revealed ? target.name : ""}
+          alt={answered ? target.name : ""}
           className={cn(
             "h-full w-full object-contain drop-shadow-xl transition duration-700 ease-out",
             revealed ? undefined : "brightness-0",
@@ -36,10 +37,11 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
       <p
         className={cn(
           "relative text-center text-lg font-black",
-          revealed ? "animate-pop text-emerald-700" : "text-slate-500",
+          answered ? "animate-pop text-success" : "text-muted-foreground",
         )}
+        data-artwork-label={answered ? target.name : ""}
       >
-        {revealed ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}
+        {answered ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}
       </p>
     </div>
   );

@@ -5,7 +5,7 @@
 
 ## Context
 
-Na de schaaktutorial wil de eigenaar korte schaakpuzzels aanbieden. De app is statisch, doet geen externe requests en gebruikt al `chess.js` en `react-chessboard`. Een runtime-koppeling met de Lichess-API is daarom geen optie. De Lichess-puzzeldatabase is publiek beschikbaar onder CC0 en bevat FEN, oplossingen, rating en thema's.
+Na de schaaktutorial wil de maintainer korte schaakpuzzels aanbieden. De app is statisch, doet geen externe requests en gebruikt al `chess.js` en `react-chessboard`. Een runtime-koppeling met de Lichess-API is daarom geen optie. De Lichess-puzzeldatabase is publiek beschikbaar onder CC0 en bevat FEN, oplossingen, rating en thema's.
 
 ## Beslissing
 
@@ -33,3 +33,7 @@ Na de schaaktutorial wil de eigenaar korte schaakpuzzels aanbieden. De app is st
 - De selectie is bewust niet representatief voor de hele Lichess-database en bevat geen dynamisch rating- of voortgangssysteem.
 - Meer puzzels toevoegen betekent een nieuwe offline selectie maken, de juiste `difficulty` kiezen en de data/test bijwerken.
 - De runner ondersteunt nu één spelerszet per puzzel. Latere tactics met meerdere zetten kunnen dezelfde engine gebruiken, maar vragen extra UI-feedback en tests.
+
+## Vervolg
+
+ADR 0015 breidt deze selectie uit met 90 gegenereerde Lichess-puzzels, waaronder mat-in-twee en tactieken met meer stukvariatie.

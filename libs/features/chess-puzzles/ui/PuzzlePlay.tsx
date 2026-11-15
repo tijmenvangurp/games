@@ -1,16 +1,20 @@
-import { useId, useMemo } from "react";
-import { Chessboard, type ChessboardOptions } from "react-chessboard";
-import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
-import { Button, Check, Lightbulb, Play, RotateCcw } from "@shared/ui";
-import { useChessPuzzle } from "../model/useChessPuzzle";
+import { useEffect, useId, useMemo, useRef } from "react";
+import type { ChessboardOptions } from "react-chessboard";
+import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
 import {
-  PUZZLE_DIFFICULTIES,
-  type ChessPuzzle,
-  type PuzzleDifficulty,
-  type PuzzleFeedback,
-  type PuzzleKind,
-  type PuzzleStatus,
-} from "../model/types";
+  Button,
+  Check,
+  ChessBoard,
+  LayoutGrid,
+  Lightbulb,
+  Play,
+  RotateCcw,
+  SpeechButton,
+} from "@shared/ui";
+import { puzzlePromptSpeech, puzzleStatusSpeech, puzzleTitleSpeech } from "../model/audio";
+import { useChessPuzzle } from "../model/useChessPuzzle";
+import type { ChessPuzzle, PuzzleDifficulty, PuzzleFeedback, PuzzleStatus } from "../model/types";
+import { PuzzleDifficultyPicker } from "./PuzzleDifficultyPicker";
 
 interface PuzzlePlayProps {
   readonly difficulty: PuzzleDifficulty;
@@ -19,158 +23,114 @@ interface PuzzlePlayProps {
   readonly total: number;
   readonly onDifficultyChange: (difficulty: PuzzleDifficulty) => void;
   readonly onNext: () => void;
-}
-
-function titleFor(kind: PuzzleKind): string {
-  return kind === "mate" ? "Zet schaakmat!" : "Win een stuk!";
-}
-
-function promptFor(kind: PuzzleKind, playerColor: "w" | "b"): string {
-  const player = playerColor === "w" ? "wit" : "zwart";
-  const opponent = playerColor === "w" ? "zwarte" : "witte";
-
-  return kind === "mate"
-    ? `Je bent ${player}. Zet de ${opponent} koning schaakmat.`
-    : `Je bent ${player}. Welke zet wint een stuk?`;
+  readonly onOverview: () => void;
+  readonly onSolved?: (puzzle: ChessPuzzle) => void;
 }
 
 interface PuzzleHeaderProps {
   readonly index: number;
-  readonly playerColor: "w" | "b";
-  readonly puzzle: ChessPuzzle;
+  readonly prompt: ReturnType<typeof puzzlePromptSpeech>;
+  readonly title: ReturnType<typeof puzzleTitleSpeech>;
   readonly titleId: string;
   readonly total: number;
 }
 
-function PuzzleHeader({ index, playerColor, puzzle, titleId, total }: PuzzleHeaderProps) {
+function PuzzleHeader({ index, prompt, title, titleId, total }: PuzzleHeaderProps) {
   return (
     <header className="space-y-1 text-center">
-      <p className="text-xs font-black uppercase tracking-widest text-teal-700">
+      <p className="text-xs font-black uppercase tracking-widest text-primary">
         Puzzel {index + 1} van {total}
       </p>
-      <h2 id={titleId} className="text-2xl font-black text-slate-900 sm:text-3xl">
-        {titleFor(puzzle.kind)}
+      <h2 id={titleId} className="text-2xl font-black text-foreground sm:text-3xl">
+        {title.text}
       </h2>
-      <p className="text-sm font-semibold text-slate-600">{promptFor(puzzle.kind, playerColor)}</p>
+      <div className="flex items-center justify-center gap-1">
+        <p className="text-sm font-semibold text-muted-foreground">{prompt.text}</p>
+        <SpeechButton className="shrink-0" label="Beluister de opdracht" line={prompt} />
+      </div>
     </header>
-  );
-}
-
-interface DifficultyPickerProps {
-  readonly current: PuzzleDifficulty;
-  readonly onSelect: (difficulty: PuzzleDifficulty) => void;
-}
-
-function DifficultyPicker({ current, onSelect }: DifficultyPickerProps) {
-  return (
-    <nav aria-label="Kies een moeilijkheidsgraad" className="grid grid-cols-3 gap-2">
-      {PUZZLE_DIFFICULTIES.map((option) => {
-        const active = option.id === current;
-
-        return (
-          <button
-            key={option.id}
-            type="button"
-            aria-pressed={active}
-            className={cn(
-              "min-h-11 rounded-xl border-2 px-2 py-2 text-xs font-bold leading-tight transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal-300",
-              active
-                ? "border-teal-500 bg-teal-100 text-teal-950"
-                : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50",
-            )}
-            onClick={() => onSelect(option.id)}
-          >
-            <span className="block">{option.label}</span>
-            <span
-              className={cn(
-                "mt-0.5 block text-xs font-medium",
-                active ? "text-teal-800" : "text-slate-500",
-              )}
-            >
-              {option.hint}
-            </span>
-          </button>
-        );
-      })}
-    </nav>
   );
 }
 
 function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
   return (
-    <div
-      aria-label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Sleep een stuk of tik erop."
-      className="mx-auto w-full max-w-lg"
-      role="group"
-    >
-      <div className="aspect-square w-full touch-manipulation">
-        <Chessboard options={options} />
-      </div>
-    </div>
+    <ChessBoard
+      label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten."
+      options={options}
+    />
   );
 }
 
 interface PuzzleStatusProps {
-  readonly feedback: PuzzleFeedback;
-  readonly kind: PuzzleKind;
-  readonly status: PuzzleStatus;
+  readonly speech: ReturnType<typeof puzzleStatusSpeech>;
+  readonly solved: boolean;
+  readonly tone: "success" | "danger" | "primary" | "muted";
 }
 
-function statusText(feedback: PuzzleFeedback, kind: PuzzleKind, status: PuzzleStatus): string {
-  if (status === "solved") {
-    return kind === "mate" ? "Schaakmat! Knap gedaan." : "Gelukt! Je hebt een stuk gewonnen.";
-  }
+const TONE_CLASSES: Record<PuzzleStatusProps["tone"], string> = {
+  success: "bg-success/10 text-success",
+  danger: "bg-danger/10 text-danger",
+  primary: "bg-primary/10 text-primary",
+  muted: "bg-muted text-muted-foreground",
+};
 
-  if (feedback === "wrong") {
-    return "Die zet is niet de beste. Probeer nog eens.";
-  }
-
-  if (feedback === "correct") {
-    return "Goed zo! De tegenstander heeft geantwoord.";
-  }
-
-  return "Sleep een stuk of tik erop. Groene stippen zijn legale zetten.";
-}
-
-function PuzzleStatusBanner({ feedback, kind, status }: PuzzleStatusProps) {
+function PuzzleStatusBanner({ speech, solved, tone }: PuzzleStatusProps) {
   return (
     <div
       aria-live="polite"
       className={cn(
-        "flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 py-2 text-center text-sm font-bold",
-        status === "solved"
-          ? "bg-emerald-100 text-emerald-900"
-          : feedback === "wrong"
-            ? "bg-rose-100 text-rose-900"
-            : feedback === "correct"
-              ? "bg-sky-100 text-sky-900"
-              : "bg-slate-100 text-slate-700",
+        "flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-bold",
+        TONE_CLASSES[tone],
       )}
     >
-      {status === "solved" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      <span>{statusText(feedback, kind, status)}</span>
+      {solved ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
+      <span className="min-w-0">{speech.text}</span>
+      <SpeechButton className="shrink-0" label="Beluister de feedback" line={speech} />
     </div>
   );
+}
+
+function statusTone(status: PuzzleStatus, feedback: PuzzleFeedback): PuzzleStatusProps["tone"] {
+  if (status === "solved") {
+    return "success";
+  }
+  if (feedback === "wrong") {
+    return "danger";
+  }
+  if (feedback === "correct") {
+    return "primary";
+  }
+  return "muted";
 }
 
 interface PuzzleActionsProps {
   readonly solved: boolean;
   readonly onHint: () => void;
   readonly onNext: () => void;
+  readonly onOverview: () => void;
   readonly onReset: () => void;
 }
 
-function PuzzleActions({ solved, onHint, onNext, onReset }: PuzzleActionsProps) {
+function PuzzleActions({ solved, onHint, onNext, onOverview, onReset }: PuzzleActionsProps) {
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-2">
-        <Button className="min-h-11" disabled={solved} variant="outline" onClick={onHint}>
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          className="min-h-12 px-2 text-xs sm:text-sm"
+          disabled={solved}
+          variant="outline"
+          onClick={onHint}
+        >
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
-        <Button className="min-h-11" variant="outline" onClick={onReset}>
+        <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>
           <RotateCcw aria-hidden="true" className="size-4" />
           Opnieuw
+        </Button>
+        <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onOverview}>
+          <LayoutGrid aria-hidden="true" className="size-4" />
+          Overzicht
         </Button>
       </div>
       <Button className="w-full" disabled={!solved} size="lg" variant="success" onClick={onNext}>
@@ -188,9 +148,38 @@ export function PuzzlePlay({
   total,
   onDifficultyChange,
   onNext,
+  onOverview,
+  onSolved,
 }: PuzzlePlayProps) {
   const puzzleState = useChessPuzzle(puzzle);
   const titleId = useId();
+  const solvedRef = useRef(false);
+  const title = puzzleTitleSpeech(puzzle.kind);
+  const prompt = puzzlePromptSpeech(puzzle.kind, puzzleState.playerColor);
+  const status = puzzleStatusSpeech(
+    puzzleState.feedback,
+    puzzle.kind,
+    puzzleState.status,
+    puzzleState.playerColor,
+    puzzleState.selectedColor,
+  );
+  const solved = puzzleState.status === "solved";
+  const tone = statusTone(puzzleState.status, puzzleState.feedback);
+
+  useAutoSpeech(`puzzle-prompt-${puzzle.id}`, prompt);
+  useAutoSpeech(
+    `puzzle-status-${puzzle.id}-${puzzleState.status}-${puzzleState.feedback}-${puzzleState.selectedColor ?? "none"}`,
+    status,
+  );
+
+  useEffect(() => {
+    if (puzzleState.status !== "solved" || solvedRef.current) {
+      return;
+    }
+
+    solvedRef.current = true;
+    onSolved?.(puzzle);
+  }, [onSolved, puzzle, puzzleState.status]);
 
   const squareStyles = useMemo(
     () =>
@@ -219,24 +208,15 @@ export function PuzzlePlay({
 
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-4">
-      <PuzzleHeader
-        index={index}
-        playerColor={puzzleState.playerColor}
-        puzzle={puzzle}
-        titleId={titleId}
-        total={total}
-      />
-      <DifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
+      <PuzzleHeader index={index} prompt={prompt} title={title} titleId={titleId} total={total} />
+      <PuzzleDifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
       <BoardPanel options={boardOptions} />
-      <PuzzleStatusBanner
-        feedback={puzzleState.feedback}
-        kind={puzzle.kind}
-        status={puzzleState.status}
-      />
+      <PuzzleStatusBanner speech={status} solved={solved} tone={tone} />
       <PuzzleActions
         solved={puzzleState.status === "solved"}
         onHint={puzzleState.showHint}
         onNext={onNext}
+        onOverview={onOverview}
         onReset={puzzleState.resetPuzzle}
       />
     </section>

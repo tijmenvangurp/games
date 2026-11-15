@@ -266,7 +266,7 @@ interface FrenchItem {
   - Bij `upmc`/`pierre`: "Audio gegenereerd met Piper (MIT), stem UPMC Pierre (CC BY-SA 4.0)." In de huidige Speaches-service is `pierre` niet selecteerbaar.
   - Bij `gilles`: "Audio gegenereerd met Piper (MIT), stem Gilles (CC0)."
   - Bij Kokoro: "Kokoro-82M (Apache-2.0)."
-  - Bij `tom`: "Audio gegenereerd met Piper (MIT), stem Tom (dataset AGPLv3)." Als de audio als afgeleid werk wordt gezien, moet de audio onder AGPLv3 worden gedeeld. Leg dit vast in de credits en laat de eigenaar de licentie expliciet goedkeuren.
+  - Bij `tom`: "Audio gegenereerd met Piper (MIT), stem Tom (dataset AGPLv3)." Als de audio als afgeleid werk wordt gezien, moet de audio onder AGPLv3 worden gedeeld. Leg dit vast in de credits en laat de maintainer de licentie expliciet goedkeuren.
   - `mls` is afgevallen: de output was onverstaanbaar.
 - **Tatoeba**, als er toch een enkele zin wordt overgenomen: CC BY 2.0 FR, met bronlink en vermelding. Niet nodig als we alles zelf schrijven.
 - **Lexique/FLELex**, als alleen ter controle gebruikt: geen data kopiëren; wel noemen in de onderzoeksnotitie. Zodra we hun data in de app opnemen, gelden CC BY-SA 4.0 respectievelijk CC BY-NC-SA 4.0.

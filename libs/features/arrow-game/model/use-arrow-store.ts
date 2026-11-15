@@ -1,19 +1,25 @@
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 import {
   findHint,
   isArrowRemovable,
   isSolved,
   levelAt,
   LEVEL_COUNT,
-  MAX_HEARTS,
   type MazeArrow,
   type MazeLevel,
 } from "@entities/arrow";
-import { loadArrowsProgress, saveArrowsProgress } from "./storage";
+import {
+  ARROWS_STORAGE_KEY,
+  ARROWS_STORAGE_VERSION,
+  arrowsStorage,
+  DEFAULT_ARROWS_PROGRESS,
+  normalizeArrowsProgress,
+} from "./storage";
 
-type ArrowsStatus = "playing" | "won" | "lost";
+type ArrowsStatus = "playing" | "won";
 
-export type ArrowsTapResult = "ignored" | "blocked" | "removed" | "won" | "lost";
+export type ArrowsTapResult = "ignored" | "blocked" | "removed" | "won";
 
 interface ArrowsStore {
   levelIndex: number;
@@ -21,7 +27,6 @@ interface ArrowsStore {
   level: MazeLevel;
   removedIds: number[];
   history: number[];
-  hearts: number;
   status: ArrowsStatus;
   hintId: number | null;
   startLevel: (index: number) => void;
@@ -36,13 +41,9 @@ interface ArrowsStore {
 type ArrowsSet = (partial: Partial<ArrowsStore>) => void;
 type ArrowsGet = () => ArrowsStore;
 
-const initialProgress = loadArrowsProgress();
-const initialLevel = levelAt(initialProgress.current);
-
 const emptyBoard = {
   removedIds: [] as number[],
   history: [] as number[],
-  hearts: MAX_HEARTS,
   status: "playing" as ArrowsStatus,
   hintId: null,
 };
@@ -59,14 +60,13 @@ function startLevelAction(set: ArrowsSet, get: ArrowsGet, index: number): void {
     level: levelAt(levelIndex),
     ...emptyBoard,
   });
-  saveArrowsProgress({ unlocked, current: levelIndex });
 }
 
-function blockArrow(set: ArrowsSet, state: ArrowsStore): ArrowsTapResult {
-  const hearts = Math.max(0, state.hearts - 1);
-  const status = hearts === 0 ? "lost" : "playing";
-  set({ hearts, status, hintId: null });
-  return status === "lost" ? "lost" : "blocked";
+function blockArrow(set: ArrowsSet): ArrowsTapResult {
+  // A blocked tap never ends the level. The arrow shakes, the status line
+  // explains why, and the child can try another arrow or ask for a hint.
+  set({ hintId: null });
+  return "blocked";
 }
 
 function removeArrow(set: ArrowsSet, state: ArrowsStore, arrow: MazeArrow): ArrowsTapResult {
@@ -83,10 +83,6 @@ function removeArrow(set: ArrowsSet, state: ArrowsStore, arrow: MazeArrow): Arro
     hintId: null,
     unlocked,
   });
-
-  if (solved) {
-    saveArrowsProgress({ unlocked, current: state.levelIndex });
-  }
 
   return solved ? "won" : "removed";
 }
@@ -105,7 +101,7 @@ function tapAction(set: ArrowsSet, get: ArrowsGet, id: number): ArrowsTapResult 
   const removed = new Set(state.removedIds);
   return isArrowRemovable(arrow, state.level, removed)
     ? removeArrow(set, state, arrow)
-    : blockArrow(set, state);
+    : blockArrow(set);
 }
 
 function undoAction(set: ArrowsSet, get: ArrowsGet): void {
@@ -141,17 +137,38 @@ function nextLevelAction(set: ArrowsSet, get: ArrowsGet): void {
   }
 }
 
-export const useArrowsStore = create<ArrowsStore>((set, get) => ({
-  levelIndex: initialProgress.current,
-  unlocked: initialProgress.unlocked,
-  level: initialLevel,
-  ...emptyBoard,
+export const useArrowsStore = create<ArrowsStore>()(
+  persist(
+    (set, get) => ({
+      levelIndex: DEFAULT_ARROWS_PROGRESS.current,
+      unlocked: DEFAULT_ARROWS_PROGRESS.unlocked,
+      level: levelAt(DEFAULT_ARROWS_PROGRESS.current),
+      ...emptyBoard,
 
-  startLevel: (index) => startLevelAction(set, get, index),
-  tap: (id) => tapAction(set, get, id),
-  undo: () => undoAction(set, get),
-  hint: () => hintAction(set, get),
-  clearHint: () => set({ hintId: null }),
-  restart: () => set({ ...emptyBoard }),
-  nextLevel: () => nextLevelAction(set, get),
-}));
+      startLevel: (index) => startLevelAction(set, get, index),
+      tap: (id) => tapAction(set, get, id),
+      undo: () => undoAction(set, get),
+      hint: () => hintAction(set, get),
+      clearHint: () => set({ hintId: null }),
+      restart: () => set({ ...emptyBoard }),
+      nextLevel: () => nextLevelAction(set, get),
+    }),
+    {
+      name: ARROWS_STORAGE_KEY,
+      version: ARROWS_STORAGE_VERSION,
+      storage: createJSONStorage(() => arrowsStorage),
+      // Keep the flat `{ unlocked, current }` shape so older saves upgrade cleanly.
+      partialize: (state) => ({ unlocked: state.unlocked, current: state.levelIndex }),
+      merge: (persisted, current) => {
+        const progress = normalizeArrowsProgress(persisted);
+        return {
+          ...current,
+          ...emptyBoard,
+          unlocked: progress.unlocked,
+          levelIndex: progress.current,
+          level: levelAt(progress.current),
+        };
+      },
+    },
+  ),
+);

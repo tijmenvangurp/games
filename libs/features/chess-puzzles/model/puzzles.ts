@@ -1,11 +1,12 @@
 import type { ChessPuzzle } from "./types";
+import { EXTRA_PUZZLES } from "./puzzles-extra";
 
 /**
- * Een kleine, lokaal gebundelde selectie uit de Lichess-puzzeldatabase (CC0).
+ * De eerste, met de hand gecontroleerde Lichess-selectie (CC0).
  * Filter: rating 400–1500, popularity ≥ 80, wit aan zet na de tegenzet, en
  * alleen `mateIn1` of `hangingPiece` met één spelerszet.
  */
-export const PUZZLES = [
+const CORE_PUZZLES = [
   {
     id: "AtcPl",
     kind: "mate",
@@ -346,4 +347,10 @@ export const PUZZLES = [
     themes: ["endgame", "master", "mate", "mateIn1", "oneMove", "queenEndgame"],
     gameUrl: "https://lichess.org/K6FzT0FJ/black#110",
   },
+] as const satisfies readonly ChessPuzzle[];
+
+/** De volledige set: de handmatige basis plus de gegenereerde uitbreiding. */
+export const PUZZLES = [
+  ...CORE_PUZZLES,
+  ...EXTRA_PUZZLES,
 ] as const satisfies readonly ChessPuzzle[];

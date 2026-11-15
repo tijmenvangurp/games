@@ -23,8 +23,8 @@ describe("haptics", () => {
     playHaptic("hint");
     expect(vibrateMock).toHaveBeenLastCalledWith(20);
 
-    playHaptic("wrong");
-    expect(vibrateMock).toHaveBeenLastCalledWith([30, 40, 30]);
+    playHaptic("surprise");
+    expect(vibrateMock).toHaveBeenLastCalledWith([15, 25, 15]);
 
     playHaptic("win");
     expect(vibrateMock).toHaveBeenLastCalledWith([20, 40, 20]);

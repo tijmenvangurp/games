@@ -1,45 +1,59 @@
 # Spelideeën
 
-- **Datum:** 2026-10-18
-- **Status:** Woordzoeker en Tafel Topper zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
+- **Datum:** 2026-10-19
+- **Status:** Woordzoeker, Tafel Topper, Vlaggenreis en Mengelmoes zijn geïmplementeerd. De overige ideeën zijn nog niet gepland of goedgekeurd.
 - **Aanleiding:** na de eerste spellen is de vraag welke educatieve spellen logisch volgen.
 - **Kader:** de app blijft statisch en client-side. Geen backend, accounts, analytics of externe requests. Alle code, woorden en assets staan lokaal in de repository. Nieuwe spellen volgen de bestaande FSD-opzet: een entity voor pure regels, een feature voor de Zustand-store en UI, een page, een route en tests.
 
 ## Wat er nu is
 
-| Spel                 | Route          | Leerzame kant                                                                   |
-| -------------------- | -------------- | ------------------------------------------------------------------------------- |
-| Sudoku               | `/sudoku`      | Logisch redeneren, patroonherkenning, cijfers of dieren                         |
-| Pijlen               | `/pijlen`      | Ruimtelijk inzicht, planning, doordacht bewegen                                 |
-| Waar is Wobbel?      | `/zoeken`      | Visuele aandacht, observeren, vergelijken                                       |
-| Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                     |
-| Tafel Topper         | `/rekenen`     | Plus, min, keer en delen; getallenlijn en groepjes als uitleg                   |
-| Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                 |
-| Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                   |
-| Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels |
-| Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                  |
+| Spel                 | Route          | Leerzame kant                                                                     |
+| -------------------- | -------------- | --------------------------------------------------------------------------------- |
+| Sudoku               | `/sudoku`      | Logisch redeneren, patroonherkenning, cijfers of dieren                           |
+| Pijlen               | `/pijlen`      | Ruimtelijk inzicht, planning, doordacht bewegen                                   |
+| Waar is Wobbel?      | `/zoeken`      | Visuele aandacht, observeren, vergelijken                                         |
+| Woordzoeker          | `/woordzoeker` | Woordherkenning, spelling, visuele scanning                                       |
+| Tafel Topper         | `/rekenen`     | Plus, min, keer en delen; getallenlijn en groepjes als uitleg                     |
+| Pokémon Memory       | `/memory`      | Visueel geheugen, namen onthouden, concentratie                                   |
+| Wie is deze Pokémon? | `/raad`        | Herkenning en lezen, met een meesterlevel met lookalike-namen                     |
+| Schaaktutorial       | `/schaken`     | Bordgeometrie, regels, vooruitdenken; alle stukken en de eerste speciale regels   |
+| Schaakpuzzels        | `/puzzels`     | Mat en stukwinst herkennen in korte stellingen                                    |
+| Vlaggenreis          | `/vlaggen`     | Vlaggen van landen per continent én van de Nederlandse provincies                 |
+| Mengelmoes           | `/mengelmoes`  | Associëren, combineren en ontdekken; 214 elementen, 242 recepten en 30 opdrachten |
 
-De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken**. De grootste gaten zijn nu **wereldoriëntatie en computationeel denken**.
+De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen, schaken, wereldoriëntatie en associëren**. Het grootste gat is nu **computationeel denken**.
+
+Externe verrijkingsmaterialen per leerjaar staan in [het SLO-overzicht](../research/verrijkingsmaterialen/README.md). Bronnen over actuele verrijkingsmaterialen staan in [actuele bronnen](../research/actuele-bronnen/README.md). Deze overzichten zijn bronmateriaal en geen planning.
+
+## Mengelmoes (verticale slice)
+
+**Leerdoel:** associëren, oorzaak-gevolg en nieuwsgierig experimenteren. Het kind sleept twee elementen op elkaar en ontdekt wat er ontstaat.
+
+**Vorm:** een vrije werkbank met een schap van ontdekte elementen. Water, vuur, aarde en lucht zijn het startpunt; de eerste slice heeft 214 elementen en 242 recepten. Een ongeldige combinatie is geen fout: de elementen wiebelen en blijven staan. Er is een hint, een labboek met categoriefilters, sortering en een detailview per element, en lokale opslag. Sommige elementen hebben meerdere recepten, zodat er meer dan één route naar hetzelfde resultaat is. Daarnaast zijn er 30 opdrachten in drie reeksen, van modder tot eenhoorn. De opdrachtkaart toont de volgende ontdekking en telt hoeveel je er al hebt gehaald; je kunt een opdracht ook overslaan. Op een telefoon is het schap een horizontale strook. Op een tablet in portret staat het schap onder de werkbank; in landschap en op een groot scherm staat het ernaast. Sleep het icoon van een element naar de werkbank, of tik erop.
+
+**Techniek:** `entities/alchemy` bevat de pure elementen, recepten, missies en graafregels; `features/alchemy-lab` de Zustand-store, opslag en UI; `pages/alchemy` het scherm. Drag-and-drop gebruikt de al aanwezige `@dnd-kit/core` met een eigen collision-detector op middelpuntafstand. De iconen zijn lokale Fluent Emoji Flat SVG's (MIT). Zie [het onderzoek](../research/2026-10-19-mengelmoes-assets.md) voor de bronnen, licenties en de visuele richting.
+
+**Aandachtspunten:** de receptenboom is de grootste kostenpost. Elke nieuwe reeks moet kindvriendelijk, logisch en bereikbaar zijn. Geen timer, geen levens en geen straf bij een mislukte combinatie.
 
 ## Overzicht
 
-| Prioriteit | Idee             | Domein                | Effort      | Kern                                                     |
-| ---------- | ---------------- | --------------------- | ----------- | -------------------------------------------------------- |
-| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0011 en het richtingenonderzoek |
-| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                            |
-| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                        |
-| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen           |
-| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen    |
-| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Provincies en hoofdsteden van Nederland                  |
-| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                    |
-| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                             |
-| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden     |
+| Prioriteit | Idee             | Domein                | Effort      | Kern                                                                   |
+| ---------- | ---------------- | --------------------- | ----------- | ---------------------------------------------------------------------- |
+| 1          | Woordzoeker      | Taal                  | Laag        | Geïmplementeerd; zie ADR 0011 en het richtingenonderzoek               |
+| 2          | Tafel Topper     | Rekenen               | Laag        | Geïmplementeerd; zie ADR 0010                                          |
+| 3          | Klokkijken       | Rekenen en tijd       | Middel      | Analoge klok lezen en zelf zetten                                      |
+| 4          | Robo Route       | Computationeel denken | Middel      | Een programma van commando's maken en debuggen                         |
+| 5          | Schaakmat in 1   | Schaken               | Laag        | Deels gedekt door Schaakpuzzels; nog eigen oefeningen                  |
+| 6          | Provincie Prik   | Wereldoriëntatie      | Middel-hoog | Kaartspel met provincies; vlaggen en hoofdsteden zijn klaar (ADR 0018) |
+| 7          | Breuken en geld  | Rekenen               | Middel      | Visuele breuken en rekenen met munten                                  |
+| 8          | Noten lezen      | Muziek                | Middel      | Noten en gehoor via WebAudio                                           |
+| 9          | Kleine varianten | Taal en natuur        | Laag        | Letter-memory, Woordbouw, Dierenquiz, Verkeersborden                   |
 
 ## 1. Woordzoeker
 
 **Leerdoel:** woorden herkennen, spelling oefenen, visueel scannen en de woordenschat van een thema versterken.
 
-**Vorm:** een klassieke woordzoeker met de thema's **Tuin** en **Onder water** uit _Waar is Wobbel?_. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden krijgen een handgetekende streep. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Makkelijk zoekt alleen links-naar-rechts en boven-naar-beneden, gemiddeld voegt de diagonale richtingen toe en moeilijk opent alle acht richtingen. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
+**Vorm:** een klassieke woordzoeker met de thema's **Tuin**, **Onder water** en **Pokémon**. De speler sleept over een woord of tikt de eerste en de laatste letter aan. Gevonden woorden krijgen een handgetekende streep. Er zijn drie maten: 10×10 met 8 woorden, 12×12 met 10 woorden en 14×14 met 12 woorden. Makkelijk zoekt alleen links-naar-rechts en boven-naar-beneden, gemiddeld voegt de diagonale richtingen toe en moeilijk opent alle acht richtingen. Op mobiel kan het bord tussen "passend" en "vergroot" (minstens 44 px per cel) wisselen.
 
 **Waarom:** taal is het grootste gat in het huidige aanbod. Een woordzoeker is laagdrempelig, goed te herspelen en vraagt geen nieuwe backend of externe assets.
 
@@ -101,7 +115,7 @@ De app dekt daarmee **logica, ruimte, geheugen, taal, rekenen, lezen en schaken*
 
 **Vorm:** een vereenvoudigde, zelfgetekende SVG-kaart van Nederland. Modi: "Waar ligt Friesland?", "Wat is de hoofdstad van Gelderland?" en "Sleep de provincie naar de juiste plek". De kaart is het middelpunt; de vragen zijn kort.
 
-**Waarom:** wereldoriëntatie ontbreekt nog volledig. Het is een klassiek onderwerp voor groep 5 tot en met 8.
+**Waarom:** wereldoriëntatie is met Vlaggenreis (/vlaggen, ADR 0015) begonnen. De provincievlaggen, namen en hoofdsteden zitten daar nu in; wat nog ontbreekt is de kaart: waar ligt elke provincie? Dat is een klassiek onderwerp voor groep 5 tot en met 8.
 
 **Techniek:** `entities/netherlands` met provincies, hoofdsteden en posities, `features/province-quiz` met de UI. Een zorgvuldige, originele SVG-kaart is het grootste werk. Geen externe kaart of API.
 

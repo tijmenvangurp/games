@@ -1,18 +1,9 @@
-import { MAX_HEARTS, type MazeDifficulty, type MazeLevel } from "@entities/arrow";
-import { ArrowLeft, Button, Heart, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
-import { cn } from "@shared/lib";
-
-const DIFFICULTY_LABELS: Record<MazeDifficulty, string> = {
-  makkelijk: "Makkelijk",
-  gemiddeld: "Gemiddeld",
-  moeilijk: "Moeilijk",
-  "super-hard": "Super hard",
-};
+import type { MazeLevel } from "@entities/arrow";
+import { ArrowLeft, Button, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
 
 interface MazeHudProps {
   level: MazeLevel;
   levelIndex: number;
-  hearts: number;
   removedCount: number;
   canUndo: boolean;
   playing: boolean;
@@ -25,7 +16,6 @@ interface MazeHudProps {
 export function MazeHud({
   level,
   levelIndex,
-  hearts,
   removedCount,
   canUndo,
   playing,
@@ -37,7 +27,7 @@ export function MazeHud({
   const progress = level.arrows.length === 0 ? 0 : removedCount / level.arrows.length;
 
   return (
-    <header className="space-y-2">
+    <header className="game-panel space-y-2 p-3">
       <div className="flex items-center gap-0.5">
         <Button aria-label="Terug" size="icon" variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
@@ -52,34 +42,18 @@ export function MazeHud({
           <Undo2 aria-hidden="true" className="size-5" />
         </Button>
 
-        <div
-          aria-label={`${hearts} van ${MAX_HEARTS} harten`}
-          className="flex flex-1 items-center justify-center gap-1 text-rose-500"
-          role="img"
-        >
-          {Array.from({ length: MAX_HEARTS }, (_, index) => (
-            <Heart
-              key={index}
-              aria-hidden="true"
-              className={cn("size-5", index >= hearts && "text-rose-200")}
-              fill="currentColor"
-            />
-          ))}
-        </div>
+        <div className="flex-1" />
 
         <SoundToggle />
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-          {DIFFICULTY_LABELS[level.difficulty]}
-        </span>
         <div
           aria-label={`${removedCount} van ${level.arrows.length} pijlen weg`}
           aria-valuemax={level.arrows.length}
           aria-valuemin={0}
           aria-valuenow={removedCount}
-          className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200"
+          className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"
           role="progressbar"
         >
           <div
@@ -88,7 +62,7 @@ export function MazeHud({
           />
         </div>
         <Button aria-label="Hint" disabled={!playing} size="icon" variant="ghost" onClick={onHint}>
-          <Lightbulb aria-hidden="true" className="size-5 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-5 text-warning" />
         </Button>
         <Button aria-label="Opnieuw" size="icon" variant="ghost" onClick={onRestart}>
           <RotateCcw aria-hidden="true" className="size-5" />

@@ -20,10 +20,9 @@ function feedbackForTap(
   setFlying: Dispatch<SetStateAction<FlyingArrow | null>>,
   setBlockedId: Dispatch<SetStateAction<number | null>>,
 ): void {
-  if (result === "blocked" || result === "lost") {
+  if (result === "blocked") {
     setBlockedId(arrow?.id ?? null);
-    playSound("wrong");
-    playHaptic("wrong");
+    playHaptic("tap");
     return;
   }
   if ((result === "removed" || result === "won") && arrow) {
@@ -104,18 +103,15 @@ export function useMazeActions(
 }
 
 export function statusTextFor(
-  status: "playing" | "won" | "lost",
+  status: "playing" | "won",
   blockedId: number | null,
   hintId: number | null,
 ): string {
   if (status === "won") {
     return "Alle pijlen zijn weg!";
   }
-  if (status === "lost") {
-    return "Je harten zijn op.";
-  }
   if (blockedId !== null) {
-    return "Die pijl is geblokkeerd.";
+    return "Die pijl kan nog niet weg. Kijk welke pijl vrij is.";
   }
   if (hintId !== null) {
     return "De gemarkeerde pijl kan weg.";

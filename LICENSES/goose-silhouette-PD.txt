@@ -1,0 +1,6 @@
+Goose silhouette
+https://commons.wikimedia.org/wiki/File:Goose_Silhouette_(NIH_BioArt_177_-_630230).svg
+
+The goose shape in libs/features/ganzenbord/ui/goose-mark.tsx comes from
+"Goose Silhouette (NIH BioArt 177 - 630230)", courtesy of NIAID and
+illustrated by Ryan Kissinger. The work is in the public domain.

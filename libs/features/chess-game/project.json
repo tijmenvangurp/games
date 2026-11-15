@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "features-chess-game",
+  "projectType": "library",
+  "sourceRoot": "libs/features/chess-game",
+  "tags": ["layer:features", "scope:chess", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/features/chess-game"
+      }
+    }
+  },
+  "implicitDependencies": ["entities-chess", "shared-lib", "shared-ui"]
+}

@@ -4,7 +4,6 @@ import { LEVEL_COUNT, MAZE_LEVELS } from "@entities/arrow";
 import {
   MazeIntro,
   MazeLevelSelect,
-  MazeLost,
   MazePlay,
   MazeResult,
   useArrowsStore,
@@ -17,10 +16,9 @@ interface MazeOverlaysProps {
   onNext: () => void;
   onLevels: () => void;
   onHome: () => void;
-  onLostRestart: () => void;
 }
 
-function MazeOverlays({ showResult, onNext, onLevels, onHome, onLostRestart }: MazeOverlaysProps) {
+function MazeOverlays({ showResult, onNext, onLevels, onHome }: MazeOverlaysProps) {
   const level = useArrowsStore((state) => state.level);
   const levelIndex = useArrowsStore((state) => state.levelIndex);
   const status = useArrowsStore((state) => state.status);
@@ -36,10 +34,6 @@ function MazeOverlays({ showResult, onNext, onLevels, onHome, onLostRestart }: M
         onNext={onNext}
       />
     );
-  }
-
-  if (status === "lost") {
-    return <MazeLost onHome={onHome} onLevels={onLevels} onRestart={onLostRestart} />;
   }
 
   return null;
@@ -112,10 +106,6 @@ export function ArrowsPage() {
         showResult={showResult}
         onHome={goHome}
         onLevels={() => setScreen("levels")}
-        onLostRestart={() => {
-          useArrowsStore.getState().restart();
-          setScreen("play");
-        }}
         onNext={handleNext}
       />
     </>

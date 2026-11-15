@@ -11,15 +11,6 @@ export function PokemonAssetsCredits() {
           target="_blank"
         >
           PokeAPI artwork
-        </a>
-        ,{" "}
-        <a
-          className="font-semibold underline"
-          href="https://play.pokemonshowdown.com/audio/cries/"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Showdown-audio
         </a>{" "}
         en{" "}
         <a

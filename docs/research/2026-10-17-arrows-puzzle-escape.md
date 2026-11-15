@@ -143,7 +143,7 @@ Regels:
 
 ### 5.2 Collision
 
-**Runtime (sinds 2026-10-17).** Een pijl glijdt als een slang langs zijn eigen polyline naar buiten: de kop schuift recht vooruit en het lijf volgt hetzelfde spoor. Daardoor bezet de pijl alleen nieuwe cellen in de **baan vóór de pijlpunt**, en een pijl kan weg zodra die baan vrij is. Een buur die de baan slechts in een hoekpunt raakt blokkeert niet; een buur die de baan echt kruist of er collineair vóór ligt wel. Zie `isArrowRemovable` in `libs/entities/arrow/model/geometry.ts`. Dit vervangt de eerdere regel “het volledige lichaam moet vrij baan hebben”, die te streng was: twee pijlen met naast elkaar liggende, loodrechte punten konden daardoor onnodig geblokkeerd raken.
+**Runtime (bijgewerkt 2026-10-18).** Een pijl glijdt als een slang langs zijn eigen polyline naar buiten: de kop schuift recht vooruit en het lijf volgt hetzelfde spoor. Daardoor bezet de pijl alleen nieuwe cellen in de **baan vóór de pijlpunt**. Een buur die de baan alleen in een eindpunt raakt, blokkeert niet; een kruising midden in een recht stuk wel. Rechte stukken worden eerst samengevoegd: de levelopslag zet een punt op elke rastercel, waardoor een echte kruising anders als een onschuldige eindaanraking werd gezien. Zonder die samenvoeging vloog een hintpijl dwars door een lange lijn van een buur heen. Zie `isArrowRemovable` in `libs/entities/arrow/model/geometry.ts`.
 
 **Levelgenerator (bijgewerkt).** De generator gebruikt dezelfde baan-regel als de runtime (`isArrowRemovable`). Eerder gebruikte hij een strengere starre sweep (`isArrowRemovableRigid`); die verwijderde onnodig veel pijlen en was een tweede regel die uit de pas kon lopen met het spel. Na het genereren controleert `buildLevel` met `solveMaze` dat het level oplosbaar is. Zo is er één bron van waarheid en is elk level gegarandeerd oplosbaar: de generator bewaart alleen pijlen in de volgorde waarin hij ze kon verwijderen.
 
@@ -249,6 +249,7 @@ Voor grotere aantallen is een klein editor-script handiger, maar dat is pas nodi
 
 - De echte game is lastig te raken op kleine schermen. Wij moeten het beter doen:
   - hit-area minimaal 24–32 px rond de lijn, ook al is de zichtbare lijn 3–4 px;
+  - **Correctie (2026-10-18):** de hit-test gebruikt dezelfde zichtbare polyline als de renderer. De staart is 0.2 rastereenheid ingekort en twee koppen die hetzelfde punt raken zijn beide ingekort. Zo pakt een tik op een pijlpunt altijd de bedoelde pijl en niet de buurpijl die zijn staart op dat punt heeft. Zonder die regel leek een level onoplosbaar: de hint markeerde een vrije pijl, maar een tik op de punt koos de geblokkeerde buur en kostte een hart;
   - geselecteerde pijl duidelijk highlighten;
   - 44 px waar knoppen dat toelaten;
   - zoom/pinch of een “pas aan scherm aan”-knop voor grote figuren;

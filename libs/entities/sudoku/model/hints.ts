@@ -1,4 +1,4 @@
-import { geometryFor } from "./geometry";
+import { geometryFor, isPeer } from "./geometry";
 import { candidateMask, createMasks } from "./masks";
 import type { SudokuPuzzle } from "./types";
 import { unitsFor, type Unit, type UnitKind } from "./units";
@@ -169,6 +169,21 @@ export function findHint(
   }
 
   return forced[0] ?? null;
+}
+
+/**
+ * Cells to highlight when the player asks for a more detailed hint. For a
+ * naked single that is the whole row, column and box; for a hidden single the
+ * unit that constrains the digit.
+ */
+export function hintDetailCells(puzzle: SudokuPuzzle, hint: SudokuHint): number[] {
+  if (hint.technique === "hidden-single") {
+    return hint.related;
+  }
+  const geometry = geometryFor(puzzle.size);
+  return puzzle.givens
+    .map((_, index) => index)
+    .filter((index) => index !== hint.index && isPeer(index, hint.index, geometry));
 }
 
 /**

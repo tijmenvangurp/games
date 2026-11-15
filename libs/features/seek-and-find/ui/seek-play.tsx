@@ -37,7 +37,7 @@ export function SeekPlay() {
     ? "Gevonden!"
     : wrongId !== null
       ? "Nog niet — kijk goed naar de ster."
-      : "Tik op de Wobbel met de ster.";
+      : null;
 
   const handleTap = (id: number) => {
     const wasFound = useSeekStore.getState().found;
@@ -48,16 +48,13 @@ export function SeekPlay() {
     }
     if (next.found) {
       playHaptic("win");
-    } else if (next.wrongId === id) {
-      playSound("wrong");
-      playHaptic("wrong");
     }
   };
 
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
-        <div className="order-1 flex items-center gap-3 rounded-3xl border bg-card p-3 shadow-sm">
+        <div className="order-1 game-panel flex items-center gap-3 p-3">
           <svg
             aria-label="Doel: de Wobbel met een ster op de hoed"
             className="size-16 shrink-0"
@@ -72,7 +69,6 @@ export function SeekPlay() {
               Zoek deze
             </p>
             <p className="text-base font-black leading-tight">Wobbel met de ster</p>
-            <p className="text-xs text-muted-foreground">Alle anderen hebben een ander teken.</p>
           </div>
         </div>
 
@@ -87,7 +83,7 @@ export function SeekPlay() {
                 useSeekStore.getState().showHint();
               }}
             >
-              <Search aria-hidden="true" className="size-4 text-amber-500" />
+              <Search aria-hidden="true" className="size-4 text-warning" />
               Hint
             </Button>
             <Button
@@ -99,13 +95,15 @@ export function SeekPlay() {
               }}
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Nieuw
+              Nieuw zoekveld
             </Button>
           </div>
 
-          <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-            {status}
-          </p>
+          {status ? (
+            <p aria-live="polite" className="text-center text-xs text-muted-foreground">
+              {status}
+            </p>
+          ) : null}
         </div>
       </aside>
 

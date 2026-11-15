@@ -12,7 +12,7 @@ Er kwam een verzoek voor een memory met Pokémon. Deze repository en de bijbehor
 - De app gebruikt **originele, zelfgetekende monstertjes** in SVG. Geen officiële Pokémon-afbeeldingen, namen of logo's.
 - Er komen **geen runtime-koppelingen** naar externe databases of API's. Alle speldata en assets staan lokaal in de repository.
 - De memory heet **Monster Memory** en gebruikt tien eigen personages met eigen namen.
-- Wie later gelicenseerde of zelfgemaakte kaarten wil gebruiken, levert die assets zelf aan. Zulke bestanden horen niet in deze publieke repository; daarvoor is een aparte, niet-openbare hostingplek nodig, met goedkeuring van de eigenaar.
+- Wie later gelicenseerde of zelfgemaakte kaarten wil gebruiken, levert die assets zelf aan. Zulke bestanden horen niet in deze publieke repository; daarvoor is een aparte, niet-openbare hostingplek nodig, met goedkeuring van de maintainer.
 
 ## Gevolgen
 
@@ -20,4 +20,4 @@ Er kwam een verzoek voor een memory met Pokémon. Deze repository en de bijbehor
 - De app blijft volledig statisch, offline bruikbaar en vrij van externe requests.
 - Een toekomstige integratie met een database voor scores of accounts vereist een nieuwe ADR met een privacy- en beveiligingsontwerp.
 
-> Deze beslissing is op 2026-10-17 vervangen door ADR 0005. De eigenaar heeft expliciet gekozen voor lokaal gebundelde Pokémon-assets.
+> Deze beslissing is op 2026-10-17 vervangen door ADR 0005. De maintainer heeft expliciet gekozen voor lokaal gebundelde Pokémon-assets.

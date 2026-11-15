@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-flags",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/flags",
+  "tags": ["layer:pages", "scope:flags", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/flags"
+      }
+    }
+  },
+  "implicitDependencies": ["widgets-game-shell", "features-flag-game", "shared-ui"]
+}

@@ -70,7 +70,7 @@ export function WordSearchStrokes({ placements, size }: WordSearchStrokesProps) 
               fill="none"
               opacity={0.12}
               pathLength={1}
-              stroke="#93c5fd"
+              stroke="var(--success)"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={0.13}
@@ -80,7 +80,7 @@ export function WordSearchStrokes({ placements, size }: WordSearchStrokesProps) 
               d={path}
               fill="none"
               pathLength={1}
-              stroke="#3b82f6"
+              stroke="var(--success)"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={0.06}

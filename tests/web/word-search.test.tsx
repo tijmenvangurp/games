@@ -129,9 +129,9 @@ describe("word search", () => {
     const { puzzle } = await startDefaultGame();
     useWordSearchStore.setState({ found: puzzle.placements.map((item) => item.word) });
 
-    expect(await screen.findByRole("heading", { name: "Knap gedaan!" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "Gevonden!" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Nog een keer/ }));
-    expect(screen.queryByRole("heading", { name: "Knap gedaan!" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "Gevonden!" })).toBeNull();
     expect(useWordSearchStore.getState().found).toEqual([]);
     expect(useWordSearchStore.getState().puzzle).not.toBe(puzzle);
   }, 30_000);
@@ -161,6 +161,25 @@ describe("word search", () => {
       expect(board.querySelector('[aria-label*="gevonden"]')).toBeTruthy();
     });
     expect(board.querySelector(`[data-word="${placement.word}"]`)).toBeTruthy();
+  }, 30_000);
+
+  it("starts a Pokémon word search", async () => {
+    renderApp();
+    expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /Pokémon/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+
+    const board = await screen.findByRole("group", { name: /Woordzoeker van 10 bij 10/i });
+    const puzzle = currentPuzzle();
+    expect(puzzle.theme).toBe("pokemon");
+    expect(within(board).getAllByRole("button")).toHaveLength(100);
+
+    const first = puzzle.placements[0];
+    if (!first) {
+      throw new Error("No placement");
+    }
+    expect(screen.getByRole("button", { name: first.word })).toBeTruthy();
   }, 30_000);
 
   it("opens the setup again and can go back to the active game", async () => {

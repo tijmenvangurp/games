@@ -50,7 +50,7 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
-      <div className="flex items-center justify-between gap-3 rounded-3xl border bg-card px-4 py-3 shadow-sm">
+      <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
             Oefen met kaarten

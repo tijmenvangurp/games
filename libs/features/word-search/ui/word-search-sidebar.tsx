@@ -1,13 +1,12 @@
-import { Button, Lightbulb, RotateCcw, ZoomIn, ZoomOut } from "@shared/ui";
+import { Button, Lightbulb, RotateCcw, SpeechButton, ZoomIn, ZoomOut } from "@shared/ui";
+import type { WordSearchFeedback } from "../model/audio";
 import { WordSearchWordList } from "./word-search-word-list";
 
 interface WordSearchActionsProps {
   complete: boolean;
   nextWord: string | undefined;
-  selectedCount: number;
-  wrong: boolean;
   zoomed: boolean;
-  lastFound: string | null;
+  feedback: WordSearchFeedback;
   onHint: (word: string) => void;
   onNew: () => void;
   onToggleZoom: () => void;
@@ -18,26 +17,11 @@ interface WordSearchSidebarProps extends WordSearchActionsProps {
   found: readonly string[];
 }
 
-function statusText(complete: boolean, wrong: boolean, selectedCount: number): string {
-  if (complete) {
-    return "Alle woorden gevonden!";
-  }
-  if (wrong) {
-    return "Die niet — probeer een andere lijn.";
-  }
-  if (selectedCount === 1) {
-    return "Kies de laatste letter.";
-  }
-  return "Sleep over een woord of tik de eerste en de laatste letter.";
-}
-
 function WordSearchActions({
   complete,
   nextWord,
-  selectedCount,
-  wrong,
   zoomed,
-  lastFound,
+  feedback,
   onHint,
   onNew,
   onToggleZoom,
@@ -54,12 +38,12 @@ function WordSearchActions({
             }
           }}
         >
-          <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
         <Button variant="outline" onClick={onNew}>
           <RotateCcw aria-hidden="true" className="size-4" />
-          Nieuw
+          Nieuw bord
         </Button>
       </div>
 
@@ -72,12 +56,12 @@ function WordSearchActions({
         {zoomed ? "Heel bord" : "Vergroot"}
       </Button>
 
-      <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-        {statusText(complete, wrong, selectedCount)}
-      </p>
-      <p aria-live="polite" className="sr-only">
-        {lastFound ? `${lastFound} gevonden` : ""}
-      </p>
+      <div className="flex items-center justify-center gap-1">
+        <p aria-live="polite" className="text-center text-xs text-muted-foreground">
+          {feedback.text}
+        </p>
+        <SpeechButton className="shrink-0" label="Beluister de uitleg" line={feedback.lines} />
+      </div>
     </div>
   );
 }
@@ -87,17 +71,15 @@ export function WordSearchSidebar({
   found,
   complete,
   nextWord,
-  selectedCount,
-  wrong,
   zoomed,
-  lastFound,
+  feedback,
   onHint,
   onNew,
   onToggleZoom,
 }: WordSearchSidebarProps) {
   return (
     <aside className="space-y-3 lg:order-2 lg:col-span-1">
-      <div className="rounded-3xl border bg-card p-3 shadow-sm">
+      <div className="game-panel p-3">
         <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           Te zoeken
         </p>
@@ -106,10 +88,8 @@ export function WordSearchSidebar({
 
       <WordSearchActions
         complete={complete}
-        lastFound={lastFound}
+        feedback={feedback}
         nextWord={nextWord}
-        selectedCount={selectedCount}
-        wrong={wrong}
         zoomed={zoomed}
         onHint={onHint}
         onNew={onNew}

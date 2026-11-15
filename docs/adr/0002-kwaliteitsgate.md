@@ -5,7 +5,7 @@
 
 ## Context
 
-De eigenaar wil in dit nieuwe project dezelfde kwaliteitscontroles en repositorystructuur als in `homelab-control`: Feature-Sliced Design, OXC (oxlint/oxfmt), gesplitste TypeScript-checks, Vitest met coverage-drempel, Steiger, Fallow, Playwright E2E, Husky en commitlint. Een deel van die gate is ingericht rond een bestaande, volwassen lockfile.
+De maintainer wil in dit nieuwe project dezelfde kwaliteitscontroles en repositorystructuur als in `homelab-control`: Feature-Sliced Design, OXC (oxlint/oxfmt), gesplitste TypeScript-checks, Vitest met coverage-drempel, Steiger, Fallow, Playwright E2E, Husky en commitlint. Een deel van die gate is ingericht rond een bestaande, volwassen lockfile.
 
 ## Beslissing
 

@@ -1,0 +1,903 @@
+{
+  "version": 1,
+  "entries": {
+    "math-number-0": {
+      "folder": "math",
+      "textHash": "0d725c20"
+    },
+    "math-number-1": {
+      "folder": "math",
+      "textHash": "2bd3d5bb"
+    },
+    "math-number-2": {
+      "folder": "math",
+      "textHash": "c391d2da"
+    },
+    "math-number-3": {
+      "folder": "math",
+      "textHash": "aaa111f1"
+    },
+    "math-number-4": {
+      "folder": "math",
+      "textHash": "e0a4fcd7"
+    },
+    "math-number-5": {
+      "folder": "math",
+      "textHash": "eab1d888"
+    },
+    "math-number-6": {
+      "folder": "math",
+      "textHash": "a68b6631"
+    },
+    "math-number-7": {
+      "folder": "math",
+      "textHash": "60156209"
+    },
+    "math-number-8": {
+      "folder": "math",
+      "textHash": "4b08b281"
+    },
+    "math-number-9": {
+      "folder": "math",
+      "textHash": "40c82066"
+    },
+    "math-number-10": {
+      "folder": "math",
+      "textHash": "5851aebd"
+    },
+    "math-number-11": {
+      "folder": "math",
+      "textHash": "58884926"
+    },
+    "math-number-12": {
+      "folder": "math",
+      "textHash": "783f2154"
+    },
+    "math-number-13": {
+      "folder": "math",
+      "textHash": "9d705240"
+    },
+    "math-number-14": {
+      "folder": "math",
+      "textHash": "43101a07"
+    },
+    "math-number-15": {
+      "folder": "math",
+      "textHash": "9b7e0dd8"
+    },
+    "math-number-16": {
+      "folder": "math",
+      "textHash": "856c3d51"
+    },
+    "math-number-17": {
+      "folder": "math",
+      "textHash": "50bbcf09"
+    },
+    "math-number-18": {
+      "folder": "math",
+      "textHash": "3ccf6c81"
+    },
+    "math-number-19": {
+      "folder": "math",
+      "textHash": "e9cf2702"
+    },
+    "math-number-20": {
+      "folder": "math",
+      "textHash": "1b028e59"
+    },
+    "math-number-21": {
+      "folder": "math",
+      "textHash": "364dae26"
+    },
+    "math-number-22": {
+      "folder": "math",
+      "textHash": "3a0833eb"
+    },
+    "math-number-23": {
+      "folder": "math",
+      "textHash": "977cd072"
+    },
+    "math-number-24": {
+      "folder": "math",
+      "textHash": "e4b74f1a"
+    },
+    "math-number-25": {
+      "folder": "math",
+      "textHash": "0be5446f"
+    },
+    "math-number-26": {
+      "folder": "math",
+      "textHash": "25b45548"
+    },
+    "math-number-27": {
+      "folder": "math",
+      "textHash": "d2b380f0"
+    },
+    "math-number-28": {
+      "folder": "math",
+      "textHash": "f77dba18"
+    },
+    "math-number-29": {
+      "folder": "math",
+      "textHash": "257e5a89"
+    },
+    "math-number-30": {
+      "folder": "math",
+      "textHash": "85dac988"
+    },
+    "math-number-31": {
+      "folder": "math",
+      "textHash": "2ba424a5"
+    },
+    "math-number-32": {
+      "folder": "math",
+      "textHash": "1431c842"
+    },
+    "math-number-33": {
+      "folder": "math",
+      "textHash": "080b5d41"
+    },
+    "math-number-34": {
+      "folder": "math",
+      "textHash": "c3146439"
+    },
+    "math-number-35": {
+      "folder": "math",
+      "textHash": "00a34096"
+    },
+    "math-number-36": {
+      "folder": "math",
+      "textHash": "f896f4cf"
+    },
+    "math-number-37": {
+      "folder": "math",
+      "textHash": "942d9567"
+    },
+    "math-number-38": {
+      "folder": "math",
+      "textHash": "f10ed01f"
+    },
+    "math-number-39": {
+      "folder": "math",
+      "textHash": "1e28e4b8"
+    },
+    "math-number-40": {
+      "folder": "math",
+      "textHash": "32eda179"
+    },
+    "math-number-41": {
+      "folder": "math",
+      "textHash": "34001792"
+    },
+    "math-number-42": {
+      "folder": "math",
+      "textHash": "e5839d4b"
+    },
+    "math-number-43": {
+      "folder": "math",
+      "textHash": "96087b4e"
+    },
+    "math-number-44": {
+      "folder": "math",
+      "textHash": "323616f6"
+    },
+    "math-number-45": {
+      "folder": "math",
+      "textHash": "03e9032f"
+    },
+    "math-number-46": {
+      "folder": "math",
+      "textHash": "583aa284"
+    },
+    "math-number-47": {
+      "folder": "math",
+      "textHash": "6d83aa4c"
+    },
+    "math-number-48": {
+      "folder": "math",
+      "textHash": "6f7d5514"
+    },
+    "math-number-49": {
+      "folder": "math",
+      "textHash": "45567e69"
+    },
+    "math-number-50": {
+      "folder": "math",
+      "textHash": "c69fbe80"
+    },
+    "math-number-51": {
+      "folder": "math",
+      "textHash": "0818f357"
+    },
+    "math-number-52": {
+      "folder": "math",
+      "textHash": "c93302d6"
+    },
+    "math-number-53": {
+      "folder": "math",
+      "textHash": "b4d2947b"
+    },
+    "math-number-54": {
+      "folder": "math",
+      "textHash": "e9144903"
+    },
+    "math-number-55": {
+      "folder": "math",
+      "textHash": "e5b69002"
+    },
+    "math-number-56": {
+      "folder": "math",
+      "textHash": "ff95a44d"
+    },
+    "math-number-57": {
+      "folder": "math",
+      "textHash": "fdbc0dd5"
+    },
+    "math-number-58": {
+      "folder": "math",
+      "textHash": "091484fd"
+    },
+    "math-number-59": {
+      "folder": "math",
+      "textHash": "2ed401d0"
+    },
+    "math-number-60": {
+      "folder": "math",
+      "textHash": "a92ea13f"
+    },
+    "math-number-61": {
+      "folder": "math",
+      "textHash": "2022050a"
+    },
+    "math-number-62": {
+      "folder": "math",
+      "textHash": "2b46eadd"
+    },
+    "math-number-63": {
+      "folder": "math",
+      "textHash": "608036be"
+    },
+    "math-number-64": {
+      "folder": "math",
+      "textHash": "6561ee46"
+    },
+    "math-number-65": {
+      "folder": "math",
+      "textHash": "41b05789"
+    },
+    "math-number-66": {
+      "folder": "math",
+      "textHash": "59cf3e18"
+    },
+    "math-number-67": {
+      "folder": "math",
+      "textHash": "c5af7640"
+    },
+    "math-number-68": {
+      "folder": "math",
+      "textHash": "45e39e08"
+    },
+    "math-number-69": {
+      "folder": "math",
+      "textHash": "7b7a544f"
+    },
+    "math-number-70": {
+      "folder": "math",
+      "textHash": "c930baf7"
+    },
+    "math-number-71": {
+      "folder": "math",
+      "textHash": "49523dae"
+    },
+    "math-number-72": {
+      "folder": "math",
+      "textHash": "6645f5c9"
+    },
+    "math-number-73": {
+      "folder": "math",
+      "textHash": "b89e97aa"
+    },
+    "math-number-74": {
+      "folder": "math",
+      "textHash": "dfbadb82"
+    },
+    "math-number-75": {
+      "folder": "math",
+      "textHash": "e4a7936d"
+    },
+    "math-number-76": {
+      "folder": "math",
+      "textHash": "8a99b378"
+    },
+    "math-number-77": {
+      "folder": "math",
+      "textHash": "0ef620d0"
+    },
+    "math-number-78": {
+      "folder": "math",
+      "textHash": "15c85c68"
+    },
+    "math-number-79": {
+      "folder": "math",
+      "textHash": "79cfd5c7"
+    },
+    "math-number-80": {
+      "folder": "math",
+      "textHash": "037a3eeb"
+    },
+    "math-number-81": {
+      "folder": "math",
+      "textHash": "db973ba0"
+    },
+    "math-number-82": {
+      "folder": "math",
+      "textHash": "4c2104c1"
+    },
+    "math-number-83": {
+      "folder": "math",
+      "textHash": "9b0d089c"
+    },
+    "math-number-84": {
+      "folder": "math",
+      "textHash": "c3dbfc94"
+    },
+    "math-number-85": {
+      "folder": "math",
+      "textHash": "42dda9e5"
+    },
+    "math-number-86": {
+      "folder": "math",
+      "textHash": "e7031046"
+    },
+    "math-number-87": {
+      "folder": "math",
+      "textHash": "e9079dde"
+    },
+    "math-number-88": {
+      "folder": "math",
+      "textHash": "b53235b6"
+    },
+    "math-number-89": {
+      "folder": "math",
+      "textHash": "97ec003b"
+    },
+    "math-number-90": {
+      "folder": "math",
+      "textHash": "c801297e"
+    },
+    "math-number-91": {
+      "folder": "math",
+      "textHash": "3a2b867f"
+    },
+    "math-number-92": {
+      "folder": "math",
+      "textHash": "f4204130"
+    },
+    "math-number-93": {
+      "folder": "math",
+      "textHash": "3f26ada3"
+    },
+    "math-number-94": {
+      "folder": "math",
+      "textHash": "da8937db"
+    },
+    "math-number-95": {
+      "folder": "math",
+      "textHash": "2eb192cc"
+    },
+    "math-number-96": {
+      "folder": "math",
+      "textHash": "d6568459"
+    },
+    "math-number-97": {
+      "folder": "math",
+      "textHash": "2ab74371"
+    },
+    "math-number-98": {
+      "folder": "math",
+      "textHash": "0796e349"
+    },
+    "math-number-99": {
+      "folder": "math",
+      "textHash": "0bef6c8e"
+    },
+    "math-number-100": {
+      "folder": "math",
+      "textHash": "caac9323"
+    },
+    "math-plus": {
+      "folder": "math",
+      "textHash": "c4adc675"
+    },
+    "math-min": {
+      "folder": "math",
+      "textHash": "c98f4557"
+    },
+    "math-keer": {
+      "folder": "math",
+      "textHash": "f07b976e"
+    },
+    "math-deel": {
+      "folder": "math",
+      "textHash": "07b33b43"
+    },
+    "math-what-is": {
+      "folder": "math",
+      "textHash": "785e4009"
+    },
+    "math-answer-prefix": {
+      "folder": "math",
+      "textHash": "d8f914ce"
+    },
+    "math-correct": {
+      "folder": "math",
+      "textHash": "a8548c68"
+    },
+    "math-almost": {
+      "folder": "math",
+      "textHash": "f90be284"
+    },
+    "math-choose": {
+      "folder": "math",
+      "textHash": "931be1d2"
+    },
+    "coach-stuck": {
+      "folder": "chess",
+      "textHash": "244feced"
+    },
+    "coach-illegal": {
+      "folder": "chess",
+      "textHash": "baadf121"
+    },
+    "coach-blocked": {
+      "folder": "chess",
+      "textHash": "bb1c8de9"
+    },
+    "coach-hint": {
+      "folder": "chess",
+      "textHash": "e3bb35c9"
+    },
+    "coach-moved-target": {
+      "folder": "chess",
+      "textHash": "b16dfaba"
+    },
+    "coach-moved-free": {
+      "folder": "chess",
+      "textHash": "92238210"
+    },
+    "coach-selected": {
+      "folder": "chess",
+      "textHash": "fd52a672"
+    },
+    "coach-success": {
+      "folder": "chess",
+      "textHash": "313e4646"
+    },
+    "coach-preview-tap": {
+      "folder": "chess",
+      "textHash": "ea463c6b"
+    },
+    "rook-train-instruction": {
+      "folder": "chess",
+      "textHash": "94159e1a"
+    },
+    "rook-train-preview": {
+      "folder": "chess",
+      "textHash": "ff498854"
+    },
+    "rook-train-explanation": {
+      "folder": "chess",
+      "textHash": "53bbc85c"
+    },
+    "rook-train-hint": {
+      "folder": "chess",
+      "textHash": "498b05e4"
+    },
+    "rook-train-next-step": {
+      "folder": "chess",
+      "textHash": "9fe2061d"
+    },
+    "rook-train-success": {
+      "folder": "chess",
+      "textHash": "c6b6df30"
+    },
+    "bishop-line-instruction": {
+      "folder": "chess",
+      "textHash": "0be3bfbf"
+    },
+    "bishop-line-preview": {
+      "folder": "chess",
+      "textHash": "6c90a40f"
+    },
+    "bishop-line-explanation": {
+      "folder": "chess",
+      "textHash": "ec8a2040"
+    },
+    "bishop-line-hint": {
+      "folder": "chess",
+      "textHash": "3cb9026b"
+    },
+    "bishop-line-next-step": {
+      "folder": "chess",
+      "textHash": "d8891084"
+    },
+    "bishop-line-success": {
+      "folder": "chess",
+      "textHash": "20c80931"
+    },
+    "queen-dance-instruction": {
+      "folder": "chess",
+      "textHash": "93138404"
+    },
+    "queen-dance-preview": {
+      "folder": "chess",
+      "textHash": "f30c6f0b"
+    },
+    "queen-dance-explanation": {
+      "folder": "chess",
+      "textHash": "cc6aba8a"
+    },
+    "queen-dance-hint": {
+      "folder": "chess",
+      "textHash": "612c02c1"
+    },
+    "queen-dance-next-step": {
+      "folder": "chess",
+      "textHash": "2bc565a2"
+    },
+    "queen-dance-success": {
+      "folder": "chess",
+      "textHash": "50db3f05"
+    },
+    "knight-jump-instruction": {
+      "folder": "chess",
+      "textHash": "39cee63c"
+    },
+    "knight-jump-preview": {
+      "folder": "chess",
+      "textHash": "1ca528a8"
+    },
+    "knight-jump-explanation": {
+      "folder": "chess",
+      "textHash": "d9c33cab"
+    },
+    "knight-jump-hint": {
+      "folder": "chess",
+      "textHash": "9e634ffe"
+    },
+    "knight-jump-next-step": {
+      "folder": "chess",
+      "textHash": "b7bd7c29"
+    },
+    "knight-jump-success": {
+      "folder": "chess",
+      "textHash": "ac56a32b"
+    },
+    "king-step-instruction": {
+      "folder": "chess",
+      "textHash": "ff44759b"
+    },
+    "king-step-preview": {
+      "folder": "chess",
+      "textHash": "41111acb"
+    },
+    "king-step-explanation": {
+      "folder": "chess",
+      "textHash": "66d53736"
+    },
+    "king-step-hint": {
+      "folder": "chess",
+      "textHash": "e01fd155"
+    },
+    "king-step-next-step": {
+      "folder": "chess",
+      "textHash": "2004ee94"
+    },
+    "king-step-success": {
+      "folder": "chess",
+      "textHash": "bf328309"
+    },
+    "pawn-crossing-instruction": {
+      "folder": "chess",
+      "textHash": "f3a4f4b6"
+    },
+    "pawn-crossing-preview": {
+      "folder": "chess",
+      "textHash": "7c203b6b"
+    },
+    "pawn-crossing-explanation": {
+      "folder": "chess",
+      "textHash": "cafb26e6"
+    },
+    "pawn-crossing-hint": {
+      "folder": "chess",
+      "textHash": "ab7feb5e"
+    },
+    "pawn-crossing-next-step": {
+      "folder": "chess",
+      "textHash": "39ca33fb"
+    },
+    "pawn-crossing-success": {
+      "folder": "chess",
+      "textHash": "d6417a52"
+    },
+    "castling-instruction": {
+      "folder": "chess",
+      "textHash": "e5c928c1"
+    },
+    "castling-preview": {
+      "folder": "chess",
+      "textHash": "b383d3b7"
+    },
+    "castling-explanation": {
+      "folder": "chess",
+      "textHash": "34295f97"
+    },
+    "castling-hint": {
+      "folder": "chess",
+      "textHash": "18d76380"
+    },
+    "castling-success": {
+      "folder": "chess",
+      "textHash": "30813e4c"
+    },
+    "check-instruction": {
+      "folder": "chess",
+      "textHash": "ffa2b52c"
+    },
+    "check-preview": {
+      "folder": "chess",
+      "textHash": "f80a3fd3"
+    },
+    "check-explanation": {
+      "folder": "chess",
+      "textHash": "7a8577ee"
+    },
+    "check-hint": {
+      "folder": "chess",
+      "textHash": "fb524116"
+    },
+    "check-success": {
+      "folder": "chess",
+      "textHash": "77409da2"
+    },
+    "checkmate-instruction": {
+      "folder": "chess",
+      "textHash": "cec757a2"
+    },
+    "checkmate-preview": {
+      "folder": "chess",
+      "textHash": "fb8ff06c"
+    },
+    "checkmate-explanation": {
+      "folder": "chess",
+      "textHash": "12105ced"
+    },
+    "checkmate-hint": {
+      "folder": "chess",
+      "textHash": "deec9b6c"
+    },
+    "checkmate-success": {
+      "folder": "chess",
+      "textHash": "069e2fdf"
+    },
+    "puzzle-mate-title": {
+      "folder": "chess-puzzles",
+      "textHash": "2f6932f4"
+    },
+    "puzzle-capture-title": {
+      "folder": "chess-puzzles",
+      "textHash": "0e54a9db"
+    },
+    "puzzle-tactic-title": {
+      "folder": "chess-puzzles",
+      "textHash": "c70c26ea"
+    },
+    "puzzle-mate-w": {
+      "folder": "chess-puzzles",
+      "textHash": "40dc5a53"
+    },
+    "puzzle-mate-b": {
+      "folder": "chess-puzzles",
+      "textHash": "b5b2a145"
+    },
+    "puzzle-capture-w": {
+      "folder": "chess-puzzles",
+      "textHash": "81545262"
+    },
+    "puzzle-capture-b": {
+      "folder": "chess-puzzles",
+      "textHash": "14cea202"
+    },
+    "puzzle-tactic-w": {
+      "folder": "chess-puzzles",
+      "textHash": "dc90797b"
+    },
+    "puzzle-tactic-b": {
+      "folder": "chess-puzzles",
+      "textHash": "784cdd1b"
+    },
+    "puzzle-solved-mate": {
+      "folder": "chess-puzzles",
+      "textHash": "c10a88dd"
+    },
+    "puzzle-solved-capture": {
+      "folder": "chess-puzzles",
+      "textHash": "54ed7300"
+    },
+    "puzzle-solved-tactic": {
+      "folder": "chess-puzzles",
+      "textHash": "8d256733"
+    },
+    "puzzle-wrong": {
+      "folder": "chess-puzzles",
+      "textHash": "11da8832"
+    },
+    "puzzle-correct": {
+      "folder": "chess-puzzles",
+      "textHash": "3d9d540e"
+    },
+    "puzzle-idle": {
+      "folder": "chess-puzzles",
+      "textHash": "a79a2545"
+    },
+    "word-bloem": {
+      "folder": "words",
+      "textHash": "c8fd7d52"
+    },
+    "word-boom": {
+      "folder": "words",
+      "textHash": "c79493aa"
+    },
+    "word-gras": {
+      "folder": "words",
+      "textHash": "b09aa3dc"
+    },
+    "word-tulp": {
+      "folder": "words",
+      "textHash": "8747458e"
+    },
+    "word-slak": {
+      "folder": "words",
+      "textHash": "71a4538e"
+    },
+    "word-bij": {
+      "folder": "words",
+      "textHash": "5ecadf0a"
+    },
+    "word-vijver": {
+      "folder": "words",
+      "textHash": "62852f2f"
+    },
+    "word-roos": {
+      "folder": "words",
+      "textHash": "19fd0340"
+    },
+    "word-blad": {
+      "folder": "words",
+      "textHash": "81ca576e"
+    },
+    "word-hark": {
+      "folder": "words",
+      "textHash": "ebc366e1"
+    },
+    "word-schop": {
+      "folder": "words",
+      "textHash": "608b72ee"
+    },
+    "word-zon": {
+      "folder": "words",
+      "textHash": "917c3a98"
+    },
+    "word-water": {
+      "folder": "words",
+      "textHash": "49c69a10"
+    },
+    "word-vogel": {
+      "folder": "words",
+      "textHash": "1924a996"
+    },
+    "word-nest": {
+      "folder": "words",
+      "textHash": "5ed0d48b"
+    },
+    "word-zaad": {
+      "folder": "words",
+      "textHash": "4ace8921"
+    },
+    "word-vis": {
+      "folder": "words",
+      "textHash": "7b124869"
+    },
+    "word-krab": {
+      "folder": "words",
+      "textHash": "b56a9dcb"
+    },
+    "word-zee": {
+      "folder": "words",
+      "textHash": "b88b8287"
+    },
+    "word-boot": {
+      "folder": "words",
+      "textHash": "d094a1d5"
+    },
+    "word-zand": {
+      "folder": "words",
+      "textHash": "48d9beee"
+    },
+    "word-koraal": {
+      "folder": "words",
+      "textHash": "724dab6f"
+    },
+    "word-octopus": {
+      "folder": "words",
+      "textHash": "bebfab0e"
+    },
+    "word-walvis": {
+      "folder": "words",
+      "textHash": "5c0e06cb"
+    },
+    "word-golf": {
+      "folder": "words",
+      "textHash": "ee66dab9"
+    },
+    "word-haai": {
+      "folder": "words",
+      "textHash": "e9a31010"
+    },
+    "word-kwal": {
+      "folder": "words",
+      "textHash": "f28574fa"
+    },
+    "word-schelp": {
+      "folder": "words",
+      "textHash": "3d7aa390"
+    },
+    "word-zeester": {
+      "folder": "words",
+      "textHash": "3146288f"
+    },
+    "word-dolfijn": {
+      "folder": "words",
+      "textHash": "aa91f365"
+    },
+    "word-bubbel": {
+      "folder": "words",
+      "textHash": "a155b535"
+    },
+    "word-instruction": {
+      "folder": "words",
+      "textHash": "0e74c92f"
+    },
+    "word-last-letter": {
+      "folder": "words",
+      "textHash": "c52ad16e"
+    },
+    "word-wrong": {
+      "folder": "words",
+      "textHash": "8e86dfc0"
+    },
+    "word-complete": {
+      "folder": "words",
+      "textHash": "42a33ed4"
+    },
+    "word-found": {
+      "folder": "words",
+      "textHash": "98181787"
+    },
+    "puzzle-opponent": {
+      "folder": "chess-puzzles",
+      "textHash": "6a7a5f67"
+    },
+    "coach-selected-opponent": {
+      "folder": "chess",
+      "textHash": "1830469b"
+    },
+    "coach-selected-own": {
+      "folder": "chess",
+      "textHash": "2a2078f6"
+    }
+  },
+  "model": "speaches-ai/piper-nl_BE-nathalie-medium",
+  "voice": "nathalie"
+}
