@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { useMurdokuStore } from "@features/murdoku-game";
+import { DEFAULT_MURDOKU_SETTINGS, useMurdokuStore } from "@features/murdoku-game";
 
 /**
  * jsdom tekent geen canvas. Het bord roept alleen tekenmethodes aan; de pixels
@@ -28,7 +28,13 @@ function silentContext(): CanvasRenderingContext2D {
 beforeEach(() => {
   cleanup();
   localStorage.clear();
-  useMurdokuStore.setState({ puzzle: null, play: null, history: [] });
+  useMurdokuStore.setState({
+    puzzle: null,
+    play: null,
+    history: [],
+    settings: DEFAULT_MURDOKU_SETTINGS,
+    solvedCaseIds: new Set(),
+  });
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => silentContext());
 });
 
@@ -366,5 +372,28 @@ describe("Wie was het? hints en tikbare woorden", () => {
     expect((screen.getByRole("button", { name: "Aanwijzing" }) as HTMLButtonElement).disabled).toBe(
       true,
     );
+  });
+
+  it("bewaart de instellingen en laat auto-kruis het bord volgen", async () => {
+    renderApp("/mysterie");
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+
+    const autoCross = screen.getByRole("button", {
+      name: "Rij en kolom automatisch wegstrepen",
+    });
+    expect(autoCross.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(autoCross);
+    expect(autoCross.getAttribute("aria-pressed")).toBe("false");
+    expect(useMurdokuStore.getState().settings.autoCross).toBe(false);
+
+    // Zonder auto-kruis blijft de rij van een geplaatst persoon leeg.
+    fireEvent.click(screen.getByRole("button", { name: "Anna" }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 1/ })).toBeTruthy();
+
+    const blocked = screen.getByRole("button", { name: "Ook kruisjes op meubels" });
+    fireEvent.click(blocked);
+    expect(blocked.getAttribute("aria-pressed")).toBe("true");
+    expect(useMurdokuStore.getState().settings.crossOnBlocked).toBe(true);
   });
 });

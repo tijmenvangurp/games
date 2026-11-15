@@ -18,6 +18,8 @@ interface MurdokuBoardSectionProps {
   /** Werktitel van de zaak, voor het toegankelijke bordlabel. */
   title: string;
   play: MurdokuPlayState;
+  /** Of de rij en kolom van een geplaatst persoon automatisch een kruisje krijgen. */
+  autoCross?: boolean;
   /** Of er een stap is om ongedaan te maken. */
   canUndo: boolean;
   /** Of de controle nu mag: iedereen staat en de zaak loopt nog. */
@@ -145,6 +147,7 @@ interface MurdokuBoardPanelProps {
   puzzle: Puzzle;
   title: string;
   play: MurdokuPlayState;
+  autoCross: boolean;
   focus: MurdokuBoardHighlight | null;
   helpMarks: ReturnType<typeof focusView>["marks"] | null;
   onCellTap: (cell: Cell) => void;
@@ -155,11 +158,15 @@ function MurdokuBoardPanel({
   puzzle,
   title,
   play,
+  autoCross,
   focus,
   helpMarks,
   onCellTap,
 }: MurdokuBoardPanelProps) {
-  const crosses = useMemo(() => crossedCells(puzzle, play), [puzzle, play]);
+  const crosses = useMemo(
+    () => crossedCells(puzzle, play, { autoCross }),
+    [puzzle, play, autoCross],
+  );
   const candidates = useMemo(() => candidateCells(puzzle, play), [puzzle, play]);
   const highlight = useMemo(
     () => (candidates ? { cells: candidates, color: MURDOKU_CANDIDATE_COLOR } : null),
@@ -209,6 +216,7 @@ export function MurdokuBoardSection({
   puzzle,
   title,
   play,
+  autoCross = true,
   canUndo,
   canCheck,
   feedback,
@@ -232,6 +240,7 @@ export function MurdokuBoardSection({
         De plattegrond
       </h2>
       <MurdokuBoardPanel
+        autoCross={autoCross}
         focus={focusFor(hint, clueFocus, wordView.cells)}
         helpMarks={clueFocus ? wordView.marks : null}
         play={play}

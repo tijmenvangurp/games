@@ -11,6 +11,8 @@ import {
   type MurdokuMode,
   type MurdokuPlayState,
 } from "./play";
+import type { MurdokuSettings } from "./settings";
+import { restoreMurdokuState, saveMurdokuState } from "./storage";
 
 const MAX_HISTORY = 200;
 
@@ -21,7 +23,7 @@ interface MurdokuStore {
   play: MurdokuPlayState | null;
   /** Eerdere bordtoestanden, voor ongedaan maken. */
   history: MurdokuPlayState[];
-  /** Zaken die in deze sessie zijn opgelost; de zaakkeuze toont ze. */
+  /** Zaken die zijn opgelost; de zaakkeuze toont ze, ook na herladen. */
   solvedCaseIds: ReadonlySet<string>;
   /** De hint die nu op het bord staat; `null` als het kind niets vroeg. */
   hint: MurdokuHintState | null;
@@ -31,6 +33,8 @@ interface MurdokuStore {
   clueFocus: MurdokuClueFocus | null;
   /** Dat woord zoals het in de zin stond, voor de melding onder het bord. */
   clueFocusLabel: string | null;
+  /** Voorkeuren van het kind; ze gelden voor elke zaak en blijven bewaard. */
+  settings: MurdokuSettings;
   start: (puzzle: Puzzle) => void;
   selectPerson: (person: PersonId) => void;
   setMode: (mode: MurdokuMode) => void;
@@ -45,6 +49,10 @@ interface MurdokuStore {
   showHint: () => void;
   /** Een tik op een woord in een aanwijzing; nog eens tikken heft het op. */
   focusClue: (focus: MurdokuClueFocus, label: string) => void;
+  /** De rij en kolom van een geplaatst persoon automatisch wegstrepen. */
+  setAutoCross: (enabled: boolean) => void;
+  /** Ook een kruisje mogen zetten op een vakje waar niemand kan staan. */
+  setCrossOnBlocked: (enabled: boolean) => void;
 }
 
 function withHistory(history: MurdokuPlayState[], play: MurdokuPlayState): MurdokuPlayState[] {
@@ -53,15 +61,19 @@ function withHistory(history: MurdokuPlayState[], play: MurdokuPlayState): Murdo
 
 const CLEARED_HINT = { hint: null, clueFocus: null, clueFocusLabel: null } as const;
 
+/** De bewaarde zaak, opgeloste zaken en instellingen van de vorige keer. */
+const restored = restoreMurdokuState();
+
 export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
-  puzzle: null,
-  play: null,
+  puzzle: restored.puzzle,
+  play: restored.play,
   history: [],
-  solvedCaseIds: new Set(),
-  hint: null,
-  hintsUsed: 0,
+  solvedCaseIds: restored.solvedCaseIds,
+  hint: restored.hint,
+  hintsUsed: restored.hintsUsed,
   clueFocus: null,
   clueFocusLabel: null,
+  settings: restored.settings,
 
   start: (puzzle) =>
     set((state) => ({
@@ -72,8 +84,9 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
       hintsUsed: 0,
       clueFocus: null,
       clueFocusLabel: null,
-      // Opgeloste zaken blijven staan als het kind een nieuwe zaak kiest.
+      // Opgeloste zaken en instellingen blijven staan als het kind een nieuwe zaak kiest.
       solvedCaseIds: state.solvedCaseIds,
+      settings: state.settings,
     })),
 
   selectPerson: (person) =>
@@ -82,9 +95,12 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
   setMode: (mode) => set((state) => (state.play ? { play: setMurdokuMode(state.play, mode) } : {})),
 
   tapCell: (cell) => {
-    const { puzzle, play } = get();
+    const { puzzle, play, settings } = get();
     if (!puzzle || !play) return;
-    const next = tapMurdokuCell(puzzle, play, cell);
+    const next = tapMurdokuCell(puzzle, play, cell, {
+      autoCross: settings.autoCross,
+      crossOnBlocked: settings.crossOnBlocked,
+    });
     if (next === play) return;
     set({ play: next, history: withHistory(get().history, play), ...CLEARED_HINT });
   },
@@ -137,4 +153,19 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
         hint: null,
       };
     }),
+
+  setAutoCross: (autoCross) => set((state) => ({ settings: { ...state.settings, autoCross } })),
+
+  setCrossOnBlocked: (crossOnBlocked) =>
+    set((state) => ({ settings: { ...state.settings, crossOnBlocked } })),
 }));
+
+useMurdokuStore.subscribe((state) => {
+  saveMurdokuState({
+    play: state.play,
+    hint: state.hint,
+    hintsUsed: state.hintsUsed,
+    solvedCaseIds: state.solvedCaseIds,
+    settings: state.settings,
+  });
+});
