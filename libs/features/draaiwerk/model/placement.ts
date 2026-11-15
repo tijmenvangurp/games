@@ -243,11 +243,11 @@ export function nextSolutionPlacement(
   );
 }
 
-/** Distance from the worm wheel's pitch circle to the shaft's centreline. */
-export const WORM_SHAFT_CLEARANCE = 7;
+/** Distance from the worm wheel's rim to the shaft's centreline. */
+export const WORM_SHAFT_CLEARANCE = 9;
 
 export interface WormShaft {
-  /** Centre of the shaft body, on the rim facing the input gear. */
+  /** Centre of the shaft body, above the worm wheel. */
   centre: { x: number; y: number };
   /** Rotation of the shaft, along the tangent of the worm wheel. */
   angle: number;
@@ -257,27 +257,22 @@ export interface WormShaft {
 }
 
 /**
- * The worm shaft rests on the worm wheel instead of spanning both gear hubs:
- * it lies along the tangent at the rim point nearest the input gear, so half of
- * its body sinks into the teeth and the coils grip them.
+ * The worm shaft lies on top of the worm wheel instead of spanning both gear
+ * hubs: a horizontal screw above the rim, with its lower half sunk into the top
+ * teeth so it visibly grips them.
  */
 export function wormShaftGeometry(
   level: Level,
   placement: Extract<Placement, { kind: "worm" }>,
   toRadius: number,
 ): WormShaft {
-  const from = holeCenter(level, placement.fromHoleId);
   const target = holeCenter(level, placement.toHoleId);
-  const reach = distance(from, target) || 1;
-  const ux = (target.x - from.x) / reach;
-  const uy = (target.y - from.y) / reach;
-  const clearance = toRadius + WORM_SHAFT_CLEARANCE;
-  const length = Math.max(38, toRadius * 1.05);
+  const length = Math.max(70, toRadius * 1.3);
   const coils = Math.max(3, Math.round(length / 11));
 
   return {
-    centre: { x: target.x - ux * clearance, y: target.y - uy * clearance },
-    angle: (Math.atan2(ux, -uy) * 180) / Math.PI,
+    centre: { x: target.x, y: target.y - (toRadius + WORM_SHAFT_CLEARANCE) },
+    angle: 0,
     length,
     coils,
     pitch: length / coils,

@@ -169,7 +169,7 @@ describe("draaiwerk placement", () => {
     ).toBe("De ketting past niet tussen deze wielen.");
   });
 
-  it("legt de wormas op de velg van het wormwiel in plaats van van hart tot hart", () => {
+  it("legt de wormas bovenop het wormwiel in plaats van van hart tot hart", () => {
     const wormLevel = levelAt(9);
     const placement = wormLevel.solution.find((part) => part.kind === "worm");
     const wheel = wormLevel.outputs.find((output) => output.id === "target-1");
@@ -179,23 +179,20 @@ describe("draaiwerk placement", () => {
 
     const radius = gearRadius(wheel.size);
     const target = holeCenter(wormLevel, placement.toHoleId);
-    const from = holeCenter(wormLevel, placement.fromHoleId);
     const shaft = wormShaftGeometry(wormLevel, placement, radius);
     const offset = Math.hypot(shaft.centre.x - target.x, shaft.centre.y - target.y);
 
-    // The shaft centres on the rim (plus its half thickness), not on the hub.
+    // The shaft sits straight above the wheel, not between the two hubs.
+    expect(shaft.centre.x).toBeCloseTo(target.x, 6);
+    expect(shaft.centre.y).toBeLessThan(target.y);
+    expect(shaft.angle).toBeCloseTo(0, 6);
     expect(offset).toBeCloseTo(radius + WORM_SHAFT_CLEARANCE, 6);
-    expect(offset).toBeGreaterThan(radius);
-    // Its axis runs along the tangent, so both gears turn about the same line.
-    const axis = {
-      x: Math.cos((shaft.angle * Math.PI) / 180),
-      y: Math.sin((shaft.angle * Math.PI) / 180),
-    };
-    const link = { x: target.x - from.x, y: target.y - from.y };
-    expect(axis.x * link.x + axis.y * link.y).toBeCloseTo(0, 6);
-    // Half the body still reaches inside the pitch circle and grips the teeth.
-    expect(offset - 8).toBeLessThan(radius);
-    expect(shaft.length).toBeGreaterThanOrEqual(38);
+    // The lower edge sinks into the tooth tips (the tip circle is radius + 4)
+    // but stays clear of the wheel body.
+    expect(offset - 8).toBeLessThan(radius + 4);
+    expect(offset - 8).toBeGreaterThanOrEqual(radius);
+    expect(shaft.length).toBeGreaterThanOrEqual(70);
+    expect(shaft.coils).toBeGreaterThanOrEqual(3);
   });
 
   it("formats labels, speeds and outputs", () => {
