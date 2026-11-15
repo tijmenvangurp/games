@@ -50,14 +50,18 @@ function linkPair(fromHoleId: string, toHoleId: string): string {
   return [fromHoleId, toHoleId].sort().join("|");
 }
 
-function isLinkPlacement(
-  placement: Placement,
-): placement is Extract<Placement, { kind: LinkPlacementKind }> {
+export type LinkPlacement = Extract<Placement, { kind: LinkPlacementKind }>;
+
+export function isLinkPlacement(placement: Placement): placement is LinkPlacement {
   return (
     placement.kind === "open-belt" ||
     placement.kind === "crossed-belt" ||
     placement.kind === "chain"
   );
+}
+
+export function connectionKey(placement: LinkPlacement): string {
+  return `${placement.kind}:${placement.fromHoleId}:${placement.toHoleId}`;
 }
 
 /**

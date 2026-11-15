@@ -1,5 +1,5 @@
 import { useMemo, type MouseEvent } from "react";
-import { useDroppable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
   boardViewBox,
   gearPath,
@@ -9,6 +9,7 @@ import {
   type GearPose,
   type Hole,
   type Level,
+  type ConnectionPose,
   type Output,
   type Placement,
   type TrayItem,
@@ -33,6 +34,7 @@ interface DraaiwerkBoardProps {
   placements: readonly Placement[];
   selectedItem: TrayItem | null;
   linkDrag: boolean;
+  canMovePlaced: boolean;
   pendingHoleId: string | null;
   pendingGearKey: string | null;
   hintPlacement: Placement | null;
@@ -118,6 +120,14 @@ function DraaiwerkHole({
         />
       ) : null}
       <circle
+        aria-hidden="true"
+        cx={center.x}
+        cy={center.y}
+        fill="transparent"
+        pointerEvents="none"
+        r={22.5}
+      />
+      <circle
         className="draaiwerk-focus-ring"
         cx={center.x}
         cy={center.y}
@@ -199,12 +209,85 @@ function GearDropZone({ pose, enabled }: { pose: GearPose; enabled: boolean }) {
   );
 }
 
+function PlacedGearHandle({ pose, enabled }: { pose: GearPose; enabled: boolean }) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: `placed:${pose.key}`,
+    disabled: !enabled,
+  });
+
+  if (!enabled) {
+    return null;
+  }
+
+  return (
+    <circle
+      ref={(node) => setNodeRef(node as unknown as HTMLElement)}
+      {...attributes}
+      {...listeners}
+      aria-label="Verplaats dit onderdeel"
+      className="draaiwerk-placed-handle"
+      cx={pose.center.x}
+      cy={pose.center.y}
+      data-placed-key={pose.key}
+      fill="transparent"
+      pointerEvents="all"
+      r={gearRadius(pose.size) + 2}
+      style={{ touchAction: "none" }}
+    />
+  );
+}
+
+function PlacedConnectionHandle({
+  connection,
+  gears,
+  enabled,
+}: {
+  connection: ConnectionPose;
+  gears: readonly GearPose[];
+  enabled: boolean;
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: `placed:belt:${connection.key}`,
+    disabled: !enabled,
+  });
+  const from = gears.find((pose) => pose.key === connection.fromKey);
+  const to = gears.find((pose) => pose.key === connection.toKey);
+
+  if (!enabled || !from || !to) {
+    return null;
+  }
+
+  const cx = (from.center.x + to.center.x) / 2;
+  const cy = (from.center.y + to.center.y) / 2;
+
+  return (
+    <g
+      ref={(node) => setNodeRef(node as unknown as HTMLElement)}
+      {...attributes}
+      {...listeners}
+      aria-label="Verplaats of verwijder deze verbinding"
+      className="draaiwerk-placed-handle"
+      data-placed-key={`belt:${connection.key}`}
+      style={{ touchAction: "none" }}
+    >
+      <circle cx={cx} cy={cy} fill="var(--card)" r={14} stroke="var(--border)" strokeWidth={1.5} />
+      <path
+        d={`M ${cx - 6} ${cy - 3} H ${cx + 6} M ${cx - 6} ${cy + 3} H ${cx + 6}`}
+        stroke="var(--muted-foreground)"
+        strokeLinecap="round"
+        strokeWidth={1.6}
+      />
+    </g>
+  );
+}
+
 export function DraaiwerkBoard({
   level,
   result,
   placements,
   selectedItem,
   linkDrag,
+  canMovePlaced,
   pendingHoleId,
   pendingGearKey,
   hintPlacement,
@@ -431,6 +514,27 @@ export function DraaiwerkBoard({
                   <GearHitTarget key={pose.key} label={meta?.label} pose={pose} onTap={onGear} />
                 );
               })
+            : null}
+        </g>
+
+        <g>
+          {canMovePlaced
+            ? result.gears
+                .filter((pose) => pose.key.startsWith("gear:") || pose.key.startsWith("as:"))
+                .map((pose) => <PlacedGearHandle key={`move:${pose.key}`} enabled pose={pose} />)
+            : null}
+        </g>
+
+        <g>
+          {canMovePlaced
+            ? result.connections.map((connection) => (
+                <PlacedConnectionHandle
+                  key={`move:${connection.key}`}
+                  connection={connection}
+                  enabled
+                  gears={result.gears}
+                />
+              ))
             : null}
         </g>
 

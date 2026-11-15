@@ -1,11 +1,19 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { LEVEL_COUNT, levelAt, type Level, type Placement } from "@entities/gear";
+import {
+  LEVEL_COUNT,
+  drive,
+  levelAt,
+  type DriveResult,
+  type Level,
+  type Placement,
+} from "@entities/gear";
 import {
   DEFAULT_DRAAIWERK_PROGRESS,
   DRAAIWERK_STORAGE_KEY,
   DRAAIWERK_STORAGE_VERSION,
   normalizeDraaiwerkProgress,
+  statusMessage,
   useDraaiwerkStore,
 } from "@features/draaiwerk";
 import { DraaiwerkScreen } from "@pages/draaiwerk";
@@ -342,5 +350,191 @@ describe("draaiwerk", () => {
       current: 0,
       finished: false,
     });
+  });
+});
+
+function emptyDrive(): DriveResult {
+  return { gears: [], connections: [], outputs: [], jammed: false, solved: false };
+}
+
+function outputPose(
+  kind: "target" | "generator" | "lift",
+  satisfied: boolean,
+): DriveResult["outputs"][number] {
+  return {
+    id: kind,
+    kind,
+    satisfied,
+    speed: 1,
+    direction: 1,
+    center: { x: 0, y: 0 },
+  };
+}
+
+describe("draaiwerk: onderdelen verplaatsen", () => {
+  it("verplaatst een geplaatst tandwiel en haalt het weer weg", () => {
+    useDraaiwerkStore.setState({ unlocked: 2, finished: false });
+    useDraaiwerkStore.getState().startLevel(0);
+    const item = levelAt(0).tray[0];
+    if (!item) {
+      throw new Error("Level 1 has no tray item");
+    }
+
+    useDraaiwerkStore.getState().selectTray(item.id);
+    useDraaiwerkStore.getState().tapHole("1,0");
+    expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
+
+    useDraaiwerkStore.getState().movePlaced("gear:1,0", "2,2");
+    expect(useDraaiwerkStore.getState().status).toBe("solved");
+
+    useDraaiwerkStore.getState().startLevel(0);
+    useDraaiwerkStore.getState().selectTray(item.id);
+    useDraaiwerkStore.getState().tapHole("1,0");
+    useDraaiwerkStore.getState().removePlaced("gear:1,0");
+
+    expect(useDraaiwerkStore.getState().placements).toEqual([]);
+    expect(useDraaiwerkStore.getState().usedTrayIds).toEqual([]);
+  });
+
+  it("weigert een ongeldige verplaatsing", () => {
+    useDraaiwerkStore.setState({ unlocked: 2, finished: false });
+    useDraaiwerkStore.getState().startLevel(0);
+    const item = levelAt(0).tray[0];
+    if (!item) {
+      throw new Error("Level 1 has no tray item");
+    }
+
+    useDraaiwerkStore.getState().selectTray(item.id);
+    useDraaiwerkStore.getState().tapHole("1,0");
+    useDraaiwerkStore.getState().movePlaced("gear:1,0", "0,2");
+
+    expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
+    expect(useDraaiwerkStore.getState().feedback).toBe("Daar past dit onderdeel niet.");
+  });
+
+  it("verplaatst en verwijdert een liggende as", () => {
+    useDraaiwerkStore.setState({ unlocked: 16, finished: false });
+    useDraaiwerkStore.getState().startLevel(9);
+    const axle = levelAt(9).tray.find((candidate) => candidate.kind === "lying-as");
+    if (!axle) {
+      throw new Error("Level 10 has no lying axle");
+    }
+
+    useDraaiwerkStore.getState().selectTray(axle.id);
+    useDraaiwerkStore.getState().tapHole("3,0");
+    useDraaiwerkStore.getState().tapHole("7,0");
+    useDraaiwerkStore.getState().movePlaced("as:3,0", "3,2");
+
+    expect(useDraaiwerkStore.getState().status).toBe("solved");
+
+    useDraaiwerkStore.getState().startLevel(9);
+    useDraaiwerkStore.getState().selectTray(axle.id);
+    useDraaiwerkStore.getState().tapHole("3,0");
+    useDraaiwerkStore.getState().tapHole("7,0");
+    useDraaiwerkStore.getState().removePlaced("as:3,0");
+
+    expect(useDraaiwerkStore.getState().placements).toEqual([]);
+    expect(useDraaiwerkStore.getState().usedTrayIds).toEqual([]);
+  });
+
+  it("haalt een geplaatste riem terug", () => {
+    useDraaiwerkStore.setState({ unlocked: 16, finished: false });
+    useDraaiwerkStore.getState().startLevel(12);
+    const belt = levelAt(12).tray.find((candidate) => candidate.kind === "belt");
+    if (!belt) {
+      throw new Error("Level 13 has no belt");
+    }
+
+    useDraaiwerkStore.getState().selectTray(belt.id);
+    useDraaiwerkStore.getState().tapGear("motor");
+    useDraaiwerkStore.getState().tapGear("output:generator-1");
+    const placement = useDraaiwerkStore.getState().placements[0];
+    if (
+      !placement ||
+      (placement.kind !== "open-belt" &&
+        placement.kind !== "crossed-belt" &&
+        placement.kind !== "chain")
+    ) {
+      throw new Error("Belt was not placed");
+    }
+
+    useDraaiwerkStore
+      .getState()
+      .removePlaced(`belt:${placement.kind}:${placement.fromHoleId}:${placement.toHoleId}`);
+
+    expect(useDraaiwerkStore.getState().placements).toEqual([]);
+    expect(useDraaiwerkStore.getState().usedTrayIds).toEqual([]);
+  });
+});
+
+describe("draaiwerk: statusmeldingen", () => {
+  const level = levelAt(0);
+  const base = emptyDrive();
+
+  it("kiest de juiste melding per uitkomst", () => {
+    expect(statusMessage(level, { ...base, solved: true }, null, "instructie", false)).toBe(
+      "Level gehaald.",
+    );
+    expect(statusMessage(level, { ...base, jammed: true }, null, "instructie", false)).toContain(
+      "Vastgelopen",
+    );
+    expect(statusMessage(level, base, "fout", "instructie", false)).toBe("fout");
+    expect(
+      statusMessage(level, { ...base, outputs: [outputPose("generator", true)] }, null, "i", false),
+    ).toBe("De lamp brandt.");
+    expect(
+      statusMessage(level, { ...base, outputs: [outputPose("lift", true)] }, null, "i", false),
+    ).toBe("De lift gaat omhoog.");
+    expect(
+      statusMessage(level, { ...base, outputs: [outputPose("target", true)] }, null, "i", false),
+    ).toBe("Het doel draait de goede kant op.");
+    expect(statusMessage(level, base, null, "instructie", true)).toContain("Alle onderdelen");
+    expect(statusMessage(level, base, null, "instructie", false)).toBe("instructie");
+  });
+
+  it("herkent een verkeerde richting, meter, lamp en lift", () => {
+    const wrongLevel = levelAt(7);
+    expect(
+      statusMessage(
+        wrongLevel,
+        drive(wrongLevel, [{ kind: "gear", holeId: "3,2", size: 2 }]),
+        null,
+        "i",
+        false,
+      ),
+    ).toContain("andere kant");
+
+    const meterLevel = levelAt(11);
+    expect(
+      statusMessage(
+        meterLevel,
+        drive(meterLevel, [{ kind: "lying-as", holeA: "3,2", holeB: "7,2", sizeA: 2, sizeB: 1 }]),
+        null,
+        "i",
+        false,
+      ),
+    ).toContain("meter");
+
+    const generatorLevel = levelAt(12);
+    expect(
+      statusMessage(
+        generatorLevel,
+        drive(generatorLevel, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "9,2" }]),
+        null,
+        "i",
+        false,
+      ),
+    ).toContain("lamp");
+
+    const liftLevel = levelAt(13);
+    expect(
+      statusMessage(
+        liftLevel,
+        drive(liftLevel, [{ kind: "lying-as", holeA: "2,2", holeB: "6,2", sizeA: 1, sizeB: 2 }]),
+        null,
+        "i",
+        false,
+      ),
+    ).toContain("lift");
   });
 });

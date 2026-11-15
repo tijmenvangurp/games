@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Check } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { trayLabel, type TrayItem } from "@entities/gear";
@@ -40,7 +40,7 @@ function TrayCard({
       aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
       aria-pressed={selected}
       className={cn(
-        "relative flex min-h-16 min-w-28 shrink-0 touch-none flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] md:landscape:min-w-0 md:landscape:shrink",
+        "relative flex min-h-16 min-w-28 shrink-0 cursor-grab touch-none flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] active:cursor-grabbing md:landscape:min-w-0 md:landscape:shrink",
         used
           ? "border-dashed border-border bg-muted/30 opacity-50"
           : "border-border bg-card hover:bg-muted/40",
@@ -79,25 +79,40 @@ function TrayCard({
   );
 }
 
-export function DraaiwerkTray() {
+export function DraaiwerkTray({ removing }: { removing: boolean }) {
   const level = useDraaiwerkStore((state) => state.level);
   const usedTrayIds = useDraaiwerkStore((state) => state.usedTrayIds);
   const selectedTrayId = useDraaiwerkStore((state) => state.selectedTrayId);
   const status = useDraaiwerkStore((state) => state.status);
   const solving = status === "solved";
+  const { isOver, setNodeRef } = useDroppable({
+    id: "tray-remove",
+    disabled: !removing,
+  });
 
   return (
     <section
-      aria-label="Onderdelen"
-      className="game-panel flex min-h-0 min-w-0 flex-col p-2.5 sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
+      ref={(node) => setNodeRef(node)}
+      aria-label={removing ? "Onderdelen, sleep hier om weg te halen" : "Onderdelen"}
+      className={cn(
+        "game-panel flex min-h-0 min-w-0 flex-col p-2.5 transition sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2",
+        removing && "border-dashed border-primary/60",
+        isOver && "bg-primary/5 ring-2 ring-primary/20",
+      )}
+      data-drop-over={isOver ? "true" : "false"}
+      data-tray-drop="true"
     >
       <div className="mb-2 flex shrink-0 items-baseline justify-between gap-2">
         <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Onderdelen
         </h2>
-        <p className="text-[10px] font-bold text-muted-foreground">
-          {level.tray.length - usedTrayIds.length} over
-        </p>
+        {removing ? (
+          <p className="text-[10px] font-bold text-primary">Loslaten om weg te halen</p>
+        ) : (
+          <p className="text-[10px] font-bold text-muted-foreground">
+            {level.tray.length - usedTrayIds.length} over
+          </p>
+        )}
       </div>
 
       <div

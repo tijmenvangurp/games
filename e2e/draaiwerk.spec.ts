@@ -102,6 +102,52 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByRole("heading", { name: "Gelukt!" })).toBeVisible();
   });
+
+  test("verplaatst een verkeerd geplaatst tandwiel", async ({ page }) => {
+    await page.goto("/draaiwerk");
+
+    await page.locator("[data-tray-id]").first().click();
+    await page.locator('[data-hole-id="1,0"]').click();
+    await expect(page.locator('[data-placed-key="gear:1,0"]')).toBeVisible();
+
+    await dragOnto(page, '[data-placed-key="gear:1,0"]', '[data-hole-id="2,2"]');
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+  });
+
+  test("haalt een geplaatst tandwiel terug naar de la", async ({ page }) => {
+    await page.goto("/draaiwerk");
+
+    await page.locator("[data-tray-id]").first().click();
+    await page.locator('[data-hole-id="1,0"]').click();
+    await expect(page.locator('[data-placed-key="gear:1,0"]')).toBeVisible();
+
+    await dragOnto(page, '[data-placed-key="gear:1,0"]', "[data-tray-drop]");
+
+    await expect(page.locator("[data-placed-key]")).toHaveCount(0);
+    await expect(page.locator("[data-tray-id]").first()).toHaveAttribute("data-used", "false");
+  });
+
+  test("haalt een geplaatste riem terug naar de la", async ({ page }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 16, current: 12 }, version: 1 }),
+      );
+    });
+    await page.reload();
+
+    await page.locator("[data-tray-id]").first().click();
+    await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:generator-1"]').click();
+    await expect(page.locator('[data-placed-key^="belt:"]')).toBeVisible();
+
+    await dragOnto(page, '[data-placed-key^="belt:"]', "[data-tray-drop]");
+
+    await expect(page.locator('[data-placed-key^="belt:"]')).toHaveCount(0);
+    await expect(page.locator("[data-tray-id]").first()).toHaveAttribute("data-used", "false");
+  });
 });
 
 test.describe("draaiwerk op een telefoon", () => {
@@ -128,5 +174,17 @@ test.describe("draaiwerk op een telefoon", () => {
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByRole("heading", { name: "Gelukt!" })).toBeVisible();
+  });
+
+  test("verplaatst een geplaatst tandwiel met een vinger", async ({ page }) => {
+    await page.goto("/draaiwerk");
+
+    await page.locator("[data-tray-id]").first().click();
+    await page.locator('[data-hole-id="1,0"]').click();
+    await expect(page.locator('[data-placed-key="gear:1,0"]')).toBeVisible();
+
+    await touchDragOnto(page, '[data-placed-key="gear:1,0"]', '[data-hole-id="2,2"]');
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
   });
 });

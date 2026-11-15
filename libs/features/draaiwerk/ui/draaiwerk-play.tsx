@@ -4,6 +4,7 @@ import {
   DndContext,
   DragOverlay,
   MouseSensor,
+  pointerWithin,
   TouchSensor,
   useSensor,
   useSensors,
@@ -13,7 +14,7 @@ import {
 } from "@dnd-kit/core";
 import { drive, type TrayItem } from "@entities/gear";
 import { playHaptic, playSound } from "@shared/lib";
-import { trayShortLabel } from "../model/labels";
+import { connectionKey, isLinkPlacement } from "../model/placement";
 import { useDraaiwerkStore, useSelectedTrayItem } from "../model/use-draaiwerk-store";
 import { DraaiwerkBoard } from "./draaiwerk-board";
 import { DraaiwerkHud } from "./draaiwerk-hud";
@@ -36,6 +37,7 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
   const pendingGearKey = useDraaiwerkStore((state) => state.pendingGearKey);
   const hintPlacement = useDraaiwerkStore((state) => state.hintPlacement);
   const [activeTrayId, setActiveTrayId] = useState<string | null>(null);
+  const [activePlacedKey, setActivePlacedKey] = useState<string | null>(null);
 
   const result = useMemo(() => drive(level, placements), [level, placements]);
   const selectedItem = useSelectedTrayItem();
@@ -43,38 +45,72 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
     ? (level.tray.find((item) => item.id === activeTrayId) ?? null)
     : null;
   const linkDrag = activeItem?.kind === "belt" || activeItem?.kind === "chain";
+  const canMovePlaced = !selectedItem && !activeTrayId && !result.solved;
 
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: 8 } }),
   );
 
   const collisionDetection = useMemo<CollisionDetection>(
     () => (args) => {
-      const wanted = linkDrag ? "gear:" : "hole:";
-      return closestCenter(args).filter((collision) => String(collision.id).startsWith(wanted));
+      const allowed = (collision: { id: string | number }) => {
+        const id = String(collision.id);
+        if (activePlacedKey) {
+          if (activePlacedKey.startsWith("belt:")) {
+            return id === "tray-remove";
+          }
+          return id.startsWith("hole:") || id === "tray-remove";
+        }
+        if (linkDrag) {
+          return id.startsWith("gear:");
+        }
+        return id.startsWith("hole:");
+      };
+      const underPointer = pointerWithin(args).filter(allowed);
+      if (underPointer.length > 0) {
+        return underPointer;
+      }
+      return closestCenter(args).filter(allowed);
     },
-    [linkDrag],
+    [activePlacedKey, linkDrag],
   );
 
   const handleDragStart = (event: DragStartEvent) => {
-    const trayId = trayIdFromActive(event.active.id);
-    if (!trayId) {
+    const id = String(event.active.id);
+    if (id.startsWith("tray:")) {
+      setActiveTrayId(id.slice("tray:".length));
+    } else if (id.startsWith("placed:")) {
+      setActivePlacedKey(id.slice("placed:".length));
+    } else {
       return;
     }
-    setActiveTrayId(trayId);
     playSound("tap");
     playHaptic("tap");
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    const over = event.over ? String(event.over.id) : null;
+    const placedKey = activePlacedKey;
     const trayId = trayIdFromActive(event.active.id);
     setActiveTrayId(null);
-    if (!trayId || !event.over) {
+    setActivePlacedKey(null);
+
+    if (placedKey) {
+      if (over?.startsWith("hole:")) {
+        useDraaiwerkStore.getState().movePlaced(placedKey, over.slice("hole:".length));
+        return;
+      }
+      if (over === "tray-remove") {
+        useDraaiwerkStore.getState().removePlaced(placedKey);
+      }
       return;
     }
 
-    const over = String(event.over.id);
+    if (!trayId || !over) {
+      return;
+    }
+
     if (over.startsWith("hole:")) {
       useDraaiwerkStore
         .getState()
@@ -87,6 +123,49 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
         .dropTray(trayId, { kind: "gear", targetId: over.slice("gear:".length) });
     }
   };
+
+  const activePlacedItem: TrayItem | null = useMemo(() => {
+    if (!activePlacedKey) {
+      return null;
+    }
+    if (activePlacedKey.startsWith("gear:")) {
+      const pose = result.gears.find((gear) => gear.key === activePlacedKey);
+      return pose ? { id: "drag", kind: "gear", size: pose.size } : null;
+    }
+    if (activePlacedKey.startsWith("belt:")) {
+      const wantedKey = activePlacedKey.slice("belt:".length);
+      const placement = placements.find(
+        (candidate) => isLinkPlacement(candidate) && connectionKey(candidate) === wantedKey,
+      );
+      if (placement?.kind === "chain") {
+        return { id: "drag", kind: "chain" };
+      }
+      if (placement?.kind === "open-belt" || placement?.kind === "crossed-belt") {
+        return {
+          id: "drag",
+          kind: "belt",
+          crossed: placement.kind === "crossed-belt",
+        };
+      }
+      return null;
+    }
+    const placement = placements.find(
+      (candidate) =>
+        candidate.kind === "lying-as" &&
+        (`as:${candidate.holeA}` === activePlacedKey ||
+          `as:${candidate.holeB}` === activePlacedKey),
+    );
+    return placement && placement.kind === "lying-as"
+      ? {
+          id: "drag",
+          kind: "lying-as",
+          sizeA: placement.sizeA,
+          sizeB: placement.sizeB,
+        }
+      : null;
+  }, [activePlacedKey, placements, result.gears]);
+
+  const overlayItem = activeItem ?? activePlacedItem;
 
   return (
     <div className="flex min-h-0 flex-col gap-3 md:flex-1">
@@ -108,6 +187,7 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
       >
         <div className="grid min-h-0 gap-3 md:flex-1 md:grid-cols-1 md:portrait:grid-rows-[minmax(0,1fr)_auto] md:landscape:grid-cols-7">
           <DraaiwerkBoard
+            canMovePlaced={canMovePlaced}
             hintPlacement={hintPlacement}
             level={level}
             linkDrag={linkDrag}
@@ -119,14 +199,13 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
             onGear={(key) => useDraaiwerkStore.getState().tapGear(key)}
             onHole={(holeId) => useDraaiwerkStore.getState().tapHole(holeId)}
           />
-          <DraaiwerkTray />
+          <DraaiwerkTray removing={Boolean(activePlacedKey)} />
         </div>
 
         <DragOverlay dropAnimation={null}>
-          {activeItem ? (
-            <div className="game-card flex items-center gap-2 px-3 py-2 shadow-xl">
-              <TrayArt item={activeItem} />
-              <span className="text-sm font-bold">{trayShortLabel(activeItem)}</span>
+          {overlayItem ? (
+            <div className="draaiwerk-drag-token flex h-full w-full items-center justify-center">
+              <TrayArt item={overlayItem} />
             </div>
           ) : null}
         </DragOverlay>

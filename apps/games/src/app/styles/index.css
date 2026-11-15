@@ -615,6 +615,21 @@
     filter: drop-shadow(0 1.5px 1px rgb(43 37 28 / 0.16));
   }
 
+  .draaiwerk-drag-token {
+    filter: drop-shadow(0 12px 16px rgb(43 37 28 / 0.28));
+    pointer-events: none;
+    transform: scale(1.9);
+    transform-origin: center;
+  }
+
+  .draaiwerk-placed-handle {
+    cursor: grab;
+  }
+
+  .draaiwerk-placed-handle:active {
+    cursor: grabbing;
+  }
+
   .draaiwerk-direction {
     display: none;
   }

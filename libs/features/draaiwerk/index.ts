@@ -6,5 +6,6 @@ export {
   normalizeDraaiwerkProgress,
 } from "./model/storage";
 export { chapterName } from "./model/labels";
+export { statusMessage } from "./model/feedback";
 export { DraaiwerkLevelSelect } from "./ui/draaiwerk-level-select";
 export { DraaiwerkPlay } from "./ui/draaiwerk-play";

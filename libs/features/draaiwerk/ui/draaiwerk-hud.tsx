@@ -21,7 +21,7 @@ function instructionFor(
   pendingGearKey: string | null,
 ): string {
   if (!item) {
-    return "Kies een onderdeel uit de la en tik daarna op het bord.";
+    return "Kies een onderdeel of sleep een geplaatst onderdeel naar de la.";
   }
   if (item.kind === "gear") {
     return "Tik op een leeg gat voor het tandwiel.";

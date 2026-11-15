@@ -14,7 +14,9 @@ import { playHaptic, playSound } from "@shared/lib";
 import { JAMMED } from "./feedback";
 import { sizeWord } from "./labels";
 import {
+  connectionKey,
   holeForGearKey,
+  isLinkPlacement,
   linkPlacementKind,
   nextSolutionPlacement,
   occupiedHoleIds,
@@ -49,6 +51,8 @@ interface DraaiwerkStore {
   startLevel: (index: number) => void;
   selectTray: (id: string) => void;
   dropTray: (id: string, target: { kind: "hole" | "gear"; targetId: string }) => void;
+  movePlaced: (key: string, targetHoleId: string) => void;
+  removePlaced: (key: string) => void;
   tapHole: (holeId: string) => void;
   tapGear: (key: string) => void;
   removeLast: () => void;
@@ -81,6 +85,41 @@ function selectedItem(state: DraaiwerkStore): TrayItem | null {
   return selectedTrayItem(state.level, state.selectedTrayId);
 }
 
+function applyPlacements(
+  set: DraaiwerkSet,
+  get: DraaiwerkGet,
+  nextPlacements: Placement[],
+  extra: Partial<DraaiwerkStore> = {},
+): void {
+  const state = get();
+  const result = drive(state.level, nextPlacements);
+  const unlocked = result.solved
+    ? Math.min(LEVEL_COUNT, Math.max(state.unlocked, state.levelIndex + 2))
+    : state.unlocked;
+
+  set({
+    ...extra,
+    placements: nextPlacements,
+    unlocked,
+    finished: state.finished || (result.solved && state.levelIndex === LEVEL_COUNT - 1),
+    status: result.solved ? "solved" : "playing",
+    hintPlacement: null,
+    feedback: result.solved ? "Level gehaald." : result.jammed ? JAMMED : null,
+    feedbackTone: result.solved ? "success" : result.jammed ? "warn" : null,
+  });
+
+  if (result.solved) {
+    playSound("win");
+    playHaptic("win");
+  } else if (result.jammed) {
+    playSound("almost");
+    playHaptic("almost");
+  } else {
+    playSound("select");
+    playHaptic("select");
+  }
+}
+
 function attemptPlacement(
   set: DraaiwerkSet,
   get: DraaiwerkGet,
@@ -104,32 +143,9 @@ function attemptPlacement(
   }
 
   const nextPlacements = [...placements, placement];
-  const result = drive(level, nextPlacements);
-  const unlocked = result.solved
-    ? Math.min(LEVEL_COUNT, Math.max(state.unlocked, state.levelIndex + 2))
-    : state.unlocked;
-
-  set({
-    placements: nextPlacements,
+  applyPlacements(set, get, nextPlacements, {
     usedTrayIds: [...state.usedTrayIds, trayId],
-    unlocked,
-    finished: state.finished || (result.solved && state.levelIndex === LEVEL_COUNT - 1),
-    status: result.solved ? "solved" : "playing",
-    hintPlacement: null,
-    feedback: result.solved ? "Level gehaald." : result.jammed ? JAMMED : null,
-    feedbackTone: result.solved ? "success" : result.jammed ? "warn" : null,
   });
-
-  if (result.solved) {
-    playSound("win");
-    playHaptic("win");
-  } else if (result.jammed) {
-    playSound("almost");
-    playHaptic("almost");
-  } else {
-    playSound("select");
-    playHaptic("select");
-  }
 
   return true;
 }
@@ -192,6 +208,149 @@ function dropTrayAction(
   } else {
     get().tapGear(target.targetId);
   }
+}
+
+interface FoundPlacement {
+  placement: Placement;
+  end?: "a" | "b";
+}
+
+function findPlaced(placements: readonly Placement[], key: string): FoundPlacement | null {
+  if (key.startsWith("gear:")) {
+    const holeId = key.slice("gear:".length);
+    const placement = placements.find(
+      (candidate) => candidate.kind === "gear" && candidate.holeId === holeId,
+    );
+    return placement ? { placement } : null;
+  }
+  if (key.startsWith("as:")) {
+    const holeId = key.slice("as:".length);
+    const placement = placements.find(
+      (candidate) =>
+        candidate.kind === "lying-as" && (candidate.holeA === holeId || candidate.holeB === holeId),
+    );
+    if (!placement || placement.kind !== "lying-as") {
+      return null;
+    }
+    return { placement, end: placement.holeA === holeId ? "a" : "b" };
+  }
+  if (key.startsWith("belt:")) {
+    const wantedKey = key.slice("belt:".length);
+    const placement = placements.find(
+      (candidate) => isLinkPlacement(candidate) && connectionKey(candidate) === wantedKey,
+    );
+    return placement ? { placement } : null;
+  }
+  return null;
+}
+
+function holeAt(level: Level, col: number, row: number) {
+  return level.holes.find((hole) => hole.col === col && hole.row === row) ?? null;
+}
+
+function trayIdForPlacement(state: DraaiwerkStore, placement: Placement): string | undefined {
+  return state.usedTrayIds.find((id) => {
+    const item = state.level.tray.find((candidate) => candidate.id === id);
+    return item ? trayItemMatches(item, placement) : false;
+  });
+}
+
+function commitMove(set: DraaiwerkSet, get: DraaiwerkGet, nextPlacements: Placement[]): void {
+  applyPlacements(set, get, nextPlacements);
+}
+
+function movePlacedAction(
+  set: DraaiwerkSet,
+  get: DraaiwerkGet,
+  key: string,
+  targetHoleId: string,
+): void {
+  const state = get();
+  if (state.status === "solved") {
+    return;
+  }
+  const found = findPlaced(state.placements, key);
+  const target = state.level.holes.find((hole) => hole.id === targetHoleId);
+  if (!found || !target) {
+    return;
+  }
+
+  const without = state.placements.filter((placement) => placement !== found.placement);
+  let next: Placement;
+
+  if (found.placement.kind === "gear") {
+    if (found.placement.holeId === targetHoleId) {
+      return;
+    }
+    next = { ...found.placement, holeId: targetHoleId };
+  } else if (found.placement.kind === "lying-as" && found.end) {
+    const draggedHoleId = found.end === "a" ? found.placement.holeA : found.placement.holeB;
+    const anchorHoleId = found.end === "a" ? found.placement.holeB : found.placement.holeA;
+    const draggedHole = state.level.holes.find((hole) => hole.id === draggedHoleId);
+    const anchorHole = state.level.holes.find((hole) => hole.id === anchorHoleId);
+    if (!draggedHole || !anchorHole || draggedHoleId === targetHoleId) {
+      return;
+    }
+
+    const nextAnchor = holeAt(
+      state.level,
+      anchorHole.col + target.col - draggedHole.col,
+      anchorHole.row + target.row - draggedHole.row,
+    );
+    if (!nextAnchor) {
+      set({ feedback: "De as past daar niet.", feedbackTone: "warn" });
+      playSound("almost");
+      playHaptic("almost");
+      return;
+    }
+
+    next =
+      found.end === "a"
+        ? { ...found.placement, holeA: targetHoleId, holeB: nextAnchor.id }
+        : { ...found.placement, holeA: nextAnchor.id, holeB: targetHoleId };
+  } else {
+    return;
+  }
+
+  if (!canPlace(state.level, without, next)) {
+    set({ feedback: "Daar past dit onderdeel niet.", feedbackTone: "warn" });
+    playSound("almost");
+    playHaptic("almost");
+    return;
+  }
+
+  commitMove(
+    set,
+    get,
+    state.placements.map((placement) => (placement === found.placement ? next : placement)),
+  );
+}
+
+function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void {
+  const state = get();
+  if (state.status === "solved") {
+    return;
+  }
+  const found = findPlaced(state.placements, key);
+  if (!found) {
+    return;
+  }
+
+  const trayId = trayIdForPlacement(state, found.placement);
+
+  set({
+    placements: state.placements.filter((placement) => placement !== found.placement),
+    usedTrayIds: trayId ? state.usedTrayIds.filter((id) => id !== trayId) : state.usedTrayIds,
+    selectedTrayId: null,
+    pendingHoleId: null,
+    pendingGearKey: null,
+    status: "playing",
+    hintPlacement: null,
+    feedback: "Onderdeel weggehaald.",
+    feedbackTone: "info",
+  });
+  playSound("tap");
+  playHaptic("tap");
 }
 
 function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): void {
@@ -347,10 +506,7 @@ function removeLastAction(set: DraaiwerkSet, get: DraaiwerkGet): void {
     return;
   }
 
-  const trayId = state.usedTrayIds.find((id) => {
-    const item = state.level.tray.find((candidate) => candidate.id === id);
-    return item ? trayItemMatches(item, last) : false;
-  });
+  const trayId = trayIdForPlacement(state, last);
 
   set({
     placements: state.placements.slice(0, -1),
@@ -415,6 +571,8 @@ export const useDraaiwerkStore = create<DraaiwerkStore>()(
       startLevel: (index) => startLevelAction(set, get, index),
       selectTray: (id) => selectTrayAction(set, get, id),
       dropTray: (id, target) => dropTrayAction(set, get, id, target),
+      movePlaced: (key, targetHoleId) => movePlacedAction(set, get, key, targetHoleId),
+      removePlaced: (key) => removePlacedAction(set, get, key),
       tapHole: (holeId) => tapHoleAction(set, get, holeId),
       tapGear: (key) => tapGearAction(set, get, key),
       removeLast: () => removeLastAction(set, get),
