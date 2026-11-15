@@ -108,7 +108,8 @@
     "unused-export:libs/features/murdoku-game/lib/vendored/boardRender.ts:drawObjectIcon",
     "unused-export:libs/features/murdoku-game/lib/vendored/boardRender.ts:drawWindow",
     "unused-export:libs/features/murdoku-game/lib/vendored/floorArt.ts:EDITOR_FLOOR_PATTERNS",
-    "unused-export:libs/features/murdoku-game/lib/vendored/helpMarks.ts:hasMarks"
+    "unused-export:libs/features/murdoku-game/lib/vendored/helpMarks.ts:hasMarks",
+    "unused-export:libs/features/murdoku-game/lib/vendored/helpMarks.ts:helpMarks"
   ],
   "unused_types": [
     "unused-type:libs/entities/murdoku/model/engine/clues/index.ts:ClueJson",

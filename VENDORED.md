@@ -7,7 +7,7 @@ Deze repository bevat twee 1:1 overgenomen stukken uit één upstream-project:
 | `libs/entities/murdoku/model/engine/`      | pure TypeScript-engine: model, aanwijzingen, solver, level-io, generator    | 70        |
 | `libs/features/murdoku-game/lib/vendored/` | canvas-renderlaag (bord, meubels, vloeren, portretten) en de tekst-renderer | 8         |
 
-Onze eigen code staat daarbuiten: `libs/entities/murdoku/model/murdoku.ts`, `libs/entities/murdoku/index.ts`, `libs/features/murdoku-game/lib/{nl,text,palette,preview-level}.ts`, `libs/features/murdoku-game/ui/**` en `libs/pages/murdoku/**`. Zie [ADR 0031](docs/adr/0031-vendored-murdoku-engine.md) voor de afweging.
+Onze eigen code staat daarbuiten: `libs/entities/murdoku/model/murdoku.ts`, `libs/entities/murdoku/index.ts`, `libs/features/murdoku-game/lib/{nl,text,palette,intro-level,legend,reveal}.ts`, `libs/features/murdoku-game/{model,ui}/**` en `libs/pages/murdoku/**`. Zie [ADR 0031](docs/adr/0031-vendored-murdoku-engine.md) voor de afweging.
 
 ## Bron
 
@@ -73,7 +73,7 @@ De engine is verder byte-identiek aan upstream op commit `efc3c3b`; van de acht 
 3. Draai `corepack pnpm exec oxfmt libs/entities/murdoku/model/engine libs/features/murdoku-game/lib/vendored`.
 4. Bekijk `git diff -w` per bestand en controleer dat er geen logica verandert; alleen opmaak, paden en de genoemde patches horen in de diff te staan.
 5. Draai `corepack pnpm run test:coverage` en `corepack pnpm run quality`; werk daarna de commit, kopieerdatum en patchlijst in dit bestand bij.
-6. Prun de dead-codebaseline met `corepack pnpm exec fallow baselines prune` als upstream exports heeft toegevoegd of verwijderd.
+6. Draai `corepack pnpm exec fallow baselines prune` en werk daarna de commit, kopieerdatum en patchlijst in dit bestand bij. Voegt upstream exports toe, of laat onze eigen UI een export vallen, dan groeit de dead-codebaseline; zet die reden in de commit.
 
 ### Wat we niet doen
 
