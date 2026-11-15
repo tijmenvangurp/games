@@ -41,7 +41,7 @@ function trayIdFromActive(id: string | number): string | null {
 }
 
 /** Lift the drag preview above the finger, in screen pixels. */
-const DRAG_LIFT_PX = 64;
+const DRAG_LIFT_PX = 56;
 
 /** The viewport point of a pointer or touch event, without trusting its type. */
 function clientPointFromEvent(event: Event): { x: number; y: number } | null {
@@ -76,6 +76,14 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     ? (level.tray.find((item) => item.id === activeTrayId) ?? null)
     : null;
   const canMovePlaced = !selectedItem && !activeTrayId && !result.solved;
+  // Only the chain token and the loose-chain ghost are lifted. A gear token
+  // stays under the finger, otherwise a lift of two hole rows would place it
+  // on the wrong hole.
+  const liftDragToken =
+    activeItem?.kind === "belt" ||
+    activeItem?.kind === "chain" ||
+    Boolean(activePlacedKey?.startsWith("loose:")) ||
+    Boolean(activePlacedKey?.startsWith("belt:"));
 
   // A short press is a tap, a longer movement is a drag. The same threshold
   // also drives the sensors, which replaces the old wasDragging booleans.
@@ -104,12 +112,57 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
         return id.startsWith("hole:");
       };
       const underPointer = pointerWithin(args).filter(allowed);
+      const pointer = args.pointerCoordinates;
+      if (pointer) {
+        // The chain token and the loose-chain ghost are drawn above the finger,
+        // so their drop target moves up with them. A gear stays under the
+        // finger; lifting it would shift it by two hole rows.
+        const lift = liftDragToken ? DRAG_LIFT_PX : 0;
+        const pickAt = (x: number, y: number) => {
+          const candidates: Array<{
+            container: (typeof args.droppableContainers)[number];
+            distance: number;
+            inside: boolean;
+          }> = [];
+          for (const container of args.droppableContainers) {
+            if (!allowed(container)) {
+              continue;
+            }
+            const rect = args.droppableRects.get(container.id);
+            if (!rect) {
+              continue;
+            }
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const distance = Math.hypot(x - centerX, y - centerY);
+            const withinRect =
+              x >= rect.left &&
+              x <= rect.left + rect.width &&
+              y >= rect.top &&
+              y <= rect.top + rect.height;
+            const inside = withinRect || distance <= Math.min(rect.width, rect.height) / 2 + 16;
+            if (!inside && distance > 72) {
+              continue;
+            }
+            candidates.push({ container, distance, inside });
+          }
+          candidates.sort((a, b) => Number(b.inside) - Number(a.inside) || a.distance - b.distance);
+          return candidates[0]?.inside ? candidates[0].container : null;
+        };
+
+        const liftedTarget = lift > 0 ? pickAt(pointer.x, pointer.y - lift) : null;
+        const target = liftedTarget ?? pickAt(pointer.x, pointer.y);
+        if (target) {
+          return [{ id: target.id, data: { droppableContainer: target, value: 1 } }];
+        }
+        return [];
+      }
       if (underPointer.length > 0) {
         return underPointer;
       }
       return closestCenter(args).filter(allowed);
     },
-    [activeItem, activePlacedKey],
+    [activeItem, activePlacedKey, liftDragToken],
   );
 
   const startBeltGhost = (holeId: string, activator: Event) => {
@@ -121,17 +174,11 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     if (!placement || placement.kind !== "loose-belt" || !anchor || !origin) {
       return;
     }
-    const point = boardPointFromClient(boardRef.current, level, origin.x, origin.y);
-    const drawPoint = boardPointFromClient(
-      boardRef.current,
-      level,
-      origin.x,
-      origin.y - DRAG_LIFT_PX,
-    );
-    if (!point || !drawPoint) {
+    const point = boardPointFromClient(boardRef.current, level, origin.x, origin.y - DRAG_LIFT_PX);
+    if (!point) {
       return;
     }
-    const drag: BeltGhost = { anchorKey: anchor.key, link: placement.link, point, drawPoint };
+    const drag: BeltGhost = { anchorKey: anchor.key, link: placement.link, point };
     ghostOrigin.current = origin;
     ghostRef.current = drag;
     setGhost(drag);
@@ -168,18 +215,12 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       boardRef.current,
       level,
       origin.x + event.delta.x,
-      origin.y + event.delta.y,
-    );
-    const drawPoint = boardPointFromClient(
-      boardRef.current,
-      level,
-      origin.x + event.delta.x,
       origin.y + event.delta.y - DRAG_LIFT_PX,
     );
     if (!point) {
       return;
     }
-    const next: BeltGhost = { ...drag, point, drawPoint: drawPoint ?? point };
+    const next: BeltGhost = { ...drag, point };
     ghostRef.current = next;
     setGhost(next);
   };
@@ -381,7 +422,10 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
 
         <DragOverlay dropAnimation={null}>
           {overlayItem ? (
-            <div className="draaiwerk-drag-token flex h-full w-full items-center justify-center">
+            <div
+              className="draaiwerk-drag-token flex h-full w-full items-center justify-center"
+              data-lift={liftDragToken ? "true" : "false"}
+            >
               <TrayArt item={overlayItem} />
             </div>
           ) : null}
