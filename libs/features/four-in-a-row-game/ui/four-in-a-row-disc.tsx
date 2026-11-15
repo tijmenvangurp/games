@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Player } from "@entities/four-in-a-row";
 import { cn } from "@shared/lib";
 
@@ -10,6 +11,8 @@ interface FourInARowDiscProps {
   highlighted?: boolean;
   /** De schijf die net gevallen is. */
   latest?: boolean;
+  /** Aantal vakjes dat de schijf valt; minimaal één. */
+  dropRows?: number;
 }
 
 export function FourInARowDisc({
@@ -17,6 +20,7 @@ export function FourInARowDisc({
   ghost = null,
   highlighted = false,
   latest = false,
+  dropRows = 1,
 }: FourInARowDiscProps) {
   const shown = player ?? ghost;
 
@@ -29,9 +33,10 @@ export function FourInARowDisc({
         shown === "one" && "border-player-one bg-player-one",
         shown === "two" && "border-player-two bg-player-two",
         player === null && shown ? "opacity-40" : null,
-        latest && "animate-pop",
+        latest && "animate-drop",
         highlighted && "ring-2 ring-foreground/60 ring-offset-2 ring-offset-muted",
       )}
+      style={latest ? ({ "--drop-rows": dropRows } as CSSProperties) : undefined}
     />
   );
 }
