@@ -11,7 +11,7 @@ import {
   type MurdokuHintState,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
-import { Button, Check, Lightbulb, Undo2, X } from "@shared/ui";
+import { Button, Check, CircleQuestionMark, Lightbulb, Undo2, X } from "@shared/ui";
 
 interface MurdokuBoardSectionProps {
   puzzle: Puzzle;
@@ -32,6 +32,8 @@ interface MurdokuBoardSectionProps {
   clueFocus?: MurdokuClueFocus | null;
   /** Melding bij dat woord, bijvoorbeeld "De keuken licht op." */
   clueMessage?: string | null;
+  /** Opent de uitleg en de woordenlijst; weglaten verbergt de ?-knop. */
+  onHelp?: () => void;
   onCellTap: (cell: Cell) => void;
   onUndo: () => void;
   onToggleCross: () => void;
@@ -58,9 +60,10 @@ interface MurdokuControlsProps {
   onUndo: () => void;
   onCheck: () => void;
   onHint: () => void;
+  onHelp?: () => void;
 }
 
-/** De vier grote knoppen onder het bord. */
+/** De knoppen onder het bord, met de ? voor de uitleg. */
 function MurdokuControls({
   mode,
   solved,
@@ -70,6 +73,7 @@ function MurdokuControls({
   onUndo,
   onCheck,
   onHint,
+  onHelp,
 }: MurdokuControlsProps) {
   return (
     <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
@@ -95,6 +99,17 @@ function MurdokuControls({
         <Check aria-hidden="true" className="size-5" />
         Controleer
       </Button>
+      {onHelp ? (
+        <Button
+          aria-label="Uitleg en woordenlijst"
+          className="min-h-11"
+          size="icon"
+          variant="outline"
+          onClick={onHelp}
+        >
+          <CircleQuestionMark aria-hidden="true" className="size-5" />
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -216,6 +231,7 @@ export function MurdokuBoardSection({
   hintMessage = null,
   clueFocus = null,
   clueMessage = null,
+  onHelp,
   onCellTap,
   onUndo,
   onToggleCross,
@@ -245,6 +261,7 @@ export function MurdokuBoardSection({
         mode={play.mode}
         solved={solved}
         onCheck={onCheck}
+        onHelp={onHelp}
         onHint={onHint}
         onToggleCross={onToggleCross}
         onUndo={onUndo}

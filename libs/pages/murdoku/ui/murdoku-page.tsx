@@ -93,6 +93,7 @@ export function MurdokuPage() {
         revealSentence={revealSentence}
         onCellTap={tapCell}
         onCheck={() => check(solution)}
+        onHelp={() => navigate({ to: "/mysterie/les" })}
         onHome={() => navigate({ to: "/" })}
         onRestart={() => start(puzzle)}
         onSelectPerson={selectPerson}
