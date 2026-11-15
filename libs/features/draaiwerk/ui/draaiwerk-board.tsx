@@ -334,10 +334,8 @@ function LooseBeltBand({
     x: pose.center.x + Math.cos(endAngle) * radius,
     y: pose.center.y + Math.sin(endAngle) * radius,
   };
-  const tail = {
-    x: arcEnd.x + 8,
-    y: arcEnd.y + 32,
-  };
+  const chainBottom = { x: pose.center.x, y: pose.center.y + radius * 2.9 };
+  const tail = link === "chain" ? chainBottom : { x: arcEnd.x + 8, y: arcEnd.y + 32 };
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: `placed:loose:${pose.holeId}`,
     disabled: !enabled,
@@ -348,10 +346,31 @@ function LooseBeltBand({
   // free end, instead of a closed ring that reads as a bracelet.
   const sway = `M ${arcStart.x} ${arcStart.y} A ${radius} ${radius} 0 1 0 ${arcEnd.x} ${arcEnd.y} Q ${arcEnd.x + 4} ${arcEnd.y + 16} ${tail.x} ${tail.y}`;
 
+  // A loose chain is a big loop draped over the gear, with the handle at the
+  // bottom so it reads as something gravity is pulling on.
+  const chainLoop = (() => {
+    const cx = pose.center.x;
+    const cy = pose.center.y;
+    const left = { x: cx - radius, y: cy };
+    const right = { x: cx + radius, y: cy };
+    return [
+      `M ${left.x} ${left.y}`,
+      `A ${radius} ${radius} 0 0 1 ${right.x} ${right.y}`,
+      `C ${cx + radius * 1.15} ${cy + radius * 1.4}, ${cx + radius * 0.75} ${cy + radius * 2.5}, ${cx + radius * 0.25} ${cy + radius * 2.9}`,
+      `C ${cx + radius * 0.1} ${cy + radius * 3}, ${cx - radius * 0.1} ${cy + radius * 3}, ${cx - radius * 0.25} ${cy + radius * 2.9}`,
+      `C ${cx - radius * 0.75} ${cy + radius * 2.5}, ${cx - radius * 1.15} ${cy + radius * 1.4}, ${left.x} ${left.y}`,
+      "Z",
+    ].join(" ");
+  })();
+
   return (
-    <g data-loose-belt={pose.holeId} data-dragging={isDragging ? "true" : "false"}>
+    <g
+      data-loose-belt={pose.holeId}
+      data-dragging={isDragging ? "true" : "false"}
+      opacity={isDragging ? 0.25 : 1}
+    >
       {link === "chain" ? (
-        <StaticChain path={sway} spacing={12} />
+        <StaticChain path={chainLoop} spacing={12} />
       ) : (
         <>
           <path d={sway} fill="none" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={5.8} />
@@ -403,8 +422,38 @@ function LooseBeltBand({
         }}
       >
         <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={22} />
-        <circle cx={tail.x} cy={tail.y} fill="#d8cfbd" r={7} stroke="#6d6458" strokeWidth={1.4} />
-        <circle cx={tail.x} cy={tail.y} fill="#fffdf7" r={2.8} stroke="#8b8477" strokeWidth={1} />
+        {link === "chain" ? (
+          <>
+            <circle
+              cx={tail.x}
+              cy={tail.y}
+              fill="var(--card)"
+              r={7}
+              stroke="#79828e"
+              strokeWidth={2.6}
+            />
+            <circle cx={tail.x} cy={tail.y} fill="#3f4652" r={2.8} />
+          </>
+        ) : (
+          <>
+            <circle
+              cx={tail.x}
+              cy={tail.y}
+              fill="#d8cfbd"
+              r={7}
+              stroke="#6d6458"
+              strokeWidth={1.4}
+            />
+            <circle
+              cx={tail.x}
+              cy={tail.y}
+              fill="#fffdf7"
+              r={2.8}
+              stroke="#8b8477"
+              strokeWidth={1}
+            />
+          </>
+        )}
       </g>
     </g>
   );
