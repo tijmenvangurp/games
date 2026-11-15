@@ -121,6 +121,30 @@ nog een tweede tik was te veel werk voor één onderdeel.
   ander wiel, maakt pas daarna de verbinding. Dat maakt de tussenstap
   zichtbaar en voorkomt dat de speler per ongeluk twee wielen verbindt.
 
+## Addendum 2026-11-15: wormas over twee bestaande tandwielen
+
+De wormas is geen as-tandwiel met een apart bronzen wormwiel meer. Hij ligt als
+één ribbelige schroef over **twee bestaande tandwielen** (bijvoorbeeld de motor
+en het doel). Dit supersedeert de visuele opzet uit het vorige addendum.
+
+- **Eén tik, twee bestaande wielen.** De speler kiest de wormas en tikt één
+  tandwiel. De app kiest het tweede tandwiel dat de machine het best laat
+  doorlopen; de schroef wordt over beide wielen getekend. Er komen geen extra
+  tandwielen meer bij.
+- **Eenrichtingsverkeer blijft.** De `worm`-edge loopt van het invoertandwiel
+  naar het uitvoertandwiel met `speedFactor = direction * ratio`. De ratio is
+  nog steeds 0,5 of 0,25. De schroef drijft alleen aan, niet terug.
+- **Nieuwe levels.** Level 10 en 11 leggen de wormas direct over motor en doel.
+  Level 14 doet hetzelfde voor de lift. Level 16 gebruikt een ketting (1×) voor
+  de lamp en een wormas (0,5×) voor de lift; de drie tussenwielen zijn
+  vervallen.
+- **Visueel.** De schroef is een metalen cilinder met echte diagonale ribbels,
+  een lichte bovenrand en twee lagers. De ribbels bewegen langzaam, zodat de
+  schroef draait. De tray toont dezelfde ribbelige schroef zonder los wiel.
+- **Waarom.** Een kind ziet nu één onderdeel over twee wielen liggen in plaats
+  van een schroef plus een extra tandwiel dat er niet bij hoort. Dat maakt de
+  werking en de plaatsing in één beeld duidelijk.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)
