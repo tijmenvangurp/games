@@ -320,16 +320,16 @@ export async function checkMurdokuLevelsFile(file = MURDOKU_LEVELS_FILE): Promis
     return [`${file} is niet leesbaar: ${error instanceof Error ? error.message : String(error)}`];
   }
 
-  const drift = compareCases(expected, actual);
-  if (drift.length > 0) return drift;
-
   try {
-    return validateMurdokuCases(toMurdokuCases(actual));
+    const problems = validateMurdokuCases(toMurdokuCases(actual));
+    if (problems.length > 0) return problems;
   } catch (error) {
     return [
       `de zaken zijn niet te laden: ${error instanceof Error ? error.message : String(error)}`,
     ];
   }
+
+  return compareCases(expected, actual);
 }
 
 /** Schrijft het bestand in de vorm die de app importeert. */
