@@ -61,6 +61,10 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 **Mengelmoes** gebruikt lokale SVG's uit [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) (Flat). Die vallen onder de MIT-licentie; de volledige tekst staat in [`LICENSES/fluent-emoji-MIT.txt`](LICENSES/fluent-emoji-MIT.txt). Ontbreekt een emoji, dan valt het element terug op [Phosphor Icons](https://github.com/phosphor-icons/core) (MIT, [`LICENSES/phosphor-MIT.txt`](LICENSES/phosphor-MIT.txt)) of op een handgemaakte SVG in dezelfde platte stijl. De bestanden staan in `apps/games/public/elements/` en worden niet tijdens het spelen bij een externe host opgehaald.
 
+## Wie was het?
+
+**Wie was het?** (in ontwikkeling) gebruikt de MIT-engine uit [LifeValuable/murdoku](https://github.com/LifeValuable/murdoku), 1:1 overgenomen in `libs/entities/murdoku/model/engine`. De engine is pure TypeScript: model, aanwijzingen, solver, level-io en generator. De map `model` heet in de kopie `domain`, omdat Steiger een geneste `model`-map afkeurt; de code en bestandsnamen zijn verder ongewijzigd en `oxfmt` slaat de vendored map over. De volledige MIT-tekst staat in [`LICENSES/murdoku-MIT.txt`](LICENSES/murdoku-MIT.txt). De levelbestanden, namen en teksten uit die repository zijn niet overgenomen; de zaken van het spel zijn eigen werk. De generator draait build-time en gaat niet mee de client in.
+
 ## Audio
 
 Audio is lokaal en vooraf gegenereerd; de app doet tijdens het spelen geen TTS-aanroep. Frans gebruikt de Piper-stem Tom. Nederlands gebruikt de Piper-stem **Nathalie** (`nl_BE-nathalie-medium`, CC0) voor Letterpret en voor de gesproken uitleg in Schaakles, Schaakpuzzels, Rekenen en Woordzoeker. Zie [ADR 0017](docs/adr/0017-letterklanken-en-audio.md) en [ADR 0023](docs/adr/0023-voorlezen-met-tts.md). Zo draai je de TTS-server lokaal: [docs/tooling.md](docs/tooling.md#tts-lokaal-draaien).
