@@ -5,12 +5,19 @@ import {
   type Controller,
   type Dice,
   type GanzenbordGame,
+  type PlayerColor,
   type PlayerId,
   type TurnEvent,
 } from "@entities/ganzenbord";
 import { playHaptic, playSound } from "@shared/lib";
-import { buildTurnAnimation, type TurnAnimation } from "./animation";
-import { clampPlayerCount, playersFromSettings, type GanzenbordSettings } from "./settings";
+import { buildTurnAnimation, specialEvent, type TurnAnimation } from "./animation";
+import {
+  clampPlayerCount,
+  playersFromSettings,
+  withPlayerColor,
+  withPlayerName,
+  type GanzenbordSettings,
+} from "./settings";
 import { loadGanzenbordState, saveGanzenbordState, type Wins } from "./storage";
 
 function rollDie(): number {
@@ -32,6 +39,8 @@ interface GanzenbordStore {
   start: () => void;
   setPlayerCount: (count: number) => void;
   setController: (id: PlayerId, controller: Controller) => void;
+  setPlayerName: (id: PlayerId, name: string) => void;
+  setPlayerColor: (id: PlayerId, color: PlayerColor) => void;
   beginRoll: () => Dice | null;
   commitRoll: (dice?: Dice) => void;
   advanceAnimation: () => void;
@@ -80,6 +89,23 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
       ...state.settings,
       controllers: { ...state.settings.controllers, [id]: controller },
     };
+    set({ settings });
+    persist(settings, state.wins);
+  },
+
+  setPlayerName: (id, name) => {
+    const state = get();
+    const settings = withPlayerName(state.settings, id, state.settings.controllers[id], name);
+    set({ settings });
+    persist(settings, state.wins);
+  },
+
+  setPlayerColor: (id, color) => {
+    const state = get();
+    const settings = withPlayerColor(state.settings, id, color);
+    if (settings === state.settings) {
+      return;
+    }
     set({ settings });
     persist(settings, state.wins);
   },
@@ -142,6 +168,12 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
     const next = animation.index + 1;
     if (next < animation.steps.length) {
       set({ animation: { ...animation, index: next } });
+      if (specialEvent(animation.steps[next])) {
+        playSound("surprise");
+        playHaptic("almost");
+      } else {
+        playSound("tap");
+      }
       return;
     }
 
@@ -160,12 +192,6 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
       persist(get().settings, wins);
       return;
     }
-
-    const noteworthy = animation.result.events.some(
-      (event) => event.kind === "goose" || event.kind === "bridge" || event.kind === "maze",
-    );
-    playSound(noteworthy ? "select" : "tap");
-    playHaptic("tap");
 
     if (animation.result.game.status === "draw") {
       persist(get().settings, wins);
