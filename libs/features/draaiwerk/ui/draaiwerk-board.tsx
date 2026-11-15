@@ -22,10 +22,6 @@ import {
   type LinkPlacementKind,
 } from "../model/placement";
 import {
-  BELT_BODY,
-  BELT_EDGE,
-  BELT_HIGHLIGHT,
-  BeltPreview,
   BoardGear,
   ChainPreview,
   ConnectionBand,
@@ -314,37 +310,21 @@ function PlacedConnectionHandle({
 
 function LooseBeltBand({
   pose,
-  link,
   enabled,
   onLoose,
 }: {
   pose: GearPose;
-  link: LinkPlacementKind;
   enabled: boolean;
   onLoose: (holeId: string) => void;
 }) {
-  const radius = gearRadius(pose.size) + (link === "chain" ? 0 : 4);
-  const startAngle = -Math.PI / 6;
-  const endAngle = Math.PI / 3;
-  const arcStart = {
-    x: pose.center.x + Math.cos(startAngle) * radius,
-    y: pose.center.y + Math.sin(startAngle) * radius,
-  };
-  const arcEnd = {
-    x: pose.center.x + Math.cos(endAngle) * radius,
-    y: pose.center.y + Math.sin(endAngle) * radius,
-  };
+  const radius = gearRadius(pose.size);
   const chainBottom = { x: pose.center.x, y: pose.center.y + radius * 2.9 };
-  const tail = link === "chain" ? chainBottom : { x: arcEnd.x + 8, y: arcEnd.y + 32 };
+  const tail = chainBottom;
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: `placed:loose:${pose.holeId}`,
     disabled: !enabled,
   });
   const pressPoint = useRef<{ x: number; y: number } | null>(null);
-
-  // A belt that is not tensioned yet hangs on the pulley: a 270° wrap with one
-  // free end, instead of a closed ring that reads as a bracelet.
-  const sway = `M ${arcStart.x} ${arcStart.y} A ${radius} ${radius} 0 1 0 ${arcEnd.x} ${arcEnd.y} Q ${arcEnd.x + 4} ${arcEnd.y + 16} ${tail.x} ${tail.y}`;
 
   // A loose chain is a big loop draped over the gear, with the handle at the
   // bottom so it reads as something gravity is pulling on.
@@ -369,31 +349,12 @@ function LooseBeltBand({
       data-dragging={isDragging ? "true" : "false"}
       opacity={isDragging ? 0.25 : 1}
     >
-      {link === "chain" ? (
-        <StaticChain path={chainLoop} spacing={12} />
-      ) : (
-        <>
-          <path d={sway} fill="none" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={5.8} />
-          <path d={sway} fill="none" stroke={BELT_BODY} strokeLinecap="round" strokeWidth={4.4} />
-          <path
-            d={sway}
-            fill="none"
-            stroke={BELT_HIGHLIGHT}
-            strokeDasharray="1.5 14.5"
-            strokeLinecap="round"
-            strokeWidth={0.9}
-          />
-        </>
-      )}
+      <StaticChain path={chainLoop} spacing={12} />
       <g
         ref={(node) => setNodeRef(node as unknown as HTMLElement)}
         {...attributes}
         {...listeners}
-        aria-label={
-          link === "chain"
-            ? "Trek de ketting naar een ander tandwiel"
-            : "Trek de riem naar een ander tandwiel"
-        }
+        aria-label="Trek de ketting naar een ander tandwiel"
         className="draaiwerk-loose-handle"
         data-placed-key={`loose:${pose.holeId}`}
         role="button"
@@ -422,38 +383,15 @@ function LooseBeltBand({
         }}
       >
         <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={22} />
-        {link === "chain" ? (
-          <>
-            <circle
-              cx={tail.x}
-              cy={tail.y}
-              fill="var(--card)"
-              r={7}
-              stroke="#79828e"
-              strokeWidth={2.6}
-            />
-            <circle cx={tail.x} cy={tail.y} fill="#3f4652" r={2.8} />
-          </>
-        ) : (
-          <>
-            <circle
-              cx={tail.x}
-              cy={tail.y}
-              fill="#d8cfbd"
-              r={7}
-              stroke="#6d6458"
-              strokeWidth={1.4}
-            />
-            <circle
-              cx={tail.x}
-              cy={tail.y}
-              fill="#fffdf7"
-              r={2.8}
-              stroke="#8b8477"
-              strokeWidth={1}
-            />
-          </>
-        )}
+        <circle
+          cx={tail.x}
+          cy={tail.y}
+          fill="var(--card)"
+          r={7}
+          stroke="#79828e"
+          strokeWidth={2.6}
+        />
+        <circle cx={tail.x} cy={tail.y} fill="#3f4652" r={2.8} />
       </g>
     </g>
   );
@@ -479,7 +417,9 @@ function BeltHitTarget({
   }
 
   const crossed = connection.kind === "crossed-belt";
-  const label = crossed ? "Riem, gekruist; tik om open te maken" : "Riem, open; tik om te kruisen";
+  const label = crossed
+    ? "Ketting, gekruist; tik om open te maken"
+    : "Ketting, open; tik om te kruisen";
   const toggle = () => onToggle(connection.key);
 
   return (
@@ -653,31 +593,18 @@ export function DraaiwerkBoard({
     const virtualRadius = gearRadius(target?.pose.size ?? anchor.size);
     const span = Math.hypot(virtual.x - anchor.center.x, virtual.y - anchor.center.y);
     const reachable = span > anchorRadius + virtualRadius + 1;
-    const beltPath = reachable
-      ? connectionPath(
-          ghost.link === "crossed-belt" ? "crossed-belt" : "open-belt",
-          anchor.center,
-          anchorRadius,
-          virtual,
-          virtualRadius,
-        )
-      : null;
-    const chainPath = reachable
-      ? connectionPath("chain", anchor.center, anchorRadius, virtual, virtualRadius)
+    const path = reachable
+      ? connectionPath(ghost.link, anchor.center, anchorRadius, virtual, virtualRadius)
       : null;
 
     return {
-      beltPath,
-      chainPath,
+      path,
       kind: ghost.link,
       target: snapped,
       virtual,
       virtualRadius,
     };
   }, [ghost, level, placements, result.gears]);
-
-  const beltConnections = result.connections.filter((connection) => connection.kind !== "chain");
-  const chainConnections = result.connections.filter((connection) => connection.kind === "chain");
 
   return (
     <section
@@ -721,46 +648,6 @@ export function DraaiwerkBoard({
         />
 
         <g>
-          {beltConnections.map((connection) => (
-            <ConnectionBand
-              connection={connection}
-              key={`belt:${connection.fromKey}:${connection.toKey}`}
-            />
-          ))}
-        </g>
-
-        {ghostArt ? (
-          <g aria-hidden="true" data-belt-ghost="true" pointerEvents="none">
-            {ghostArt.kind === "chain" ? (
-              ghostArt.chainPath ? (
-                <ChainPreview path={ghostArt.chainPath} />
-              ) : null
-            ) : ghostArt.beltPath ? (
-              <BeltPreview active path={ghostArt.beltPath} />
-            ) : null}
-            <circle
-              cx={ghostArt.virtual.x}
-              cy={ghostArt.virtual.y}
-              fill="none"
-              r={ghostArt.virtualRadius}
-              stroke="var(--muted-foreground)"
-              strokeDasharray="4 6"
-              strokeWidth={1.5}
-            />
-            {ghostArt.target ? (
-              <circle
-                cx={ghostArt.target.center.x}
-                cy={ghostArt.target.center.y}
-                fill="none"
-                r={gearRadius(ghostArt.target.size) + 8}
-                stroke="var(--primary)"
-                strokeWidth={2}
-              />
-            ) : null}
-          </g>
-        ) : null}
-
-        <g>
           {worms.map((worm) => (
             <WormBar
               key={`worm-bar:${worm.shaftHoleId}:${worm.wheelHoleId}`}
@@ -794,15 +681,37 @@ export function DraaiwerkBoard({
           })}
         </g>
 
-        {/* A chain sits on the tooth tips, so it is drawn over the wheels. */}
+        {/* Every connection is a chain, so it is drawn over the wheels. */}
         <g data-chain-layer="true">
-          {chainConnections.map((connection) => (
-            <ConnectionBand
-              connection={connection}
-              key={`chain:${connection.fromKey}:${connection.toKey}`}
-            />
+          {result.connections.map((connection) => (
+            <ConnectionBand connection={connection} key={connection.key} />
           ))}
         </g>
+
+        {ghostArt ? (
+          <g aria-hidden="true" data-belt-ghost="true" pointerEvents="none">
+            {ghostArt.path ? <ChainPreview path={ghostArt.path} /> : null}
+            <circle
+              cx={ghostArt.virtual.x}
+              cy={ghostArt.virtual.y}
+              fill="none"
+              r={ghostArt.virtualRadius}
+              stroke="var(--muted-foreground)"
+              strokeDasharray="4 6"
+              strokeWidth={1.5}
+            />
+            {ghostArt.target ? (
+              <circle
+                cx={ghostArt.target.center.x}
+                cy={ghostArt.target.center.y}
+                fill="none"
+                r={gearRadius(ghostArt.target.size) + 8}
+                stroke="var(--primary)"
+                strokeWidth={2}
+              />
+            ) : null}
+          </g>
+        ) : null}
 
         {/* The whole loop of a belt is a button: tap it to cross or open it. */}
         <g>
@@ -911,7 +820,6 @@ export function DraaiwerkBoard({
               <LooseBeltBand
                 key={`loose:${loose.holeId}`}
                 enabled={canMovePlaced}
-                link={loose.link}
                 pose={pose}
                 onLoose={onLoose}
               />

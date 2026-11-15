@@ -21,7 +21,7 @@ interface DraaiwerkHudProps {
 function instructionFor(item: TrayItem | null, pendingGearKey: string | null): string {
   if (!item) {
     return pendingGearKey
-      ? "Tik nu een tweede tandwiel voor de riem."
+      ? "Tik nu een tweede tandwiel voor de ketting."
       : "Kies een onderdeel of sleep een geplaatst onderdeel naar de la.";
   }
   if (item.kind === "gear") {
@@ -30,7 +30,7 @@ function instructionFor(item: TrayItem | null, pendingGearKey: string | null): s
   if (item.kind === "worm") {
     return "Tik op een leeg gat; de wormas zoekt zelf de tweede plek.";
   }
-  return "Tik op een tandwiel om de riem eromheen te hangen.";
+  return "Tik op een tandwiel om de ketting eromheen te hangen.";
 }
 
 export function DraaiwerkHud({

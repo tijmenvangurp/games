@@ -1,4 +1,4 @@
-import { memo, type CSSProperties, type KeyboardEvent } from "react";
+import { memo, type KeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   gearPath,
@@ -365,67 +365,10 @@ export function LiftGlyph({ output, size }: { output: OutputPose; size: GearSize
   );
 }
 
-/** Below this surface speed the band is drawn as if the machine stands still. */
+/** Below this surface speed the chain is drawn as if the machine stands still. */
 const MIN_SURFACE_SPEED = 0.5;
-/**
- * The tread dash is 2 on, 14 off, so the period is 16 board units. The CSS
- * keyframe must travel exactly that far, otherwise the band visibly jumps.
- */
-const BELT_TREAD_CYCLE = 16;
 /** Only a degenerate chain without a measured pitch falls back to this. */
 const FALLBACK_CHAIN_PITCH = 12;
-/** A leather drive belt: dark edge, warm body, fine moving sheen. */
-export const BELT_EDGE = "#493a29";
-export const BELT_BODY = "#6f5a42";
-export const BELT_HIGHLIGHT = "#b3a084";
-
-function beltDuration(speed: number): number {
-  const seconds = BELT_TREAD_CYCLE / Math.max(MIN_SURFACE_SPEED, Math.abs(speed));
-  return Math.round(seconds * 1000) / 1000;
-}
-
-interface BeltRibbonProps {
-  path: string;
-  active: boolean;
-  speed: number;
-  /** The drag ghost is a little lighter and never animates. */
-  preview?: boolean;
-}
-
-/**
- * A belt is a closed loop around both pulleys. The thin leather band hugs the
- * tooth tips, so the wrap stays visible and there are no loose end caps.
- */
-function BeltRibbon({ path, active, speed, preview = false }: BeltRibbonProps) {
-  const moving = active && !preview && Math.abs(speed) >= MIN_SURFACE_SPEED;
-  const reversed = speed < 0;
-
-  return (
-    <g
-      className="draaiwerk-belt"
-      data-belt="true"
-      data-speed={speed}
-      data-moving={moving ? "true" : "false"}
-      data-preview={preview ? "true" : "false"}
-      opacity={preview ? 0.78 : active ? 1 : 0.55}
-      style={{ "--belt-duration": `${beltDuration(speed)}s` } as CSSProperties}
-    >
-      <path d={path} fill="none" stroke={BELT_EDGE} strokeLinejoin="round" strokeWidth={5.8} />
-      <path d={path} fill="none" stroke={BELT_BODY} strokeLinejoin="round" strokeWidth={4.4} />
-      <path
-        className="draaiwerk-belt-tread"
-        d={path}
-        data-moving={moving ? "true" : "false"}
-        data-reverse={reversed ? "true" : "false"}
-        fill="none"
-        stroke={BELT_HIGHLIGHT}
-        strokeDasharray="1.5 14.5"
-        strokeLinecap="round"
-        strokeWidth={0.9}
-      />
-    </g>
-  );
-}
 
 function ChainLink({ outer, span }: { outer: boolean; span: number }) {
   const plateHeight = outer ? 4.8 : 3.2;
@@ -550,22 +493,9 @@ export function ConnectionBand({ connection }: { connection: ConnectionPose }) {
       data-connection-key={connection.key}
       data-kind={connection.kind}
     >
-      {connection.kind === "chain" ? (
-        <ChainBand connection={connection} />
-      ) : (
-        <BeltRibbon
-          active={connection.active}
-          path={connection.path}
-          speed={connection.surfaceSpeed}
-        />
-      )}
+      <ChainBand connection={connection} />
     </g>
   );
-}
-
-/** The drag ghost for a loose belt: the same band, lighter and without motion. */
-export function BeltPreview({ path, active = true }: { path: string; active?: boolean }) {
-  return <BeltRibbon active={active} path={path} preview speed={0} />;
 }
 
 /** The drag ghost for a loose chain: static links along the would-be path. */
@@ -721,51 +651,41 @@ export function TrayArt({ item }: { item: TrayItem }) {
     );
   }
 
-  if (item.kind === "belt") {
-    const crossed = item.crossed === true;
-    const strap = "M 9 27 C 20 15, 38 13, 52 22";
+  if (item.kind === "belt" && item.crossed === true) {
     return (
       <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
-        {crossed ? (
-          <>
-            <path d="M 10 14 L 54 30" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={8} />
-            <path d="M 10 14 L 54 30" stroke={BELT_BODY} strokeLinecap="round" strokeWidth={5.8} />
-            <path d="M 54 14 L 10 30" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={8} />
-            <path d="M 54 14 L 10 30" stroke={BELT_BODY} strokeLinecap="round" strokeWidth={5.8} />
-          </>
-        ) : (
-          <>
-            <path d={strap} fill="none" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={9} />
-            <path
-              d={strap}
-              fill="none"
-              stroke={BELT_BODY}
-              strokeLinecap="round"
-              strokeWidth={6.8}
-            />
-            <path
-              d={strap}
-              fill="none"
-              stroke={BELT_HIGHLIGHT}
-              strokeDasharray="1 5"
-              strokeLinecap="round"
-              strokeWidth={1.2}
-            />
-            <rect
-              fill="none"
-              height={15}
-              rx={3}
-              stroke="#b08a52"
-              strokeWidth={2}
-              width={13}
-              x={43}
-              y={14}
-            />
-            <path d="M 49.5 15 V 28" stroke="#b08a52" strokeWidth={1.6} />
-            <circle cx={16} cy={24} fill="#6d4c2f" r={2} />
-            <circle cx={23} cy={20} fill="#6d4c2f" r={1.6} />
-          </>
-        )}
+        <path
+          d="M 18 12 L 46 32"
+          stroke="#79828e"
+          strokeDasharray="4 3"
+          strokeLinecap="round"
+          strokeWidth={4.6}
+        />
+        <path
+          d="M 18 12 L 46 32"
+          stroke="#3f4652"
+          strokeDasharray="2 5"
+          strokeLinecap="round"
+          strokeWidth={2}
+        />
+        <path
+          d="M 46 12 L 18 32"
+          stroke="#79828e"
+          strokeDasharray="4 3"
+          strokeLinecap="round"
+          strokeWidth={4.6}
+        />
+        <path
+          d="M 46 12 L 18 32"
+          stroke="#3f4652"
+          strokeDasharray="2 5"
+          strokeLinecap="round"
+          strokeWidth={2}
+        />
+        <circle cx={18} cy={22} fill="#39404f" r={8.5} stroke="#242a36" strokeWidth={1} />
+        <circle cx={18} cy={22} fill="#e8e3d6" r={3} />
+        <circle cx={46} cy={22} fill="#6d78ad" r={8.5} stroke="#4f5d9e" strokeWidth={1} />
+        <circle cx={46} cy={22} fill="#e7e8f4" r={3} />
       </svg>
     );
   }

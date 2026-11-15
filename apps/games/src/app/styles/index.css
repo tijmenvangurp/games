@@ -677,21 +677,8 @@
    * board-eenheden; de keyframe reist precies die periodelengte, anders
    * springt het loopvlak bij elke herhaling.
    */
-  .draaiwerk-belt,
   .draaiwerk-chain {
     pointer-events: none;
-  }
-
-  .draaiwerk-belt {
-    filter: drop-shadow(0 1px 1px rgb(43 37 28 / 0.18));
-  }
-
-  .draaiwerk-belt-tread[data-moving="true"] {
-    animation: draaiwerk-tread var(--belt-duration, 1s) linear infinite;
-  }
-
-  .draaiwerk-belt-tread[data-moving="true"][data-reverse="true"] {
-    animation-direction: reverse;
   }
 
   .draaiwerk-lamp-glow {
@@ -705,12 +692,6 @@
   @keyframes draaiwerk-spin {
     to {
       transform: rotate(360deg);
-    }
-  }
-
-  @keyframes draaiwerk-tread {
-    to {
-      stroke-dashoffset: -16;
     }
   }
 
@@ -744,10 +725,6 @@
 @layer motion {
   @media (prefers-reduced-motion: reduce) {
     .draaiwerk-rotor {
-      animation: none;
-    }
-
-    .draaiwerk-belt-tread {
       animation: none;
     }
 

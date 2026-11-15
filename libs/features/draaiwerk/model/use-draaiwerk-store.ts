@@ -315,7 +315,7 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
 
   if (!canPlace(state.level, without, nextKind)) {
     set({
-      feedback: "Deze riem kan niet van stand wisselen.",
+      feedback: "Deze ketting kan niet van stand wisselen.",
       feedbackTone: "warn",
     });
     playSound("almost");
@@ -326,7 +326,7 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
   applyPlacements(set, get, nextPlacements);
   if (get().feedback === null) {
     set({
-      feedback: nextKind.kind === "crossed-belt" ? "Riem gekruist." : "Riem open.",
+      feedback: nextKind.kind === "crossed-belt" ? "Ketting gekruist." : "Ketting open.",
       feedbackTone: "info",
     });
   }
@@ -640,10 +640,7 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
     set({
       selectedTrayId: null,
       pendingGearKey: key,
-      feedback:
-        item.kind === "chain"
-          ? "Trek de ketting nu naar een ander tandwiel."
-          : "Trek de riem nu naar een ander tandwiel.",
+      feedback: "Trek de ketting nu naar een ander tandwiel.",
       feedbackTone: "info",
     });
   }

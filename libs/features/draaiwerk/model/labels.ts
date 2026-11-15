@@ -14,9 +14,9 @@ export function chapterName(chapter: number): string {
 const NEW_LABELS: Record<string, string> = {
   "first-mesh": "tandwiel",
   parity: "tussenwiel",
-  "open-belt": "open riem",
-  chain: "ketting",
-  "crossed-belt": "gekruiste riem",
+  "open-belt": "gesloten ketting",
+  chain: "lange ketting",
+  "crossed-belt": "gekruiste ketting",
   detour: "omweg",
   "limited-tray": "beperkte voorraad",
   "reverse-motor": "andere motorrichting",
@@ -49,7 +49,7 @@ export function trayShortLabel(item: TrayItem): string {
     case "worm":
       return item.ratio <= 0.25 ? "Wormas sterk" : "Wormas";
     case "belt":
-      return item.crossed === true ? "Gekruist" : "Open riem";
+      return item.crossed === true ? "Gekruist" : "Ketting";
     case "chain":
       return "Ketting";
   }

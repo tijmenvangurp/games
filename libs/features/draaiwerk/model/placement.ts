@@ -153,7 +153,7 @@ function rejectLooseBelt(next: LooseBeltPlacement, slots: ReturnType<typeof gear
   if (!slots.some((slot) => slot.holeId === next.holeId)) {
     return "Op dit gat zit nog geen tandwiel.";
   }
-  return "Hier hangt al een riem.";
+  return "Hier hangt al een ketting.";
 }
 
 function rejectLink(level: Level, placements: readonly Placement[], next: LinkPlacement): string {
@@ -178,7 +178,7 @@ function rejectLink(level: Level, placements: readonly Placement[], next: LinkPl
 
   const span = distance(holeCenter(level, next.fromHoleId), holeCenter(level, next.toHoleId));
   return span <= Math.abs(gearRadius(from.size) - gearRadius(to.size))
-    ? "De riem past niet tussen deze wielen."
+    ? "De ketting past niet tussen deze wielen."
     : "Dat past hier niet.";
 }
 
