@@ -26,6 +26,9 @@ describe("murdoku-play store", () => {
     expect(store().play?.manualCrosses.size).toBe(0);
     expect(store().play?.selected).toBeNull();
     expect(store().play?.mode).toBe("place");
+    expect(store().play?.phase).toBe("playing");
+    expect(store().play?.wrongCheck).toBe(false);
+    expect(store().play?.resolution).toBeNull();
     expect(store().history).toEqual([]);
   });
 

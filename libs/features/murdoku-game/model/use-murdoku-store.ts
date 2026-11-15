@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import {
+  checkMurdokuPlay,
   createMurdokuPlay,
   selectPerson,
   setMurdokuMode,
@@ -23,6 +24,8 @@ interface MurdokuStore {
   setMode: (mode: MurdokuMode) => void;
   tapCell: (cell: Cell) => void;
   undo: () => void;
+  /** Controleert de zaak tegen de oplossing; zie {@link checkMurdokuPlay}. */
+  check: (solution: ReadonlyMap<PersonId, Cell>) => void;
 }
 
 function withHistory(history: MurdokuPlayState[], play: MurdokuPlayState): MurdokuPlayState[] {
@@ -56,8 +59,18 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
 
   undo: () =>
     set((state) => {
+      if (state.play?.phase === "solved") return {};
       const previous = state.history.at(-1);
       if (!previous) return {};
       return { play: previous, history: state.history.slice(0, -1) };
     }),
+
+  check: (solution) => {
+    const { puzzle, play } = get();
+    if (!puzzle || !play) return;
+    const next = checkMurdokuPlay(puzzle, play, solution);
+    if (next === play) return;
+    // Controleren verandert hooguit de afloop, nooit de bordgeschiedenis.
+    set({ play: next });
+  },
 }));

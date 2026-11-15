@@ -2,8 +2,9 @@ import { useEffect, useRef } from "react";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import type { MurdokuText } from "../lib/text";
 import { suspectColor } from "../lib/palette";
+import { withRoomOutline } from "../lib/reveal";
 import { avatarDataUri } from "../lib/vendored/avatar";
-import { drawBoard } from "../lib/vendored/boardRender";
+import { drawBoard, type RevealInfo } from "../lib/vendored/boardRender";
 import type { HelpMarks } from "../lib/vendored/helpMarks";
 import { onArtReady } from "../lib/vendored/objectArt";
 
@@ -16,6 +17,10 @@ interface MurdokuCanvasOptions {
   highlight: ReadonlySet<Cell> | null;
   highlightColor?: { wash: string; ring: string };
   helpMarks: HelpMarks | null;
+  /** Omlijnt deze kamer, bijvoorbeeld die van het slachtoffer bij de afloop. */
+  outlineRoomId: string | null;
+  /** De onthulling na een goede controle; `null` zolang de zaak loopt. */
+  reveal: RevealInfo | null;
 }
 
 /**
@@ -32,6 +37,8 @@ export function useMurdokuCanvas({
   highlight,
   highlightColor,
   helpMarks,
+  outlineRoomId,
+  reveal,
 }: MurdokuCanvasOptions) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const avatarsRef = useRef<Map<PersonId, HTMLImageElement>>(new Map());
@@ -45,6 +52,7 @@ export function useMurdokuCanvas({
 
     const boardWidth = width * cell;
     const boardHeight = height * cell;
+    const marks = withRoomOutline(helpMarks, outlineRoomId);
 
     const draw = () => {
       const ctx = canvas.getContext("2d");
@@ -68,8 +76,8 @@ export function useMurdokuCanvas({
         crosses: new Set(crosses),
         highlight: highlight ? new Set(highlight) : null,
         highlightColor,
-        helpMarks,
-        reveal: null,
+        helpMarks: marks,
+        reveal,
         avatars: avatarsRef.current,
       });
     };
@@ -78,7 +86,20 @@ export function useMurdokuCanvas({
     draw();
 
     return onArtReady(draw);
-  }, [puzzle, cell, width, height, placed, highlight, highlightColor, crosses, helpMarks, text]);
+  }, [
+    puzzle,
+    cell,
+    width,
+    height,
+    placed,
+    highlight,
+    highlightColor,
+    crosses,
+    helpMarks,
+    outlineRoomId,
+    reveal,
+    text,
+  ]);
 
   useEffect(() => {
     const map = new Map<PersonId, HTMLImageElement>();

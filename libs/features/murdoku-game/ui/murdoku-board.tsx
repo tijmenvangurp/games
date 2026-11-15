@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type RefObject } from "react";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
 import type { MurdokuMode } from "../model/play";
@@ -7,6 +7,12 @@ import type { HelpMarks } from "../lib/vendored/helpMarks";
 import { MurdokuCellGrid, MurdokuColumnLabels, MurdokuRowLabels } from "./murdoku-board-parts";
 import { useBoardCellSize, LABEL_SIZE } from "./use-board-cell-size";
 import { useMurdokuCanvas } from "./use-murdoku-canvas";
+
+/** De onthulling na een goede controle: de dader en het slachtoffer. */
+interface MurdokuBoardReveal {
+  murdererId: PersonId;
+  victimCell: Cell;
+}
 
 interface MurdokuBoardProps {
   puzzle: Puzzle;
@@ -21,6 +27,10 @@ interface MurdokuBoardProps {
   crosses?: ReadonlySet<Cell>;
   /** Rustige referentiemarkeringen van de aanwijzingen (kameromtrek, objectring). */
   helpMarks?: HelpMarks | null;
+  /** Omlijnt één kamer, bijvoorbeeld de kamer van het slachtoffer bij de afloop. */
+  outlineRoomId?: string | null;
+  /** De onthulling: de dader krijgt een ring en het slachtoffer staat op het bord. */
+  reveal?: MurdokuBoardReveal | null;
   /** De gekozen persoon, voor de toegankelijke vakjeslabels. */
   selectedPerson?: PersonId | null;
   /** De tikstand; bepaalt of een tik plaatst of wegstreept. */
@@ -33,6 +43,7 @@ interface MurdokuBoardProps {
 }
 
 const NO_CELLS: ReadonlySet<Cell> = new Set();
+const NO_PLACEMENTS: ReadonlyMap<PersonId, Cell> = new Map();
 
 function cellLabel(
   puzzle: Puzzle,
@@ -68,6 +79,61 @@ function cellLabel(
     .join(", ");
 }
 
+/** De toegankelijke naam van elk vakje, in bordvolgorde. */
+function boardLabels(
+  puzzle: Puzzle,
+  text: ReturnType<typeof createMurdokuText>,
+  placed: ReadonlyMap<PersonId, Cell>,
+  crosses: ReadonlySet<Cell>,
+): string[] {
+  const total = puzzle.board.width * puzzle.board.height;
+  return Array.from({ length: total }, (_, cell) => cellLabel(puzzle, text, placed, crosses, cell));
+}
+
+interface BoardGridProps {
+  title: string;
+  width: number;
+  height: number;
+  cell: number;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  labels: readonly string[];
+  mode: MurdokuMode;
+  selectedPerson: PersonId | null;
+  onCellTap?: (cell: Cell) => void;
+}
+
+/** Het canvas met het transparante knoppenrooster eroverheen. */
+function BoardGrid({
+  title,
+  width,
+  height,
+  cell,
+  canvasRef,
+  labels,
+  mode,
+  selectedPerson,
+  onCellTap,
+}: BoardGridProps) {
+  return (
+    <div className="relative" style={{ width: width * cell, height: height * cell }}>
+      <canvas
+        ref={canvasRef}
+        aria-label={`Plattegrond van ${title}, ${width} bij ${height}`}
+        className="block rounded-sm"
+        role="img"
+      />
+      <MurdokuCellGrid
+        height={height}
+        labels={labels}
+        mode={mode}
+        onCellTap={onCellTap}
+        selectedPerson={selectedPerson}
+        width={width}
+      />
+    </div>
+  );
+}
+
 /**
  * Eén canvas met de plattegrond van een zaak: kamers, vloeren, meubels, ramen,
  * kamernamen en de geplaatste portretten. Boven en links staan de kolom- en
@@ -83,6 +149,8 @@ export function MurdokuBoard({
   highlightColor,
   crosses = NO_CELLS,
   helpMarks = null,
+  outlineRoomId = null,
+  reveal = null,
   selectedPerson = null,
   mode = "place",
   onCellTap,
@@ -93,13 +161,10 @@ export function MurdokuBoard({
   const height = puzzle.board.height;
   const { wrapRef, cell } = useBoardCellSize(width, maxCellSize);
   const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
-  const placed = useMemo(() => new Map(placements ?? []), [placements]);
+  const placed = placements ?? NO_PLACEMENTS;
   const labels = useMemo(
-    () =>
-      Array.from({ length: width * height }, (_, cellIndex) =>
-        cellLabel(puzzle, text, placed, crosses, cellIndex),
-      ),
-    [puzzle, text, placed, crosses, width, height],
+    () => boardLabels(puzzle, text, placed, crosses),
+    [puzzle, text, placed, crosses],
   );
   const canvasRef = useMurdokuCanvas({
     puzzle,
@@ -110,6 +175,8 @@ export function MurdokuBoard({
     highlight,
     highlightColor,
     helpMarks,
+    outlineRoomId,
+    reveal,
   });
 
   return (
@@ -118,22 +185,17 @@ export function MurdokuBoard({
         <MurdokuColumnLabels cell={cell} labelSize={LABEL_SIZE} width={width} />
         <div className="flex">
           <MurdokuRowLabels cell={cell} height={height} labelSize={LABEL_SIZE} />
-          <div className="relative" style={{ width: width * cell, height: height * cell }}>
-            <canvas
-              ref={canvasRef}
-              aria-label={`Plattegrond van ${title}, ${width} bij ${height}`}
-              className="block rounded-sm"
-              role="img"
-            />
-            <MurdokuCellGrid
-              height={height}
-              labels={labels}
-              mode={mode}
-              onCellTap={onCellTap}
-              selectedPerson={selectedPerson}
-              width={width}
-            />
-          </div>
+          <BoardGrid
+            canvasRef={canvasRef}
+            cell={cell}
+            height={height}
+            labels={labels}
+            mode={mode}
+            selectedPerson={selectedPerson}
+            title={title}
+            width={width}
+            onCellTap={onCellTap}
+          />
         </div>
       </div>
     </div>

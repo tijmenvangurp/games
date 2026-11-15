@@ -7,7 +7,7 @@ import {
   crossedCells,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
-import { Button, Undo2, X } from "@shared/ui";
+import { Button, Check, Undo2, X } from "@shared/ui";
 
 interface MurdokuBoardSectionProps {
   puzzle: Puzzle;
@@ -16,9 +16,14 @@ interface MurdokuBoardSectionProps {
   play: MurdokuPlayState;
   /** Of er een stap is om ongedaan te maken. */
   canUndo: boolean;
+  /** Of de controle nu mag: iedereen staat en de zaak loopt nog. */
+  canCheck: boolean;
+  /** Melding onder het bord; `null` toont de gewone hulpregel. */
+  feedback: string | null;
   onCellTap: (cell: Cell) => void;
   onUndo: () => void;
   onToggleCross: () => void;
+  onCheck: () => void;
 }
 
 function statusText(puzzle: Puzzle, play: MurdokuPlayState): string {
@@ -32,21 +37,33 @@ function statusText(puzzle: Puzzle, play: MurdokuPlayState): string {
 }
 
 /**
- * Het bord met de rij- en kolomlabels, de twee bedieningsknoppen en de
- * hulpregel. De pagina hoeft alleen de zaak en de store-acties door te geven.
+ * Het bord met de rij- en kolomlabels, de bedieningsknoppen en de hulpregel.
+ * De pagina hoeft alleen de zaak en de store-acties door te geven. Na een goede
+ * controle omlijnt het bord de kamer van het slachtoffer en krijgt de dader een
+ * ring; het bord staat dan vast.
  */
 export function MurdokuBoardSection({
   puzzle,
   title,
   play,
   canUndo,
+  canCheck,
+  feedback,
   onCellTap,
   onUndo,
   onToggleCross,
+  onCheck,
 }: MurdokuBoardSectionProps) {
   const crosses = useMemo(() => crossedCells(puzzle, play), [puzzle, play]);
   const candidates = useMemo(() => candidateCells(puzzle, play), [puzzle, play]);
-  const status = statusText(puzzle, play);
+  const solved = play.phase === "solved";
+  const resolution = play.resolution;
+  const reveal = useMemo(
+    () =>
+      resolution ? { murdererId: resolution.murdererId, victimCell: resolution.victimCell } : null,
+    [resolution],
+  );
+  const status = feedback ?? statusText(puzzle, play);
 
   return (
     <section aria-labelledby="murdoku-plattegrond">
@@ -61,8 +78,10 @@ export function MurdokuBoardSection({
             highlightColor={MURDOKU_CANDIDATE_COLOR}
             maxCellSize={120}
             mode={play.mode}
+            outlineRoomId={resolution?.roomId ?? null}
             placements={play.placements}
             puzzle={puzzle}
+            reveal={reveal}
             selectedPerson={play.selected}
             title={title}
             onCellTap={onCellTap}
@@ -73,18 +92,37 @@ export function MurdokuBoardSection({
         <Button
           aria-pressed={play.mode === "cross"}
           className="min-h-11"
+          disabled={solved}
           variant={play.mode === "cross" ? "default" : "outline"}
           onClick={onToggleCross}
         >
           <X aria-hidden="true" className="size-5" />
           Kruisjesstand
         </Button>
-        <Button className="min-h-11" disabled={!canUndo} variant="outline" onClick={onUndo}>
+        <Button
+          className="min-h-11"
+          disabled={!canUndo || solved}
+          variant="outline"
+          onClick={onUndo}
+        >
           <Undo2 aria-hidden="true" className="size-5" />
           Ongedaan maken
         </Button>
+        <Button className="min-h-11" disabled={!canCheck} onClick={onCheck}>
+          <Check aria-hidden="true" className="size-5" />
+          Controleer
+        </Button>
       </div>
-      <p aria-live="polite" className="mt-2 text-center text-sm text-muted-foreground">
+      {!canCheck && !solved ? (
+        <p className="mt-1 text-center text-xs leading-relaxed text-muted-foreground">
+          Controleren kan zodra iedereen op het bord staat.
+        </p>
+      ) : null}
+      <p
+        aria-live="polite"
+        className="mt-2 text-center text-sm text-muted-foreground"
+        role="status"
+      >
         {status}
       </p>
       <p className="mt-1 text-center text-xs leading-relaxed text-muted-foreground">
