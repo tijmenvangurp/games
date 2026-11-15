@@ -40,6 +40,8 @@ export function GanzenbordPage() {
               useGanzenbordStore.getState().setController(id, controller)
             }
             onPlayerCountChange={(count) => useGanzenbordStore.getState().setPlayerCount(count)}
+            onNameChange={(id, name) => useGanzenbordStore.getState().setPlayerName(id, name)}
+            onColorChange={(id, color) => useGanzenbordStore.getState().setPlayerColor(id, color)}
             onStart={() => {
               useGanzenbordStore.getState().start();
               setShowSetup(false);

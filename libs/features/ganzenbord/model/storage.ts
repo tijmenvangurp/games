@@ -1,6 +1,20 @@
-import { PLAYER_IDS, type Controller, type PlayerId } from "@entities/ganzenbord";
+import {
+  DEFAULT_PLAYER_COLORS,
+  MAX_PLAYER_NAME_LENGTH,
+  PLAYER_IDS,
+  isPlayerColor,
+  type Controller,
+  type PlayerColor,
+  type PlayerId,
+} from "@entities/ganzenbord";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
-import { DEFAULT_SETTINGS, isController, isPlayerCount, type GanzenbordSettings } from "./settings";
+import {
+  DEFAULT_SETTINGS,
+  isController,
+  isPlayerCount,
+  type GanzenbordSettings,
+  type PlayerName,
+} from "./settings";
 
 const STORAGE_KEY = "games.ganzenbord.v1";
 
@@ -38,6 +52,61 @@ function toControllers(value: unknown): Record<PlayerId, Controller> | undefined
   return controllers;
 }
 
+function toName(value: unknown): PlayerName | undefined {
+  // Oude opslag bewaarde één naam per speler; die wordt de naam voor de mens.
+  if (typeof value === "string") {
+    return { human: value.slice(0, MAX_PLAYER_NAME_LENGTH), computer: "" };
+  }
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const { human, computer } = value;
+  if (typeof human !== "string" || typeof computer !== "string") {
+    return undefined;
+  }
+  return {
+    human: human.slice(0, MAX_PLAYER_NAME_LENGTH),
+    computer: computer.slice(0, MAX_PLAYER_NAME_LENGTH),
+  };
+}
+
+function toNames(value: unknown): Record<PlayerId, PlayerName> | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const names = {} as Record<PlayerId, PlayerName>;
+  for (const id of PLAYER_IDS) {
+    const name = toName(value[id]);
+    if (!name) {
+      return undefined;
+    }
+    names[id] = name;
+  }
+  return names;
+}
+
+function toColors(value: unknown): Record<PlayerId, PlayerColor> | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const colors = {} as Record<PlayerId, PlayerColor>;
+  for (const id of PLAYER_IDS) {
+    const color = value[id];
+    if (!isPlayerColor(color)) {
+      return undefined;
+    }
+    colors[id] = color;
+  }
+
+  // Een dubbele kleur maakt de pionnen ononderscheidbaar; dan liever de vaste set.
+  return new Set(Object.values(colors)).size === PLAYER_IDS.length
+    ? colors
+    : { ...DEFAULT_PLAYER_COLORS };
+}
+
 function toSettings(value: unknown): GanzenbordSettings | undefined {
   if (!isRecord(value)) {
     return undefined;
@@ -46,7 +115,12 @@ function toSettings(value: unknown): GanzenbordSettings | undefined {
   if (!controllers || !isPlayerCount(value.playerCount)) {
     return undefined;
   }
-  return { playerCount: value.playerCount, controllers };
+  return {
+    playerCount: value.playerCount,
+    controllers,
+    names: toNames(value.names) ?? FALLBACK.settings.names,
+    colors: toColors(value.colors) ?? FALLBACK.settings.colors,
+  };
 }
 
 function toWins(value: unknown): Wins | undefined {

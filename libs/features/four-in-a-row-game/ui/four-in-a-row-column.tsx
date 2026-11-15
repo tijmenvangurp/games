@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { Cell, Player } from "@entities/four-in-a-row";
 import { FourInARowDisc } from "./four-in-a-row-disc";
 
@@ -30,21 +31,42 @@ export function FourInARowColumn({
   onDrop,
   onHover,
 }: FourInARowColumnProps) {
+  // Een tik op een aanraakscherm kan de knop ook focus geven; dan tonen we
+  // geen hint, want op touch bestaat hover niet.
+  const touched = useRef(false);
+
   return (
     <button
       type="button"
       aria-label={`Kolom ${index + 1}`}
-      className="flex flex-1 flex-col-reverse gap-0.5 rounded-md transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:gap-1"
+      className="four-in-a-row-column flex flex-1 flex-col-reverse gap-0.5 rounded-md transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:gap-1"
       disabled={disabled}
       onBlur={() => onHover(null)}
       onClick={() => onDrop(index)}
-      onFocus={() => onHover(index)}
-      onPointerEnter={() => onHover(index)}
+      onFocus={() => {
+        if (!touched.current) {
+          onHover(index);
+        }
+      }}
+      onKeyDown={() => {
+        touched.current = false;
+      }}
+      onPointerDown={(event) => {
+        touched.current = event.pointerType === "touch";
+      }}
+      onPointerEnter={(event) => {
+        // Op een aanraakscherm bestaat hover niet: daar zou de hint alleen
+        // heel even flitsen vlak voor het muntje valt.
+        if (event.pointerType !== "touch") {
+          onHover(index);
+        }
+      }}
       onPointerLeave={() => onHover(null)}
     >
       {cells.map((cell, row) => (
         <FourInARowDisc
           key={row}
+          dropRows={cells.length - row}
           ghost={row === previewRow ? ghost : null}
           highlighted={winning.has(`${index}:${row}`)}
           latest={latest === `${index}:${row}`}

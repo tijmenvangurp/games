@@ -18,6 +18,7 @@
   --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
   --animate-pop: pop 0.25s ease-out;
   --animate-rise: rise 0.25s ease-out;
+  --animate-drop: drop 0.45s cubic-bezier(0.3, 0.7, 0.4, 1);
 }
 
 @theme inline {
@@ -34,8 +35,12 @@
   --color-danger: var(--danger);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
-  --color-player-three: var(--player-three);
-  --color-player-four: var(--player-four);
+  --color-pawn-red: var(--pawn-red);
+  --color-pawn-orange: var(--pawn-orange);
+  --color-pawn-green: var(--pawn-green);
+  --color-pawn-blue: var(--pawn-blue);
+  --color-pawn-violet: var(--pawn-violet);
+  --color-pawn-pink: var(--pawn-pink);
 }
 
 :root {
@@ -52,13 +57,19 @@
   --warning: oklch(0.56 0.13 72);
   --danger: oklch(0.53 0.17 25);
   /*
-   * Twee rustige spelerkleuren voor bordspellen. Ze staan los van de
-   * feedbackkleuren: groen, amber en rood blijven betekenis houden.
+   * Vrolijke pionkleuren voor bordspellen: rood, oranje, groen, blauw, paars
+   * en roze. Ze staan los van de feedbackkleuren; de gans en het nummer op de
+   * pion maken de speler herkenbaar, niet de kleur alleen.
    */
+  --pawn-red: oklch(0.6 0.21 22);
+  --pawn-orange: oklch(0.66 0.17 55);
+  --pawn-green: oklch(0.62 0.16 148);
+  --pawn-blue: oklch(0.58 0.19 255);
+  --pawn-violet: oklch(0.56 0.2 300);
+  --pawn-pink: oklch(0.64 0.2 350);
+  /* De vaste kleuren van Vier op een Rij blijven rustiger van toon. */
   --player-one: #4f5d9e;
   --player-two: oklch(0.58 0.2 30);
-  --player-three: oklch(0.55 0.11 190);
-  --player-four: oklch(0.56 0.13 305);
 }
 
 @layer base {
@@ -136,6 +147,17 @@
     transition:
       left 260ms ease-in-out,
       top 260ms ease-in-out;
+  }
+
+  /* Dezelfde tussenruimte als de kolom (gap-0.5 en sm:gap-1). */
+  .four-in-a-row-column {
+    --four-in-a-row-gap: 0.125rem;
+  }
+
+  @media (min-width: 40rem) {
+    .four-in-a-row-column {
+      --four-in-a-row-gap: 0.25rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -327,6 +349,28 @@
     to {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  /*
+   * Een muntje valt van boven de kolom naar zijn vakje. `--drop-rows` telt de
+   * lege vakjes boven het muntje plus één, zodat de val altijd boven het bord
+   * begint. De kolom levert de tussenruimte via `--four-in-a-row-gap`.
+   */
+  @keyframes drop {
+    from {
+      transform: translateY(
+        calc(-1 * var(--drop-rows, 1) * (100% + var(--four-in-a-row-gap, 0.125rem)))
+      );
+    }
+    78% {
+      transform: translateY(0) scale(1);
+    }
+    88% {
+      transform: translateY(0) scale(1.04, 0.94);
+    }
+    to {
+      transform: translateY(0) scale(1);
     }
   }
 

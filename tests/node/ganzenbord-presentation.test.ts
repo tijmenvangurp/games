@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  DEFAULT_PLAYER_COLORS,
   createGame,
   type GanzenbordGame,
   type PlayerId,
@@ -41,7 +42,15 @@ describe("ganzenbord: presentatie", () => {
     expect(playerName({ id: "one", controller: "human" })).toBe("Speler 1");
     expect(playerName({ id: "two", controller: "computer" })).toBe("Computer 2");
     expect(playerShortName({ id: "two", controller: "computer" })).toBe("CPU 2");
-    expect(playerColorClass("three")).toBe("bg-player-three");
+    expect(playerColorClass("violet")).toBe("bg-pawn-violet");
+    expect(playerColorClass(DEFAULT_PLAYER_COLORS.three)).toBe("bg-pawn-green");
+  });
+
+  it("gebruikt een eigen naam als die is ingevuld", () => {
+    expect(playerName({ id: "one", controller: "human", name: "Saar" })).toBe("Saar");
+    expect(playerName({ id: "two", controller: "computer", name: "Opa" })).toBe("Opa");
+    expect(playerShortName({ id: "one", controller: "human", name: "Saar" })).toBe("Saar");
+    expect(playerName({ id: "one", controller: "human", name: "  " })).toBe("Speler 1");
   });
 
   it("beschrijft de positie en status van een speler", () => {
