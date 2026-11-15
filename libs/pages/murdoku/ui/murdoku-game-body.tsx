@@ -4,23 +4,23 @@ import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import {
   MurdokuClueCards,
   MurdokuObjectLegend,
+  type MurdokuClueFocus,
   type MurdokuPlayState,
-  type MurdokuText,
 } from "@features/murdoku-game";
 import { Button, CelebrationDialog } from "@shared/ui";
 import { MurdokuBoardSection } from "./murdoku-board-section";
 import { feedbackFor } from "./murdoku-copy";
 import { MurdokuReveal } from "./murdoku-reveal";
+import type { MurdokuCaseView, MurdokuHintView } from "./murdoku-view";
 
 interface MurdokuGameBodyProps {
-  puzzle: Puzzle;
-  text: MurdokuText;
+  /** De zaak: bord, tekstlaag, titel en intro. */
+  caseView: MurdokuCaseView;
   play: MurdokuPlayState;
-  title: string;
-  intro: string;
   canCheck: boolean;
   historyLength: number;
   revealSentence: string | null;
+  hintView: MurdokuHintView;
   onCellTap: (cell: Cell) => void;
   onUndo: () => void;
   onToggleCross: () => void;
@@ -31,14 +31,23 @@ interface MurdokuGameBodyProps {
 }
 
 interface MurdokuInfoSectionsProps {
-  puzzle: Puzzle;
-  text: MurdokuText;
+  caseView: MurdokuCaseView;
   play: MurdokuPlayState;
+  clueFocus: MurdokuClueFocus | null;
   onSelectPerson: (person: PersonId) => void;
+  onFocusWord: (focus: MurdokuClueFocus, label: string) => void;
 }
 
 /** De kaarten met de aanwijzingen en de legenda onder het bord. */
-function MurdokuInfoSections({ puzzle, text, play, onSelectPerson }: MurdokuInfoSectionsProps) {
+function MurdokuInfoSections({
+  caseView,
+  play,
+  clueFocus,
+  onSelectPerson,
+  onFocusWord,
+}: MurdokuInfoSectionsProps) {
+  const { puzzle, text } = caseView;
+
   return (
     <>
       <section aria-labelledby="murdoku-personen" className="flex flex-col gap-2.5">
@@ -48,7 +57,13 @@ function MurdokuInfoSections({ puzzle, text, play, onSelectPerson }: MurdokuInfo
         <p className="text-sm leading-relaxed text-muted-foreground">
           {text.rule("aloneWithVictim")}
         </p>
-        <MurdokuClueCards puzzle={puzzle} selectedId={play.selected} onSelect={onSelectPerson} />
+        <MurdokuClueCards
+          activeWord={clueFocus}
+          puzzle={puzzle}
+          selectedId={play.selected}
+          onFocusWord={onFocusWord}
+          onSelect={onSelectPerson}
+        />
       </section>
 
       <section aria-labelledby="murdoku-legenda" className="flex flex-col gap-2.5">
@@ -61,16 +76,39 @@ function MurdokuInfoSections({ puzzle, text, play, onSelectPerson }: MurdokuInfo
   );
 }
 
+/** De viering na een opgeloste zaak. */
+function MurdokuSolvedDialog({
+  sentence,
+  onAgain,
+  onChoose,
+  onHome,
+}: {
+  sentence: string;
+  onAgain: () => void;
+  onChoose: () => void;
+  onHome: () => void;
+}) {
+  return (
+    <CelebrationDialog
+      chooseLabel="Bekijk de plattegrond"
+      confetti
+      description={sentence}
+      title="Opgelost!"
+      onAgain={onAgain}
+      onChoose={onChoose}
+      onHome={onHome}
+    />
+  );
+}
+
 /** Bord, kaarten, onthulling en viering van één zaak. */
 export function MurdokuGameBody({
-  puzzle,
-  text,
+  caseView,
   play,
-  title,
-  intro,
   canCheck,
   historyLength,
   revealSentence,
+  hintView,
   onCellTap,
   onUndo,
   onToggleCross,
@@ -80,6 +118,8 @@ export function MurdokuGameBody({
   onHome,
 }: MurdokuGameBodyProps) {
   const [showCelebration, setShowCelebration] = useState(true);
+  const { puzzle, text, title, intro } = caseView;
+  const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
   const restart = () => {
     setShowCelebration(true);
     onRestart();
@@ -96,12 +136,17 @@ export function MurdokuGameBody({
         <MurdokuBoardSection
           canCheck={canCheck}
           canUndo={historyLength > 0}
+          clueFocus={clueFocus}
+          clueMessage={clueMessage}
           feedback={feedbackFor(play, revealSentence)}
+          hint={hint}
+          hintMessage={hintMessage}
           play={play}
           puzzle={puzzle}
           title={title}
           onCellTap={onCellTap}
           onCheck={onCheck}
+          onHint={onHint}
           onToggleCross={onToggleCross}
           onUndo={onUndo}
         />
@@ -109,19 +154,17 @@ export function MurdokuGameBody({
         {revealSentence ? <MurdokuReveal sentence={revealSentence} onRestart={restart} /> : null}
 
         <MurdokuInfoSections
+          caseView={caseView}
+          clueFocus={clueFocus}
           play={play}
-          puzzle={puzzle}
-          text={text}
+          onFocusWord={onFocusWord}
           onSelectPerson={onSelectPerson}
         />
       </div>
 
       {revealSentence && showCelebration ? (
-        <CelebrationDialog
-          chooseLabel="Bekijk de plattegrond"
-          confetti
-          description={revealSentence}
-          title="Opgelost!"
+        <MurdokuSolvedDialog
+          sentence={revealSentence}
           onAgain={restart}
           onChoose={() => setShowCelebration(false)}
           onHome={onHome}

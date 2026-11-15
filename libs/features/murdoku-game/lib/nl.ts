@@ -536,8 +536,44 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
     oneEachLine: "Iedereen staat in een eigen rij en kolom.",
   },
 
+  // De hinttrap: eerst wijzen (rij, kolom of kamer), dan één onmogelijk vakje
+  // wegstrepen, dan één persoon plaatsen. Alle zinnen staan hier zodat de
+  // woordenlijst en spraak later dezelfde tekst kunnen gebruiken.
+  hint: {
+    focusRow: "Kijk eens naar rij {{num}}.",
+    focusRowName: "Kijk eens naar rij {{num}}, waar {{name}} nog kan staan.",
+    focusCol: "Kijk eens naar kolom {{num}}.",
+    focusColName: "Kijk eens naar kolom {{num}}, waar {{name}} nog kan staan.",
+    focusRoom: "Kijk eens naar {{room}}.",
+    focusRoomName: "Kijk eens naar {{room}}, waar {{name}} nog kan staan.",
+    crossRow:
+      "Streep {{cell}} weg. Rij {{num}} heeft nog maar één vrij vakje, en dat ligt in deze kolom.",
+    crossCol:
+      "Streep {{cell}} weg. Kolom {{num}} heeft nog maar één vrij vakje, en dat ligt in deze rij.",
+    crossPlain: "Streep {{cell}} weg: daar kan niemand staan.",
+    place: "Zet {{name}} op {{cell}}. Alle andere vakjes kunnen niet.",
+    placeClue: "Zet {{name}} op {{cell}}, want {{child}}.",
+    checkPlacement: "Kijk nog eens naar {{name}} op {{cell}}.",
+    lastPerson: "Bijna klaar! Zet de laatste persoon zelf.",
+    none: "Ik zie nu geen stap meer. Kijk nog eens naar de aanwijzingen.",
+  },
+
   coord: { row: "R", col: "K" },
   sameThe: "dezelfde",
+
+  /** Meldingen bij het bord, bijvoorbeeld als een woord uit een aanwijzing oplicht. */
+  board: {
+    wordOn: "{{word}} licht op.",
+  },
+
+  // Losse verwijzingen die een aanwijzing noemt en die op het bord kunnen
+  // oplichten. Ze staan hier zodat de zin en het tikbare woord hetzelfde zeggen.
+  word: {
+    corner: "in een hoek",
+    wall: "tegen een muur",
+    outside: "buiten",
+    inside: "binnen",
+  },
 
   clue: {
     negWord: "niet ",

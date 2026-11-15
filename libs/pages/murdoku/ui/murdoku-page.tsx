@@ -15,22 +15,41 @@ import { useMurdokuSession } from "./use-murdoku-session";
  * auto-kruis doet de rij en kolom van een geplaatst persoon, en ongedaan maken
  * zet de vorige bordtoestand terug. Zodra iedereen staat, controleert het kind
  * de zaak; een goede controle onthult de dader en de kamer van het slachtoffer.
+ * Een hint licht eerst de rij, kolom of kamer op en doet daarna één stap voor.
  */
 export function MurdokuPage() {
   const navigate = useNavigate();
-  const { start, selectPerson, setMode, tapCell, undo, check, storedPlay, historyLength } =
-    useMurdokuStore(
-      useShallow((state) => ({
-        start: state.start,
-        selectPerson: state.selectPerson,
-        setMode: state.setMode,
-        tapCell: state.tapCell,
-        undo: state.undo,
-        check: state.check,
-        storedPlay: state.play,
-        historyLength: state.history.length,
-      })),
-    );
+  const {
+    start,
+    selectPerson,
+    setMode,
+    tapCell,
+    undo,
+    check,
+    showHint,
+    focusClue,
+    storedPlay,
+    historyLength,
+    hint,
+    clueFocus,
+    clueFocusLabel,
+  } = useMurdokuStore(
+    useShallow((state) => ({
+      start: state.start,
+      selectPerson: state.selectPerson,
+      setMode: state.setMode,
+      tapCell: state.tapCell,
+      undo: state.undo,
+      check: state.check,
+      showHint: state.showHint,
+      focusClue: state.focusClue,
+      storedPlay: state.play,
+      historyLength: state.history.length,
+      hint: state.hint,
+      clueFocus: state.clueFocus,
+      clueFocusLabel: state.clueFocusLabel,
+    })),
+  );
   const { activeCase, puzzle, text, solution, title } = useMurdokuSession(storedPlay);
 
   useEffect(() => {
@@ -43,6 +62,10 @@ export function MurdokuPage() {
   // juiste beeld en houdt de pagina zonder flikkering bruikbaar.
   const play = storedPlay?.levelId === puzzle.id ? storedPlay : createMurdokuPlay(puzzle.id);
   const revealSentence = revealSentenceFor(puzzle, text, play);
+  const hintMessage = hint ? text.explanation(hint.explanation) : null;
+  const clueMessage = clueFocusLabel
+    ? text.explanation({ key: "board.wordOn", params: { word: clueFocusLabel } })
+    : null;
   const intro =
     activeCase?.intro ??
     "Er is iets gestolen. Lees de aanwijzingen, plaats iedereen en zoek wie als enige bij Vera was.";
@@ -56,13 +79,18 @@ export function MurdokuPage() {
     >
       <MurdokuGameBody
         canCheck={play.phase === "playing" && everyonePlaced(puzzle, play)}
+        caseView={{ puzzle, text, title, intro }}
         historyLength={historyLength}
-        intro={intro}
+        hintView={{
+          hint,
+          hintMessage,
+          clueFocus,
+          clueMessage,
+          onHint: showHint,
+          onFocusWord: focusClue,
+        }}
         play={play}
-        puzzle={puzzle}
         revealSentence={revealSentence}
-        text={text}
-        title={title}
         onCellTap={tapCell}
         onCheck={() => check(solution)}
         onHome={() => navigate({ to: "/" })}

@@ -82,6 +82,11 @@ export const CANDIDATE_BLUE = {
   wash: "rgba(79, 93, 158, 0.26)",
   ring: APP_TOKENS.primary,
 };
+/** Hintwash: amber, de kleur die de app voor hulp reserveert. */
+export const MURDOKU_HINT_COLOR = {
+  wash: "rgba(176, 122, 54, 0.30)",
+  ring: APP_TOKENS.warning,
+};
 /** Referentiemarkeringen van ontkende aanwijzingen ("hier niet") — foutrood. */
 export const REF_RED = { wash: "rgba(191, 74, 58, 0.26)", ring: APP_TOKENS.danger };
 /** Kameromtrek binnen de muren van de kamer onder de cursor. */
