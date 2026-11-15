@@ -422,13 +422,17 @@ const ChainBand = memo(function ChainBand({ connection }: { connection: Connecti
   const speed = Math.abs(connection.surfaceSpeed);
   const moving = connection.active && !reduced && length > 0.01 && speed >= MIN_SURFACE_SPEED;
   const loop = Math.round((length / Math.max(MIN_SURFACE_SPEED, speed)) * 1000) / 1000;
-  const reverse = connection.surfaceSpeed < 0;
+  // De gekruiste baan begint met de tegenovergestelde raaklijn: de ketting
+  // moet daar de andere kant op bewegen dan bij een open baan.
+  const reverse =
+    connection.kind === "crossed-belt" ? connection.surfaceSpeed >= 0 : connection.surfaceSpeed < 0;
 
   return (
     <g
       className="draaiwerk-chain"
       data-chain-links={count}
       data-moving={moving ? "true" : "false"}
+      data-reverse={reverse ? "true" : "false"}
       data-speed={connection.surfaceSpeed}
       opacity={connection.active ? 1 : 0.5}
     >

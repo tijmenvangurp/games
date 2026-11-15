@@ -704,6 +704,7 @@ describe("draaiwerk: riem en ketting", () => {
     expect(Number(chain?.getAttribute("data-chain-links"))).toBeGreaterThan(0);
     expect(Number(chain?.getAttribute("data-speed"))).toBeCloseTo(connection.surfaceSpeed, 6);
     expect(chain?.getAttribute("data-moving")).toBe("true");
+    expect(chain?.getAttribute("data-reverse")).toBe("false");
     const links = band?.querySelectorAll("[data-chain-link]") ?? [];
     expect(links).toHaveLength(Number(chain?.getAttribute("data-chain-links")));
     expect(links.length).toBeGreaterThan(8);
@@ -779,6 +780,28 @@ describe("draaiwerk: riem en ketting", () => {
 
     expect(useDraaiwerkStore.getState().placements).toBe(before);
     expect(document.querySelector('[data-kind="chain"]')).toBeTruthy();
+  });
+
+  it("laat een gekruiste ketting met de wielen meedraaien", () => {
+    useDraaiwerkStore.setState({ unlocked: 5, finished: false });
+    useDraaiwerkStore.getState().startLevel(4);
+
+    const level = levelAt(4);
+    const belt = level.tray.find((item) => item.kind === "belt" && item.crossed === true);
+    if (!belt) {
+      throw new Error("Level 5 has no crossed belt");
+    }
+
+    useDraaiwerkStore.getState().selectTray(belt.id);
+    useDraaiwerkStore.getState().tapGear("motor");
+    useDraaiwerkStore.getState().tapGear("output:target-1");
+
+    expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
+    expect(useDraaiwerkStore.getState().placements[0]?.kind).toBe("crossed-belt");
+    renderGame();
+    const chain = document.querySelector('[data-kind="crossed-belt"] [data-chain-links]');
+    expect(chain?.getAttribute("data-moving")).toBe("true");
+    expect(chain?.getAttribute("data-reverse")).toBe("true");
   });
 
   it("tekent een ketting als schakels die het pad volgen", () => {
