@@ -162,9 +162,48 @@ boventanden.
 - **Ribbels lopen mee.** De animatie verschuift de ribbels precies één spoed,
   zodat de lus naadloos blijft bij elke schroeflengte.
 
+## Addendum 2026-11-15: wormas verbindt twee wielen
+
+De wormas is nu een **verbinding tussen twee bestaande tandwielen**, niet een
+as die één wiel aandrijft. Dit supersedeert het eenrichtingsverkeer en de vaste
+ratio's uit de vorige addenda.
+
+- **Onderzoek.** Een worm en een wormwiel hebben assen die loodrecht op elkaar
+  staan. Eén wormas kan meerdere wormwielen langs zijn lengte aandrijven; dat
+  bestaat als dubbele-uitgang-wormkast. De twee wielen draaien dan dezelfde kant
+  op en de snelheidsverhouding volgt uit hun tandenaantal, niet uit een vaste
+  schroefratio.
+- **Twee richtingen.** De `worm`-edge loopt in de graaf beide kanten op met
+  `speedFactor = straal_van / straal_naar`. De speler mag dus vanaf elk van de
+  twee wielen beginnen. De schroef is een verbinding zoals een ketting, maar
+  zonder lus om de wielen.
+- **Geen vaste ratio meer.** `TrayItem` en `Placement` hebben voor de worm geen
+  `ratio` of `direction` meer. Level 10 gebruikt twee even grote wielen (1×),
+  level 11 een groot wormwiel (0,5×). De sterke wormas uit level 11 is daarmee
+  een grote vertraging door het wiel, niet door een apart schroefprofiel.
+- **Gemeenschappelijke raaklijn.** `wormShaft` legt de as op de gemeenschappelijke
+  buitenraaklijn van beide steekcirkels. Bij even grote wielen is dat een
+  horizontale as boven beide; bij ongelijke wielen loopt de as schuin. De as
+  ligt `WORM_SHAFT_CLEARANCE` van de steekcirkel, zodat de onderkant in de
+  tandtoppen zakt en de naaf vrij blijft.
+- **Plaatsing.** `canPlace` weigert twee wielen die al in elkaar grijpen, een as
+  die van het bord loopt en een as die een derde tandwiel raakt. De speler tikt
+  één wiel; de app kiest het tweede wiel dat de machine het best laat lopen.
+- **Aangepaste levels.** Level 10 verbindt twee even grote wielen. Level 11
+  gebruikt een groot wormwiel voor de vertraging. Level 12 en 13 hebben alleen
+  de ketting in de bak, omdat een wormas tussen twee even grote wielen dezelfde
+  1× zou geven. Level 14 heeft alleen de wormas. Level 16 houdt de ketting voor
+  de lamp en de wormas voor de lift; de lift kreeg een groter wiel.
+- **Waarom.** Het bord laat nu één schroef over twee wielen zien, met twee
+  raakpunten. Dat is het beeld dat een kind van een wormas moet onthouden en het
+  maakt de wormas een echte verbindingsmethode naast de ketting.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)
+- [Worm drive (Wikipedia)](https://en.wikipedia.org/wiki/Worm_drive)
+- [Worm gears: ontwerp en formules (RoyMech)](https://www.roymech.co.uk/Useful_Tables/Drive/Worm_Gears.html)
+- [Dubbele-uitgang-wormkast (Tramec)](https://tramec.it/en/product/double-output-worm-gearboxes-series-vm)
 - [mechanism-lab (MIT)](https://github.com/jacobplee/mechanism-lab)
 - [Licentie mechanism-lab](../../LICENSES/mechanism-lab-MIT.txt)
 - [Sprocketry als referentie](https://gameeduhub.com/sprocketry.html)

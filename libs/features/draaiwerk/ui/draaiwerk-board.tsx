@@ -679,13 +679,18 @@ export function DraaiwerkBoard({
         {/* The worm shaft lies across two gears, so it is drawn over them. */}
         <g data-worm-layer="true">
           {worms.map((worm) => {
-            const wheel = result.gears.find((pose) => pose.holeId === worm.toHoleId);
+            const from = result.gears.find((pose) => pose.holeId === worm.fromHoleId);
+            const to = result.gears.find((pose) => pose.holeId === worm.toHoleId);
+            const speed = from?.speed ?? to?.speed ?? 1;
             return (
               <WormBar
+                active={Boolean((from?.driven || to?.driven) && !result.jammed)}
+                direction={speed < 0 ? -1 : 1}
+                fromRadius={gearRadius(from?.size ?? 1)}
                 key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
                 level={level}
                 placement={worm}
-                toRadius={gearRadius(wheel?.size ?? 1)}
+                toRadius={gearRadius(to?.size ?? 1)}
               />
             );
           })}

@@ -1,14 +1,19 @@
 import {
+  boardRect,
   canPlace,
   gearRadius,
   gearSlots,
   holeCenter,
   trayItemMatches,
+  wormShaft,
   type GearPose,
   type Level,
   type Placement,
   type TrayItem,
+  type WormShaft,
 } from "@entities/gear";
+
+export { WORM_SHAFT_CLEARANCE } from "@entities/gear";
 
 export type LinkTrayItem = Extract<TrayItem, { kind: "belt" | "chain" }>;
 
@@ -114,6 +119,7 @@ function rejectGear(
 }
 
 function rejectWorm(
+  level: Level,
   placements: readonly Placement[],
   next: WormPlacement,
   slots: ReturnType<typeof gearSlots>,
@@ -121,10 +127,22 @@ function rejectWorm(
   if (next.fromHoleId === next.toHoleId) {
     return "Kies twee verschillende tandwielen.";
   }
-  const gearHoles = new Set(slots.map((slot) => slot.holeId));
-  if (!gearHoles.has(next.fromHoleId) || !gearHoles.has(next.toHoleId)) {
+  const from = slots.find((slot) => slot.holeId === next.fromHoleId);
+  const to = slots.find((slot) => slot.holeId === next.toHoleId);
+  if (!from || !to) {
     return "De wormas moet op twee tandwielen liggen.";
   }
+  const fromCenter = holeCenter(level, next.fromHoleId);
+  const toCenter = holeCenter(level, next.toHoleId);
+  if (distance(fromCenter, toCenter) <= gearRadius(from.size) + gearRadius(to.size) + 1) {
+    return "Deze twee wielen raken elkaar al.";
+  }
+
+  const shaft = wormShaftGeometry(level, next, gearRadius(from.size), gearRadius(to.size));
+  if (!shaft || !shaft.fits) {
+    return "De wormas past niet op het bord.";
+  }
+
   const pair = [next.fromHoleId, next.toHoleId].sort().join("|");
   const duplicate = placements.some(
     (placement) =>
@@ -184,7 +202,7 @@ export function rejectionFor(
     case "gear":
       return rejectGear(level, next, blocked, occupied, slots);
     case "worm":
-      return rejectWorm(placements, next, slots);
+      return rejectWorm(level, placements, next, slots);
     case "loose-belt":
       return rejectLooseBelt(next, slots);
     default:
@@ -198,10 +216,8 @@ function sameGear(first: GearPlacement, second: GearPlacement): boolean {
 
 function sameWorm(first: WormPlacement, second: WormPlacement): boolean {
   return (
-    first.ratio === second.ratio &&
-    first.direction === second.direction &&
-    first.fromHoleId === second.fromHoleId &&
-    first.toHoleId === second.toHoleId
+    [first.fromHoleId, first.toHoleId].sort().join("|") ===
+    [second.fromHoleId, second.toHoleId].sort().join("|")
   );
 }
 
@@ -243,40 +259,24 @@ export function nextSolutionPlacement(
   );
 }
 
-/** Distance from the worm wheel's rim to the shaft's centreline. */
-export const WORM_SHAFT_CLEARANCE = 9;
-
-export interface WormShaft {
-  /** Centre of the shaft body, above the worm wheel. */
-  centre: { x: number; y: number };
-  /** Rotation of the shaft, along the tangent of the worm wheel. */
-  angle: number;
-  length: number;
-  coils: number;
-  pitch: number;
-}
-
 /**
- * The worm shaft lies on top of the worm wheel instead of spanning both gear
- * hubs: a horizontal screw above the rim, with its lower half sunk into the top
- * teeth so it visibly grips them.
+ * The worm shaft lies on the common tangent of both wheels. Its body is lifted
+ * off the pitch circles by `WORM_SHAFT_CLEARANCE`, so the lower edge grips the
+ * teeth while the wheel hubs stay clear.
  */
 export function wormShaftGeometry(
   level: Level,
   placement: Extract<Placement, { kind: "worm" }>,
+  fromRadius: number,
   toRadius: number,
-): WormShaft {
-  const target = holeCenter(level, placement.toHoleId);
-  const length = Math.max(70, toRadius * 1.3);
-  const coils = Math.max(3, Math.round(length / 11));
-
-  return {
-    centre: { x: target.x, y: target.y - (toRadius + WORM_SHAFT_CLEARANCE) },
-    angle: 0,
-    length,
-    coils,
-    pitch: length / coils,
-  };
+): WormShaft | null {
+  return wormShaft(
+    holeCenter(level, placement.fromHoleId),
+    fromRadius,
+    holeCenter(level, placement.toHoleId),
+    toRadius,
+    boardRect(level),
+  );
 }
 
 /** The hole behind a drive pose key, without trusting that the pose exists. */

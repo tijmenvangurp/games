@@ -15,7 +15,7 @@ import {
 const level = levelAt(2);
 
 function worm(fromHoleId: string, toHoleId: string): Placement {
-  return { kind: "worm", fromHoleId, toHoleId, ratio: 0.5, direction: -1 };
+  return { kind: "worm", fromHoleId, toHoleId };
 }
 
 describe("draaiwerk placement", () => {
@@ -169,7 +169,7 @@ describe("draaiwerk placement", () => {
     ).toBe("De ketting past niet tussen deze wielen.");
   });
 
-  it("legt de wormas bovenop het wormwiel in plaats van van hart tot hart", () => {
+  it("legt de wormas over beide wielen op de gemeenschappelijke raaklijn", () => {
     const wormLevel = levelAt(9);
     const placement = wormLevel.solution.find((part) => part.kind === "worm");
     const wheel = wormLevel.outputs.find((output) => output.id === "target-1");
@@ -177,22 +177,77 @@ describe("draaiwerk placement", () => {
       throw new Error("Level 10 has no worm drive");
     }
 
+    const motorRadius = gearRadius(wormLevel.motor.size);
     const radius = gearRadius(wheel.size);
+    const motor = holeCenter(wormLevel, placement.fromHoleId);
     const target = holeCenter(wormLevel, placement.toHoleId);
-    const shaft = wormShaftGeometry(wormLevel, placement, radius);
-    const offset = Math.hypot(shaft.centre.x - target.x, shaft.centre.y - target.y);
+    const shaft = wormShaftGeometry(wormLevel, placement, motorRadius, radius);
+    if (!shaft) {
+      throw new Error("Level 10 has no worm shaft");
+    }
 
-    // The shaft sits straight above the wheel, not between the two hubs.
-    expect(shaft.centre.x).toBeCloseTo(target.x, 6);
-    expect(shaft.centre.y).toBeLessThan(target.y);
+    // The shaft runs above both equal wheels, not above one of them.
     expect(shaft.angle).toBeCloseTo(0, 6);
-    expect(offset).toBeCloseTo(radius + WORM_SHAFT_CLEARANCE, 6);
+    expect(shaft.centre.y).toBeLessThan(motor.y);
+    expect(shaft.centre.y).toBeLessThan(target.y);
+    expect(Math.abs(shaft.centre.y - motor.y)).toBeCloseTo(motorRadius + WORM_SHAFT_CLEARANCE, 6);
+    expect(Math.abs(shaft.centre.y - target.y)).toBeCloseTo(radius + WORM_SHAFT_CLEARANCE, 6);
+
+    // Both contact points sit on a pitch circle.
+    for (const [contact, center, wheelRadius] of [
+      [shaft.contacts[0], motor, motorRadius],
+      [shaft.contacts[1], target, radius],
+    ] as const) {
+      expect(Math.hypot(contact.x - center.x, contact.y - center.y)).toBeCloseTo(wheelRadius, 6);
+    }
+    expect(shaft.contacts[0].x).toBeCloseTo(motor.x, 6);
+    expect(shaft.contacts[1].x).toBeCloseTo(target.x, 6);
+    expect(shaft.span).toBeCloseTo(Math.hypot(target.x - motor.x, target.y - motor.y), 6);
+
     // The lower edge sinks into the tooth tips (the tip circle is radius + 4)
     // but stays clear of the wheel body.
-    expect(offset - 8).toBeLessThan(radius + 4);
-    expect(offset - 8).toBeGreaterThanOrEqual(radius);
+    expect(shaft.centre.y + 8).toBeLessThanOrEqual(motor.y - motorRadius);
+    expect(shaft.centre.y + 8).toBeGreaterThanOrEqual(motor.y - motorRadius - 4);
+    expect(shaft.fits).toBe(true);
     expect(shaft.length).toBeGreaterThanOrEqual(70);
     expect(shaft.coils).toBeGreaterThanOrEqual(3);
+  });
+
+  it("legt de as schuin over een klein en een groot wiel", () => {
+    const wormLevel = levelAt(10);
+    const placement = wormLevel.solution.find((part) => part.kind === "worm");
+    const wheel = wormLevel.outputs.find((output) => output.id === "target-1");
+    if (!placement || placement.kind !== "worm" || !wheel) {
+      throw new Error("Level 11 has no worm drive");
+    }
+
+    const motorRadius = gearRadius(wormLevel.motor.size);
+    const targetRadius = gearRadius(wheel.size);
+    const motor = holeCenter(wormLevel, placement.fromHoleId);
+    const target = holeCenter(wormLevel, placement.toHoleId);
+    const shaft = wormShaftGeometry(wormLevel, placement, motorRadius, targetRadius);
+    if (!shaft) {
+      throw new Error("Level 11 has no worm shaft");
+    }
+
+    // The common tangent is slanted because the wheels differ in size.
+    expect(Math.abs(shaft.angle)).toBeGreaterThan(0.1);
+    for (const [contact, center, radius] of [
+      [shaft.contacts[0], motor, motorRadius],
+      [shaft.contacts[1], target, targetRadius],
+    ] as const) {
+      expect(Math.hypot(contact.x - center.x, contact.y - center.y)).toBeCloseTo(radius, 6);
+    }
+
+    // Both wheel centres stay on the same side of the shaft, so both wheels
+    // turn the same way.
+    const axis = { x: Math.cos(shaft.angle), y: Math.sin(shaft.angle) };
+    const side = (center: { x: number; y: number }, contact: { x: number; y: number }) =>
+      axis.x * (center.y - contact.y) - axis.y * (center.x - contact.x);
+    expect(Math.sign(side(motor, shaft.contacts[0]))).toBe(
+      Math.sign(side(target, shaft.contacts[1])),
+    );
+    expect(shaft.fits).toBe(true);
   });
 
   it("formats labels, speeds and outputs", () => {
@@ -205,10 +260,7 @@ describe("draaiwerk placement", () => {
     expect(trayShortLabel({ id: "g1", kind: "gear", size: 1 })).toBe("Klein");
     expect(trayShortLabel({ id: "g2", kind: "gear", size: 2 })).toBe("Middel");
     expect(trayShortLabel({ id: "g3", kind: "gear", size: 3 })).toBe("Groot");
-    expect(trayShortLabel({ id: "w1", kind: "worm", ratio: 0.5, direction: 1 })).toBe("Wormas");
-    expect(trayShortLabel({ id: "w2", kind: "worm", ratio: 0.25, direction: 1 })).toBe(
-      "Wormas sterk",
-    );
+    expect(trayShortLabel({ id: "w1", kind: "worm" })).toBe("Wormas");
     expect(trayShortLabel({ id: "b1", kind: "belt" })).toBe("Ketting");
     expect(trayShortLabel({ id: "b2", kind: "belt", crossed: true })).toBe("Gekruist");
     expect(trayShortLabel({ id: "c1", kind: "chain" })).toBe("Ketting");

@@ -246,11 +246,13 @@ describe("draaiwerk", () => {
     fireEvent.click(gearNode(gearKeyAt(level, solution.toHoleId)));
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
-    expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
-      kind: "worm",
-      fromHoleId: solution.fromHoleId,
-      toHoleId: solution.toHoleId,
-    });
+    const placed = useDraaiwerkStore.getState().placements[0];
+    if (!placed || placed.kind !== "worm") {
+      throw new Error("Wormas was not placed");
+    }
+    expect([placed.fromHoleId, placed.toHoleId].sort()).toEqual(
+      [solution.fromHoleId, solution.toHoleId].sort(),
+    );
   });
 
   it("explains blocked holes and overlapping gears", () => {
@@ -478,8 +480,6 @@ describe("draaiwerk: onderdelen verplaatsen", () => {
       kind: "worm",
       fromHoleId: "0,2",
       toHoleId: "4,2",
-      ratio: worm.ratio,
-      direction: worm.direction,
     };
 
     useDraaiwerkStore.setState({
@@ -495,10 +495,10 @@ describe("draaiwerk: onderdelen verplaatsen", () => {
 
   it("haalt een geplaatste riem terug", () => {
     useDraaiwerkStore.setState({ unlocked: 16, finished: false });
-    useDraaiwerkStore.getState().startLevel(13);
-    const belt = levelAt(13).tray.find((candidate) => candidate.kind === "belt");
+    useDraaiwerkStore.getState().startLevel(15);
+    const belt = levelAt(15).tray.find((candidate) => candidate.kind === "belt");
     if (!belt) {
-      throw new Error("Level 14 has no belt");
+      throw new Error("Level 16 has no belt");
     }
 
     useDraaiwerkStore.getState().selectTray(belt.id);
@@ -992,7 +992,10 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("andere kant");
 
-    const meterLevel = levelAt(11);
+    const meterLevel: Level = {
+      ...levelAt(11),
+      outputs: levelAt(11).outputs.map((output) => ({ ...output, size: 2 as const })),
+    };
     expect(
       statusMessage(
         meterLevel,
@@ -1001,8 +1004,6 @@ describe("draaiwerk: statusmeldingen", () => {
             kind: "worm",
             fromHoleId: "0,2",
             toHoleId: "9,2",
-            ratio: 0.5,
-            direction: 1,
           },
         ]),
         null,
@@ -1011,7 +1012,10 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("meter");
 
-    const generatorLevel = levelAt(12);
+    const generatorLevel: Level = {
+      ...levelAt(12),
+      outputs: levelAt(12).outputs.map((output) => ({ ...output, size: 2 as const })),
+    };
     expect(
       statusMessage(
         generatorLevel,
@@ -1020,8 +1024,6 @@ describe("draaiwerk: statusmeldingen", () => {
             kind: "worm",
             fromHoleId: "0,2",
             toHoleId: "9,2",
-            ratio: 0.5,
-            direction: -1,
           },
         ]),
         null,
@@ -1030,7 +1032,10 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("lamp");
 
-    const liftLevel = levelAt(13);
+    const liftLevel: Level = {
+      ...levelAt(13),
+      outputs: levelAt(13).outputs.map((output) => ({ ...output, maxSpeed: 0.4 })),
+    };
     expect(
       statusMessage(
         liftLevel,

@@ -109,6 +109,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.locator('[data-gear-key="motor"]').click();
 
     await expect(page.locator("[data-worm]")).toBeVisible();
+    await expect(page.locator("[data-worm]")).toHaveAttribute("data-worm-span", "112");
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
   });
@@ -174,7 +175,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.evaluate(() => {
       localStorage.setItem(
         "games.draaiwerk.v1",
-        JSON.stringify({ state: { unlocked: 16, current: 13 }, version: 1 }),
+        JSON.stringify({ state: { unlocked: 16, current: 15 }, version: 1 }),
       );
     });
     await page.reload();

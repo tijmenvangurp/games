@@ -698,6 +698,10 @@
     animation-direction: reverse;
   }
 
+  .draaiwerk-worm-ribs[data-spin="off"] {
+    animation: none;
+  }
+
   .draaiwerk-direction {
     display: none;
   }

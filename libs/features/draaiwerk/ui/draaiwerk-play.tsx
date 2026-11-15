@@ -366,8 +366,6 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       ? {
           id: "drag",
           kind: "worm",
-          ratio: placement.ratio,
-          direction: placement.direction,
         }
       : null;
   }, [activePlacedKey, placements, result.gears]);

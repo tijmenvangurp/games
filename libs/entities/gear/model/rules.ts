@@ -1,10 +1,14 @@
 import {
   beltTangentRuns,
+  boardRect,
   connectionLength,
   connectionPath,
   gearRadius,
   gearTeeth,
+  gearTipRadius,
   holePoint,
+  WORM_SHAFT_RADIUS,
+  wormShaft,
   type ConnectionKind,
   type Point,
 } from "./geometry";
@@ -116,25 +120,30 @@ function addEdge(adjacency: Map<string, GearEdge[]>, edge: GearEdge): void {
   }
 }
 
+/** The two gear nodes a placement connects, or null when one end is missing. */
+function placementNodes(
+  byHole: ReadonlyMap<string, GearNode>,
+  fromHoleId: string,
+  toHoleId: string,
+): { from: GearNode; to: GearNode } | null {
+  const from = byHole.get(fromHoleId);
+  const to = byHole.get(toHoleId);
+  if (!from || !to || from.key === to.key) {
+    return null;
+  }
+  return { from, to };
+}
+
 function buildEdges(
   nodes: readonly GearNode[],
   placements: readonly Placement[],
 ): Map<string, GearEdge[]> {
   const adjacency = new Map<string, GearEdge[]>();
-  // A worm shaft couples its two gears; they do not also mesh tooth-on-tooth.
-  const wormPairs = new Set(
-    placements
-      .filter((placement) => placement.kind === "worm")
-      .map((placement) => [placement.fromHoleId, placement.toHoleId].sort().join("|")),
-  );
 
   for (let first = 0; first < nodes.length; first += 1) {
     for (let second = first + 1; second < nodes.length; second += 1) {
       const a = nodes[first] as GearNode;
       const b = nodes[second] as GearNode;
-      if (wormPairs.has([a.holeId, b.holeId].sort().join("|"))) {
-        continue;
-      }
       const contact = gearRadius(a.size) + gearRadius(b.size);
       if (Math.abs(distanceBetween(a.center, b.center) - contact) > MESH_TOLERANCE) {
         continue;
@@ -163,18 +172,26 @@ function buildEdges(
     if (placement.kind !== "worm") {
       continue;
     }
-    const from = byHole.get(placement.fromHoleId);
-    const to = byHole.get(placement.toHoleId);
-    if (!from || !to || from.key === to.key) {
+    const ends = placementNodes(byHole, placement.fromHoleId, placement.toHoleId);
+    if (!ends) {
       continue;
     }
-    // A worm drive is deliberately one-way: the input gear drives the shaft,
-    // the output gear is driven by it. It does not back-drive.
+    const { from, to } = ends;
+    // Both wheels sit on the same shaft, so they turn the same way. The shaft
+    // is a connector, not a fixed reduction: the wheel sizes set the ratio.
+    const ratio = gearRadius(from.size) / gearRadius(to.size);
     addEdge(adjacency, {
       kind: "worm",
       from: from.key,
       to: to.key,
-      speedFactor: placement.direction * placement.ratio,
+      speedFactor: ratio,
+      phase: "free",
+    });
+    addEdge(adjacency, {
+      kind: "worm",
+      from: to.key,
+      to: from.key,
+      speedFactor: 1 / ratio,
       phase: "free",
     });
   }
@@ -187,11 +204,11 @@ function buildEdges(
     ) {
       continue;
     }
-    const from = byHole.get(placement.fromHoleId);
-    const to = byHole.get(placement.toHoleId);
-    if (!from || !to || from.key === to.key) {
+    const ends = placementNodes(byHole, placement.fromHoleId, placement.toHoleId);
+    if (!ends) {
       continue;
     }
+    const { from, to } = ends;
     const direction = placement.kind === "crossed-belt" ? -1 : 1;
     const ratio = gearRadius(from.size) / gearRadius(to.size);
     addEdge(adjacency, {
@@ -415,6 +432,30 @@ function slotsByHole(slots: readonly GearSlot[]): Map<string, GearSlot> {
   return map;
 }
 
+interface PlacementSlots {
+  from: Hole;
+  to: Hole;
+  fromSlot: GearSlot;
+  toSlot: GearSlot;
+}
+
+function placementSlots(
+  holes: ReadonlyMap<string, Hole>,
+  slots: readonly GearSlot[],
+  fromHoleId: string,
+  toHoleId: string,
+): PlacementSlots | null {
+  const from = holes.get(fromHoleId);
+  const to = holes.get(toHoleId);
+  const byHole = slotsByHole(slots);
+  const fromSlot = byHole.get(fromHoleId);
+  const toSlot = byHole.get(toHoleId);
+  if (!from || !to || !fromSlot || !toSlot) {
+    return null;
+  }
+  return { from, to, fromSlot, toSlot };
+}
+
 function linkPair(fromHoleId: string, toHoleId: string): string {
   return [fromHoleId, toHoleId].sort().join("|");
 }
@@ -448,7 +489,22 @@ function canPlaceGear(
   return true;
 }
 
+function distanceToSegment(point: Point, start: Point, end: Point): number {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const lengthSquared = dx * dx + dy * dy;
+  if (lengthSquared === 0) {
+    return distanceBetween(point, start);
+  }
+  const t = Math.min(
+    1,
+    Math.max(0, ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared),
+  );
+  return distanceBetween(point, { x: start.x + t * dx, y: start.y + t * dy });
+}
+
 function canPlaceWorm(
+  level: Level,
   holes: ReadonlyMap<string, Hole>,
   slots: readonly GearSlot[],
   placements: readonly Placement[],
@@ -457,14 +513,47 @@ function canPlaceWorm(
   if (next.fromHoleId === next.toHoleId) {
     return false;
   }
-  if (next.ratio <= 0 || next.ratio > 1) {
+  const ends = placementSlots(holes, slots, next.fromHoleId, next.toHoleId);
+  if (!ends) {
     return false;
   }
-  const from = holes.get(next.fromHoleId);
-  const to = holes.get(next.toHoleId);
-  const byHole = slotsByHole(slots);
-  if (!from || !to || !byHole.has(next.fromHoleId) || !byHole.has(next.toHoleId)) {
+  const { from, to, fromSlot, toSlot } = ends;
+
+  const fromCenter = holePoint(from);
+  const toCenter = holePoint(to);
+  const fromRadius = gearRadius(fromSlot.size);
+  const toRadius = gearRadius(toSlot.size);
+  // Two wheels that already mesh cannot also hang on one worm shaft.
+  if (distanceBetween(fromCenter, toCenter) <= fromRadius + toRadius + CONTACT_TOLERANCE) {
     return false;
+  }
+
+  const shaft = wormShaft(fromCenter, fromRadius, toCenter, toRadius, boardRect(level));
+  if (!shaft || !shaft.fits) {
+    return false;
+  }
+
+  // The shaft may only touch the two wheels it connects. A third wheel under
+  // the same shaft would be driven too, so it is not a two-wheel part.
+  const axisX = Math.cos(shaft.angle);
+  const axisY = Math.sin(shaft.angle);
+  const half = shaft.length / 2;
+  const start = { x: shaft.centre.x - axisX * half, y: shaft.centre.y - axisY * half };
+  const end = { x: shaft.centre.x + axisX * half, y: shaft.centre.y + axisY * half };
+  for (const slot of slots) {
+    if (slot.holeId === next.fromHoleId || slot.holeId === next.toHoleId) {
+      continue;
+    }
+    const hole = holes.get(slot.holeId);
+    if (!hole) {
+      continue;
+    }
+    if (
+      distanceToSegment(holePoint(hole), start, end) <
+      gearTipRadius(slot.size) + WORM_SHAFT_RADIUS - CONTACT_TOLERANCE
+    ) {
+      return false;
+    }
   }
 
   const pair = linkPair(next.fromHoleId, next.toHoleId);
@@ -498,12 +587,8 @@ function canPlaceLink(
   if (next.fromHoleId === next.toHoleId) {
     return false;
   }
-  const from = holes.get(next.fromHoleId);
-  const to = holes.get(next.toHoleId);
-  const byHole = slotsByHole(slots);
-  const fromSlot = byHole.get(next.fromHoleId);
-  const toSlot = byHole.get(next.toHoleId);
-  if (!from || !to || !fromSlot || !toSlot) {
+  const ends = placementSlots(holes, slots, next.fromHoleId, next.toHoleId);
+  if (!ends) {
     return false;
   }
 
@@ -521,8 +606,8 @@ function canPlaceLink(
     }
   }
 
-  const distance = distanceBetween(holePoint(from), holePoint(to));
-  return distance > Math.abs(gearRadius(fromSlot.size) - gearRadius(toSlot.size));
+  const distance = distanceBetween(holePoint(ends.from), holePoint(ends.to));
+  return distance > Math.abs(gearRadius(ends.fromSlot.size) - gearRadius(ends.toSlot.size));
 }
 
 export function canPlace(level: Level, placements: readonly Placement[], next: Placement): boolean {
@@ -535,7 +620,7 @@ export function canPlace(level: Level, placements: readonly Placement[], next: P
     return canPlaceGear(holes, blocked, occupied, slots, next);
   }
   if (next.kind === "worm") {
-    return canPlaceWorm(holes, slots, placements, next);
+    return canPlaceWorm(level, holes, slots, placements, next);
   }
   if (next.kind === "loose-belt") {
     return canPlaceLooseBelt(slots, placements, next);
@@ -548,11 +633,7 @@ export function trayItemMatches(item: TrayItem, placement: Placement): boolean {
     case "gear":
       return item.kind === "gear" && item.size === placement.size;
     case "worm":
-      return (
-        item.kind === "worm" &&
-        item.ratio === placement.ratio &&
-        item.direction === placement.direction
-      );
+      return item.kind === "worm";
     case "loose-belt":
       return (
         (item.kind === "belt" && item.crossed !== true && placement.link === "open-belt") ||
@@ -745,11 +826,19 @@ function validateWormGeometry(
       errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} leaves the board`);
       continue;
     }
-    if (!finalSlots.has(placement.fromHoleId) || !finalSlots.has(placement.toHoleId)) {
+    const fromSlot = finalSlots.get(placement.fromHoleId);
+    const toSlot = finalSlots.get(placement.toHoleId);
+    if (!fromSlot || !toSlot) {
       errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} must lie on two gears`);
+      continue;
     }
-    if (placement.ratio <= 0 || placement.ratio > 1) {
-      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} needs a ratio`);
+    if (
+      distanceBetween(holePoint(fromHole), holePoint(toHole)) <=
+      gearRadius(fromSlot.size) + gearRadius(toSlot.size) + CONTACT_TOLERANCE
+    ) {
+      errors.push(
+        `Wormas ${placement.fromHoleId} -> ${placement.toHoleId} touches two meshing gears`,
+      );
     }
   }
 }
@@ -832,7 +921,7 @@ export function trayLabel(item: TrayItem): string {
       return `${label.charAt(0).toUpperCase()}${label.slice(1)} tandwiel`;
     }
     case "worm":
-      return item.ratio <= 0.25 ? "Wormas, grote vertraging" : "Wormas";
+      return "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruiste ketting" : "Ketting";
     case "chain":

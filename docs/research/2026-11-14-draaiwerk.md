@@ -560,6 +560,33 @@ De deterministische graaf, de involute-tandwielen, de lokale opslag en de
 CSP blijven ongewijzigd. Zie het addendum in
 [ADR 0031](../adr/0031-draaiwerk.md).
 
+## Update 2026-11-15: wormas als verbinding tussen twee wielen
+
+Na het spelen van level 10 bleek de wormas nog steeds op één wiel te liggen. Het
+Het gewenste beeld is één schroefas die over twee even grote tandwielen ligt en ze
+samen verbindt. Daarvoor is de mechanica opnieuw bekeken:
+
+- **Assen.** Een worm en een wormwiel hebben assen die loodrecht op elkaar
+  staan. In het bovenaanzicht van het spel staan de wielassen loodrecht op het
+  bord en ligt de wormas in het bordvlak. Een rechte wormas kan daarom meerdere
+  wielen langs zijn lengte raken.
+- **Verhouding.** De twee wielen op dezelfde worm draaien dezelfde kant op. Hun
+  snelheidsverhouding is de verhouding van hun tandenaantallen; de spoed van de
+  schroef valt weg. Een small wiel naast een groot wiel geeft dus 0,5×, twee
+  even grote wielen 1×.
+- **Plaatsing.** De as ligt op de gemeenschappelijke buitenraaklijn van de twee
+  steekcirkels. Bij even grote wielen is dat horizontaal boven beide; bij
+  ongelijke wielen schuin. De as mag niet over een derde tandwiel lopen en moet
+  met lagers binnen het bord passen.
+- **Bronnen.** [Worm drive](https://en.wikipedia.org/wiki/Worm_drive),
+  [RoyMech](https://www.roymech.co.uk/Useful_Tables/Drive/Worm_Gears.html) en
+  een bestaande [dubbele-uitgang-wormkast](https://tramec.it/en/product/double-output-worm-gearboxes-series-vm)
+  met één wormas en twee wormwielen.
+
+De vaste 0,5×/0,25×-ratio's en het eenrichtingsverkeer zijn daarmee vervallen.
+Level 10 verbindt twee even grote wielen; level 11 gebruikt een groot wormwiel
+voor de vertraging. Zie het addendum in [ADR 0031](../adr/0031-draaiwerk.md).
+
 ## Bronnen
 
 - [Sprocketry — Game Edu Hub](https://gameeduhub.com/sprocketry.html)

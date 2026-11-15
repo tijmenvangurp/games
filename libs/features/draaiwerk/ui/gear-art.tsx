@@ -486,31 +486,44 @@ export function ChainPreview({ path }: { path: string }) {
 }
 
 /**
- * The worm shaft lies across the worm wheel instead of spanning both hubs: its
- * body rests on the rim at the side that faces the input gear, so the coils
- * grip the teeth like a real worm drive.
+ * The worm shaft lies on the common tangent of both wheels. Its two contact
+ * patches show where the threads meet the pitch circles; the body is drawn
+ * over the wheels because it sits on top of them.
  */
 export function WormBar({
   level,
   placement,
+  fromRadius = gearRadius(1),
   toRadius = gearRadius(1),
+  active = true,
+  direction = 1,
 }: {
   level: Level;
   placement: Extract<Placement, { kind: "worm" }>;
+  fromRadius?: number;
   toRadius?: number;
+  active?: boolean;
+  direction?: 1 | -1;
 }) {
-  const shaft = wormShaftGeometry(level, placement, toRadius);
-  const { centre, angle, length, coils, pitch } = shaft;
+  const shaft = wormShaftGeometry(level, placement, fromRadius, toRadius);
+  if (!shaft) {
+    return null;
+  }
+  const { centre, angle, length, coils, pitch, contacts } = shaft;
   const clipId = `worm-clip-${placement.fromHoleId}-${placement.toHoleId}`.replace(
     /[^a-zA-Z0-9_-]/g,
     "-",
   );
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+  const localX = (point: { x: number; y: number }): number =>
+    (point.x - centre.x) * cos + (point.y - centre.y) * sin;
 
   return (
     <g
-      data-direction={placement.direction}
+      data-direction={direction}
       data-worm={`${placement.fromHoleId}:${placement.toHoleId}`}
-      data-worm-ratio={placement.ratio}
+      data-worm-span={Math.round(shaft.span * 10) / 10}
       data-worm-pitch={Math.round(pitch * 10) / 10}
     >
       <g transform={`translate(${centre.x} ${centre.y}) rotate(${angle})`}>
@@ -519,9 +532,41 @@ export function WormBar({
             <rect height={16} rx={8} width={Math.max(0, length - 2)} x={-length / 2 + 1} y={-8} />
           </clipPath>
         </defs>
-        {/* Axle stubs run into the bearings at both ends. */}
-        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={-length / 2 - 5} y={-1.5} />
-        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={length / 2 - 5} y={-1.5} />
+        {/* Contact patches sit under the body, so only their lower edge shows. */}
+        {contacts.map((contact) => (
+          <ellipse
+            cx={localX(contact)}
+            cy={8.4}
+            fill="#3c434c"
+            key={`contact-${Math.round(localX(contact) * 10)}`}
+            opacity={0.32}
+            rx={10}
+            ry={2.6}
+          />
+        ))}
+        {/* Axle stubs and bearing blocks run into the frame at both ends. */}
+        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={-length / 2 - 6} y={-1.5} />
+        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={length / 2 - 4} y={-1.5} />
+        <rect
+          fill="#b8c0c8"
+          height={19}
+          rx={2}
+          stroke="#646d78"
+          strokeWidth={1}
+          width={6}
+          x={-length / 2 - 7}
+          y={-9.5}
+        />
+        <rect
+          fill="#b8c0c8"
+          height={19}
+          rx={2}
+          stroke="#646d78"
+          strokeWidth={1}
+          width={6}
+          x={length / 2 + 1}
+          y={-9.5}
+        />
         <rect
           fill="#8f98a2"
           height={16}
@@ -544,6 +589,7 @@ export function WormBar({
         <g
           className="draaiwerk-worm-ribs"
           clipPath={`url(#${clipId})`}
+          data-spin={active ? "on" : "off"}
           style={{ "--worm-pitch": `${Math.round(pitch * 10) / 10}px` } as CSSProperties}
         >
           {Array.from({ length: coils + 1 }, (_, index) => {
@@ -569,9 +615,9 @@ export function WormBar({
             );
           })}
         </g>
-        {/* The lower edge presses into the teeth, so the rim disappears there. */}
+        {/* The wheel side of the shaft presses into the teeth. */}
         <path
-          d={`M ${-length / 2 + 2} -9 Q 0 -10.4 ${length / 2 - 2} -9`}
+          d={`M ${-length / 2 + 2} 9 Q 0 10.4 ${length / 2 - 2} 9`}
           fill="none"
           opacity={0.45}
           stroke="#3c434c"
