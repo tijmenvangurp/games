@@ -151,3 +151,111 @@ describe("Wie was het? in de catalogus en de router", () => {
     expect((undo as HTMLButtonElement).disabled).toBe(true);
   });
 });
+
+/** De drie verdachten van de instapzaak op hun oplossingsvakje. */
+function placeIntroSolution(): void {
+  fireEvent.click(screen.getByRole("button", { name: /^Anna\. Anna stond in de keuken/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^Bram\. Bram stond op een stoel/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 2, kolom 1/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^Cato\. Cato stond in de badkamer/ }));
+  fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 3, kolom 4/ }));
+}
+
+async function renderSolvedIntro() {
+  renderApp("/mysterie");
+  await screen.findByRole("heading", { name: "Wie is wie?" });
+  placeIntroSolution();
+  fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
+}
+
+describe("Wie was het? controleren en de afloop", () => {
+  it("zet de controle pas aan als iedereen staat", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+    const check = screen.getByRole("button", { name: "Controleer" });
+    expect((check as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Anna\. Anna stond in de keuken/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+    expect((check as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Bram\. Bram stond op een stoel/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 2, kolom 1/ }));
+    expect((check as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Cato\. Cato stond in de badkamer/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 3, kolom 4/ }));
+    expect((check as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it("geeft neutrale feedback bij een fout en houdt het bord staan", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+    fireEvent.click(screen.getByRole("button", { name: /^Anna\. Anna stond in de keuken/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^Bram\. Bram stond op een stoel/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 2, kolom 1/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^Cato\. Cato stond in de badkamer/ }));
+    fireEvent.click(screen.getByRole("button", { name: /rij 3, kolom 1/ }));
+
+    fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
+
+    const status = screen.getByRole("status");
+    expect(status.textContent).toContain("Nog niet helemaal");
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.queryByRole("region", { name: "De dader" })).toBeNull();
+    expect(useMurdokuStore.getState().play?.wrongCheck).toBe(true);
+    expect(useMurdokuStore.getState().play?.placements.get("C")).toBe(8);
+    expect(screen.getByRole("button", { name: /^Cato, rij 3, kolom 1/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /rij 3, kolom 4/ }));
+
+    expect(screen.queryByText(/Nog niet helemaal/)).toBeNull();
+    expect(useMurdokuStore.getState().play?.wrongCheck).toBe(false);
+
+    fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
+
+    expect(await screen.findByRole("dialog")).toBeTruthy();
+  });
+
+  it("onthult de dader en de kamer van het slachtoffer", async () => {
+    await renderSolvedIntro();
+
+    const dialog = await screen.findByRole("dialog");
+    expect(within(dialog).getByRole("heading", { name: "Opgelost!" })).toBeTruthy();
+    expect(within(dialog).getByText("Cato was als enige bij Vera in de badkamer.")).toBeTruthy();
+
+    const reveal = screen.getByRole("region", { name: "De dader" });
+    expect(within(reveal).getByText("Cato was als enige bij Vera in de badkamer.")).toBeTruthy();
+
+    // Het slachtoffer staat nu op het bord en de dader is de enige in haar kamer.
+    expect(screen.getByRole("button", { name: /^Vera, rij 4, kolom 3/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^Cato, rij 3, kolom 4/ })).toBeTruthy();
+    expect(useMurdokuStore.getState().play?.phase).toBe("solved");
+    expect((screen.getByRole("button", { name: "Controleer" }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
+
+    // De viering kan weg om de omlijnde kamer rustig te bekijken.
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk de plattegrond" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(screen.getByRole("region", { name: "De dader" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Nog een keer" })).toBeTruthy();
+    expect(useMurdokuStore.getState().play?.phase).toBe("solved");
+  });
+
+  it("begint na de viering een nieuwe poging", async () => {
+    await renderSolvedIntro();
+
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Nog een keer" }));
+
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(useMurdokuStore.getState().play?.phase).toBe("playing");
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "De dader" })).toBeNull();
+  });
+});
