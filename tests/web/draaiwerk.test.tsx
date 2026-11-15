@@ -725,12 +725,12 @@ function placeBeltBetweenGears(): void {
 }
 
 describe("draaiwerk: riem en ketting", () => {
-  it("tekent een riem als twee banden met een eigen snelheid en richting", () => {
+  it("tekent een riem als een gesloten band met een eigen snelheid en richting", () => {
     solveBeltLevel();
     renderGame();
 
     const connection = drive(levelAt(2), useDraaiwerkStore.getState().placements).connections[0];
-    if (!connection?.runs) {
+    if (!connection) {
       throw new Error("Level 3 has no belt connection");
     }
     expect(connection.surfaceSpeed).toBeGreaterThan(0);
@@ -739,27 +739,18 @@ describe("draaiwerk: riem en ketting", () => {
     expect(band?.getAttribute("data-active")).toBe("true");
     expect(band?.getAttribute("data-connection-key")).toBe(connection.key);
 
-    const ribbon = band?.querySelector("[data-speed]");
+    const ribbon = band?.querySelector('[data-belt="true"]');
     expect(Number(ribbon?.getAttribute("data-speed"))).toBeCloseTo(connection.surfaceSpeed, 6);
     expect(ribbon?.getAttribute("data-moving")).toBe("true");
-    expect(ribbon?.getAttribute("data-reverse")).toBe("false");
     expect(ribbon?.getAttribute("data-preview")).toBe("false");
 
-    const runs = band?.querySelectorAll("[data-belt-run]") ?? [];
-    expect(runs).toHaveLength(2);
-    for (const run of runs) {
-      // Donkere rand, lichte band en de bewegende groef.
-      expect(run.querySelectorAll("path")).toHaveLength(3);
-    }
+    // Donkere rand, lederen band en de bewegende groef over hetzelfde pad.
+    expect(ribbon?.querySelectorAll("path")).toHaveLength(3);
 
     const tread = band?.querySelectorAll(".draaiwerk-belt-tread") ?? [];
-    expect(tread).toHaveLength(2);
-    // De bovenste band loopt van A naar B, de onderste draagt de band terug.
-    expect([...tread].map((node) => node.getAttribute("data-direction")).sort()).toEqual([
-      "forward",
-      "reverse",
-    ]);
-    expect([...tread].every((node) => node.getAttribute("data-moving") === "true")).toBe(true);
+    expect(tread).toHaveLength(1);
+    expect(tread[0]?.getAttribute("data-moving")).toBe("true");
+    expect(tread[0]?.getAttribute("data-reverse")).toBe("false");
     expect(band?.querySelector("[data-chain-links]")).toBeNull();
   });
 
@@ -770,7 +761,7 @@ describe("draaiwerk: riem en ketting", () => {
 
     const before = useDraaiwerkStore.getState();
     expect(before.placements).toHaveLength(4);
-    expect(document.querySelectorAll("[data-belt-run]")).toHaveLength(2);
+    expect(document.querySelectorAll('[data-belt="true"]')).toHaveLength(1);
 
     const toggle = document.querySelector("[data-belt-toggle]");
     expect(toggle?.getAttribute("aria-label")).toBe("Riem, open; tik om te kruisen");
@@ -790,7 +781,7 @@ describe("draaiwerk: riem en ketting", () => {
     expect(crossed.usedTrayIds).toEqual(before.usedTrayIds);
     expect(crossed.status).toBe("playing");
     expect(crossed.feedback).toBe("Riem gekruist.");
-    expect(document.querySelectorAll("[data-belt-run]")).toHaveLength(2);
+    expect(document.querySelectorAll('[data-belt="true"]')).toHaveLength(1);
 
     fireEvent.click(document.querySelector("[data-belt-toggle]") as Element);
 

@@ -163,7 +163,7 @@ describe("connection length", () => {
 
     // Gelijke poelies: twee halve cirkels op de velg plus twee rechte banden.
     expect(connectionLength("open-belt", from, radius, to, radius)).toBeCloseTo(
-      2 * Math.PI * (radius + 6) + 2 * 140,
+      2 * Math.PI * (radius + 4) + 2 * 140,
       6,
     );
     expect(connectionLength("chain", from, radius, to, radius)).toBeCloseTo(
