@@ -21,6 +21,8 @@ interface MurdokuText {
   objectName(type: string): string;
   /** Een richting in gewone taal ("links", "boven"). */
   direction(direction: string): string;
+  /** Een vaste bordregel, bijvoorbeeld de regel over het slachtoffer. */
+  rule(name: "aloneWithVictim" | "oneEachLine"): string;
 }
 
 export function createMurdokuText(puzzle: Puzzle): MurdokuText {
@@ -37,5 +39,6 @@ export function createMurdokuText(puzzle: Puzzle): MurdokuText {
     roomName: (nameKey) => (renderer.lookup(nameKey) ?? nameKey).replace(/^(de|het) /, ""),
     objectName: (type) => renderer.resolveParam("objName", type),
     direction: (direction) => renderer.resolveParam("direction", direction),
+    rule: (name) => renderer.lookup(`rule.${name}`) ?? name,
   };
 }
