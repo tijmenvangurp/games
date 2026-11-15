@@ -19,6 +19,8 @@ interface MurdokuStore {
   play: MurdokuPlayState | null;
   /** Eerdere bordtoestanden, voor ongedaan maken. */
   history: MurdokuPlayState[];
+  /** Zaken die in deze sessie zijn opgelost; de zaakkeuze toont ze. */
+  solvedCaseIds: ReadonlySet<string>;
   start: (puzzle: Puzzle) => void;
   selectPerson: (person: PersonId) => void;
   setMode: (mode: MurdokuMode) => void;
@@ -36,6 +38,7 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
   puzzle: null,
   play: null,
   history: [],
+  solvedCaseIds: new Set(),
 
   start: (puzzle) =>
     set({
@@ -65,12 +68,17 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
       return { play: previous, history: state.history.slice(0, -1) };
     }),
 
-  check: (solution) => {
-    const { puzzle, play } = get();
-    if (!puzzle || !play) return;
-    const next = checkMurdokuPlay(puzzle, play, solution);
-    if (next === play) return;
-    // Controleren verandert hooguit de afloop, nooit de bordgeschiedenis.
-    set({ play: next });
-  },
+  check: (solution) =>
+    set((state) => {
+      const { puzzle, play } = state;
+      if (!puzzle || !play) return {};
+      const next = checkMurdokuPlay(puzzle, play, solution);
+      if (next === play) return {};
+      // Controleren verandert hooguit de afloop, nooit de bordgeschiedenis.
+      const solvedCaseIds =
+        next.phase === "solved"
+          ? new Set([...state.solvedCaseIds, puzzle.id])
+          : state.solvedCaseIds;
+      return { play: next, solvedCaseIds };
+    }),
 }));
