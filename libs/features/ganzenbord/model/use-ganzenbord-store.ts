@@ -10,7 +10,7 @@ import {
   type TurnEvent,
 } from "@entities/ganzenbord";
 import { playHaptic, playSound } from "@shared/lib";
-import { buildTurnAnimation, type TurnAnimation } from "./animation";
+import { buildTurnAnimation, specialEvent, type TurnAnimation } from "./animation";
 import {
   clampPlayerCount,
   playersFromSettings,
@@ -95,7 +95,7 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
 
   setPlayerName: (id, name) => {
     const state = get();
-    const settings = withPlayerName(state.settings, id, name);
+    const settings = withPlayerName(state.settings, id, state.settings.controllers[id], name);
     set({ settings });
     persist(settings, state.wins);
   },
@@ -168,6 +168,12 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
     const next = animation.index + 1;
     if (next < animation.steps.length) {
       set({ animation: { ...animation, index: next } });
+      if (specialEvent(animation.steps[next])) {
+        playSound("surprise");
+        playHaptic("almost");
+      } else {
+        playSound("tap");
+      }
       return;
     }
 
@@ -186,12 +192,6 @@ export const useGanzenbordStore = create<GanzenbordStore>((set, get) => ({
       persist(get().settings, wins);
       return;
     }
-
-    const noteworthy = animation.result.events.some(
-      (event) => event.kind === "goose" || event.kind === "bridge" || event.kind === "maze",
-    );
-    playSound(noteworthy ? "select" : "tap");
-    playHaptic("tap");
 
     if (animation.result.game.status === "draw") {
       persist(get().settings, wins);

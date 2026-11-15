@@ -8,7 +8,13 @@ import {
   type PlayerId,
 } from "@entities/ganzenbord";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
-import { DEFAULT_SETTINGS, isController, isPlayerCount, type GanzenbordSettings } from "./settings";
+import {
+  DEFAULT_SETTINGS,
+  isController,
+  isPlayerCount,
+  type GanzenbordSettings,
+  type PlayerName,
+} from "./settings";
 
 const STORAGE_KEY = "games.ganzenbord.v1";
 
@@ -46,18 +52,37 @@ function toControllers(value: unknown): Record<PlayerId, Controller> | undefined
   return controllers;
 }
 
-function toNames(value: unknown): Record<PlayerId, string> | undefined {
+function toName(value: unknown): PlayerName | undefined {
+  // Oude opslag bewaarde één naam per speler; die wordt de naam voor de mens.
+  if (typeof value === "string") {
+    return { human: value.slice(0, MAX_PLAYER_NAME_LENGTH), computer: "" };
+  }
   if (!isRecord(value)) {
     return undefined;
   }
 
-  const names = {} as Record<PlayerId, string>;
+  const { human, computer } = value;
+  if (typeof human !== "string" || typeof computer !== "string") {
+    return undefined;
+  }
+  return {
+    human: human.slice(0, MAX_PLAYER_NAME_LENGTH),
+    computer: computer.slice(0, MAX_PLAYER_NAME_LENGTH),
+  };
+}
+
+function toNames(value: unknown): Record<PlayerId, PlayerName> | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const names = {} as Record<PlayerId, PlayerName>;
   for (const id of PLAYER_IDS) {
-    const name = value[id];
-    if (typeof name !== "string") {
+    const name = toName(value[id]);
+    if (!name) {
       return undefined;
     }
-    names[id] = name.slice(0, MAX_PLAYER_NAME_LENGTH);
+    names[id] = name;
   }
   return names;
 }

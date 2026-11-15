@@ -44,6 +44,7 @@ describe("ganzenbord: spelersnaam en kleur", () => {
     const settings = withPlayerName(
       withPlayerColor(DEFAULT_SETTINGS, "one", "pink"),
       "one",
+      "human",
       "Saar",
     );
 
@@ -51,6 +52,22 @@ describe("ganzenbord: spelersnaam en kleur", () => {
       { id: "one", controller: "human", color: "pink", name: "Saar" },
       { id: "two", controller: "human", color: "red", name: "" },
     ]);
+  });
+
+  it("houdt per controller een eigen naam bij", () => {
+    const human = withPlayerName(DEFAULT_SETTINGS, "two", "human", "Saar");
+    const computer = withPlayerName(human, "two", "computer", "Rekenhulp");
+
+    expect(playersFromSettings(computer)[1]).toMatchObject({ controller: "human", name: "Saar" });
+
+    const switched = {
+      ...computer,
+      controllers: { ...computer.controllers, two: "computer" as const },
+    };
+    expect(playersFromSettings(switched)[1]).toMatchObject({
+      controller: "computer",
+      name: "Rekenhulp",
+    });
   });
 
   it("laat spelers van kleur ruilen zodat elke pion uniek blijft", () => {

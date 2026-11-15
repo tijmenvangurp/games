@@ -15,13 +15,18 @@ const PLAYER_COUNTS = [2, 3, 4] as const;
 
 export type PlayerCount = (typeof PLAYER_COUNTS)[number];
 
-export type PlayerNames = Readonly<Record<PlayerId, string>>;
+export type PlayerName = Readonly<Record<Controller, string>>;
+export type PlayerNames = Readonly<Record<PlayerId, PlayerName>>;
 export type PlayerColors = Readonly<Record<PlayerId, PlayerColor>>;
 
 export interface GanzenbordSettings {
   readonly playerCount: PlayerCount;
   readonly controllers: Readonly<Record<PlayerId, Controller>>;
-  /** Een lege naam betekent: gebruik de standaardnaam van de spelersplek. */
+  /**
+   * Een lege naam betekent: gebruik de standaardnaam van de spelersplek.
+   * Mens en computer hebben elk hun eigen naam, zodat wisselen van controller
+   * ook echt een andere naam laat zien.
+   */
   readonly names: PlayerNames;
   readonly colors: PlayerColors;
 }
@@ -33,11 +38,11 @@ const ALL_HUMAN: Record<PlayerId, Controller> = {
   four: "human",
 };
 
-const NO_NAMES: Record<PlayerId, string> = {
-  one: "",
-  two: "",
-  three: "",
-  four: "",
+const NO_NAMES: Record<PlayerId, PlayerName> = {
+  one: { human: "", computer: "" },
+  two: { human: "", computer: "" },
+  three: { human: "", computer: "" },
+  four: { human: "", computer: "" },
 };
 
 export const DEFAULT_SETTINGS: GanzenbordSettings = {
@@ -78,11 +83,15 @@ export function clampPlayerCount(value: number): PlayerCount {
 export function withPlayerName(
   settings: GanzenbordSettings,
   id: PlayerId,
+  controller: Controller,
   name: string,
 ): GanzenbordSettings {
   return {
     ...settings,
-    names: { ...settings.names, [id]: name.slice(0, MAX_PLAYER_NAME_LENGTH) },
+    names: {
+      ...settings.names,
+      [id]: { ...settings.names[id], [controller]: name.slice(0, MAX_PLAYER_NAME_LENGTH) },
+    },
   };
 }
 
@@ -112,10 +121,13 @@ export function withPlayerColor(
 }
 
 export function playersFromSettings(settings: GanzenbordSettings): PlayerSetup[] {
-  return PLAYER_IDS.slice(0, settings.playerCount).map((id) => ({
-    id,
-    controller: settings.controllers[id],
-    color: settings.colors[id],
-    name: settings.names[id],
-  }));
+  return PLAYER_IDS.slice(0, settings.playerCount).map((id) => {
+    const controller = settings.controllers[id];
+    return {
+      id,
+      controller,
+      color: settings.colors[id],
+      name: settings.names[id][controller],
+    };
+  });
 }

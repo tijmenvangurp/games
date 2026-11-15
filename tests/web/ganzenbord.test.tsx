@@ -153,8 +153,50 @@ describe("ganzenbord", () => {
     expect(game?.players[1]?.name).toBeUndefined();
 
     const stored = loadGanzenbordState().settings;
-    expect(stored.names.one).toBe("Saar");
+    expect(stored.names.one.human).toBe("Saar");
     expect(stored.colors.one).toBe("violet");
+  });
+
+  it("geeft de computer zijn eigen naam als je wisselt", async () => {
+    await openSetup();
+
+    fireEvent.change(screen.getByLabelText("Naam van speler 1"), { target: { value: "Saar" } });
+    fireEvent.click(screen.getByRole("button", { name: "Speler 1: computer" }));
+
+    const input = screen.getByLabelText("Naam van speler 1") as HTMLInputElement;
+    expect(input.value).toBe("");
+    expect(input.placeholder).toBe("Computer 1");
+
+    fireEvent.change(input, { target: { value: "Rekenhulp" } });
+    startGame();
+
+    expect(useGanzenbordStore.getState().game?.players[0]).toMatchObject({
+      controller: "computer",
+      name: "Rekenhulp",
+    });
+    expect(loadGanzenbordState().settings.names.one).toEqual({
+      human: "Saar",
+      computer: "Rekenhulp",
+    });
+  });
+
+  it("leest een oude opgeslagen naam als naam voor de mens", () => {
+    localStorage.setItem(
+      "games.ganzenbord.v1",
+      JSON.stringify({
+        settings: {
+          playerCount: 2,
+          controllers: { one: "human", two: "computer", three: "human", four: "human" },
+          names: { one: "Saar", two: "", three: "", four: "" },
+        },
+        wins: { one: 0, two: 0, three: 0, four: 0 },
+      }),
+    );
+
+    const stored = loadGanzenbordState().settings;
+    expect(stored.names.one).toEqual({ human: "Saar", computer: "" });
+    expect(stored.names.two).toEqual({ human: "", computer: "" });
+    expect(stored.colors.one).toBe("indigo");
   });
 
   it("bewaart de instellingen", async () => {

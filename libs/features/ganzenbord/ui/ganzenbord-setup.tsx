@@ -66,7 +66,7 @@ export function GanzenbordSetup({
                   placeholder={playerName({ id, controller })}
                   spellCheck={false}
                   type="text"
-                  value={settings.names[id]}
+                  value={settings.names[id][controller]}
                   onChange={(event) => onNameChange(id, event.target.value)}
                 />
                 <div className="flex shrink-0 gap-0.5 rounded-lg border border-border p-0.5">
