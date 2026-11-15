@@ -61,7 +61,10 @@ interface DraaiwerkBoardProps {
 export interface BeltGhost {
   anchorKey: string;
   link: LinkPlacementKind;
+  /** The real pointer position, used for snapping. */
   point: { x: number; y: number };
+  /** The lifted position used for drawing, so the finger does not cover it. */
+  drawPoint: { x: number; y: number };
   /** The drop animation is in progress: keep the point as it is, do not snap. */
   locked?: boolean;
 }
@@ -596,7 +599,8 @@ export function DraaiwerkBoard({
     );
     const anchorRadius = gearRadius(anchor.size);
     const snapped = target?.snapped ? target.pose : null;
-    const virtual = snapped && !ghost.locked ? snapped.center : ghost.point;
+    const drawPoint = ghost.locked ? ghost.point : ghost.drawPoint;
+    const virtual = snapped && !ghost.locked ? snapped.center : drawPoint;
     const virtualRadius = gearRadius(target?.pose.size ?? anchor.size);
     const span = Math.hypot(virtual.x - anchor.center.x, virtual.y - anchor.center.y);
     const reachable = span > anchorRadius + virtualRadius + 1;

@@ -40,6 +40,9 @@ function trayIdFromActive(id: string | number): string | null {
   return value.startsWith("tray:") ? value.slice("tray:".length) : null;
 }
 
+/** Lift the drag preview above the finger, in screen pixels. */
+const DRAG_LIFT_PX = 64;
+
 /** The viewport point of a pointer or touch event, without trusting its type. */
 function clientPointFromEvent(event: Event): { x: number; y: number } | null {
   const pointer = event as Event & { clientX?: number; clientY?: number };
@@ -119,10 +122,16 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       return;
     }
     const point = boardPointFromClient(boardRef.current, level, origin.x, origin.y);
-    if (!point) {
+    const drawPoint = boardPointFromClient(
+      boardRef.current,
+      level,
+      origin.x,
+      origin.y - DRAG_LIFT_PX,
+    );
+    if (!point || !drawPoint) {
       return;
     }
-    const drag: BeltGhost = { anchorKey: anchor.key, link: placement.link, point };
+    const drag: BeltGhost = { anchorKey: anchor.key, link: placement.link, point, drawPoint };
     ghostOrigin.current = origin;
     ghostRef.current = drag;
     setGhost(drag);
@@ -161,10 +170,16 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       origin.x + event.delta.x,
       origin.y + event.delta.y,
     );
+    const drawPoint = boardPointFromClient(
+      boardRef.current,
+      level,
+      origin.x + event.delta.x,
+      origin.y + event.delta.y - DRAG_LIFT_PX,
+    );
     if (!point) {
       return;
     }
-    const next: BeltGhost = { ...drag, point };
+    const next: BeltGhost = { ...drag, point, drawPoint: drawPoint ?? point };
     ghostRef.current = next;
     setGhost(next);
   };
