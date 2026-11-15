@@ -682,15 +682,15 @@
     pointer-events: none;
   }
 
-  .draaiwerk-belt-tread {
-    stroke-dasharray: 5 11;
+  .draaiwerk-belt {
+    filter: drop-shadow(0 1px 1px rgb(43 37 28 / 0.18));
   }
 
   .draaiwerk-belt-tread[data-moving="true"] {
     animation: draaiwerk-tread var(--belt-duration, 1s) linear infinite;
   }
 
-  .draaiwerk-belt-tread[data-moving="true"][data-direction="reverse"] {
+  .draaiwerk-belt-tread[data-moving="true"][data-reverse="true"] {
     animation-direction: reverse;
   }
 

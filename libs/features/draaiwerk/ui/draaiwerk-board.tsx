@@ -1,7 +1,6 @@
 import { useMemo, useRef, useState, type MouseEvent, type Ref } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
-  beltTangentRuns,
   boardViewBox,
   connectionPath,
   gearRadius,
@@ -23,6 +22,9 @@ import {
   type LinkPlacementKind,
 } from "../model/placement";
 import {
+  BELT_BODY,
+  BELT_EDGE,
+  BELT_HIGHLIGHT,
   BeltPreview,
   BoardGear,
   ChainPreview,
@@ -307,11 +309,6 @@ function PlacedConnectionHandle({
   );
 }
 
-/** A closed circle path, so a loose chain can use the same static link stroke. */
-function ringPath(cx: number, cy: number, radius: number): string {
-  return `M ${cx + radius} ${cy} A ${radius} ${radius} 0 1 0 ${cx - radius} ${cy} A ${radius} ${radius} 0 1 0 ${cx + radius} ${cy}`;
-}
-
 function LooseBeltBand({
   pose,
   link,
@@ -323,14 +320,20 @@ function LooseBeltBand({
   enabled: boolean;
   onLoose: (holeId: string) => void;
 }) {
-  const radius = gearRadius(pose.size) + (link === "chain" ? 0 : 6);
-  const start = {
-    x: pose.center.x + radius * 0.26,
-    y: pose.center.y + radius * 0.97,
+  const radius = gearRadius(pose.size) + (link === "chain" ? 0 : 4);
+  const startAngle = -Math.PI / 6;
+  const endAngle = Math.PI / 3;
+  const arcStart = {
+    x: pose.center.x + Math.cos(startAngle) * radius,
+    y: pose.center.y + Math.sin(startAngle) * radius,
+  };
+  const arcEnd = {
+    x: pose.center.x + Math.cos(endAngle) * radius,
+    y: pose.center.y + Math.sin(endAngle) * radius,
   };
   const tail = {
-    x: pose.center.x + radius * 0.42,
-    y: pose.center.y + radius + 20,
+    x: arcEnd.x + 8,
+    y: arcEnd.y + 32,
   };
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: `placed:loose:${pose.holeId}`,
@@ -338,52 +341,25 @@ function LooseBeltBand({
   });
   const pressPoint = useRef<{ x: number; y: number } | null>(null);
 
-  const sway = `M ${start.x} ${start.y} Q ${start.x + 10} ${start.y + 12} ${tail.x} ${tail.y}`;
+  // A belt that is not tensioned yet hangs on the pulley: a 270° wrap with one
+  // free end, instead of a closed ring that reads as a bracelet.
+  const sway = `M ${arcStart.x} ${arcStart.y} A ${radius} ${radius} 0 1 0 ${arcEnd.x} ${arcEnd.y} Q ${arcEnd.x + 4} ${arcEnd.y + 16} ${tail.x} ${tail.y}`;
 
   return (
     <g data-loose-belt={pose.holeId} data-dragging={isDragging ? "true" : "false"}>
       {link === "chain" ? (
-        <>
-          <StaticChain path={ringPath(pose.center.x, pose.center.y, radius)} spacing={12} />
-          <StaticChain path={sway} spacing={12} />
-        </>
+        <StaticChain path={sway} spacing={12} />
       ) : (
         <>
-          <circle
-            cx={pose.center.x}
-            cy={pose.center.y}
-            fill="none"
-            opacity={0.92}
-            r={radius}
-            stroke="#3f4652"
-            strokeWidth={11}
-          />
-          <circle
-            cx={pose.center.x}
-            cy={pose.center.y}
-            fill="none"
-            r={radius}
-            stroke="#e2dbc9"
-            strokeWidth={7}
-          />
-          <circle
-            cx={pose.center.x}
-            cy={pose.center.y}
-            fill="none"
-            r={radius}
-            stroke="#8b8477"
-            strokeDasharray="5 11"
-            strokeWidth={2.4}
-          />
-          <path d={sway} fill="none" stroke="#3f4652" strokeLinecap="round" strokeWidth={11} />
-          <path d={sway} fill="none" stroke="#e2dbc9" strokeLinecap="round" strokeWidth={7} />
+          <path d={sway} fill="none" stroke={BELT_EDGE} strokeLinecap="round" strokeWidth={5.8} />
+          <path d={sway} fill="none" stroke={BELT_BODY} strokeLinecap="round" strokeWidth={4.4} />
           <path
             d={sway}
             fill="none"
-            stroke="#8b8477"
-            strokeDasharray="5 11"
+            stroke={BELT_HIGHLIGHT}
+            strokeDasharray="1.5 14.5"
             strokeLinecap="round"
-            strokeWidth={2.4}
+            strokeWidth={0.9}
           />
         </>
       )}
@@ -424,15 +400,8 @@ function LooseBeltBand({
         }}
       >
         <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={22} />
-        <circle
-          cx={tail.x}
-          cy={tail.y}
-          fill="var(--card)"
-          r={7}
-          stroke="var(--primary)"
-          strokeWidth={2}
-        />
-        <circle cx={tail.x} cy={tail.y} fill="var(--primary)" r={2.5} />
+        <circle cx={tail.x} cy={tail.y} fill="#d8cfbd" r={7} stroke="#6d6458" strokeWidth={1.4} />
+        <circle cx={tail.x} cy={tail.y} fill="#fffdf7" r={2.8} stroke="#8b8477" strokeWidth={1} />
       </g>
     </g>
   );
@@ -631,13 +600,13 @@ export function DraaiwerkBoard({
     const virtualRadius = gearRadius(target?.pose.size ?? anchor.size);
     const span = Math.hypot(virtual.x - anchor.center.x, virtual.y - anchor.center.y);
     const reachable = span > anchorRadius + virtualRadius + 1;
-    const runs = reachable
-      ? beltTangentRuns(
+    const beltPath = reachable
+      ? connectionPath(
+          ghost.link === "crossed-belt" ? "crossed-belt" : "open-belt",
           anchor.center,
           anchorRadius,
           virtual,
           virtualRadius,
-          ghost.link === "crossed-belt" ? 1 : 0,
         )
       : null;
     const chainPath = reachable
@@ -645,7 +614,7 @@ export function DraaiwerkBoard({
       : null;
 
     return {
-      runs,
+      beltPath,
       chainPath,
       kind: ghost.link,
       target: snapped,
@@ -713,8 +682,8 @@ export function DraaiwerkBoard({
               ghostArt.chainPath ? (
                 <ChainPreview path={ghostArt.chainPath} />
               ) : null
-            ) : ghostArt.runs ? (
-              <BeltPreview active runs={ghostArt.runs} />
+            ) : ghostArt.beltPath ? (
+              <BeltPreview active path={ghostArt.beltPath} />
             ) : null}
             <circle
               cx={ghostArt.virtual.x}

@@ -26,8 +26,8 @@ const DEDENDUM = 1.25;
 
 const TAU = Math.PI * 2;
 const SVG_DECIMALS = 100;
-/** The band runs just outside the tooth tips (tip radius = pitch radius + 4). */
-const BELT_OFFSET = 6;
+/** The band sits on the tooth tips, so the gear hides its inner half. */
+const BELT_OFFSET = 4;
 /** Chain rollers sit on the pitch circle, between the teeth. */
 const CHAIN_OFFSET = 0;
 
