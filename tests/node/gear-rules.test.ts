@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   allLevels,
+  beltTangentRuns,
   canPlace,
+  connectionLength,
   drive,
   evaluate,
+  gearRadius,
+  gearTeeth,
   LEVEL_COUNT,
   levelAt,
   trayLabel,
@@ -126,6 +130,112 @@ function beltLevel(output: Output): Level {
     outputs: [output],
     solution: [linkAt("open-belt", [0, 2], [5, 2])],
   });
+}
+
+const TAU = Math.PI * 2;
+/** Oppervlaktesnelheid van een poelie van maat 1 op de motor (1x). */
+const MOTOR_SURFACE_SPEED = (TAU / 6) * gearRadius(1);
+
+interface BoardPoint {
+  x: number;
+  y: number;
+}
+
+function connectionAt(result: DriveResult, index = 0): ConnectionPose {
+  const connection = result.connections[index];
+  if (!connection) {
+    throw new Error(`Missing connection ${index}`);
+  }
+  return connection;
+}
+
+function connectionFrom(result: DriveResult, key: string): ConnectionPose {
+  const connection = result.connections.find((candidate) => candidate.fromKey === key);
+  if (!connection) {
+    throw new Error(`Missing connection from ${key}`);
+  }
+  return connection;
+}
+
+function levelById(id: string): Level {
+  const level = allLevels().find((candidate) => candidate.id === id);
+  if (!level) {
+    throw new Error(`Missing Draaiwerk level: ${id}`);
+  }
+  return level;
+}
+
+function onRim(point: BoardPoint, center: BoardPoint, radius: number): boolean {
+  return Math.abs(Math.hypot(point.x - center.x, point.y - center.y) - radius) < 1e-9;
+}
+
+/**
+ * Meet de lengte van het pad dat `connectionPath` tekent, onafhankelijk van de
+ * formule in `connectionLength`. De bogen worden aan hun poeliecentrum gemeten;
+ * een boog met samenvallende eindpunten telt niet mee, net als in SVG.
+ */
+function measurePath(path: string, centers: readonly BoardPoint[]): number {
+  const tokens = path.trim().split(/\s+/);
+  const firstCenter = centers[0];
+  if (!firstCenter) {
+    throw new Error("No arc centres to measure against");
+  }
+
+  let index = 0;
+  let cursor: BoardPoint = { x: 0, y: 0 };
+  let start: BoardPoint = { x: 0, y: 0 };
+  let total = 0;
+
+  const nextNumber = (): number => {
+    const value = Number(tokens[index]);
+    index += 1;
+    return value;
+  };
+
+  while (index < tokens.length) {
+    const command = tokens[index];
+    index += 1;
+
+    if (command === "M") {
+      cursor = { x: nextNumber(), y: nextNumber() };
+      start = cursor;
+    } else if (command === "L") {
+      const next = { x: nextNumber(), y: nextNumber() };
+      total += Math.hypot(next.x - cursor.x, next.y - cursor.y);
+      cursor = next;
+    } else if (command === "A") {
+      const radius = nextNumber();
+      nextNumber(); // tweede straal, altijd gelijk
+      nextNumber(); // rotatie
+      nextNumber(); // large-arc
+      const sweep = nextNumber();
+      const next = { x: nextNumber(), y: nextNumber() };
+      if (Math.hypot(next.x - cursor.x, next.y - cursor.y) > 1e-6) {
+        let center = firstCenter;
+        let closest = Number.POSITIVE_INFINITY;
+        for (const candidate of centers) {
+          const error = Math.abs(
+            Math.hypot(cursor.x - candidate.x, cursor.y - candidate.y) - radius,
+          );
+          if (error < closest) {
+            closest = error;
+            center = candidate;
+          }
+        }
+        const startAngle = Math.atan2(cursor.y - center.y, cursor.x - center.x);
+        const endAngle = Math.atan2(next.y - center.y, next.x - center.x);
+        const forward = (((endAngle - startAngle) % TAU) + TAU) % TAU;
+        total += radius * (sweep === 1 ? forward : TAU - forward);
+      }
+      cursor = next;
+    } else if (command === "Z") {
+      total += Math.hypot(cursor.x - start.x, cursor.y - start.y);
+    } else {
+      throw new Error(`Unknown path command: ${command}`);
+    }
+  }
+
+  return total;
 }
 
 describe("gear rules: meshes", () => {
@@ -253,6 +363,175 @@ describe("gear rules: belts and chains", () => {
 
     expect(gearPose(result, "output:target-1").speed).toBeCloseTo(0.5);
     expect(gearPose(result, "output:target-1").direction).toBe(1);
+  });
+});
+
+describe("gear rules: belt runs and surface speed", () => {
+  it("reports the surface speed of the pulley that drives the band", () => {
+    const open = drive(levelAt(2), levelAt(2).solution);
+    expect(connectionAt(open)).toMatchObject({ kind: "open-belt", active: true });
+    expect(connectionAt(open).surfaceSpeed).toBeCloseTo(MOTOR_SURFACE_SPEED, 9);
+
+    const chain = drive(levelAt(3), levelAt(3).solution);
+    expect(connectionAt(chain).kind).toBe("chain");
+    expect(connectionAt(chain).surfaceSpeed).toBeCloseTo(MOTOR_SURFACE_SPEED, 9);
+  });
+
+  it("follows a worm wheel that runs at half speed", () => {
+    const level = makeLevel({
+      cols: 10,
+      rows: 5,
+      motor: motorAt(0, 2),
+      outputs: [targetAt(9, 2)],
+      solution: [wormAt([2, 2], [6, 2], 1, 1, 0.5), linkAt("open-belt", [6, 2], [9, 2])],
+    });
+    const result = drive(level, level.solution);
+
+    expect(gearPose(result, "worm:6,2").speed).toBeCloseTo(0.5);
+    const connection = connectionFrom(result, "worm:6,2");
+    expect(connection.surfaceSpeed).toBeCloseTo(0.5 * MOTOR_SURFACE_SPEED, 9);
+  });
+
+  it("follows a pulley that runs at double speed", () => {
+    const level = makeLevel({
+      cols: 9,
+      rows: 5,
+      motor: motorAt(0, 2, 2),
+      outputs: [targetAt(8, 2, { size: 2 })],
+      solution: [
+        gearAt(4, 2, 1),
+        linkAt("open-belt", [0, 2], [4, 2]),
+        linkAt("chain", [4, 2], [8, 2]),
+      ],
+    });
+    const result = drive(level, level.solution);
+
+    expect(gearPose(result, "gear:4,2").speed).toBeCloseTo(2);
+    const connection = connectionFrom(result, "gear:4,2");
+    expect(connection.kind).toBe("chain");
+    expect(connection.surfaceSpeed).toBeCloseTo(2 * MOTOR_SURFACE_SPEED, 9);
+  });
+
+  it("turns the surface speed negative with the motor", () => {
+    const motor: Motor = { holeId: "0,2", size: 1, direction: -1 };
+    const level: Level = { ...beltLevel(targetAt(5, 2, { direction: -1 })), motor };
+    const result = drive(level, level.solution);
+
+    expect(connectionAt(result).surfaceSpeed).toBeCloseTo(-MOTOR_SURFACE_SPEED, 9);
+    expect(connectionAt(result).active).toBe(true);
+    expect(result.outputs[0]?.satisfied).toBe(true);
+  });
+
+  it("gives an open belt two runs on the rims and a chain none", () => {
+    const result = drive(levelAt(2), levelAt(2).solution);
+    const connection = connectionAt(result);
+    const from = gearPose(result, connection.fromKey);
+    const to = gearPose(result, connection.toKey);
+    const runs = connection.runs;
+    if (!runs) {
+      throw new Error("An open belt needs two runs");
+    }
+
+    expect(runs).toHaveLength(2);
+    for (const run of runs) {
+      expect(onRim(run.from, from.center, gearRadius(from.size))).toBe(true);
+      expect(onRim(run.to, to.center, gearRadius(to.size))).toBe(true);
+    }
+    expect(runs[0]).not.toEqual(runs[1]);
+    expect(runs).toEqual(
+      beltTangentRuns(from.center, gearRadius(from.size), to.center, gearRadius(to.size)),
+    );
+
+    const chain = drive(levelAt(3), levelAt(3).solution);
+    expect(connectionAt(chain).runs).toBeNull();
+  });
+
+  it("crosses the two runs of a crossed belt", () => {
+    const level = levelById("gekruist");
+    const result = drive(level, level.solution);
+    const connection = connectionAt(result);
+    const from = gearPose(result, connection.fromKey);
+    const to = gearPose(result, connection.toKey);
+    const runs = connection.runs;
+    if (!runs) {
+      throw new Error("A crossed belt needs two runs");
+    }
+
+    expect(connection.kind).toBe("crossed-belt");
+    for (const run of runs) {
+      expect(onRim(run.from, from.center, gearRadius(from.size))).toBe(true);
+      expect(onRim(run.to, to.center, gearRadius(to.size))).toBe(true);
+    }
+    expect(runs[0]).not.toEqual(runs[1]);
+    expect(runs).toEqual(
+      beltTangentRuns(from.center, gearRadius(from.size), to.center, gearRadius(to.size), 1),
+    );
+  });
+
+  it("reports the length and chain pitch as derived pose data", () => {
+    for (const id of ["de-riem", "gekruist", "de-ketting"]) {
+      const level = levelById(id);
+      const result = drive(level, level.solution);
+
+      for (const connection of result.connections) {
+        const from = gearPose(result, connection.fromKey);
+        const to = gearPose(result, connection.toKey);
+        const expected = connectionLength(
+          connection.kind,
+          from.center,
+          gearRadius(from.size),
+          to.center,
+          gearRadius(to.size),
+        );
+
+        expect(connection.length).toBeGreaterThan(0);
+        expect(connection.length).toBeCloseTo(expected, 9);
+
+        if (connection.kind === "chain") {
+          const smallest = from.size <= to.size ? from.size : to.size;
+          const pitch = 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest));
+          expect(connection.chainPitch).toBeCloseTo(pitch, 9);
+          expect(connection.chainPitch).toBeCloseTo(12.46, 1);
+        } else {
+          expect(connection.chainPitch).toBeNull();
+        }
+      }
+    }
+
+    // De kleinste sprocket bepaalt de steek, ook als de motor groter is.
+    const mixed = makeLevel({
+      cols: 5,
+      rows: 5,
+      motor: motorAt(0, 2, 2),
+      outputs: [targetAt(4, 2)],
+      solution: [linkAt("chain", [0, 2], [4, 2])],
+    });
+    const mixedResult = drive(mixed, mixed.solution);
+    expect(connectionAt(mixedResult).chainPitch).toBeCloseTo(2 * 28 * Math.sin(Math.PI / 14), 9);
+  });
+
+  it("gives the same length as the drawn connection path", () => {
+    for (const id of ["de-riem", "gekruist", "de-ketting"]) {
+      const level = levelById(id);
+      const result = drive(level, level.solution);
+      expect(result.connections.length).toBeGreaterThan(0);
+
+      for (const connection of result.connections) {
+        const from = gearPose(result, connection.fromKey);
+        const to = gearPose(result, connection.toKey);
+        const precise = connectionLength(
+          connection.kind,
+          from.center,
+          gearRadius(from.size),
+          to.center,
+          gearRadius(to.size),
+        );
+        const drawn = measurePath(connection.path, [from.center, to.center]);
+
+        expect(drawn).toBeGreaterThan(0);
+        expect(Math.abs(precise - drawn) / drawn).toBeLessThan(0.01);
+      }
+    }
   });
 });
 

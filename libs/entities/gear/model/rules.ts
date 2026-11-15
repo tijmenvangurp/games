@@ -1,4 +1,6 @@
 import {
+  beltTangentRuns,
+  connectionLength,
   connectionPath,
   gearRadius,
   gearTeeth,
@@ -23,6 +25,9 @@ import type {
 const SPEED_EPSILON = 1e-9;
 const MESH_TOLERANCE = 1;
 const CONTACT_TOLERANCE = 1;
+/** De motor doet één omwenteling in 6 seconden. */
+const MOTOR_TURN_SECONDS = 6;
+const MOTOR_ANGULAR_SPEED = (Math.PI * 2) / MOTOR_TURN_SECONDS;
 
 interface GearNode {
   key: string;
@@ -360,19 +365,37 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
     }
     const fromRotor = rotors.get(from.key);
     const toRotor = rotors.get(to.key);
+    const fromRadius = gearRadius(from.size);
+    const toRadius = gearRadius(to.size);
+    // Het loopvlak van een riem of ketting heeft de oppervlaktesnelheid van de
+    // poelie waar hij op aangrijpt: v = omega * r.
+    const surfaceSpeed = (fromRotor?.speed ?? 0) * MOTOR_ANGULAR_SPEED * fromRadius;
+    // De kettingsteek volgt de kleinste sprocket: 2 * r * sin(PI / tanden).
+    const smallest: GearSize = from.size <= to.size ? from.size : to.size;
+    const chainPitch =
+      placement.kind === "chain"
+        ? 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest))
+        : null;
     connections.push({
       key: `${placement.kind}:${placement.fromHoleId}:${placement.toHoleId}`,
       kind: placement.kind,
       fromKey: from.key,
       toKey: to.key,
-      path: connectionPath(
-        placement.kind,
-        from.center,
-        gearRadius(from.size),
-        to.center,
-        gearRadius(to.size),
-      ),
+      path: connectionPath(placement.kind, from.center, fromRadius, to.center, toRadius),
       active: Boolean(fromRotor?.driven && toRotor?.driven && !jammed),
+      surfaceSpeed,
+      runs:
+        placement.kind === "chain"
+          ? null
+          : beltTangentRuns(
+              from.center,
+              fromRadius,
+              to.center,
+              toRadius,
+              placement.kind === "crossed-belt" ? 1 : 0,
+            ),
+      length: connectionLength(placement.kind, from.center, fromRadius, to.center, toRadius),
+      chainPitch,
     });
   }
 

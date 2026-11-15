@@ -1,4 +1,13 @@
-export { boardViewBox, gearPath, gearRadius, gearTeeth, holeCenter } from "./model/geometry";
+export {
+  beltTangentRuns,
+  boardViewBox,
+  connectionLength,
+  connectionPath,
+  gearPath,
+  gearRadius,
+  gearTeeth,
+  holeCenter,
+} from "./model/geometry";
 export { LEVEL_COUNT, allLevels, levelAt } from "./model/levels";
 export {
   canPlace,
@@ -10,6 +19,7 @@ export {
   validateLevel,
 } from "./model/rules";
 export type {
+  BeltRun,
   ConnectionPose,
   DriveResult,
   GearPose,

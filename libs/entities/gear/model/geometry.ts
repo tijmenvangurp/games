@@ -8,7 +8,7 @@
 //   C = angle + PI - PI / N_B - k * angle
 //   phi_B = k * phi_A + C
 
-import type { GearSize, Hole, Level } from "./types";
+import type { BeltRun, GearSize, Hole, Level } from "./types";
 
 /** Distance between two neighbouring pegboard holes. */
 const HOLE_SPACING = 28;
@@ -28,8 +28,8 @@ const TAU = Math.PI * 2;
 const SVG_DECIMALS = 100;
 /** The band runs just outside the tooth tips (tip radius = pitch radius + 4). */
 const BELT_OFFSET = 6;
-/** Chain links sit on the tooth tips. */
-const CHAIN_OFFSET = 4;
+/** Chain rollers sit on the pitch circle, between the teeth. */
+const CHAIN_OFFSET = 0;
 
 export interface Point {
   x: number;
@@ -212,50 +212,100 @@ function connectionFrame(from: Point, to: Point): { distance: number; angle: num
   };
 }
 
-function openBeltPath(from: Point, fromRadius: number, to: Point, toRadius: number): string {
+interface TangentGeometry {
+  /** Afstand tussen de twee hartpunten. */
+  distance: number;
+  /** Halve omslaghoek tussen de twee raaklijnen. */
+  sweep: number;
+  /** De twee rechte banden, elk van velg naar velg. */
+  runs: readonly [BeltRun, BeltRun];
+}
+
+/** Afstand tussen twee punten in board-eenheden. */
+function pointDistance(a: Point, b: Point): number {
+  return Math.hypot(b.x - a.x, b.y - a.y);
+}
+
+/**
+ * De raaklijnen en de omslaghoek voor een open of gekruiste riem.
+ * Beide poelies krijgen dezelfde halve omslaghoek; bij een gekruiste riem
+ * ligt het raakpunt op de tweede poelie aan de andere kant van de band.
+ */
+function tangentGeometry(
+  crossed: boolean,
+  from: Point,
+  fromRadius: number,
+  to: Point,
+  toRadius: number,
+): TangentGeometry {
   const { distance, angle } = connectionFrame(from, to);
+  if (distance === 0) {
+    // Samenvallende hartpunten: er is geen raaklijn, dus geen band.
+    const run: BeltRun = { from, to };
+    return { distance, sweep: 0, runs: [run, run] };
+  }
+
+  const ratio = crossed ? (fromRadius + toRadius) / distance : (fromRadius - toRadius) / distance;
+  const sweep = Math.acos(clamp(ratio, -1, 1));
+  const flip = crossed ? Math.PI : 0;
+  const runAt = (offset: number): BeltRun => ({
+    from: polar(from, fromRadius, angle + offset),
+    to: polar(to, toRadius, angle + offset + flip),
+  });
+
+  return { distance, sweep, runs: [runAt(sweep), runAt(-sweep)] };
+}
+
+function mixPoint(a: Point, b: Point, t: number): Point {
+  return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+}
+
+function mixRuns(
+  open: readonly [BeltRun, BeltRun],
+  crossed: readonly [BeltRun, BeltRun],
+  t: number,
+): readonly [BeltRun, BeltRun] {
+  const mix = (a: BeltRun, b: BeltRun): BeltRun => ({
+    from: mixPoint(a.from, b.from, t),
+    to: mixPoint(a.to, b.to, t),
+  });
+  return [mix(open[0], crossed[0]), mix(open[1], crossed[1])];
+}
+
+function openBeltPath(from: Point, fromRadius: number, to: Point, toRadius: number): string {
+  const { distance, sweep, runs } = tangentGeometry(false, from, fromRadius, to, toRadius);
   if (distance === 0) {
     return straightPath(from, to);
   }
 
-  const phi = Math.acos(clamp((fromRadius - toRadius) / distance, -1, 1));
-  const start = angle + phi;
-  const end = angle - phi;
-  const fromStart = polar(from, fromRadius, start);
-  const fromEnd = polar(from, fromRadius, end);
-  const toStart = polar(to, toRadius, start);
-  const toEnd = polar(to, toRadius, end);
-  const largeFrom = TAU - 2 * phi > Math.PI ? 1 : 0;
-  const largeTo = 2 * phi > Math.PI ? 1 : 0;
+  const [top, bottom] = runs;
+  const largeFrom = TAU - 2 * sweep > Math.PI ? 1 : 0;
+  const largeTo = 2 * sweep > Math.PI ? 1 : 0;
 
   return [
-    `M ${formatPoint(fromStart)}`,
-    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${largeFrom} 1 ${formatPoint(fromEnd)}`,
-    `L ${formatPoint(toEnd)}`,
-    `A ${round(toRadius)} ${round(toRadius)} 0 ${largeTo} 1 ${formatPoint(toStart)}`,
+    `M ${formatPoint(top.from)}`,
+    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${largeFrom} 1 ${formatPoint(bottom.from)}`,
+    `L ${formatPoint(bottom.to)}`,
+    `A ${round(toRadius)} ${round(toRadius)} 0 ${largeTo} 1 ${formatPoint(top.to)}`,
     "Z",
   ].join(" ");
 }
 
 function crossedBeltPath(from: Point, fromRadius: number, to: Point, toRadius: number): string {
-  const { distance, angle } = connectionFrame(from, to);
+  const { distance, sweep, runs } = tangentGeometry(true, from, fromRadius, to, toRadius);
   if (distance === 0) {
     return straightPath(from, to);
   }
 
-  const gamma = Math.acos(clamp((fromRadius + toRadius) / distance, -1, 1));
-  const fromTop = polar(from, fromRadius, angle + gamma);
-  const toTop = polar(to, toRadius, angle + gamma + Math.PI);
-  const toBottom = polar(to, toRadius, angle - gamma + Math.PI);
-  const fromBottom = polar(from, fromRadius, angle - gamma);
-  const large = 2 * gamma > Math.PI ? 1 : 0;
+  const [top, bottom] = runs;
+  const large = 2 * sweep > Math.PI ? 1 : 0;
 
   return [
-    `M ${formatPoint(fromTop)}`,
-    `L ${formatPoint(toTop)}`,
-    `A ${round(toRadius)} ${round(toRadius)} 0 ${large} 0 ${formatPoint(toBottom)}`,
-    `L ${formatPoint(fromBottom)}`,
-    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${large} 1 ${formatPoint(fromTop)}`,
+    `M ${formatPoint(top.from)}`,
+    `L ${formatPoint(top.to)}`,
+    `A ${round(toRadius)} ${round(toRadius)} 0 ${large} 0 ${formatPoint(bottom.to)}`,
+    `L ${formatPoint(bottom.from)}`,
+    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${large} 1 ${formatPoint(top.from)}`,
     "Z",
   ].join(" ");
 }
@@ -272,4 +322,64 @@ export function connectionPath(
   return kind === "crossed-belt"
     ? crossedBeltPath(from, fromRadius + offset, to, toRadius + offset)
     : openBeltPath(from, fromRadius + offset, to, toRadius + offset);
+}
+
+/**
+ * De twee rechte banden tussen twee poelies.
+ * crossing = 0 is open, crossing = 1 is gekruist; tussenliggende waarden
+ * schuiven de raakpunten mee voor de morph. De richting van de segmenten is
+ * niet betekenisvol; de tekenlaag kiest per band de dashrichting.
+ */
+export function beltTangentRuns(
+  from: Point,
+  fromRadius: number,
+  to: Point,
+  toRadius: number,
+  crossing = 0,
+): readonly [BeltRun, BeltRun] {
+  const t = clamp(crossing, 0, 1);
+  const open = tangentGeometry(false, from, fromRadius, to, toRadius).runs;
+  if (t === 0) {
+    return open;
+  }
+
+  const crossed = tangentGeometry(true, from, fromRadius, to, toRadius).runs;
+  return t === 1 ? crossed : mixRuns(open, crossed, t);
+}
+
+/**
+ * Lengte van het gesloten pad, voor de kettingsteek en de SMIL-duur.
+ * Telt de twee bogen en de twee rechte stukken van precies het pad dat
+ * `connectionPath` tekent, inclusief dezelfde offset per verbindingstype.
+ */
+export function connectionLength(
+  kind: ConnectionKind,
+  from: Point,
+  fromRadius: number,
+  to: Point,
+  toRadius: number,
+): number {
+  const offset = kind === "chain" ? CHAIN_OFFSET : BELT_OFFSET;
+  const fromRim = fromRadius + offset;
+  const toRim = toRadius + offset;
+  const crossed = kind === "crossed-belt";
+  const { distance, sweep, runs } = tangentGeometry(crossed, from, fromRim, to, toRim);
+  if (distance === 0) {
+    return 0;
+  }
+
+  const straight =
+    pointDistance(runs[0].from, runs[0].to) + pointDistance(runs[1].from, runs[1].to);
+  if (sweep === 0 || sweep === Math.PI) {
+    // De raakpunten vallen op een poelie samen, dus SVG slaat die boog over.
+    // Dit gebeurt alleen als de poelies elkaar raken of overlappen.
+    return straight;
+  }
+  // Een open riem omsluit de grootste poelie over de lange boog en de kleine
+  // over de korte; een gekruiste riem heeft op beide poelies de korte boog.
+  const arcs = crossed
+    ? 2 * sweep * (fromRim + toRim)
+    : (TAU - 2 * sweep) * fromRim + 2 * sweep * toRim;
+
+  return arcs + straight;
 }

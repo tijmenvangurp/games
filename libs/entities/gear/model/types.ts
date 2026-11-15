@@ -90,14 +90,28 @@ export interface GearPose {
   jammed: boolean;
 }
 
+/** Eén rechte band tussen twee poelies, van velg naar velg. */
+export interface BeltRun {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+}
+
 export interface ConnectionPose {
   key: string;
   kind: "open-belt" | "crossed-belt" | "chain";
   fromKey: string;
   toKey: string;
-  /** SVG path in board coordinates. */
+  /** Closed SVG path in board coordinates. Blijft de bron voor de ketting. */
   path: string;
   active: boolean;
+  /** Signed oppervlaktesnelheid in board-eenheden per seconde. */
+  surfaceSpeed: number;
+  /** Twee rechte banden voor een riem; null voor een ketting. */
+  runs: readonly [BeltRun, BeltRun] | null;
+  /** Lengte van het gesloten pad in board-eenheden. */
+  length: number;
+  /** Steek van de ketting op de kleinste sprocket; null voor een riem. */
+  chainPitch: number | null;
 }
 
 export interface OutputPose {
