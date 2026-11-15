@@ -95,8 +95,8 @@ const INTRODUCES = [
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
-const WORM_SLOW = worm([0, 2], [3, 2], 0.5, -1);
-const WORM_STRONG = worm([0, 2], [3, 2], 0.25, -1);
+const WORM_SLOW = worm([0, 2], [4, 2], 0.5, -1);
+const WORM_STRONG = worm([0, 2], [4, 2], 0.25, -1);
 const WORM_METER = worm([0, 2], [9, 2], 0.5, 1);
 const WORM_LIFT = worm([0, 2], [4, 2], 0.25, 1);
 

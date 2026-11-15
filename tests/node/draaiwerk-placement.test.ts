@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drive, levelAt, type Placement } from "@entities/gear";
+import { drive, gearRadius, holeCenter, levelAt, type Placement } from "@entities/gear";
 import {
   formatSpeed,
   holesForPlacement,
@@ -8,6 +8,8 @@ import {
   outputName,
   rejectionFor,
   trayShortLabel,
+  WORM_SHAFT_CLEARANCE,
+  wormShaftGeometry,
 } from "@features/draaiwerk";
 
 const level = levelAt(2);
@@ -165,6 +167,35 @@ describe("draaiwerk placement", () => {
         toHoleId: "1,2",
       }),
     ).toBe("De ketting past niet tussen deze wielen.");
+  });
+
+  it("legt de wormas op de velg van het wormwiel in plaats van van hart tot hart", () => {
+    const wormLevel = levelAt(9);
+    const placement = wormLevel.solution.find((part) => part.kind === "worm");
+    const wheel = wormLevel.outputs.find((output) => output.id === "target-1");
+    if (!placement || placement.kind !== "worm" || !wheel) {
+      throw new Error("Level 10 has no worm drive");
+    }
+
+    const radius = gearRadius(wheel.size);
+    const target = holeCenter(wormLevel, placement.toHoleId);
+    const from = holeCenter(wormLevel, placement.fromHoleId);
+    const shaft = wormShaftGeometry(wormLevel, placement, radius);
+    const offset = Math.hypot(shaft.centre.x - target.x, shaft.centre.y - target.y);
+
+    // The shaft centres on the rim (plus its half thickness), not on the hub.
+    expect(offset).toBeCloseTo(radius + WORM_SHAFT_CLEARANCE, 6);
+    expect(offset).toBeGreaterThan(radius);
+    // Its axis runs along the tangent, so both gears turn about the same line.
+    const axis = {
+      x: Math.cos((shaft.angle * Math.PI) / 180),
+      y: Math.sin((shaft.angle * Math.PI) / 180),
+    };
+    const link = { x: target.x - from.x, y: target.y - from.y };
+    expect(axis.x * link.x + axis.y * link.y).toBeCloseTo(0, 6);
+    // Half the body still reaches inside the pitch circle and grips the teeth.
+    expect(offset - 8).toBeLessThan(radius);
+    expect(shaft.length).toBeGreaterThanOrEqual(38);
   });
 
   it("formats labels, speeds and outputs", () => {

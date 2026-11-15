@@ -49,13 +49,13 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
       {
         id: "target-1",
         kind: "target",
-        holeId: holeId(3, 2),
+        holeId: holeId(4, 2),
         size: 2,
         direction: -1,
       },
     ],
     tray: [trayWorm("worm-1", 0.5, -1)],
-    solution: [wormAt([0, 2], [3, 2], 0.5, -1)],
+    solution: [wormAt([0, 2], [4, 2], 0.5, -1)],
   },
   {
     id: "wormas-sterk",
@@ -72,13 +72,13 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
       {
         id: "target-1",
         kind: "target",
-        holeId: holeId(3, 2),
+        holeId: holeId(4, 2),
         size: 2,
         direction: -1,
       },
     ],
     tray: [trayWorm("worm-1", 0.25, -1)],
-    solution: [wormAt([0, 2], [3, 2], 0.25, -1)],
+    solution: [wormAt([0, 2], [4, 2], 0.25, -1)],
   },
   {
     id: "de-meter",

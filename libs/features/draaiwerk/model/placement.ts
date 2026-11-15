@@ -243,6 +243,47 @@ export function nextSolutionPlacement(
   );
 }
 
+/** Distance from the worm wheel's pitch circle to the shaft's centreline. */
+export const WORM_SHAFT_CLEARANCE = 7;
+
+export interface WormShaft {
+  /** Centre of the shaft body, on the rim facing the input gear. */
+  centre: { x: number; y: number };
+  /** Rotation of the shaft, along the tangent of the worm wheel. */
+  angle: number;
+  length: number;
+  coils: number;
+  pitch: number;
+}
+
+/**
+ * The worm shaft rests on the worm wheel instead of spanning both gear hubs:
+ * it lies along the tangent at the rim point nearest the input gear, so half of
+ * its body sinks into the teeth and the coils grip them.
+ */
+export function wormShaftGeometry(
+  level: Level,
+  placement: Extract<Placement, { kind: "worm" }>,
+  toRadius: number,
+): WormShaft {
+  const from = holeCenter(level, placement.fromHoleId);
+  const target = holeCenter(level, placement.toHoleId);
+  const reach = distance(from, target) || 1;
+  const ux = (target.x - from.x) / reach;
+  const uy = (target.y - from.y) / reach;
+  const clearance = toRadius + WORM_SHAFT_CLEARANCE;
+  const length = Math.max(38, toRadius * 1.05);
+  const coils = Math.max(3, Math.round(length / 11));
+
+  return {
+    centre: { x: target.x - ux * clearance, y: target.y - uy * clearance },
+    angle: (Math.atan2(ux, -uy) * 180) / Math.PI,
+    length,
+    coils,
+    pitch: length / coils,
+  };
+}
+
 /** The hole behind a drive pose key, without trusting that the pose exists. */
 export function holeForGearKey(level: Level, key: string): string | null {
   if (key === "motor") {

@@ -145,6 +145,24 @@ en het doel). Dit supersedeert de visuele opzet uit het vorige addendum.
   van een schroef plus een extra tandwiel dat er niet bij hoort. Dat maakt de
   werking en de plaatsing in één beeld duidelijk.
 
+## Addendum 2026-11-15: wormas ligt op het wormwiel
+
+De schroef loopt niet meer van hart tot hart door beide tandwielen. Hij ligt
+met zijn cilinder op de velg van het wormwiel, aan de kant van het
+invoertandwiel, en grijpt daar in de tanden.
+
+- **Tangent, niet door het midden.** `wormShaftGeometry` legt de as langs de
+  raaklijn op de steekcirkel van het uitvoerwiel. De halve dikte van de
+  cilinder zakt in de tanden, zodat de schroef zichtbaar op het wiel ligt en
+  het wielhart en de naaf vrij blijven.
+- **Kortere schroef.** De lengte volgt de straal van het wormwiel (minimaal 38
+  bordeenheden), zodat de as bij een klein wiel niet buiten het bord steekt.
+- **Ruimte tussen de wielen.** Level 10 en 11 zetten het doel op kolom 4 in
+  plaats van 3. Daardoor ligt de schroef naast de motor in plaats van
+  eroverheen, met een zichtbare opening ertussen.
+- **Ribbels lopen mee.** De animatie verschuift de ribbels precies één spoed,
+  zodat de lus naadloos blijft bij elke schroeflengte.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)

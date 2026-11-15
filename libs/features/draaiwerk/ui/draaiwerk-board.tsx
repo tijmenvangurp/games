@@ -678,13 +678,17 @@ export function DraaiwerkBoard({
 
         {/* The worm shaft lies across two gears, so it is drawn over them. */}
         <g data-worm-layer="true">
-          {worms.map((worm) => (
-            <WormBar
-              key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
-              level={level}
-              placement={worm}
-            />
-          ))}
+          {worms.map((worm) => {
+            const wheel = result.gears.find((pose) => pose.holeId === worm.toHoleId);
+            return (
+              <WormBar
+                key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
+                level={level}
+                placement={worm}
+                toRadius={gearRadius(wheel?.size ?? 1)}
+              />
+            );
+          })}
         </g>
 
         {ghostArt ? (

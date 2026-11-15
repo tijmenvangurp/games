@@ -1,4 +1,4 @@
-import { memo, type KeyboardEvent } from "react";
+import { memo, type CSSProperties, type KeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   gearPath,
@@ -12,6 +12,7 @@ import {
   type Placement,
   type TrayItem,
 } from "@entities/gear";
+import { wormShaftGeometry } from "../model/placement";
 
 export interface GearTone {
   fill: string;
@@ -484,18 +485,22 @@ export function ChainPreview({ path }: { path: string }) {
   );
 }
 
+/**
+ * The worm shaft lies across the worm wheel instead of spanning both hubs: its
+ * body rests on the rim at the side that faces the input gear, so the coils
+ * grip the teeth like a real worm drive.
+ */
 export function WormBar({
   level,
   placement,
+  toRadius = gearRadius(1),
 }: {
   level: Level;
   placement: Extract<Placement, { kind: "worm" }>;
+  toRadius?: number;
 }) {
-  const from = holeCenter(level, placement.fromHoleId);
-  const to = holeCenter(level, placement.toHoleId);
-  const angle = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI;
-  const length = Math.max(24, Math.hypot(to.x - from.x, to.y - from.y));
-  const ribs = Math.max(6, Math.round(length / 9));
+  const shaft = wormShaftGeometry(level, placement, toRadius);
+  const { centre, angle, length, coils, pitch } = shaft;
   const clipId = `worm-clip-${placement.fromHoleId}-${placement.toHoleId}`.replace(
     /[^a-zA-Z0-9_-]/g,
     "-",
@@ -506,13 +511,17 @@ export function WormBar({
       data-direction={placement.direction}
       data-worm={`${placement.fromHoleId}:${placement.toHoleId}`}
       data-worm-ratio={placement.ratio}
+      data-worm-pitch={Math.round(pitch * 10) / 10}
     >
-      <g transform={`translate(${(from.x + to.x) / 2} ${(from.y + to.y) / 2}) rotate(${angle})`}>
+      <g transform={`translate(${centre.x} ${centre.y}) rotate(${angle})`}>
         <defs>
           <clipPath id={clipId}>
-            <rect height={16} rx={8} width={Math.max(0, length - 4)} x={-length / 2 + 2} y={-8} />
+            <rect height={16} rx={8} width={Math.max(0, length - 2)} x={-length / 2 + 1} y={-8} />
           </clipPath>
         </defs>
+        {/* Axle stubs run into the bearings at both ends. */}
+        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={-length / 2 - 5} y={-1.5} />
+        <rect fill="#5d6671" height={3} rx={1.5} width={10} x={length / 2 - 5} y={-1.5} />
         <rect
           fill="#8f98a2"
           height={16}
@@ -526,49 +535,49 @@ export function WormBar({
         <rect
           fill="#d9dee3"
           height={3}
-          opacity={0.8}
+          opacity={0.85}
           rx={1.5}
-          width={Math.max(0, length - 12)}
-          x={-length / 2 + 6}
+          width={Math.max(0, length - 14)}
+          x={-length / 2 + 7}
           y={-6}
         />
-        <g className="draaiwerk-worm-ribs" clipPath={`url(#${clipId})`}>
-          {Array.from({ length: ribs + 1 }, (_, index) => {
-            const x = -length / 2 + 4 + (index * length) / ribs;
+        <g
+          className="draaiwerk-worm-ribs"
+          clipPath={`url(#${clipId})`}
+          style={{ "--worm-pitch": `${Math.round(pitch * 10) / 10}px` } as CSSProperties}
+        >
+          {Array.from({ length: coils + 1 }, (_, index) => {
+            const x = -length / 2 + pitch * 0.6 + index * pitch;
             return (
-              <g key={`rib-${index}`}>
+              <g key={`coil-${index}`}>
                 <path
-                  d={`M ${x - 4} -8 Q ${x + 1} 0 ${x + 4} 8`}
+                  d={`M ${x - 4} -8 C ${x} -3 ${x} 3 ${x - 4} 8`}
                   fill="none"
                   stroke="#4b545e"
                   strokeLinecap="round"
-                  strokeWidth={2.6}
+                  strokeWidth={2.4}
                 />
                 <path
-                  d={`M ${x - 5.6} -8 Q ${x - 0.6} 0 ${x + 2.4} 8`}
+                  d={`M ${x} -8 C ${x + 4} -3 ${x + 4} 3 ${x} 8`}
                   fill="none"
-                  opacity={0.7}
+                  opacity={0.75}
                   stroke="#d4dade"
                   strokeLinecap="round"
-                  strokeWidth={1}
+                  strokeWidth={1.2}
                 />
               </g>
             );
           })}
         </g>
-        {[-length / 2, length / 2].map((x) => (
-          <rect
-            fill="#b8c0c8"
-            height={19}
-            key={`collar-${x}`}
-            rx={2}
-            stroke="#646d78"
-            strokeWidth={1}
-            width={6}
-            x={x - 3}
-            y={-9.5}
-          />
-        ))}
+        {/* The lower edge presses into the teeth, so the rim disappears there. */}
+        <path
+          d={`M ${-length / 2 + 2} -9 Q 0 -10.4 ${length / 2 - 2} -9`}
+          fill="none"
+          opacity={0.45}
+          stroke="#3c434c"
+          strokeLinecap="round"
+          strokeWidth={2.4}
+        />
       </g>
     </g>
   );
