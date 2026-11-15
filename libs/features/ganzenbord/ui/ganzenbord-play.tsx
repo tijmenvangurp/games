@@ -292,23 +292,26 @@ export function GanzenbordPlay() {
     : game;
 
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
-      <div className="relative order-1 lg:order-none lg:col-start-1 lg:row-start-1">
-        <GanzenbordBoard game={displayGame} zoomPosition={zoomTarget} />
-        {animation && event ? (
-          <GanzenbordEvent
-            event={event}
-            game={game}
-            onContinue={() => useGanzenbordStore.getState().advanceAnimation()}
-          />
-        ) : null}
+    <>
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
+        <div className="order-1 lg:order-none lg:col-start-1 lg:row-start-1">
+          <GanzenbordBoard game={displayGame} zoomPosition={zoomTarget} />
+        </div>
+
+        <aside className="order-2 flex flex-col gap-3 lg:order-none lg:col-start-2 lg:row-span-2">
+          <GanzenbordHud game={displayGame} wins={wins} />
+          <DicePanel />
+          <GanzenbordRules />
+        </aside>
       </div>
 
-      <aside className="order-2 flex flex-col gap-3 lg:order-none lg:col-start-2 lg:row-span-2">
-        <GanzenbordHud game={displayGame} wins={wins} />
-        <DicePanel />
-        <GanzenbordRules />
-      </aside>
-    </div>
+      {animation && event ? (
+        <GanzenbordEvent
+          event={event}
+          game={game}
+          onContinue={() => useGanzenbordStore.getState().advanceAnimation()}
+        />
+      ) : null}
+    </>
   );
 }
