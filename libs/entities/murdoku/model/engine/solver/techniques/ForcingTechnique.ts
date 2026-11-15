@@ -1,8 +1,8 @@
-import { Technique } from './Technique.ts'
-import type { SearchSolver } from '../SearchSolver.ts'
-import type { Cell, Explanation, PersonId } from '../../domain/types.ts'
-import type { SolveContext } from '../SolveContext.ts'
-import type { DeductionStep } from '../DeductionStep.ts'
+import { Technique } from "./Technique.ts";
+import type { SearchSolver } from "../SearchSolver.ts";
+import type { Cell, Explanation, PersonId } from "../../domain/types.ts";
+import type { SolveContext } from "../SolveContext.ts";
+import type { DeductionStep } from "../DeductionStep.ts";
 
 /**
  * Proof by contradiction WITH a readable trace, focused on the person who has the
@@ -17,49 +17,49 @@ import type { DeductionStep } from '../DeductionStep.ts'
  * Either way the candidate is eliminated, so no hint is ever a bare "contradiction".
  */
 export class ForcingTechnique extends Technique {
-  readonly name = 'forcing'
-  readonly difficulty = 7
+  readonly name = "forcing";
+  readonly difficulty = 7;
 
   constructor(
     private readonly base: Technique[],
     private readonly searcher: SearchSolver,
   ) {
-    super()
+    super();
   }
 
   /** How many of the most-constrained people to scan for a readable contradiction.
    *  Bounded so the work stays small on big boards instead of scanning everyone. */
-  private static readonly SCAN = 3
+  private static readonly SCAN = 3;
 
   apply(ctx: SolveContext): DeductionStep | null {
     const ranked = [...ctx.state.unplaced()]
       .filter((id) => ctx.state.domain(id).size >= 2)
-      .sort((a, b) => ctx.state.domain(a).size - ctx.state.domain(b).size)
-    if (ranked.length === 0) return null
+      .sort((a, b) => ctx.state.domain(a).size - ctx.state.domain(b).size);
+    if (ranked.length === 0) return null;
 
     // Pass 1: a readable contradiction among the FEW most-constrained people.
     for (const id of ranked.slice(0, ForcingTechnique.SCAN)) {
-      for (const cell of [...ctx.state.domain(id)]) {
-        const trial = ctx.clone()
-        trial.place(id, cell)
-        const { steps, dead } = this.runToContradiction(trial)
-        if (dead) return this.eliminate(ctx, id, cell, steps, dead, 'forcing')
+      for (const cell of ctx.state.domain(id)) {
+        const trial = ctx.clone();
+        trial.place(id, cell);
+        const { steps, dead } = this.runToContradiction(trial);
+        if (dead) return this.eliminate(ctx, id, cell, steps, dead, "forcing");
       }
     }
 
     // Pass 2: exhaustive disproof of a cell of the MOST-constrained person only
     // (the search is the fast oracle); show the visible consequences then "checked".
-    const id = ranked[0]
-    for (const cell of [...ctx.state.domain(id)]) {
-      const forced = new Map<PersonId, Cell>(ctx.state.placed)
-      forced.set(id, cell)
-      if (this.searcher.hasSolutionWith(forced)) continue
-      const trial = ctx.clone()
-      trial.place(id, cell)
-      const { steps } = this.runToContradiction(trial)
-      return this.eliminate(ctx, id, cell, steps, { key: 'contra.exhausted' }, 'satForcing')
+    const id = ranked[0];
+    for (const cell of ctx.state.domain(id)) {
+      const forced = new Map<PersonId, Cell>(ctx.state.placed);
+      forced.set(id, cell);
+      if (this.searcher.hasSolutionWith(forced)) continue;
+      const trial = ctx.clone();
+      trial.place(id, cell);
+      const { steps } = this.runToContradiction(trial);
+      return this.eliminate(ctx, id, cell, steps, { key: "contra.exhausted" }, "satForcing");
     }
-    return null
+    return null;
   }
 
   /** Build the elimination step for an impossible `cell`, with its consequence chain. */
@@ -69,41 +69,41 @@ export class ForcingTechnique extends Technique {
     cell: Cell,
     steps: DeductionStep[],
     ending: Explanation,
-    technique: 'forcing' | 'satForcing',
+    technique: "forcing" | "satForcing",
   ): DeductionStep {
-    const removed = ctx.removeWhere(id, (c) => c === cell)
+    const removed = ctx.removeWhere(id, (c) => c === cell);
     return {
       technique,
       personId: id,
       eliminated: [{ personId: id, cells: removed }],
-      explanation: { key: 'step.forcing', params: { name: id, cell } },
+      explanation: { key: "step.forcing", params: { name: id, cell } },
       chain: [
-        { key: 'step.assume', params: { name: id, cell } },
+        { key: "step.assume", params: { name: id, cell } },
         ...steps.map((s) => s.explanation),
         ending,
       ],
-    }
+    };
   }
 
   /** Propagate the base rules until a contradiction surfaces or nothing changes. */
   private runToContradiction(trial: SolveContext): {
-    steps: DeductionStep[]
-    dead: Explanation | null
+    steps: DeductionStep[];
+    dead: Explanation | null;
   } {
-    const steps: DeductionStep[] = []
+    const steps: DeductionStep[] = [];
     for (;;) {
-      const dead = trial.deadReason()
-      if (dead) return { steps, dead }
-      let progressed = false
+      const dead = trial.deadReason();
+      if (dead) return { steps, dead };
+      let progressed = false;
       for (const technique of this.base) {
-        const step = technique.apply(trial)
+        const step = technique.apply(trial);
         if (step) {
-          steps.push(step)
-          progressed = true
-          break
+          steps.push(step);
+          progressed = true;
+          break;
         }
       }
-      if (!progressed) return { steps, dead: null }
+      if (!progressed) return { steps, dead: null };
     }
   }
 }

@@ -1,5 +1,5 @@
-import type { AttributeValue, PersonId } from './types.ts'
-import type { Clue } from '../clues/Clue.ts'
+import type { AttributeValue, PersonId } from "./types.ts";
+import type { Clue } from "../clues/Clue.ts";
 
 /** A suspect: an id ("A", "B", …), a display name, attributes, and clues. */
 export class Suspect {

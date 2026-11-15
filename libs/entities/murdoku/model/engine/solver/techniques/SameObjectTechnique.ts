@@ -1,18 +1,18 @@
-import { Technique } from './Technique.ts'
-import { BesideSameObjectClue } from '../../clues/objectClues.ts'
-import { AndClue } from '../../clues/compositeClues.ts'
-import { inDirection8 } from '../../domain/types.ts'
-import type { Clue } from '../../clues/Clue.ts'
-import type { Cell, PersonId } from '../../domain/types.ts'
-import type { SolveContext } from '../SolveContext.ts'
-import type { DeductionStep } from '../DeductionStep.ts'
-import type { Puzzle } from '../../domain/Puzzle.ts'
+import { Technique } from "./Technique.ts";
+import { BesideSameObjectClue } from "../../clues/objectClues.ts";
+import { AndClue } from "../../clues/compositeClues.ts";
+import { inDirection8 } from "../../domain/types.ts";
+import type { Clue } from "../../clues/Clue.ts";
+import type { Cell, PersonId } from "../../domain/types.ts";
+import type { SolveContext } from "../SolveContext.ts";
+import type { DeductionStep } from "../DeductionStep.ts";
+import type { Puzzle } from "../../domain/Puzzle.ts";
 
 /** "Beside the same object as …" clues that are certain (top-level or inside an AND). */
 function besideClues(clue: Clue): BesideSameObjectClue[] {
-  if (clue instanceof BesideSameObjectClue) return [clue]
-  if (clue instanceof AndClue) return clue.clues.flatMap(besideClues)
-  return []
+  if (clue instanceof BesideSameObjectClue) return [clue];
+  if (clue instanceof AndClue) return clue.clues.flatMap(besideClues);
+  return [];
 }
 
 /**
@@ -33,27 +33,27 @@ function besideClues(clue: Clue): BesideSameObjectClue[] {
  * All three only ever remove provably-impossible cells; the real solution always survives.
  */
 export class SameObjectTechnique extends Technique {
-  readonly name = 'sameObject'
-  readonly difficulty = 3
+  readonly name = "sameObject";
+  readonly difficulty = 3;
 
   override relevant(puzzle: Puzzle): boolean {
-    return puzzle.suspects.some((s) => s.clues.some((c) => besideClues(c).length > 0))
+    return puzzle.suspects.some((s) => s.clues.some((c) => besideClues(c).length > 0));
   }
 
   apply(ctx: SolveContext): DeductionStep | null {
     for (const suspect of ctx.puzzle.suspects) {
       for (const clue of suspect.clues.flatMap(besideClues)) {
         if (!ctx.state.placed.has(suspect.id)) {
-          const pruned = this.pruneSubject(ctx, suspect.id, clue)
-          if (pruned) return pruned
+          const pruned = this.pruneSubject(ctx, suspect.id, clue);
+          if (pruned) return pruned;
         }
-        const forced = this.forcePartner(ctx, suspect.id, clue)
-        if (forced) return forced
-        const named = this.pruneNamedMate(ctx, suspect.id, clue)
-        if (named) return named
+        const forced = this.forcePartner(ctx, suspect.id, clue);
+        if (forced) return forced;
+        const named = this.pruneNamedMate(ctx, suspect.id, clue);
+        if (named) return named;
       }
     }
-    return null
+    return null;
   }
 
   /** Can `mate` stand on `d` as the partner of the subject sitting on `subjectCell`, beside
@@ -65,17 +65,17 @@ export class SameObjectTechnique extends Technique {
     subjectCell: Cell,
     d: Cell,
   ): boolean {
-    if (d === subjectCell) return false
-    const s = ctx.board.rc(subjectCell)
-    const m = ctx.board.rc(d)
-    if (ctx.fullPermutation && (s.row === m.row || s.col === m.col)) return false
-    if (clue.dir && !inDirection8(clue.dir, m, s)) return false
-    return true
+    if (d === subjectCell) return false;
+    const s = ctx.board.rc(subjectCell);
+    const m = ctx.board.rc(d);
+    if (ctx.fullPermutation && (s.row === m.row || s.col === m.col)) return false;
+    if (clue.dir && !inDirection8(clue.dir, m, s)) return false;
+    return true;
   }
 
   /** The beside-sets of instances the subject cell `c` touches. */
   private instancesBeside(besides: Set<Cell>[], c: Cell): Set<Cell>[] {
-    return besides.filter((set) => set.has(c))
+    return besides.filter((set) => set.has(c));
   }
 
   private pruneSubject(
@@ -83,22 +83,22 @@ export class SameObjectTechnique extends Technique {
     id: PersonId,
     clue: BesideSameObjectClue,
   ): DeductionStep | null {
-    const besides = clue.besideSets(ctx.board)
-    const mates = clue.mateIds(ctx.puzzle, id)
+    const besides = clue.besideSets(ctx.board);
+    const mates = clue.mateIds(ctx.puzzle, id);
     const hasPartner = (c: Cell): boolean =>
       this.instancesBeside(besides, c).some((set) =>
         mates.some((mate) =>
           ctx.cellsOf(mate).some((d) => set.has(d) && this.validPartner(ctx, clue, c, d)),
         ),
-      )
-    const removed = ctx.removeWhere(id, (c) => !hasPartner(c))
-    if (removed.length === 0) return null
+      );
+    const removed = ctx.removeWhere(id, (c) => !hasPartner(c));
+    if (removed.length === 0) return null;
     return {
-      technique: 'sameObject',
+      technique: "sameObject",
       personId: id,
       eliminated: [{ personId: id, cells: removed }],
-      explanation: { key: 'step.sameObject', params: { name: id, objectNom: clue.object } },
-    }
+      explanation: { key: "step.sameObject", params: { name: id, objectNom: clue.object } },
+    };
   }
 
   /** Subject is placed: the partner (someone beside the same instance) must exist. If exactly
@@ -108,35 +108,40 @@ export class SameObjectTechnique extends Technique {
     id: PersonId,
     clue: BesideSameObjectClue,
   ): DeductionStep | null {
-    const subjectCell = ctx.state.placed.get(id)
-    if (subjectCell === undefined) return null
-    const besides = clue.besideSets(ctx.board)
+    const subjectCell = ctx.state.placed.get(id);
+    if (subjectCell === undefined) return null;
+    const besides = clue.besideSets(ctx.board);
     // Every valid partner cell beside an instance the placed subject touches.
-    const partnerCells = new Set<Cell>()
+    const partnerCells = new Set<Cell>();
     for (const set of this.instancesBeside(besides, subjectCell)) {
-      for (const d of set) if (this.validPartner(ctx, clue, subjectCell, d)) partnerCells.add(d)
+      for (const d of set) if (this.validPartner(ctx, clue, subjectCell, d)) partnerCells.add(d);
     }
-    if (partnerCells.size === 0) return null
-    const mates = clue.mateIds(ctx.puzzle, id)
+    if (partnerCells.size === 0) return null;
+    const mates = clue.mateIds(ctx.puzzle, id);
     // Already satisfied by a placed partner → nothing to force.
-    if (mates.some((m) => { const p = ctx.state.placed.get(m); return p !== undefined && partnerCells.has(p) }))
-      return null
+    if (
+      mates.some((m) => {
+        const p = ctx.state.placed.get(m);
+        return p !== undefined && partnerCells.has(p);
+      })
+    )
+      return null;
     const possible = mates.filter(
       (m) => !ctx.state.placed.has(m) && ctx.cellsOf(m).some((d) => partnerCells.has(d)),
-    )
-    if (possible.length !== 1) return null
-    const partner = possible[0]
-    const removed = ctx.removeWhere(partner, (d) => !partnerCells.has(d))
-    if (removed.length === 0) return null
+    );
+    if (possible.length !== 1) return null;
+    const partner = possible[0];
+    const removed = ctx.removeWhere(partner, (d) => !partnerCells.has(d));
+    if (removed.length === 0) return null;
     return {
-      technique: 'sameObject',
+      technique: "sameObject",
       personId: partner,
       eliminated: [{ personId: partner, cells: removed }],
       explanation: {
-        key: 'step.sameObjectForce',
+        key: "step.sameObjectForce",
         params: { name: id, target: partner, objName: clue.object },
       },
-    }
+    };
   }
 
   /** Symmetric pruning for a NAMED mate: they can only be beside an instance the subject
@@ -146,20 +151,20 @@ export class SameObjectTechnique extends Technique {
     id: PersonId,
     clue: BesideSameObjectClue,
   ): DeductionStep | null {
-    if (clue.mate.kind !== 'person' || ctx.state.placed.has(clue.mate.of)) return null
-    const mate = clue.mate.of
-    const besides = clue.besideSets(ctx.board)
+    if (clue.mate.kind !== "person" || ctx.state.placed.has(clue.mate.of)) return null;
+    const mate = clue.mate.of;
+    const besides = clue.besideSets(ctx.board);
     const canReach = (d: Cell): boolean =>
       this.instancesBeside(besides, d).some((set) =>
         ctx.cellsOf(id).some((c) => set.has(c) && this.validPartner(ctx, clue, c, d)),
-      )
-    const removed = ctx.removeWhere(mate, (d) => !canReach(d))
-    if (removed.length === 0) return null
+      );
+    const removed = ctx.removeWhere(mate, (d) => !canReach(d));
+    if (removed.length === 0) return null;
     return {
-      technique: 'sameObject',
+      technique: "sameObject",
       personId: mate,
       eliminated: [{ personId: mate, cells: removed }],
-      explanation: { key: 'step.sameObject', params: { name: mate, objectNom: clue.object } },
-    }
+      explanation: { key: "step.sameObject", params: { name: mate, objectNom: clue.object } },
+    };
   }
 }

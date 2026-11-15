@@ -1,32 +1,6 @@
 {
   "$schema": "./node_modules/fallow/schema.json",
   "ignoreDependencies": ["nx-mcp"],
-  "ignoreExports": [
-    {
-      "file": "libs/entities/murdoku/model/engine/**",
-      "exports": ["*"]
-    },
-    {
-      "file": "libs/features/murdoku-game/lib/vendored/**",
-      "exports": ["*"]
-    }
-  ],
-  "overrides": [
-    {
-      "files": ["libs/entities/murdoku/model/engine/**"],
-      "rules": {
-        "unused-types": "off",
-        "unused-class-members": "off"
-      }
-    },
-    {
-      "files": ["libs/features/murdoku-game/lib/vendored/**"],
-      "rules": {
-        "unused-types": "off",
-        "unused-class-members": "off"
-      }
-    }
-  ],
   "entry": [
     "apps/games/src/app/main.tsx",
     "steiger.config.ts",
@@ -49,6 +23,9 @@
   ],
   "rules": {
     "css-selector-complexity": "error"
+  },
+  "audit": {
+    "deadCodeBaseline": "tools/fallow-dead-code-baseline.json"
   },
   "duplicates": {
     "ignore": [
@@ -98,17 +75,17 @@
         "files": ["libs/entities/murdoku/model/engine/**"],
         "maxCyclomatic": 130,
         "maxCognitive": 260,
-        "maxCrap": 4000,
-        "maxUnitSize": 500,
-        "reason": "1:1 vendored MIT-engine (LifeValuable/murdoku); de complexiteit en duplicatie zijn eigendom van de upstream-bron en worden niet door ons onderhouden. Onze eigen wrapper en public API vallen buiten deze override en blijven volledig getest."
+        "maxCrap": 3700,
+        "maxUnitSize": 540,
+        "reason": "1:1 vendored MIT-engine (LifeValuable/murdoku, zie VENDORED.md). De plafonds zijn de gemeten upstream-maxima plus een kleine marge: cyclomatisch 125 en cognitief 254 in Generator.candidatesFor, 516 regels in diezelfde functie. Onze wrapper (model/murdoku.ts en index.ts) valt buiten deze override. Ongebruikte engine-exports staan in tools/fallow-dead-code-baseline.json, niet in een blanket ignore."
       },
       {
         "files": ["libs/features/murdoku-game/lib/vendored/**"],
-        "maxCyclomatic": 130,
-        "maxCognitive": 260,
-        "maxCrap": 4000,
-        "maxUnitSize": 500,
-        "reason": "1:1 vendored MIT-renderlaag (LifeValuable/murdoku): canvas-art voor meubels, vloeren en portretten. De complexiteit is eigendom van de upstream-bron; onze eigen teksten, palette, preview-fixture en bordcomponent vallen buiten deze override en zijn getest."
+        "maxCyclomatic": 90,
+        "maxCognitive": 150,
+        "maxCrap": 1700,
+        "maxUnitSize": 640,
+        "reason": "1:1 vendored MIT-renderlaag (LifeValuable/murdoku): canvas-art voor meubels, vloeren en portretten. Gemeten maxima: cyclomatisch 84 (drawFloorTile), cognitief 143 (drawFloorTile) en 615 regels (drawFloorTile). Onze teksten, palette, preview-fixture en bordcomponent vallen buiten deze override en zijn getest."
       }
     ]
   },
