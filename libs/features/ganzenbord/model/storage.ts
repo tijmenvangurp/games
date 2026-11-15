@@ -1,4 +1,12 @@
-import { PLAYER_IDS, type Controller, type PlayerId } from "@entities/ganzenbord";
+import {
+  DEFAULT_PLAYER_COLORS,
+  MAX_PLAYER_NAME_LENGTH,
+  PLAYER_IDS,
+  isPlayerColor,
+  type Controller,
+  type PlayerColor,
+  type PlayerId,
+} from "@entities/ganzenbord";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
 import { DEFAULT_SETTINGS, isController, isPlayerCount, type GanzenbordSettings } from "./settings";
 
@@ -38,6 +46,42 @@ function toControllers(value: unknown): Record<PlayerId, Controller> | undefined
   return controllers;
 }
 
+function toNames(value: unknown): Record<PlayerId, string> | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const names = {} as Record<PlayerId, string>;
+  for (const id of PLAYER_IDS) {
+    const name = value[id];
+    if (typeof name !== "string") {
+      return undefined;
+    }
+    names[id] = name.slice(0, MAX_PLAYER_NAME_LENGTH);
+  }
+  return names;
+}
+
+function toColors(value: unknown): Record<PlayerId, PlayerColor> | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const colors = {} as Record<PlayerId, PlayerColor>;
+  for (const id of PLAYER_IDS) {
+    const color = value[id];
+    if (!isPlayerColor(color)) {
+      return undefined;
+    }
+    colors[id] = color;
+  }
+
+  // Een dubbele kleur maakt de pionnen ononderscheidbaar; dan liever de vaste set.
+  return new Set(Object.values(colors)).size === PLAYER_IDS.length
+    ? colors
+    : { ...DEFAULT_PLAYER_COLORS };
+}
+
 function toSettings(value: unknown): GanzenbordSettings | undefined {
   if (!isRecord(value)) {
     return undefined;
@@ -46,7 +90,12 @@ function toSettings(value: unknown): GanzenbordSettings | undefined {
   if (!controllers || !isPlayerCount(value.playerCount)) {
     return undefined;
   }
-  return { playerCount: value.playerCount, controllers };
+  return {
+    playerCount: value.playerCount,
+    controllers,
+    names: toNames(value.names) ?? FALLBACK.settings.names,
+    colors: toColors(value.colors) ?? FALLBACK.settings.colors,
+  };
 }
 
 function toWins(value: unknown): Wins | undefined {

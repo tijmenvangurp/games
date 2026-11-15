@@ -30,7 +30,7 @@ function PlayerCard({ game, playerId, wins }: PlayerCardProps) {
       <div className="flex min-w-0 items-center gap-2">
         <span
           aria-hidden="true"
-          className={cn("size-2.5 shrink-0 rounded-full", playerColorClass(player.id))}
+          className={cn("size-2.5 shrink-0 rounded-full", playerColorClass(player.color))}
         />
         <span className="truncate text-sm font-black">{playerShortName(player)}</span>
         <span

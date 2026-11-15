@@ -2,23 +2,34 @@ import {
   PLAYER_IDS,
   isFinished,
   type GanzenbordGame,
+  type PlayerColor,
   type PlayerId,
   type PlayerState,
   type TurnEvent,
 } from "@entities/ganzenbord";
 
+type NamedPlayer = Pick<PlayerState, "id" | "controller" | "name">;
+
 export function playerNumber(id: PlayerId): number {
   return PLAYER_IDS.indexOf(id) + 1;
 }
 
-export function playerName(player: Pick<PlayerState, "id" | "controller">): string {
+export function playerName(player: NamedPlayer): string {
+  const custom = player.name?.trim();
+  if (custom) {
+    return custom;
+  }
   return player.controller === "computer"
     ? `Computer ${playerNumber(player.id)}`
     : `Speler ${playerNumber(player.id)}`;
 }
 
 /** Korte naam voor de spelerskaarten; "Computer 2" wordt daar afgekapt. */
-export function playerShortName(player: Pick<PlayerState, "id" | "controller">): string {
+export function playerShortName(player: NamedPlayer): string {
+  const custom = player.name?.trim();
+  if (custom) {
+    return custom;
+  }
   return player.controller === "computer"
     ? `CPU ${playerNumber(player.id)}`
     : `Speler ${playerNumber(player.id)}`;
@@ -29,13 +40,26 @@ function nameOf(game: GanzenbordGame, id: PlayerId): string {
   return player ? playerName(player) : `Speler ${playerNumber(id)}`;
 }
 
-export function playerColorClass(id: PlayerId): string {
-  return {
-    one: "bg-player-one",
-    two: "bg-player-two",
-    three: "bg-player-three",
-    four: "bg-player-four",
-  }[id];
+const COLOR_CLASSES: Readonly<Record<PlayerColor, string>> = {
+  indigo: "bg-pawn-indigo",
+  red: "bg-pawn-red",
+  teal: "bg-pawn-teal",
+  violet: "bg-pawn-violet",
+  pink: "bg-pawn-pink",
+  brown: "bg-pawn-brown",
+};
+
+export const PLAYER_COLOR_OPTIONS: readonly { value: PlayerColor; label: string }[] = [
+  { value: "indigo", label: "Blauw" },
+  { value: "red", label: "Rood" },
+  { value: "teal", label: "Turquoise" },
+  { value: "violet", label: "Paars" },
+  { value: "pink", label: "Roze" },
+  { value: "brown", label: "Bruin" },
+];
+
+export function playerColorClass(color: PlayerColor): string {
+  return COLOR_CLASSES[color];
 }
 
 export function positionText(player: PlayerState): string {

@@ -131,6 +131,32 @@ describe("ganzenbord", () => {
     expect(within(screen.getByLabelText("Spelers")).getAllByRole("listitem")).toHaveLength(4);
   });
 
+  it("laat een eigen naam en kleur kiezen, maar verplicht ze niet", async () => {
+    await openSetup();
+
+    fireEvent.change(screen.getByLabelText("Naam van speler 1"), {
+      target: { value: "Saar" },
+    });
+    fireEvent.click(
+      within(screen.getByRole("group", { name: "Kleur van speler 1" })).getByRole("button", {
+        name: "Paars",
+      }),
+    );
+
+    startGame();
+
+    expect(screen.getByText("Saar")).toBeTruthy();
+    expect(screen.getByText("Speler 2")).toBeTruthy();
+
+    const game = useGanzenbordStore.getState().game;
+    expect(game?.players[0]).toMatchObject({ name: "Saar", color: "violet" });
+    expect(game?.players[1]?.name).toBeUndefined();
+
+    const stored = loadGanzenbordState().settings;
+    expect(stored.names.one).toBe("Saar");
+    expect(stored.colors.one).toBe("violet");
+  });
+
   it("bewaart de instellingen", async () => {
     await openSetup();
     fireEvent.click(screen.getByRole("button", { name: "3 spelers" }));

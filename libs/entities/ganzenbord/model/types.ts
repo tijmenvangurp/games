@@ -11,15 +11,30 @@ export const CONTROLLERS = ["human", "computer"] as const;
 /** Speelt deze pion zichzelf of zit er een mens achter? */
 export type Controller = (typeof CONTROLLERS)[number];
 
+/**
+ * De beschikbare pionkleuren. Ze staan los van de feedbackkleuren: het zijn
+ * rustige, goed onderscheidbare tinten voor de speelstukken.
+ */
+export const PLAYER_COLORS = ["indigo", "red", "teal", "violet", "pink", "brown"] as const;
+
+export type PlayerColor = (typeof PLAYER_COLORS)[number];
+
 export interface PlayerSetup {
   readonly id: PlayerId;
   readonly controller: Controller;
+  /** Optionele eigen naam; leeg of ontbrekend betekent "Speler N". */
+  readonly name?: string;
+  /** Optionele pionkleur; ontbrekend betekent de vaste kleur van de speler. */
+  readonly color?: PlayerColor;
 }
 
 /** Een pion op het bord. Positie 0 is het startvak vóór vakje 1. */
 export interface PlayerState {
   readonly id: PlayerId;
   readonly controller: Controller;
+  readonly color: PlayerColor;
+  /** Alleen gevuld als de speler in de setup een eigen naam heeft gekozen. */
+  readonly name?: string;
   readonly position: number;
   /** Aantal nog over te slaan beurten, bijvoorbeeld na de herberg. */
   readonly skipTurns: number;

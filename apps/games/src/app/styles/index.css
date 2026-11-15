@@ -34,8 +34,12 @@
   --color-danger: var(--danger);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
-  --color-player-three: var(--player-three);
-  --color-player-four: var(--player-four);
+  --color-pawn-indigo: var(--pawn-indigo);
+  --color-pawn-red: var(--pawn-red);
+  --color-pawn-teal: var(--pawn-teal);
+  --color-pawn-violet: var(--pawn-violet);
+  --color-pawn-pink: var(--pawn-pink);
+  --color-pawn-brown: var(--pawn-brown);
 }
 
 :root {
@@ -52,13 +56,18 @@
   --warning: oklch(0.56 0.13 72);
   --danger: oklch(0.53 0.17 25);
   /*
-   * Twee rustige spelerkleuren voor bordspellen. Ze staan los van de
+   * Rustige pionkleuren voor bordspellen. Ze staan los van de
    * feedbackkleuren: groen, amber en rood blijven betekenis houden.
+   * De eerste vier zijn de vaste kleuren van de spelersplekken.
    */
-  --player-one: #4f5d9e;
-  --player-two: oklch(0.58 0.2 30);
-  --player-three: oklch(0.55 0.11 190);
-  --player-four: oklch(0.56 0.13 305);
+  --pawn-indigo: #4f5d9e;
+  --pawn-red: oklch(0.58 0.2 30);
+  --pawn-teal: oklch(0.55 0.11 190);
+  --pawn-violet: oklch(0.56 0.13 305);
+  --pawn-pink: oklch(0.62 0.16 350);
+  --pawn-brown: oklch(0.5 0.07 55);
+  --player-one: var(--pawn-indigo);
+  --player-two: var(--pawn-red);
 }
 
 @layer base {
