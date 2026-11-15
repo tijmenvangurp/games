@@ -1,3 +1,6 @@
 {
-  "ignorePatterns": ["libs/entities/murdoku/model/engine/**"]
+  "ignorePatterns": [
+    "libs/entities/murdoku/model/engine/**",
+    "libs/features/murdoku-game/lib/vendored/**"
+  ]
 }
