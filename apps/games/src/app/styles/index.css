@@ -642,8 +642,12 @@
     cursor: grabbing;
   }
 
-  .draaiwerk-worm-thread {
-    animation: draaiwerk-worm 1400ms linear infinite;
+  .draaiwerk-worm-ribs {
+    animation: draaiwerk-worm-ribs 900ms linear infinite;
+  }
+
+  [data-direction="-1"] .draaiwerk-worm-ribs {
+    animation-direction: reverse;
   }
 
   .draaiwerk-direction {
@@ -699,9 +703,9 @@
     }
   }
 
-  @keyframes draaiwerk-worm {
+  @keyframes draaiwerk-worm-ribs {
     to {
-      stroke-dashoffset: -16;
+      transform: translateX(-9px);
     }
   }
 
@@ -732,7 +736,7 @@
       animation: none;
     }
 
-    .draaiwerk-worm-thread {
+    .draaiwerk-worm-ribs {
       animation: none;
     }
 

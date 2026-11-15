@@ -82,6 +82,7 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
   const liftDragToken =
     activeItem?.kind === "belt" ||
     activeItem?.kind === "chain" ||
+    activeItem?.kind === "worm" ||
     Boolean(activePlacedKey?.startsWith("loose:")) ||
     Boolean(activePlacedKey?.startsWith("belt:"));
 
@@ -106,7 +107,11 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
           }
           return id.startsWith("hole:") || id === "tray-remove";
         }
-        if (activeItem?.kind === "belt" || activeItem?.kind === "chain") {
+        if (
+          activeItem?.kind === "belt" ||
+          activeItem?.kind === "chain" ||
+          activeItem?.kind === "worm"
+        ) {
           return id.startsWith("gear:");
         }
         return id.startsWith("hole:");
@@ -355,14 +360,12 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     const placement = placements.find(
       (candidate) =>
         candidate.kind === "worm" &&
-        (candidate.shaftHoleId === holeId || candidate.wheelHoleId === holeId),
+        (candidate.fromHoleId === holeId || candidate.toHoleId === holeId),
     );
     return placement && placement.kind === "worm"
       ? {
           id: "drag",
           kind: "worm",
-          shaftSize: placement.shaftSize,
-          wheelSize: placement.wheelSize,
           ratio: placement.ratio,
           direction: placement.direction,
         }

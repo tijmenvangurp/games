@@ -41,8 +41,8 @@ export function occupiedHoleIds(level: Level, placements: readonly Placement[]):
       ids.add(placement.holeId);
     }
     if (placement.kind === "worm") {
-      ids.add(placement.shaftHoleId);
-      ids.add(placement.wheelHoleId);
+      ids.add(placement.fromHoleId);
+      ids.add(placement.toHoleId);
     }
   }
 
@@ -75,7 +75,7 @@ export function holesForPlacement(placement: Placement): Set<string> {
     return new Set([placement.holeId]);
   }
   if (placement.kind === "worm") {
-    return new Set([placement.shaftHoleId, placement.wheelHoleId]);
+    return new Set([placement.fromHoleId, placement.toHoleId]);
   }
   if (placement.kind === "loose-belt") {
     return new Set([placement.holeId]);
@@ -114,39 +114,24 @@ function rejectGear(
 }
 
 function rejectWorm(
-  level: Level,
+  placements: readonly Placement[],
   next: WormPlacement,
-  blocked: ReadonlySet<string>,
-  occupied: ReadonlySet<string>,
   slots: ReturnType<typeof gearSlots>,
 ): string {
-  if (blocked.has(next.shaftHoleId) || blocked.has(next.wheelHoleId)) {
-    return "Eén van deze gaten is geblokkeerd.";
+  if (next.fromHoleId === next.toHoleId) {
+    return "Kies twee verschillende tandwielen.";
   }
-  if (occupied.has(next.shaftHoleId) || occupied.has(next.wheelHoleId)) {
-    return "Op dit gat zit al iets.";
+  const gearHoles = new Set(slots.map((slot) => slot.holeId));
+  if (!gearHoles.has(next.fromHoleId) || !gearHoles.has(next.toHoleId)) {
+    return "De wormas moet op twee tandwielen liggen.";
   }
-  if (next.shaftHoleId === next.wheelHoleId) {
-    return "Kies twee verschillende gaten.";
-  }
-
-  const shaft = holeCenter(level, next.shaftHoleId);
-  const wheel = holeCenter(level, next.wheelHoleId);
-  const shaftRadius = gearRadius(next.shaftSize);
-  const wheelRadius = gearRadius(next.wheelSize);
-  if (distance(shaft, wheel) <= shaftRadius + wheelRadius + 1) {
-    return "De wormas is te kort: kies een gat verder weg.";
-  }
-
-  const clash = slots.some((slot) => {
-    const center = holeCenter(level, slot.holeId);
-    const radius = gearRadius(slot.size);
-    return (
-      distance(shaft, center) < shaftRadius + radius - 1 ||
-      distance(wheel, center) < wheelRadius + radius - 1
-    );
-  });
-  return clash ? "De wormas botst met een tandwiel." : "Dat past hier niet.";
+  const pair = [next.fromHoleId, next.toHoleId].sort().join("|");
+  const duplicate = placements.some(
+    (placement) =>
+      placement.kind === "worm" &&
+      [placement.fromHoleId, placement.toHoleId].sort().join("|") === pair,
+  );
+  return duplicate ? "Hier ligt al een wormas." : "Dat past hier niet.";
 }
 
 function rejectLooseBelt(next: LooseBeltPlacement, slots: ReturnType<typeof gearSlots>): string {
@@ -199,7 +184,7 @@ export function rejectionFor(
     case "gear":
       return rejectGear(level, next, blocked, occupied, slots);
     case "worm":
-      return rejectWorm(level, next, blocked, occupied, slots);
+      return rejectWorm(placements, next, slots);
     case "loose-belt":
       return rejectLooseBelt(next, slots);
     default:
@@ -215,10 +200,8 @@ function sameWorm(first: WormPlacement, second: WormPlacement): boolean {
   return (
     first.ratio === second.ratio &&
     first.direction === second.direction &&
-    first.shaftHoleId === second.shaftHoleId &&
-    first.wheelHoleId === second.wheelHoleId &&
-    first.shaftSize === second.shaftSize &&
-    first.wheelSize === second.wheelSize
+    first.fromHoleId === second.fromHoleId &&
+    first.toHoleId === second.toHoleId
   );
 }
 

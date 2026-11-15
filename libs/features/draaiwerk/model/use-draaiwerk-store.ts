@@ -334,7 +334,7 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
 
 interface FoundPlacement {
   placement: Placement;
-  end?: "shaft" | "wheel";
+  end?: "from" | "to";
 }
 
 function findPlaced(placements: readonly Placement[], key: string): FoundPlacement | null {
@@ -350,12 +350,12 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
     const placement = placements.find(
       (candidate) =>
         candidate.kind === "worm" &&
-        (candidate.shaftHoleId === holeId || candidate.wheelHoleId === holeId),
+        (candidate.fromHoleId === holeId || candidate.toHoleId === holeId),
     );
     if (!placement || placement.kind !== "worm") {
       return null;
     }
-    return { placement, end: placement.shaftHoleId === holeId ? "shaft" : "wheel" };
+    return { placement, end: placement.fromHoleId === holeId ? "from" : "to" };
   }
   if (key.startsWith("loose:")) {
     const holeId = key.slice("loose:".length);
@@ -459,9 +459,9 @@ function movePlacedAction(
     next = { ...found.placement, holeId: targetHoleId };
   } else if (found.placement.kind === "worm" && found.end) {
     const draggedHoleId =
-      found.end === "shaft" ? found.placement.shaftHoleId : found.placement.wheelHoleId;
+      found.end === "from" ? found.placement.fromHoleId : found.placement.toHoleId;
     const anchorHoleId =
-      found.end === "shaft" ? found.placement.wheelHoleId : found.placement.shaftHoleId;
+      found.end === "from" ? found.placement.toHoleId : found.placement.fromHoleId;
     const draggedHole = state.level.holes.find((hole) => hole.id === draggedHoleId);
     const anchorHole = state.level.holes.find((hole) => hole.id === anchorHoleId);
     if (!draggedHole || !anchorHole || draggedHoleId === targetHoleId) {
@@ -481,9 +481,9 @@ function movePlacedAction(
     }
 
     next =
-      found.end === "shaft"
-        ? { ...found.placement, shaftHoleId: targetHoleId, wheelHoleId: nextAnchor.id }
-        : { ...found.placement, shaftHoleId: nextAnchor.id, wheelHoleId: targetHoleId };
+      found.end === "from"
+        ? { ...found.placement, fromHoleId: targetHoleId, toHoleId: nextAnchor.id }
+        : { ...found.placement, fromHoleId: nextAnchor.id, toHoleId: targetHoleId };
   } else {
     return;
   }

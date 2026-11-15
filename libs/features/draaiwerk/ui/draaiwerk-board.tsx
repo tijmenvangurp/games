@@ -33,7 +33,6 @@ import {
   StaticChain,
   TargetArc,
   WormBar,
-  wormTone,
 } from "./gear-art";
 
 interface DraaiwerkBoardProps {
@@ -513,7 +512,10 @@ export function DraaiwerkBoard({
   }, [outputById, result.gears, result.outputs]);
   const status = result.solved ? "solved" : result.jammed ? "jammed" : "playing";
   const linkMode =
-    selectedItem?.kind === "belt" || selectedItem?.kind === "chain" || Boolean(pendingGearKey);
+    selectedItem?.kind === "belt" ||
+    selectedItem?.kind === "chain" ||
+    selectedItem?.kind === "worm" ||
+    Boolean(pendingGearKey);
 
   const handleBackgroundTap = (event: MouseEvent<SVGSVGElement>) => {
     const target = event.target as Element;
@@ -645,16 +647,6 @@ export function DraaiwerkBoard({
         />
 
         <g>
-          {worms.map((worm) => (
-            <WormBar
-              key={`worm-bar:${worm.shaftHoleId}:${worm.wheelHoleId}`}
-              level={level}
-              placement={worm}
-            />
-          ))}
-        </g>
-
-        <g>
           {result.gears.map((pose) => {
             const meta = poseMeta.get(pose.key);
             const output = meta?.output;
@@ -666,12 +658,11 @@ export function DraaiwerkBoard({
                 label={meta?.label}
                 pose={pose}
                 tone={
-                  wormTone(pose.visual) ??
-                  (output && config
+                  output && config
                     ? fixedGearTone(pose, output)
                     : pose.key === "motor"
                       ? fixedGearTone(pose, undefined)
-                      : playerGearTone(pose.size))
+                      : playerGearTone(pose.size)
                 }
               />
             );
@@ -682,6 +673,17 @@ export function DraaiwerkBoard({
         <g data-chain-layer="true">
           {result.connections.map((connection) => (
             <ConnectionBand connection={connection} key={connection.key} />
+          ))}
+        </g>
+
+        {/* The worm shaft lies across two gears, so it is drawn over them. */}
+        <g data-worm-layer="true">
+          {worms.map((worm) => (
+            <WormBar
+              key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
+              level={level}
+              placement={worm}
+            />
           ))}
         </g>
 
@@ -792,7 +794,7 @@ export function DraaiwerkBoard({
         <g>
           {canMovePlaced
             ? result.gears
-                .filter((pose) => pose.key.startsWith("gear:") || pose.key.startsWith("worm:"))
+                .filter((pose) => pose.key.startsWith("gear:"))
                 .map((pose) => <PlacedGearHandle key={`move:${pose.key}`} enabled pose={pose} />)
             : null}
         </g>

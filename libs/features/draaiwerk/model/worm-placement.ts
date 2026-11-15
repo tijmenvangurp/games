@@ -1,10 +1,8 @@
 import {
   canPlace,
   drive,
-  gearRadius,
   gearSlots,
   holeCenter,
-  type Hole,
   type Level,
   type Placement,
   type TrayItem,
@@ -13,61 +11,20 @@ import {
 type WormTrayItem = Extract<TrayItem, { kind: "worm" }>;
 type WormPlacement = Extract<Placement, { kind: "worm" }>;
 
-function wormAt(
-  shaftHole: Hole,
-  wheelHole: Hole,
-  item: WormTrayItem,
-  reversed: boolean,
-): WormPlacement {
-  const shaft = reversed ? wheelHole : shaftHole;
-  const wheel = reversed ? shaftHole : wheelHole;
+function wormBetween(fromHoleId: string, toHoleId: string, item: WormTrayItem): WormPlacement {
   return {
     kind: "worm",
-    shaftHoleId: shaft.id,
-    wheelHoleId: wheel.id,
-    shaftSize: item.shaftSize,
-    wheelSize: item.wheelSize,
+    fromHoleId,
+    toHoleId,
     ratio: item.ratio,
     direction: item.direction,
   };
 }
 
-function contactCount(
-  level: Level,
-  placements: readonly Placement[],
-  placement: WormPlacement,
-): number {
-  const slots = gearSlots(level, placements);
-  const shaft = holeCenter(level, placement.shaftHoleId);
-  const wheel = holeCenter(level, placement.wheelHoleId);
-  let contacts = 0;
-  for (const slot of slots) {
-    const center = holeCenter(level, slot.holeId);
-    const radius = gearRadius(slot.size);
-    const shaftContact =
-      Math.abs(
-        Math.hypot(shaft.x - center.x, shaft.y - center.y) -
-          (gearRadius(placement.shaftSize) + radius),
-      ) <= 1;
-    const wheelContact =
-      Math.abs(
-        Math.hypot(wheel.x - center.x, wheel.y - center.y) -
-          (gearRadius(placement.wheelSize) + radius),
-      ) <= 1;
-    if (shaftContact) {
-      contacts += 1;
-    }
-    if (wheelContact) {
-      contacts += 1;
-    }
-  }
-  return contacts;
-}
-
 /**
- * Picks the worm placement that best continues the machine around `holeId`.
- * The player only has to drop or tap one hole; the second hole and the
- * direction of the shaft follow from what is already on the board.
+ * Picks the second gear the worm shaft should lie on. The player only taps one
+ * gear; the shaft spans to the gear that best continues the machine. The worm
+ * is one-way, so both orientations are tried.
  */
 export function autoWormPlacement(
   level: Level,
@@ -75,52 +32,51 @@ export function autoWormPlacement(
   holeId: string,
   item: WormTrayItem,
 ): WormPlacement | null {
-  const hole = level.holes.find((candidate) => candidate.id === holeId);
-  if (!hole) {
+  const slots = gearSlots(level, placements);
+  if (!slots.some((slot) => slot.holeId === holeId)) {
     return null;
   }
 
   let best: { placement: WormPlacement; score: number } | null = null;
 
-  for (const partner of level.holes) {
-    if (partner.id === hole.id) {
+  for (const partner of slots) {
+    if (partner.holeId === holeId) {
       continue;
     }
     for (const reversed of [false, true]) {
-      const placement = wormAt(hole, partner, item, reversed);
+      const placement = reversed
+        ? wormBetween(partner.holeId, holeId, item)
+        : wormBetween(holeId, partner.holeId, item);
       if (!canPlace(level, placements, placement)) {
         continue;
       }
 
       const result = drive(level, [...placements, placement]);
-      const shaft = result.gears.find((pose) => pose.key === `worm:${placement.shaftHoleId}`);
-      const wheel = result.gears.find((pose) => pose.key === `worm:${placement.wheelHoleId}`);
       const satisfied = result.outputs.filter((output) => output.satisfied).length;
+      const selectedPose = result.gears.find((pose) => pose.holeId === holeId);
+      const partnerPose = result.gears.find((pose) => pose.holeId === partner.holeId);
 
       let score = 0;
       if (satisfied > 0) {
         score -= 12 * satisfied;
       }
-      if (shaft?.driven) {
-        score -= 6;
+      if (partnerPose?.driven) {
+        score -= 4;
       }
-      if (wheel?.driven) {
-        score -= 3;
+      if (selectedPose?.driven) {
+        score -= 2;
       }
-      score -= 1.5 * contactCount(level, placements, placement);
-
-      const shaftCenter = holeCenter(level, placement.shaftHoleId);
-      const wheelCenter = holeCenter(level, placement.wheelHoleId);
-      const motor = holeCenter(level, level.motor.holeId);
       score +=
-        (Math.hypot(shaftCenter.x - motor.x, shaftCenter.y - motor.y) -
-          Math.hypot(wheelCenter.x - motor.x, wheelCenter.y - motor.y)) /
-        280;
-
-      if (hole.row === partner.row) {
-        score -= 0.5;
-      }
-      score += Math.hypot(hole.col - partner.col, hole.row - partner.row) * 0.25;
+        Math.abs(
+          Math.hypot(
+            holeCenter(level, holeId).x - holeCenter(level, level.motor.holeId).x,
+            holeCenter(level, holeId).y - holeCenter(level, level.motor.holeId).y,
+          ) -
+            Math.hypot(
+              holeCenter(level, partner.holeId).x - holeCenter(level, level.motor.holeId).x,
+              holeCenter(level, partner.holeId).y - holeCenter(level, level.motor.holeId).y,
+            ),
+        ) / 280;
 
       if (!best || score < best.score) {
         best = { placement, score };

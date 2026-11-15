@@ -23,15 +23,6 @@ const MOTOR_TONE: GearTone = { fill: "#39404f", stroke: "#242a36", soft: "#e8e3d
 const TARGET_TONE: GearTone = { fill: "#6d78ad", stroke: "#4f5d9e", soft: "#e7e8f4" };
 const GENERATOR_TONE: GearTone = { fill: "#c09855", stroke: "#8d6b31", soft: "#f6ecd9" };
 const LIFT_TONE: GearTone = { fill: "#79a6a1", stroke: "#4c7f7b", soft: "#e2efec" };
-const WORM_SHAFT_TONE: GearTone = { fill: "#9aa3ad", stroke: "#646d78", soft: "#eef0f3" };
-const WORM_WHEEL_TONE: GearTone = { fill: "#b08a52", stroke: "#7c5c2e", soft: "#f4e9d6" };
-
-export function wormTone(visual: GearPose["visual"]): GearTone | null {
-  if (visual === "worm-shaft") {
-    return WORM_SHAFT_TONE;
-  }
-  return visual === "worm-wheel" ? WORM_WHEEL_TONE : null;
-}
 
 const PLAYER_TONES: Record<GearSize, GearTone> = {
   1: { fill: "#84aaa4", stroke: "#4f7f78", soft: "#e3f0ed" },
@@ -135,24 +126,6 @@ export function BoardGear({ pose, tone, label, hint = false }: BoardGearProps) {
             stroke={tone.stroke}
             strokeWidth={1.1}
           />
-          {pose.visual === "worm-wheel" ? (
-            <g opacity={0.55} stroke={tone.stroke} strokeLinecap="round" strokeWidth={1.7}>
-              {Array.from({ length: 18 }, (_, index) => {
-                const angle = (index / 18) * Math.PI * 2;
-                const inner = radius * 0.78;
-                const outer = radius * 0.94;
-                return (
-                  <line
-                    key={`wheel-hatch-${index}`}
-                    x1={Math.cos(angle) * inner + radius * 0.08}
-                    x2={Math.cos(angle) * outer}
-                    y1={Math.sin(angle) * inner + radius * 0.08}
-                    y2={Math.sin(angle) * outer}
-                  />
-                );
-              })}
-            </g>
-          ) : null}
           <circle
             fill={tone.soft}
             opacity={0.96}
@@ -514,52 +487,84 @@ export function WormBar({
   level: Level;
   placement: Extract<Placement, { kind: "worm" }>;
 }) {
-  const shaft = holeCenter(level, placement.shaftHoleId);
-  const wheel = holeCenter(level, placement.wheelHoleId);
-  const angle = (Math.atan2(wheel.y - shaft.y, wheel.x - shaft.x) * 180) / Math.PI;
-  const length = Math.hypot(wheel.x - shaft.x, wheel.y - shaft.y);
-  const threads = Math.max(4, Math.round(length / 12));
+  const from = holeCenter(level, placement.fromHoleId);
+  const to = holeCenter(level, placement.toHoleId);
+  const angle = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI;
+  const length = Math.max(24, Math.hypot(to.x - from.x, to.y - from.y));
+  const ribs = Math.max(6, Math.round(length / 9));
+  const clipId = `worm-clip-${placement.fromHoleId}-${placement.toHoleId}`.replace(
+    /[^a-zA-Z0-9_-]/g,
+    "-",
+  );
 
   return (
     <g
-      data-worm={`${placement.shaftHoleId}:${placement.wheelHoleId}`}
+      data-direction={placement.direction}
+      data-worm={`${placement.fromHoleId}:${placement.toHoleId}`}
       data-worm-ratio={placement.ratio}
     >
-      <g
-        transform={`translate(${(shaft.x + wheel.x) / 2} ${(shaft.y + wheel.y) / 2}) rotate(${angle})`}
-      >
+      <g transform={`translate(${(from.x + to.x) / 2} ${(from.y + to.y) / 2}) rotate(${angle})`}>
+        <defs>
+          <clipPath id={clipId}>
+            <rect height={12} rx={6} width={Math.max(0, length - 4)} x={-length / 2 + 2} y={-6} />
+          </clipPath>
+        </defs>
         <rect
-          fill="#b5bcc5"
-          height={11}
-          rx={5.5}
-          stroke="#7d8692"
-          strokeWidth={1}
+          fill="#8f98a2"
+          height={12}
+          rx={6}
+          stroke="#4f5862"
+          strokeWidth={1.2}
           width={length}
           x={-length / 2}
-          y={-5.5}
+          y={-6}
         />
         <rect
-          fill="#eef0f4"
-          height={3}
-          opacity={0.9}
-          rx={1.5}
-          width={Math.max(0, length - 8)}
-          x={-length / 2 + 4}
-          y={-1.5}
+          fill="#d9dee3"
+          height={2.4}
+          opacity={0.8}
+          rx={1.2}
+          width={Math.max(0, length - 12)}
+          x={-length / 2 + 6}
+          y={-4.4}
         />
-        <g
-          className="draaiwerk-worm-thread"
-          stroke="#5e6772"
-          strokeDasharray="2 4"
-          strokeLinecap="round"
-          strokeWidth={1.8}
-        >
-          {Array.from({ length: threads }, (_, index) => {
-            const x =
-              -length / 2 + 7 + (index * Math.max(1, length - 14)) / Math.max(1, threads - 1);
-            return <line key={`thread-${index}`} x1={x - 3.5} x2={x + 3.5} y1={-5} y2={5} />;
+        <g className="draaiwerk-worm-ribs" clipPath={`url(#${clipId})`}>
+          {Array.from({ length: ribs + 1 }, (_, index) => {
+            const x = -length / 2 + 4 + (index * length) / ribs;
+            return (
+              <g key={`rib-${index}`}>
+                <path
+                  d={`M ${x - 3.2} -6 Q ${x + 0.8} 0 ${x + 3.2} 6`}
+                  fill="none"
+                  stroke="#4b545e"
+                  strokeLinecap="round"
+                  strokeWidth={2.2}
+                />
+                <path
+                  d={`M ${x - 4.6} -6 Q ${x - 0.6} 0 ${x + 1.8} 6`}
+                  fill="none"
+                  opacity={0.7}
+                  stroke="#d4dade"
+                  strokeLinecap="round"
+                  strokeWidth={0.9}
+                />
+              </g>
+            );
           })}
         </g>
+        {[-length / 2, length / 2].map((x) => (
+          <rect
+            fill="#b8c0c8"
+            height={15}
+            key={`collar-${x}`}
+            rx={2}
+            stroke="#646d78"
+            strokeWidth={1}
+            width={5}
+            x={x - 2.5}
+            y={-7.5}
+          />
+        ))}
       </g>
     </g>
   );
@@ -597,56 +602,45 @@ export function TrayArt({ item }: { item: TrayItem }) {
   }
 
   if (item.kind === "worm") {
-    const wheelRadius = 6 + item.wheelSize * 2.4;
     return (
       <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
         <rect
-          fill="#b5bcc5"
-          height={9}
-          rx={4.5}
-          stroke="#7d8692"
+          fill="#8f98a2"
+          height={10}
+          rx={5}
+          stroke="#4f5862"
           strokeWidth={1}
-          width={42}
-          x={5}
-          y={12}
+          width={50}
+          x={7}
+          y={17}
         />
-        <rect fill="#eef0f4" height={2.4} opacity={0.9} rx={1.2} width={34} x={9} y={15} />
-        <g stroke="#5e6772" strokeLinecap="round" strokeWidth={1.3}>
-          {Array.from({ length: 8 }, (_, index) => (
-            <line
-              key={`tray-thread-${index}`}
-              x1={9 + index * 4}
-              x2={13 + index * 4}
-              y1={16}
-              y2={20}
-            />
-          ))}
-        </g>
-        <circle cx={44} cy={27} fill="#b08a52" r={wheelRadius} stroke="#7c5c2e" strokeWidth={1.2} />
-        <g opacity={0.55} stroke="#7c5c2e" strokeLinecap="round" strokeWidth={1}>
-          {Array.from({ length: 12 }, (_, index) => {
-            const angle = (index / 12) * Math.PI * 2;
-            return (
-              <line
-                key={`tray-wheel-${index}`}
-                x1={44 + Math.cos(angle) * wheelRadius * 0.62}
-                x2={44 + Math.cos(angle) * wheelRadius * 0.9}
-                y1={27 + Math.sin(angle) * wheelRadius * 0.62}
-                y2={27 + Math.sin(angle) * wheelRadius * 0.9}
-              />
-            );
+        <rect fill="#d9dee3" height={2} opacity={0.8} rx={1} width={42} x={11} y={18.6} />
+        <g stroke="#4b545e" strokeLinecap="round" strokeWidth={1.8}>
+          {Array.from({ length: 7 }, (_, index) => {
+            const x = 13 + index * 6.5;
+            return <path key={`tray-rib-${index}`} d={`M ${x - 2} 17 Q ${x + 1} 22 ${x + 2} 27`} />;
           })}
         </g>
-        <circle
-          cx={44}
-          cy={27}
-          fill="#f4e9d6"
-          r={wheelRadius * 0.5}
-          stroke="#7c5c2e"
-          strokeWidth={0.8}
+        <rect
+          fill="#b8c0c8"
+          height={14}
+          rx={1.8}
+          stroke="#646d78"
+          strokeWidth={1}
+          width={5}
+          x={4}
+          y={15}
         />
-        <circle cx={44} cy={27} fill="#7c5c2e" r={1.8} />
-        <circle cx={7} cy={16.5} fill="#9aa3ad" r={4.5} stroke="#646d78" strokeWidth={1} />
+        <rect
+          fill="#b8c0c8"
+          height={14}
+          rx={1.8}
+          stroke="#646d78"
+          strokeWidth={1}
+          width={5}
+          x={55}
+          y={15}
+        />
       </svg>
     );
   }
