@@ -24,18 +24,38 @@ export interface Output {
   maxSpeed?: number;
 }
 
+export type LinkKind = "open-belt" | "crossed-belt" | "chain";
+
 export type TrayItem =
   | { id: string; kind: "gear"; size: GearSize }
-  | { id: string; kind: "lying-as"; sizeA: GearSize; sizeB: GearSize }
+  | {
+      id: string;
+      kind: "worm";
+      /** The driven worm shaft. */
+      shaftSize: GearSize;
+      /** The worm wheel that drives the rest of the machine. */
+      wheelSize: GearSize;
+      /** Wheel speed per shaft turn. Always a reduction, so 0 < ratio <= 1. */
+      ratio: number;
+      /** Turns the wheel the other way when -1. */
+      direction: 1 | -1;
+    }
   | { id: string; kind: "belt"; crossed?: boolean }
   | { id: string; kind: "chain" };
 
 export type Placement =
   | { kind: "gear"; holeId: string; size: GearSize }
-  | { kind: "lying-as"; holeA: string; holeB: string; sizeA: GearSize; sizeB: GearSize }
-  | { kind: "open-belt"; fromHoleId: string; toHoleId: string }
-  | { kind: "crossed-belt"; fromHoleId: string; toHoleId: string }
-  | { kind: "chain"; fromHoleId: string; toHoleId: string };
+  | {
+      kind: "worm";
+      shaftHoleId: string;
+      wheelHoleId: string;
+      shaftSize: GearSize;
+      wheelSize: GearSize;
+      ratio: number;
+      direction: 1 | -1;
+    }
+  | { kind: "loose-belt"; holeId: string; link: LinkKind }
+  | { kind: LinkKind; fromHoleId: string; toHoleId: string };
 
 export interface Level {
   id: string;
@@ -63,6 +83,8 @@ export interface GearPose {
   speed: number;
   /** Radians. */
   phase: number;
+  /** A worm shaft end or worm wheel, used by the Draaiwerk art. */
+  visual?: "worm-shaft" | "worm-wheel";
   layer: "back" | "front";
   driven: boolean;
   jammed: boolean;

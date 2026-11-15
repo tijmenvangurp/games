@@ -10,7 +10,6 @@ import {
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
-  type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { drive, type TrayItem } from "@entities/gear";
@@ -37,19 +36,16 @@ function trayIdFromActive(id: string | number): string | null {
 export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: DraaiwerkPlayProps) {
   const level = useDraaiwerkStore((state) => state.level);
   const placements = useDraaiwerkStore((state) => state.placements);
-  const pendingHoleId = useDraaiwerkStore((state) => state.pendingHoleId);
   const pendingGearKey = useDraaiwerkStore((state) => state.pendingGearKey);
   const hintPlacement = useDraaiwerkStore((state) => state.hintPlacement);
   const [activeTrayId, setActiveTrayId] = useState<string | null>(null);
   const [activePlacedKey, setActivePlacedKey] = useState<string | null>(null);
-  const [linkPath, setLinkPath] = useState<string[]>([]);
 
   const result = useMemo(() => drive(level, placements), [level, placements]);
   const selectedItem = useSelectedTrayItem();
   const activeItem: TrayItem | null = activeTrayId
     ? (level.tray.find((item) => item.id === activeTrayId) ?? null)
     : null;
-  const linkDrag = activeItem?.kind === "belt" || activeItem?.kind === "chain";
   const canMovePlaced = !selectedItem && !activeTrayId && !result.solved;
 
   const sensors = useSensors(
@@ -65,9 +61,12 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
           if (activePlacedKey.startsWith("belt:")) {
             return id === "tray-remove";
           }
+          if (activePlacedKey.startsWith("loose:")) {
+            return id.startsWith("gear:") || id === "tray-remove";
+          }
           return id.startsWith("hole:") || id === "tray-remove";
         }
-        if (linkDrag) {
+        if (activeItem?.kind === "belt" || activeItem?.kind === "chain") {
           return id.startsWith("gear:");
         }
         return id.startsWith("hole:");
@@ -78,12 +77,11 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       }
       return closestCenter(args).filter(allowed);
     },
-    [activePlacedKey, linkDrag],
+    [activeItem, activePlacedKey],
   );
 
   const handleDragStart = (event: DragStartEvent) => {
     const id = String(event.active.id);
-    setLinkPath([]);
     if (id.startsWith("tray:")) {
       setActiveTrayId(id.slice("tray:".length));
     } else if (id.startsWith("placed:")) {
@@ -95,34 +93,26 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     playHaptic("tap");
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
-    if (!activeItem || (activeItem.kind !== "belt" && activeItem.kind !== "chain")) {
-      return;
-    }
-    const over = event.over ? String(event.over.id) : null;
-    if (!over?.startsWith("gear:")) {
-      return;
-    }
-    const key = over.slice("gear:".length);
-    setLinkPath((previous) => {
-      if (previous[previous.length - 1] === key) {
-        return previous;
-      }
-      return [...previous.slice(-3), key];
-    });
-  };
-
   const handleDragEnd = (event: DragEndEvent) => {
     const over = event.over ? String(event.over.id) : null;
     const placedKey = activePlacedKey;
     const trayId = trayIdFromActive(event.active.id);
-    const path = linkPath;
-    const isLinkTray = activeItem?.kind === "belt" || activeItem?.kind === "chain";
     setActiveTrayId(null);
     setActivePlacedKey(null);
-    setLinkPath([]);
 
     if (placedKey) {
+      if (placedKey.startsWith("loose:")) {
+        if (over?.startsWith("gear:")) {
+          useDraaiwerkStore
+            .getState()
+            .extendLooseBelt(placedKey.slice("loose:".length), over.slice("gear:".length));
+          return;
+        }
+        if (over === "tray-remove") {
+          useDraaiwerkStore.getState().removePlaced(placedKey);
+        }
+        return;
+      }
       if (over?.startsWith("hole:")) {
         useDraaiwerkStore.getState().movePlaced(placedKey, over.slice("hole:".length));
         return;
@@ -137,27 +127,16 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       return;
     }
 
-    if (isLinkTray && over.startsWith("gear:")) {
-      const finalGear = over.slice("gear:".length);
-      const previousGear = path[path.length - 2] ?? null;
-      if (previousGear && previousGear !== finalGear) {
-        useDraaiwerkStore.getState().connectTray(trayId, previousGear, finalGear);
-        return;
-      }
-      useDraaiwerkStore.getState().dropTray(trayId, { kind: "gear", targetId: finalGear });
-      return;
-    }
-
-    if (over.startsWith("hole:")) {
-      useDraaiwerkStore
-        .getState()
-        .dropTray(trayId, { kind: "hole", targetId: over.slice("hole:".length) });
-      return;
-    }
     if (over.startsWith("gear:")) {
       useDraaiwerkStore
         .getState()
         .dropTray(trayId, { kind: "gear", targetId: over.slice("gear:".length) });
+      return;
+    }
+    if (over.startsWith("hole:")) {
+      useDraaiwerkStore
+        .getState()
+        .dropTray(trayId, { kind: "hole", targetId: over.slice("hole:".length) });
     }
   };
 
@@ -168,6 +147,19 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     if (activePlacedKey.startsWith("gear:")) {
       const pose = result.gears.find((gear) => gear.key === activePlacedKey);
       return pose ? { id: "drag", kind: "gear", size: pose.size } : null;
+    }
+    if (activePlacedKey.startsWith("loose:")) {
+      const holeId = activePlacedKey.slice("loose:".length);
+      const placement = placements.find(
+        (candidate) => candidate.kind === "loose-belt" && candidate.holeId === holeId,
+      );
+      if (!placement || placement.kind !== "loose-belt") {
+        return null;
+      }
+      if (placement.link === "chain") {
+        return { id: "drag", kind: "chain" };
+      }
+      return { id: "drag", kind: "belt", crossed: placement.link === "crossed-belt" };
     }
     if (activePlacedKey.startsWith("belt:")) {
       const wantedKey = activePlacedKey.slice("belt:".length);
@@ -186,18 +178,20 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       }
       return null;
     }
+    const holeId = activePlacedKey.slice("worm:".length);
     const placement = placements.find(
       (candidate) =>
-        candidate.kind === "lying-as" &&
-        (`as:${candidate.holeA}` === activePlacedKey ||
-          `as:${candidate.holeB}` === activePlacedKey),
+        candidate.kind === "worm" &&
+        (candidate.shaftHoleId === holeId || candidate.wheelHoleId === holeId),
     );
-    return placement && placement.kind === "lying-as"
+    return placement && placement.kind === "worm"
       ? {
           id: "drag",
-          kind: "lying-as",
-          sizeA: placement.sizeA,
-          sizeB: placement.sizeB,
+          kind: "worm",
+          shaftSize: placement.shaftSize,
+          wheelSize: placement.wheelSize,
+          ratio: placement.ratio,
+          direction: placement.direction,
         }
       : null;
   }, [activePlacedKey, placements, result.gears]);
@@ -224,10 +218,8 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
         onDragCancel={() => {
           setActiveTrayId(null);
           setActivePlacedKey(null);
-          setLinkPath([]);
         }}
         onDragEnd={handleDragEnd}
-        onDragOver={handleDragOver}
         onDragStart={handleDragStart}
       >
         <div className="grid min-h-0 gap-3 md:flex-1 md:grid-cols-1 md:portrait:grid-rows-[minmax(0,1fr)_auto] md:landscape:grid-cols-7">
@@ -235,14 +227,13 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
             canMovePlaced={canMovePlaced}
             hintPlacement={hintPlacement}
             level={level}
-            linkFromKey={linkPath[linkPath.length - 2] ?? null}
             pendingGearKey={pendingGearKey}
-            pendingHoleId={pendingHoleId}
             placements={placements}
             result={result}
             selectedItem={selectedItem}
             onGear={(key) => useDraaiwerkStore.getState().tapGear(key)}
             onHole={(holeId) => useDraaiwerkStore.getState().tapHole(holeId)}
+            onLoose={(holeId) => useDraaiwerkStore.getState().selectLooseBelt(holeId)}
           />
           <DraaiwerkTray removing={Boolean(activePlacedKey)} />
         </div>

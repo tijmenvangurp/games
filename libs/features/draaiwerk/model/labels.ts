@@ -21,8 +21,8 @@ const NEW_LABELS: Record<string, string> = {
   "limited-tray": "beperkte voorraad",
   "reverse-motor": "andere motorrichting",
   size: "groot en klein",
-  "lying-as-slow": "liggende as",
-  "lying-as-fast": "liggende as",
+  "worm-as": "wormas",
+  "worm-as-strong": "sterke wormas",
   "speed-gauge": "snelheidsmeter",
   generator: "lamp",
   lift: "lift",
@@ -41,21 +41,13 @@ function shortSize(size: GearSize): string {
   return size === 2 ? "middel" : "groot";
 }
 
-/** The size word used in a sentence: "de kleine kant". */
-export function sizeWord(size: GearSize): string {
-  if (size === 1) {
-    return "kleine";
-  }
-  return size === 2 ? "middelgrote" : "grote";
-}
-
 /** A compact tray label that still reads as Dutch. */
 export function trayShortLabel(item: TrayItem): string {
   switch (item.kind) {
     case "gear":
       return shortSize(item.size).replace(/^./, (letter) => letter.toUpperCase());
-    case "lying-as":
-      return `As ${shortSize(item.sizeA)} + ${shortSize(item.sizeB)}`;
+    case "worm":
+      return item.ratio <= 0.25 ? "Wormas sterk" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruist" : "Open riem";
     case "chain":

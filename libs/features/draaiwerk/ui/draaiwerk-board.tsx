@@ -1,8 +1,7 @@
-import { useMemo, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, type MouseEvent } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
   boardViewBox,
-  gearPath,
   gearRadius,
   holeCenter,
   type DriveResult,
@@ -15,9 +14,8 @@ import {
   type TrayItem,
 } from "@entities/gear";
 import { outputName } from "../model/labels";
-import { occupiedHoleIds } from "../model/placement";
+import { holesForPlacement, occupiedHoleIds } from "../model/placement";
 import {
-  AxleBar,
   BoardGear,
   ConnectionBand,
   fixedGearTone,
@@ -26,6 +24,8 @@ import {
   LiftGlyph,
   playerGearTone,
   TargetArc,
+  WormBar,
+  wormTone,
 } from "./gear-art";
 
 interface DraaiwerkBoardProps {
@@ -33,32 +33,22 @@ interface DraaiwerkBoardProps {
   result: DriveResult;
   placements: readonly Placement[];
   selectedItem: TrayItem | null;
-  linkFromKey: string | null;
   canMovePlaced: boolean;
-  pendingHoleId: string | null;
   pendingGearKey: string | null;
   hintPlacement: Placement | null;
   onHole: (holeId: string) => void;
   onGear: (key: string) => void;
+  onLoose: (holeId: string) => void;
 }
 
-type AsPlacement = Extract<Placement, { kind: "lying-as" }>;
+type WormPlacement = Extract<Placement, { kind: "worm" }>;
 
 function hintHoles(placement: Placement | null): Set<string> {
-  if (!placement) {
-    return new Set();
-  }
-  if (placement.kind === "gear") {
-    return new Set([placement.holeId]);
-  }
-  if (placement.kind === "lying-as") {
-    return new Set([placement.holeA, placement.holeB]);
-  }
-  return new Set([placement.fromHoleId, placement.toHoleId]);
+  return placement ? holesForPlacement(placement) : new Set();
 }
 
-function isLyingAs(placement: Placement): placement is AsPlacement {
-  return placement.kind === "lying-as";
+function isWorm(placement: Placement): placement is WormPlacement {
+  return placement.kind === "worm";
 }
 
 interface DraaiwerkHoleProps {
@@ -67,19 +57,10 @@ interface DraaiwerkHoleProps {
   blocked: boolean;
   occupied: boolean;
   hint: boolean;
-  pending: boolean;
   onHole: (holeId: string) => void;
 }
 
-function DraaiwerkHole({
-  level,
-  hole,
-  blocked,
-  occupied,
-  hint,
-  pending,
-  onHole,
-}: DraaiwerkHoleProps) {
+function DraaiwerkHole({ level, hole, blocked, occupied, hint, onHole }: DraaiwerkHoleProps) {
   const { isOver, setNodeRef } = useDroppable({ id: `hole:${hole.id}` });
   const center = holeCenter(level, hole.id);
   const label = `Gat ${hole.col}, ${hole.row}${
@@ -147,16 +128,6 @@ function DraaiwerkHole({
           stroke="var(--warning)"
           strokeDasharray="4 4"
           strokeWidth={2}
-        />
-      ) : null}
-      {pending ? (
-        <circle
-          cx={center.x}
-          cy={center.y}
-          fill="none"
-          r={12}
-          stroke="var(--warning)"
-          strokeWidth={2.4}
         />
       ) : null}
       {blocked ? (
@@ -274,18 +245,120 @@ function PlacedConnectionHandle({
   );
 }
 
+function LooseBeltBand({
+  pose,
+  enabled,
+  onLoose,
+}: {
+  pose: GearPose;
+  enabled: boolean;
+  onLoose: (holeId: string) => void;
+}) {
+  const radius = gearRadius(pose.size) + 10;
+  const start = {
+    x: pose.center.x + radius * 0.26,
+    y: pose.center.y + radius * 0.97,
+  };
+  const tail = {
+    x: pose.center.x + radius * 0.42,
+    y: pose.center.y + radius + 20,
+  };
+  const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
+    id: `placed:loose:${pose.holeId}`,
+    disabled: !enabled,
+  });
+  const wasDragging = useRef(false);
+
+  useEffect(() => {
+    if (isDragging) {
+      wasDragging.current = true;
+    }
+  }, [isDragging]);
+
+  const sway = `M ${start.x} ${start.y} Q ${start.x + 10} ${start.y + 12} ${tail.x} ${tail.y}`;
+
+  return (
+    <g data-loose-belt={pose.holeId}>
+      <circle
+        cx={pose.center.x}
+        cy={pose.center.y}
+        fill="none"
+        opacity={0.92}
+        r={radius}
+        stroke="#d6cfbf"
+        strokeWidth={7}
+      />
+      <circle
+        className="draaiwerk-belt-dash"
+        cx={pose.center.x}
+        cy={pose.center.y}
+        fill="none"
+        r={radius}
+        stroke="#8a91a1"
+        strokeDasharray="5 7"
+        strokeWidth={1.5}
+      />
+      <path d={sway} fill="none" stroke="#d6cfbf" strokeLinecap="round" strokeWidth={7} />
+      <path
+        className="draaiwerk-belt-dash"
+        d={sway}
+        fill="none"
+        stroke="#8a91a1"
+        strokeDasharray="5 7"
+        strokeLinecap="round"
+        strokeWidth={1.5}
+      />
+      <g
+        ref={(node) => setNodeRef(node as unknown as HTMLElement)}
+        {...attributes}
+        {...listeners}
+        aria-label="Trek de riem naar een ander tandwiel"
+        className="draaiwerk-loose-handle"
+        data-placed-key={`loose:${pose.holeId}`}
+        role="button"
+        style={{ touchAction: "none" }}
+        tabIndex={enabled ? 0 : -1}
+        onClick={(event) => {
+          event.stopPropagation();
+          if (wasDragging.current) {
+            wasDragging.current = false;
+            return;
+          }
+          onLoose(pose.holeId);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onLoose(pose.holeId);
+          }
+        }}
+      >
+        <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={18} />
+        <circle
+          cx={tail.x}
+          cy={tail.y}
+          fill="var(--card)"
+          r={7}
+          stroke="var(--primary)"
+          strokeWidth={2}
+        />
+        <circle cx={tail.x} cy={tail.y} fill="var(--primary)" r={2.5} />
+      </g>
+    </g>
+  );
+}
+
 export function DraaiwerkBoard({
   level,
   result,
   placements,
   selectedItem,
-  linkFromKey,
   canMovePlaced,
-  pendingHoleId,
   pendingGearKey,
   hintPlacement,
   onHole,
   onGear,
+  onLoose,
 }: DraaiwerkBoardProps) {
   const layout = useMemo(() => {
     const [x, y, width, height] = boardViewBox(level).split(" ").map(Number);
@@ -295,7 +368,11 @@ export function DraaiwerkBoard({
   const occupied = useMemo(() => occupiedHoleIds(level, placements), [level, placements]);
   const blocked = useMemo(() => new Set(level.blockedHoleIds), [level]);
   const hint = hintHoles(hintPlacement);
-  const axles = placements.filter(isLyingAs);
+  const worms = placements.filter(isWorm);
+  const looseBelts = placements.filter(
+    (placement): placement is Extract<Placement, { kind: "loose-belt" }> =>
+      placement.kind === "loose-belt",
+  );
   const outputById = useMemo(
     () => new Map(level.outputs.map((output) => [output.id, output])),
     [level],
@@ -314,8 +391,8 @@ export function DraaiwerkBoard({
     );
   }, [outputById, result.gears, result.outputs]);
   const status = result.solved ? "solved" : result.jammed ? "jammed" : "playing";
-  const pendingGhost = selectedItem?.kind === "lying-as" && pendingHoleId ? pendingHoleId : null;
-  const linkMode = selectedItem?.kind === "belt" || selectedItem?.kind === "chain";
+  const linkMode =
+    selectedItem?.kind === "belt" || selectedItem?.kind === "chain" || Boolean(pendingGearKey);
 
   const handleBackgroundTap = (event: MouseEvent<SVGSVGElement>) => {
     const target = event.target as Element;
@@ -414,8 +491,12 @@ export function DraaiwerkBoard({
         </g>
 
         <g>
-          {axles.map((axle) => (
-            <AxleBar key={`${axle.holeA}:${axle.holeB}`} level={level} placement={axle} />
+          {worms.map((worm) => (
+            <WormBar
+              key={`worm-bar:${worm.shaftHoleId}:${worm.wheelHoleId}`}
+              level={level}
+              placement={worm}
+            />
           ))}
         </g>
 
@@ -431,11 +512,12 @@ export function DraaiwerkBoard({
                 label={meta?.label}
                 pose={pose}
                 tone={
-                  output && config
+                  wormTone(pose.visual) ??
+                  (output && config
                     ? fixedGearTone(pose, output)
                     : pose.key === "motor"
                       ? fixedGearTone(pose, undefined)
-                      : playerGearTone(pose.size)
+                      : playerGearTone(pose.size))
                 }
               />
             );
@@ -485,25 +567,6 @@ export function DraaiwerkBoard({
         </g>
 
         <g>
-          {result.gears
-            .filter((pose) => pose.key === linkFromKey)
-            .map((pose) => (
-              <circle
-                key={`link-from:${pose.key}`}
-                aria-hidden="true"
-                cx={pose.center.x}
-                cy={pose.center.y}
-                fill="none"
-                pointerEvents="none"
-                r={gearRadius(pose.size) + 10}
-                stroke="var(--primary)"
-                strokeDasharray="5 5"
-                strokeWidth={2.4}
-              />
-            ))}
-        </g>
-
-        <g>
           {level.holes.map((hole) => (
             <DraaiwerkHole
               key={hole.id}
@@ -512,7 +575,6 @@ export function DraaiwerkBoard({
               hole={hole}
               level={level}
               occupied={occupied.has(hole.id)}
-              pending={pendingHoleId === hole.id}
               onHole={onHole}
             />
           ))}
@@ -532,7 +594,7 @@ export function DraaiwerkBoard({
         <g>
           {canMovePlaced
             ? result.gears
-                .filter((pose) => pose.key.startsWith("gear:") || pose.key.startsWith("as:"))
+                .filter((pose) => pose.key.startsWith("gear:") || pose.key.startsWith("worm:"))
                 .map((pose) => <PlacedGearHandle key={`move:${pose.key}`} enabled pose={pose} />)
             : null}
         </g>
@@ -550,32 +612,19 @@ export function DraaiwerkBoard({
             : null}
         </g>
 
-        {pendingGhost && selectedItem?.kind === "lying-as" ? (
-          <g aria-hidden="true" pointerEvents="none">
-            <circle
-              cx={holeCenter(level, pendingGhost).x}
-              cy={holeCenter(level, pendingGhost).y}
-              fill="none"
-              opacity={0.6}
-              r={gearRadius(selectedItem.sizeA) + 5}
-              stroke="var(--warning)"
-              strokeDasharray="5 5"
-              strokeWidth={1.6}
-            />
-            <g
-              transform={`translate(${holeCenter(level, pendingGhost).x} ${holeCenter(level, pendingGhost).y})`}
-            >
-              <path
-                d={gearPath(selectedItem.sizeA)}
-                fill="var(--warning)"
-                opacity={0.12}
-                stroke="var(--warning)"
-                strokeDasharray="4 4"
-                strokeWidth={1.4}
+        <g>
+          {looseBelts.map((loose) => {
+            const pose = result.gears.find((gear) => gear.holeId === loose.holeId);
+            return pose ? (
+              <LooseBeltBand
+                key={`loose:${loose.holeId}`}
+                enabled={canMovePlaced}
+                pose={pose}
+                onLoose={onLoose}
               />
-            </g>
-          </g>
-        ) : null}
+            ) : null;
+          })}
+        </g>
       </svg>
     </section>
   );

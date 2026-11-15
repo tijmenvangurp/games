@@ -43,7 +43,7 @@ Voeg bij implementatie een ADR toe, bijvoorbeeld `0031-draaiwerk.md`, omdat het 
 - Snelheid en kracht zijn elkaars tegenpool: een langzame as kan een zware lift omhoog krijgen.
 - Een gesloten lus met een oneven aantal tandwielen kan niet draaien: dan slaat de machine vast.
 
-De eerste release richt zich op al deze punten. Alleen een wormwiel, een planetair stelsel en echte physics blijven buiten scope.
+De eerste release richt zich op al deze punten. Alleen een planetair stelsel en echte physics blijven buiten scope; de wormas is later toegevoegd (zie de update onderaan).
 
 ### Eén ronde
 
@@ -155,7 +155,7 @@ De eerste twaalf levels (tot en met de snelheidsmeter) zijn samen een speelbaar 
 
 **Buiten scope:**
 
-- Een wormwiel, een planetair stelsel of een differentieel.
+- Een planetair stelsel of een differentieel.
 - Een physics-engine of echte botsende tanden.
 - Een levelgenerator of dagelijkse puzzel.
 - Accounts, sync of een backend.
@@ -537,6 +537,28 @@ De tanden bleven op beide standen in elkaar grijpen; er was geen zichtbare botsi
 7. **Snelheidsmeter:** een kleine wijzer met drie zones, of alleen "traag / goed / snel" als tekst?
 8. **Spraak:** korte gesproken instructie toevoegen, of alles visueel houden?
 9. **Stijl:** licht papier en hout, of een donkere werkplaats zoals Sprocketry? Ik neig naar licht, passend bij de rest van de app.
+
+## Update 2026-11-15: wormas en tweetraps riem
+
+De eerste release heeft de liggende as vervangen door een **wormas**. Dat is
+een bewuste wijziging ten opzichte van de oorspronkelijke scope hierboven:
+
+- De as met twee tandwielen op één starre stang is weg. De wormas is één
+  onderdeel met een horizontale schroef en een wormwiel, zoals op de
+  referentiefoto.
+- De wormas wordt met één tik of drag geplaatst. De app zoekt zelf de tweede
+  plek en de kant die het best bij de motor en het doel passen; de speler wijst
+  nooit twee gaatjes aan.
+- De worm is eenrichtingsverkeer en vertraagt (0,5× of 0,25×). De oude
+  "snelle as" bestaat daarom niet meer; de levels 10, 11, 13, 14 en 16 zijn
+  herschreven. Een worm kan niet versnellen.
+- Een riem of ketting hangt na de eerste drop los om één wiel. Een tweede drag
+  aan het losse uiteinde, of een tweede tik op een ander wiel, maakt pas daarna
+  de verbinding. Dit vervangt de eerdere "één drag over twee wielen".
+
+De deterministische graaf, de involute-tandwielen, de lokale opslag en de
+CSP blijven ongewijzigd. Zie het addendum in
+[ADR 0031](../adr/0031-draaiwerk.md).
 
 ## Bronnen
 

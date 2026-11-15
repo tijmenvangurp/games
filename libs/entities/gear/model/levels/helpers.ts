@@ -20,9 +20,15 @@ export function trayGear(id: string, size: GearSize): TrayItem {
   return { id, kind: "gear", size };
 }
 
-/** Level-data helper for the lying axle in chapters 2-4. */
-export function trayLyingAs(id: string, sizeA: GearSize, sizeB: GearSize): TrayItem {
-  return { id, kind: "lying-as", sizeA, sizeB };
+/** Level-data helper for the worm drive in chapters 3-4. */
+export function trayWorm(
+  id: string,
+  shaftSize: GearSize,
+  wheelSize: GearSize,
+  ratio = 0.5,
+  direction: 1 | -1 = -1,
+): TrayItem {
+  return { id, kind: "worm", shaftSize, wheelSize, ratio, direction };
 }
 
 export function trayBelt(id: string, crossed = false): TrayItem {
@@ -37,19 +43,23 @@ export function gearAt(col: number, row: number, size: GearSize): Placement {
   return { kind: "gear", holeId: holeId(col, row), size };
 }
 
-/** Level-data helper for the lying axle in chapters 2-4. */
-export function lyingAsAt(
-  from: readonly [number, number],
-  to: readonly [number, number],
-  sizeA: GearSize,
-  sizeB: GearSize,
+/** Level-data helper for the worm drive in chapters 3-4. */
+export function wormAt(
+  shaft: readonly [number, number],
+  wheel: readonly [number, number],
+  shaftSize: GearSize,
+  wheelSize: GearSize,
+  ratio = 0.5,
+  direction: 1 | -1 = -1,
 ): Placement {
   return {
-    kind: "lying-as",
-    holeA: holeId(from[0], from[1]),
-    holeB: holeId(to[0], to[1]),
-    sizeA,
-    sizeB,
+    kind: "worm",
+    shaftHoleId: holeId(shaft[0], shaft[1]),
+    wheelHoleId: holeId(wheel[0], wheel[1]),
+    shaftSize,
+    wheelSize,
+    ratio,
+    direction,
   };
 }
 

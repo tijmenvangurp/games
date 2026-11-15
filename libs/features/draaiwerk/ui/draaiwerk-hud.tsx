@@ -1,7 +1,7 @@
 import { Button, Confetti, LayoutGrid, Lightbulb, RotateCcw, Trophy, Undo2 } from "@shared/ui";
 import { cn } from "@shared/lib";
 import type { DriveResult, Level, TrayItem } from "@entities/gear";
-import { chapterName, outputName, sizeWord } from "../model/labels";
+import { chapterName, outputName } from "../model/labels";
 import { statusMessage } from "../model/feedback";
 import { useDraaiwerkStore, useSelectedTrayItem } from "../model/use-draaiwerk-store";
 import { SpeedGauge } from "./speed-gauge";
@@ -18,25 +18,19 @@ interface DraaiwerkHudProps {
   onNext: () => void;
 }
 
-function instructionFor(
-  item: TrayItem | null,
-  pendingHoleId: string | null,
-  pendingGearKey: string | null,
-): string {
+function instructionFor(item: TrayItem | null, pendingGearKey: string | null): string {
   if (!item) {
-    return "Kies een onderdeel of sleep een geplaatst onderdeel naar de la.";
+    return pendingGearKey
+      ? "Tik nu een tweede tandwiel voor de riem."
+      : "Kies een onderdeel of sleep een geplaatst onderdeel naar de la.";
   }
   if (item.kind === "gear") {
     return "Tik op een leeg gat voor het tandwiel.";
   }
-  if (item.kind === "lying-as") {
-    return pendingHoleId
-      ? "Tik nu het tweede gat voor de andere kant van de as."
-      : `Tik het eerste gat voor de ${sizeWord(item.sizeA)} kant van de as.`;
+  if (item.kind === "worm") {
+    return "Tik op een leeg gat; de wormas zoekt zelf de tweede plek.";
   }
-  return pendingGearKey
-    ? "Tik nu het tweede tandwiel."
-    : "Tik op twee tandwielen om ze te verbinden.";
+  return "Tik op een tandwiel om de riem eromheen te hangen.";
 }
 
 export function DraaiwerkHud({
@@ -55,7 +49,6 @@ export function DraaiwerkHud({
   const placements = useDraaiwerkStore((state) => state.placements);
   const usedTrayIds = useDraaiwerkStore((state) => state.usedTrayIds);
   const selectedItem = useSelectedTrayItem();
-  const pendingHoleId = useDraaiwerkStore((state) => state.pendingHoleId);
   const pendingGearKey = useDraaiwerkStore((state) => state.pendingGearKey);
   const feedback = useDraaiwerkStore((state) => state.feedback);
   const feedbackTone = useDraaiwerkStore((state) => state.feedbackTone);
@@ -72,7 +65,7 @@ export function DraaiwerkHud({
       pose: result.outputs.find((candidate) => candidate.id === output.id),
     }));
 
-  const instruction = instructionFor(selectedItem, pendingHoleId, pendingGearKey);
+  const instruction = instructionFor(selectedItem, pendingGearKey);
   const statusText = statusMessage(level, result, feedback, instruction, allUsed);
 
   const tone = result.solved

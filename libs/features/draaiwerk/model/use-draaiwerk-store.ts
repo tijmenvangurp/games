@@ -12,14 +12,13 @@ import {
 } from "@entities/gear";
 import { playHaptic, playSound } from "@shared/lib";
 import { JAMMED } from "./feedback";
-import { sizeWord } from "./labels";
 import {
   connectionKey,
   holeForGearKey,
+  holesForPlacement,
   isLinkPlacement,
   linkPlacementKind,
   nextSolutionPlacement,
-  occupiedHoleIds,
   rejectionFor,
   selectedTrayItem,
 } from "./placement";
@@ -29,6 +28,7 @@ import {
   DRAAIWERK_STORAGE_VERSION,
   normalizeDraaiwerkProgress,
 } from "./storage";
+import { autoWormPlacement } from "./worm-placement";
 
 type DraaiwerkStatus = "playing" | "solved";
 type DraaiwerkFeedbackTone = "info" | "warn" | "success";
@@ -41,7 +41,6 @@ interface DraaiwerkStore {
   placements: Placement[];
   usedTrayIds: string[];
   selectedTrayId: string | null;
-  pendingHoleId: string | null;
   pendingGearKey: string | null;
   status: DraaiwerkStatus;
   hintPlacement: Placement | null;
@@ -51,7 +50,8 @@ interface DraaiwerkStore {
   startLevel: (index: number) => void;
   selectTray: (id: string) => void;
   dropTray: (id: string, target: { kind: "hole" | "gear"; targetId: string }) => void;
-  connectTray: (id: string, fromGearKey: string, toGearKey: string) => void;
+  extendLooseBelt: (anchorHoleId: string, toGearKey: string) => void;
+  selectLooseBelt: (anchorHoleId: string) => void;
   movePlaced: (key: string, targetHoleId: string) => void;
   removePlaced: (key: string) => void;
   tapHole: (holeId: string) => void;
@@ -72,7 +72,6 @@ function emptyBoard() {
     placements: [] as Placement[],
     usedTrayIds: [] as string[],
     selectedTrayId: null as string | null,
-    pendingHoleId: null as string | null,
     pendingGearKey: null as string | null,
     status: "playing" as DraaiwerkStatus,
     hintPlacement: null as Placement | null,
@@ -177,7 +176,6 @@ function selectTrayAction(set: DraaiwerkSet, get: DraaiwerkGet, id: string): voi
   const selectedTrayId = state.selectedTrayId === id ? null : id;
   set({
     selectedTrayId,
-    pendingHoleId: null,
     pendingGearKey: null,
     feedback: null,
     feedbackTone: null,
@@ -198,7 +196,6 @@ function dropTrayAction(
 
   set({
     selectedTrayId: id,
-    pendingHoleId: null,
     pendingGearKey: null,
     feedback: null,
     feedbackTone: null,
@@ -211,45 +208,85 @@ function dropTrayAction(
   }
 }
 
-function connectTrayAction(
+function findLooseBelt(
+  state: DraaiwerkStore,
+  holeId: string,
+): Extract<Placement, { kind: "loose-belt" }> | null {
+  const placement = state.placements.find(
+    (candidate) => candidate.kind === "loose-belt" && candidate.holeId === holeId,
+  );
+  return placement && placement.kind === "loose-belt" ? placement : null;
+}
+
+function extendLooseBeltAction(
   set: DraaiwerkSet,
   get: DraaiwerkGet,
-  id: string,
-  fromGearKey: string,
+  anchorHoleId: string,
   toGearKey: string,
 ): void {
-  if (!selectableTrayItem(get(), id)) {
-    return;
-  }
   const state = get();
-  const item = state.level.tray.find((candidate) => candidate.id === id);
-  if (!item || (item.kind !== "belt" && item.kind !== "chain")) {
+  if (state.status === "solved") {
     return;
   }
-  const fromHoleId = holeForGearKey(state.level, fromGearKey);
+  const loose = findLooseBelt(state, anchorHoleId);
+  if (!loose) {
+    return;
+  }
   const toHoleId = holeForGearKey(state.level, toGearKey);
-  if (!fromHoleId || !toHoleId || fromHoleId === toHoleId) {
+  if (!toHoleId || toHoleId === anchorHoleId) {
     return;
   }
 
-  const placed = attemptPlacement(
-    set,
-    get,
-    {
-      kind: linkPlacementKind(item),
-      fromHoleId,
-      toHoleId,
-    },
-    item.id,
-  );
-  if (placed) {
-    set({ selectedTrayId: null, pendingHoleId: null, pendingGearKey: null });
+  const without = state.placements.filter((placement) => placement !== loose);
+  const placement: Placement = {
+    kind: loose.link,
+    fromHoleId: anchorHoleId,
+    toHoleId,
+  };
+  if (!canPlace(state.level, without, placement)) {
+    set({
+      feedback: rejectionFor(state.level, without, placement),
+      feedbackTone: "warn",
+    });
+    playSound("almost");
+    playHaptic("almost");
+    return;
   }
+
+  applyPlacements(set, get, [...without, placement], {
+    selectedTrayId: null,
+    pendingGearKey: null,
+  });
+}
+
+function selectLooseBeltAction(set: DraaiwerkSet, get: DraaiwerkGet, anchorHoleId: string): void {
+  const state = get();
+  if (state.status === "solved") {
+    return;
+  }
+  const loose = findLooseBelt(state, anchorHoleId);
+  if (!loose) {
+    return;
+  }
+  const pose = drive(state.level, state.placements).gears.find(
+    (gear) => gear.holeId === anchorHoleId,
+  );
+  if (!pose) {
+    return;
+  }
+  set({
+    selectedTrayId: null,
+    pendingGearKey: pose.key,
+    feedback: "Tik nu een tweede tandwiel.",
+    feedbackTone: "info",
+  });
+  playSound("select");
+  playHaptic("select");
 }
 
 interface FoundPlacement {
   placement: Placement;
-  end?: "a" | "b";
+  end?: "shaft" | "wheel";
 }
 
 function findPlaced(placements: readonly Placement[], key: string): FoundPlacement | null {
@@ -260,16 +297,24 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
     );
     return placement ? { placement } : null;
   }
-  if (key.startsWith("as:")) {
-    const holeId = key.slice("as:".length);
+  if (key.startsWith("worm:")) {
+    const holeId = key.slice("worm:".length);
     const placement = placements.find(
       (candidate) =>
-        candidate.kind === "lying-as" && (candidate.holeA === holeId || candidate.holeB === holeId),
+        candidate.kind === "worm" &&
+        (candidate.shaftHoleId === holeId || candidate.wheelHoleId === holeId),
     );
-    if (!placement || placement.kind !== "lying-as") {
+    if (!placement || placement.kind !== "worm") {
       return null;
     }
-    return { placement, end: placement.holeA === holeId ? "a" : "b" };
+    return { placement, end: placement.shaftHoleId === holeId ? "shaft" : "wheel" };
+  }
+  if (key.startsWith("loose:")) {
+    const holeId = key.slice("loose:".length);
+    const placement = placements.find(
+      (candidate) => candidate.kind === "loose-belt" && candidate.holeId === holeId,
+    );
+    return placement ? { placement } : null;
   }
   if (key.startsWith("belt:")) {
     const wantedKey = key.slice("belt:".length);
@@ -285,15 +330,43 @@ function holeAt(level: Level, col: number, row: number) {
   return level.holes.find((hole) => hole.col === col && hole.row === row) ?? null;
 }
 
-function trayIdForPlacement(state: DraaiwerkStore, placement: Placement): string | undefined {
-  return state.usedTrayIds.find((id) => {
-    const item = state.level.tray.find((candidate) => candidate.id === id);
-    return item ? trayItemMatches(item, placement) : false;
+function attachedPlacements(state: DraaiwerkStore, removed: Placement): Placement[] {
+  if (removed.kind === "loose-belt" || isLinkPlacement(removed)) {
+    return [];
+  }
+  const holes = holesForPlacement(removed);
+  return state.placements.filter((placement) => {
+    if (placement === removed) {
+      return false;
+    }
+    if (placement.kind === "loose-belt") {
+      return holes.has(placement.holeId);
+    }
+    return (
+      isLinkPlacement(placement) &&
+      (holes.has(placement.fromHoleId) || holes.has(placement.toHoleId))
+    );
   });
 }
 
-function commitMove(set: DraaiwerkSet, get: DraaiwerkGet, nextPlacements: Placement[]): void {
-  applyPlacements(set, get, nextPlacements);
+function trayIdsForPlacements(state: DraaiwerkStore, placements: readonly Placement[]): string[] {
+  const available = [...state.usedTrayIds];
+  const ids: string[] = [];
+  for (const placement of placements) {
+    const found = available.find((id) => {
+      const item = state.level.tray.find((candidate) => candidate.id === id);
+      return item ? trayItemMatches(item, placement) : false;
+    });
+    if (found) {
+      ids.push(found);
+      available.splice(available.indexOf(found), 1);
+    }
+  }
+  return ids;
+}
+
+function trayIdForPlacement(state: DraaiwerkStore, placement: Placement): string | undefined {
+  return trayIdsForPlacements(state, [placement])[0];
 }
 
 function movePlacedAction(
@@ -312,7 +385,10 @@ function movePlacedAction(
     return;
   }
 
-  const without = state.placements.filter((placement) => placement !== found.placement);
+  const detached = attachedPlacements(state, found.placement);
+  const without = state.placements.filter(
+    (placement) => placement !== found.placement && !detached.includes(placement),
+  );
   let next: Placement;
 
   if (found.placement.kind === "gear") {
@@ -320,9 +396,11 @@ function movePlacedAction(
       return;
     }
     next = { ...found.placement, holeId: targetHoleId };
-  } else if (found.placement.kind === "lying-as" && found.end) {
-    const draggedHoleId = found.end === "a" ? found.placement.holeA : found.placement.holeB;
-    const anchorHoleId = found.end === "a" ? found.placement.holeB : found.placement.holeA;
+  } else if (found.placement.kind === "worm" && found.end) {
+    const draggedHoleId =
+      found.end === "shaft" ? found.placement.shaftHoleId : found.placement.wheelHoleId;
+    const anchorHoleId =
+      found.end === "shaft" ? found.placement.wheelHoleId : found.placement.shaftHoleId;
     const draggedHole = state.level.holes.find((hole) => hole.id === draggedHoleId);
     const anchorHole = state.level.holes.find((hole) => hole.id === anchorHoleId);
     if (!draggedHole || !anchorHole || draggedHoleId === targetHoleId) {
@@ -335,16 +413,16 @@ function movePlacedAction(
       anchorHole.row + target.row - draggedHole.row,
     );
     if (!nextAnchor) {
-      set({ feedback: "De as past daar niet.", feedbackTone: "warn" });
+      set({ feedback: "De wormas past daar niet.", feedbackTone: "warn" });
       playSound("almost");
       playHaptic("almost");
       return;
     }
 
     next =
-      found.end === "a"
-        ? { ...found.placement, holeA: targetHoleId, holeB: nextAnchor.id }
-        : { ...found.placement, holeA: nextAnchor.id, holeB: targetHoleId };
+      found.end === "shaft"
+        ? { ...found.placement, shaftHoleId: targetHoleId, wheelHoleId: nextAnchor.id }
+        : { ...found.placement, shaftHoleId: nextAnchor.id, wheelHoleId: targetHoleId };
   } else {
     return;
   }
@@ -356,11 +434,10 @@ function movePlacedAction(
     return;
   }
 
-  commitMove(
-    set,
-    get,
-    state.placements.map((placement) => (placement === found.placement ? next : placement)),
-  );
+  const detachedTrayIds = trayIdsForPlacements(state, detached);
+  applyPlacements(set, get, [...without, next], {
+    usedTrayIds: state.usedTrayIds.filter((id) => !detachedTrayIds.includes(id)),
+  });
 }
 
 function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void {
@@ -373,17 +450,18 @@ function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): 
     return;
   }
 
-  const trayId = trayIdForPlacement(state, found.placement);
+  const detached = attachedPlacements(state, found.placement);
+  const removed = [found.placement, ...detached];
+  const removedTrayIds = trayIdsForPlacements(state, removed);
 
   set({
-    placements: state.placements.filter((placement) => placement !== found.placement),
-    usedTrayIds: trayId ? state.usedTrayIds.filter((id) => id !== trayId) : state.usedTrayIds,
+    placements: state.placements.filter((placement) => !removed.includes(placement)),
+    usedTrayIds: state.usedTrayIds.filter((id) => !removedTrayIds.includes(id)),
     selectedTrayId: null,
-    pendingHoleId: null,
     pendingGearKey: null,
     status: "playing",
     hintPlacement: null,
-    feedback: "Onderdeel weggehaald.",
+    feedback: detached.length > 0 ? "Onderdeel en verbinding weggehaald." : "Onderdeel weggehaald.",
     feedbackTone: "info",
   });
   playSound("tap");
@@ -398,6 +476,11 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
 
   const item = selectedItem(state);
   if (!item) {
+    const pose = drive(state.level, state.placements).gears.find((gear) => gear.holeId === holeId);
+    if (state.pendingGearKey && pose) {
+      get().tapGear(pose.key);
+      return;
+    }
     set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
     playSound("tap");
     playHaptic("tap");
@@ -407,57 +490,22 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
   if (item.kind === "gear") {
     const placed = attemptPlacement(set, get, { kind: "gear", holeId, size: item.size }, item.id);
     if (placed) {
-      set({ selectedTrayId: null, pendingHoleId: null, pendingGearKey: null });
+      set({ selectedTrayId: null, pendingGearKey: null });
     }
     return;
   }
 
-  if (item.kind === "lying-as") {
-    if (!state.pendingHoleId) {
-      const blocked = state.level.blockedHoleIds.includes(holeId);
-      const occupied = occupiedHoleIds(state.level, state.placements).has(holeId);
-      if (blocked || occupied) {
-        set({
-          feedback: blocked ? "Dit gat is geblokkeerd." : "Op dit gat zit al iets.",
-          feedbackTone: "warn",
-        });
-        playSound("almost");
-        playHaptic("almost");
-        return;
-      }
-
-      const sameSize = item.sizeA === item.sizeB;
-      set({
-        pendingHoleId: holeId,
-        feedback: sameSize
-          ? "Goed. Tik nu het tweede gat."
-          : `Goed. Tik nu het tweede gat voor de ${sizeWord(item.sizeB)} kant.`,
-        feedbackTone: "info",
-      });
-      playSound("select");
-      playHaptic("select");
+  if (item.kind === "worm") {
+    const placement = autoWormPlacement(state.level, state.placements, holeId, item);
+    if (!placement) {
+      set({ feedback: "De wormas past daar niet.", feedbackTone: "warn" });
+      playSound("almost");
+      playHaptic("almost");
       return;
     }
-
-    if (state.pendingHoleId === holeId) {
-      set({ pendingHoleId: null, feedback: null, feedbackTone: null });
-      return;
-    }
-
-    const placed = attemptPlacement(
-      set,
-      get,
-      {
-        kind: "lying-as",
-        holeA: state.pendingHoleId,
-        holeB: holeId,
-        sizeA: item.sizeA,
-        sizeB: item.sizeB,
-      },
-      item.id,
-    );
+    const placed = attemptPlacement(set, get, placement, item.id);
     if (placed) {
-      set({ selectedTrayId: null, pendingHoleId: null, pendingGearKey: null });
+      set({ selectedTrayId: null, pendingGearKey: null });
     }
     return;
   }
@@ -478,13 +526,23 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
 
   const item = selectedItem(state);
   const holeId = holeForGearKey(state.level, key);
-
-  if (!item) {
-    set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
+  if (!holeId) {
     return;
   }
 
-  if (!holeId) {
+  if (!item) {
+    if (state.pendingGearKey) {
+      const anchorHoleId = holeForGearKey(state.level, state.pendingGearKey);
+      if (anchorHoleId && anchorHoleId !== holeId) {
+        get().extendLooseBelt(anchorHoleId, key);
+        return;
+      }
+      if (anchorHoleId === holeId) {
+        set({ pendingGearKey: null, feedback: null, feedbackTone: null });
+        return;
+      }
+    }
+    set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
     return;
   }
 
@@ -499,40 +557,19 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
     return;
   }
 
-  if (!state.pendingGearKey) {
+  const placement: Placement = {
+    kind: "loose-belt",
+    holeId,
+    link: linkPlacementKind(item),
+  };
+  const placed = attemptPlacement(set, get, placement, item.id);
+  if (placed) {
     set({
+      selectedTrayId: null,
       pendingGearKey: key,
-      feedback: "Goed. Tik nu het tweede tandwiel.",
+      feedback: "Trek de riem nu naar een ander tandwiel.",
       feedbackTone: "info",
     });
-    playSound("select");
-    playHaptic("select");
-    return;
-  }
-
-  if (state.pendingGearKey === key) {
-    set({ pendingGearKey: null, feedback: null, feedbackTone: null });
-    return;
-  }
-
-  const fromHoleId = holeForGearKey(state.level, state.pendingGearKey);
-  if (!fromHoleId) {
-    set({ pendingGearKey: null });
-    return;
-  }
-
-  const placed = attemptPlacement(
-    set,
-    get,
-    {
-      kind: linkPlacementKind(item),
-      fromHoleId,
-      toHoleId: holeId,
-    },
-    item.id,
-  );
-  if (placed) {
-    set({ selectedTrayId: null, pendingHoleId: null, pendingGearKey: null });
   }
 }
 
@@ -549,7 +586,6 @@ function removeLastAction(set: DraaiwerkSet, get: DraaiwerkGet): void {
     placements: state.placements.slice(0, -1),
     usedTrayIds: trayId ? state.usedTrayIds.filter((id) => id !== trayId) : state.usedTrayIds,
     selectedTrayId: null,
-    pendingHoleId: null,
     pendingGearKey: null,
     status: "playing",
     hintPlacement: null,
@@ -608,8 +644,9 @@ export const useDraaiwerkStore = create<DraaiwerkStore>()(
       startLevel: (index) => startLevelAction(set, get, index),
       selectTray: (id) => selectTrayAction(set, get, id),
       dropTray: (id, target) => dropTrayAction(set, get, id, target),
-      connectTray: (id, fromGearKey, toGearKey) =>
-        connectTrayAction(set, get, id, fromGearKey, toGearKey),
+      extendLooseBelt: (anchorHoleId, toGearKey) =>
+        extendLooseBeltAction(set, get, anchorHoleId, toGearKey),
+      selectLooseBelt: (anchorHoleId) => selectLooseBeltAction(set, get, anchorHoleId),
       movePlaced: (key, targetHoleId) => movePlacedAction(set, get, key, targetHoleId),
       removePlaced: (key) => removePlacedAction(set, get, key),
       tapHole: (holeId) => tapHoleAction(set, get, holeId),

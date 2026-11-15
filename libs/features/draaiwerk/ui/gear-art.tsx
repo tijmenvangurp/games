@@ -22,6 +22,15 @@ const MOTOR_TONE: GearTone = { fill: "#39404f", stroke: "#242a36", soft: "#e8e3d
 const TARGET_TONE: GearTone = { fill: "#6d78ad", stroke: "#4f5d9e", soft: "#e7e8f4" };
 const GENERATOR_TONE: GearTone = { fill: "#c09855", stroke: "#8d6b31", soft: "#f6ecd9" };
 const LIFT_TONE: GearTone = { fill: "#79a6a1", stroke: "#4c7f7b", soft: "#e2efec" };
+const WORM_SHAFT_TONE: GearTone = { fill: "#9aa3ad", stroke: "#646d78", soft: "#eef0f3" };
+const WORM_WHEEL_TONE: GearTone = { fill: "#b08a52", stroke: "#7c5c2e", soft: "#f4e9d6" };
+
+export function wormTone(visual: GearPose["visual"]): GearTone | null {
+  if (visual === "worm-shaft") {
+    return WORM_SHAFT_TONE;
+  }
+  return visual === "worm-wheel" ? WORM_WHEEL_TONE : null;
+}
 
 const PLAYER_TONES: Record<GearSize, GearTone> = {
   1: { fill: "#84aaa4", stroke: "#4f7f78", soft: "#e3f0ed" },
@@ -125,6 +134,24 @@ export function BoardGear({ pose, tone, label, hint = false }: BoardGearProps) {
             stroke={tone.stroke}
             strokeWidth={1.1}
           />
+          {pose.visual === "worm-wheel" ? (
+            <g opacity={0.55} stroke={tone.stroke} strokeLinecap="round" strokeWidth={1.7}>
+              {Array.from({ length: 18 }, (_, index) => {
+                const angle = (index / 18) * Math.PI * 2;
+                const inner = radius * 0.78;
+                const outer = radius * 0.94;
+                return (
+                  <line
+                    key={`wheel-hatch-${index}`}
+                    x1={Math.cos(angle) * inner + radius * 0.08}
+                    x2={Math.cos(angle) * outer}
+                    y1={Math.sin(angle) * inner + radius * 0.08}
+                    y2={Math.sin(angle) * outer}
+                  />
+                );
+              })}
+            </g>
+          ) : null}
           <circle
             fill={tone.soft}
             opacity={0.96}
@@ -368,45 +395,60 @@ export function ConnectionBand({ connection }: { connection: ConnectionPose }) {
   );
 }
 
-export function AxleBar({
+export function WormBar({
   level,
   placement,
 }: {
   level: Level;
-  placement: Extract<Placement, { kind: "lying-as" }>;
+  placement: Extract<Placement, { kind: "worm" }>;
 }) {
-  const first = holeCenter(level, placement.holeA);
-  const second = holeCenter(level, placement.holeB);
-  const angle = (Math.atan2(second.y - first.y, second.x - first.x) * 180) / Math.PI;
-  const length = Math.hypot(second.x - first.x, second.y - first.y);
+  const shaft = holeCenter(level, placement.shaftHoleId);
+  const wheel = holeCenter(level, placement.wheelHoleId);
+  const angle = (Math.atan2(wheel.y - shaft.y, wheel.x - shaft.x) * 180) / Math.PI;
+  const length = Math.hypot(wheel.x - shaft.x, wheel.y - shaft.y);
+  const threads = Math.max(4, Math.round(length / 12));
 
   return (
-    <g data-lying-as={`${placement.holeA}:${placement.holeB}`}>
+    <g
+      data-worm={`${placement.shaftHoleId}:${placement.wheelHoleId}`}
+      data-worm-ratio={placement.ratio}
+    >
       <g
-        transform={`translate(${(first.x + second.x) / 2} ${(first.y + second.y) / 2}) rotate(${angle})`}
+        transform={`translate(${(shaft.x + wheel.x) / 2} ${(shaft.y + wheel.y) / 2}) rotate(${angle})`}
       >
         <rect
-          fill="#c7cbd3"
-          height={10}
-          rx={5}
-          stroke="#8d94a1"
+          fill="#b5bcc5"
+          height={11}
+          rx={5.5}
+          stroke="#7d8692"
           strokeWidth={1}
           width={length}
           x={-length / 2}
-          y={-5}
+          y={-5.5}
         />
         <rect
           fill="#eef0f4"
-          height={3.5}
+          height={3}
           opacity={0.9}
-          rx={1.75}
+          rx={1.5}
           width={Math.max(0, length - 8)}
           x={-length / 2 + 4}
-          y={-1.75}
+          y={-1.5}
         />
+        <g
+          className="draaiwerk-worm-thread"
+          stroke="#5e6772"
+          strokeDasharray="2 4"
+          strokeLinecap="round"
+          strokeWidth={1.8}
+        >
+          {Array.from({ length: threads }, (_, index) => {
+            const x =
+              -length / 2 + 7 + (index * Math.max(1, length - 14)) / Math.max(1, threads - 1);
+            return <line key={`thread-${index}`} x1={x - 3.5} x2={x + 3.5} y1={-5} y2={5} />;
+          })}
+        </g>
       </g>
-      <circle cx={first.x} cy={first.y} fill="#aab1bd" r={7} stroke="#7c8492" strokeWidth={1} />
-      <circle cx={second.x} cy={second.y} fill="#aab1bd" r={7} stroke="#7c8492" strokeWidth={1} />
     </g>
   );
 }
@@ -442,21 +484,57 @@ export function TrayArt({ item }: { item: TrayItem }) {
     );
   }
 
-  if (item.kind === "lying-as") {
-    const firstRadius = 6 + item.sizeA * 2.4;
-    const secondRadius = 6 + item.sizeB * 2.4;
+  if (item.kind === "worm") {
+    const wheelRadius = 6 + item.wheelSize * 2.4;
     return (
       <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
-        <line stroke="#c7cbd3" strokeWidth={5} x1={23} x2={41} y1={20} y2={20} />
-        <line stroke="#8d94a1" strokeWidth={1} x1={23} x2={41} y1={20} y2={20} />
-        {miniGear(item.sizeA, 22, 20, firstRadius)}
-        {miniGear(item.sizeB, 42, 20, secondRadius)}
-        <text fill="var(--muted-foreground)" fontSize={7} textAnchor="middle" x={22} y={40}>
-          A
-        </text>
-        <text fill="var(--muted-foreground)" fontSize={7} textAnchor="middle" x={42} y={40}>
-          B
-        </text>
+        <rect
+          fill="#b5bcc5"
+          height={9}
+          rx={4.5}
+          stroke="#7d8692"
+          strokeWidth={1}
+          width={42}
+          x={5}
+          y={12}
+        />
+        <rect fill="#eef0f4" height={2.4} opacity={0.9} rx={1.2} width={34} x={9} y={15} />
+        <g stroke="#5e6772" strokeLinecap="round" strokeWidth={1.3}>
+          {Array.from({ length: 8 }, (_, index) => (
+            <line
+              key={`tray-thread-${index}`}
+              x1={9 + index * 4}
+              x2={13 + index * 4}
+              y1={16}
+              y2={20}
+            />
+          ))}
+        </g>
+        <circle cx={44} cy={27} fill="#b08a52" r={wheelRadius} stroke="#7c5c2e" strokeWidth={1.2} />
+        <g opacity={0.55} stroke="#7c5c2e" strokeLinecap="round" strokeWidth={1}>
+          {Array.from({ length: 12 }, (_, index) => {
+            const angle = (index / 12) * Math.PI * 2;
+            return (
+              <line
+                key={`tray-wheel-${index}`}
+                x1={44 + Math.cos(angle) * wheelRadius * 0.62}
+                x2={44 + Math.cos(angle) * wheelRadius * 0.9}
+                y1={27 + Math.sin(angle) * wheelRadius * 0.62}
+                y2={27 + Math.sin(angle) * wheelRadius * 0.9}
+              />
+            );
+          })}
+        </g>
+        <circle
+          cx={44}
+          cy={27}
+          fill="#f4e9d6"
+          r={wheelRadius * 0.5}
+          stroke="#7c5c2e"
+          strokeWidth={0.8}
+        />
+        <circle cx={44} cy={27} fill="#7c5c2e" r={1.8} />
+        <circle cx={7} cy={16.5} fill="#9aa3ad" r={4.5} stroke="#646d78" strokeWidth={1} />
       </svg>
     );
   }

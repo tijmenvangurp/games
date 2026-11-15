@@ -180,16 +180,16 @@ export function boardViewBox(level: Level): string {
     if (item.kind === "gear") {
       maxSize = Math.max(maxSize, item.size) as GearSize;
     }
-    if (item.kind === "lying-as") {
-      maxSize = Math.max(maxSize, item.sizeA, item.sizeB) as GearSize;
+    if (item.kind === "worm") {
+      maxSize = Math.max(maxSize, item.shaftSize, item.wheelSize) as GearSize;
     }
   }
   for (const placement of level.solution) {
     if (placement.kind === "gear") {
       maxSize = Math.max(maxSize, placement.size) as GearSize;
     }
-    if (placement.kind === "lying-as") {
-      maxSize = Math.max(maxSize, placement.sizeA, placement.sizeB) as GearSize;
+    if (placement.kind === "worm") {
+      maxSize = Math.max(maxSize, placement.shaftSize, placement.wheelSize) as GearSize;
     }
   }
 

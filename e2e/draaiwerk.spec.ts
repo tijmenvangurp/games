@@ -26,30 +26,6 @@ async function dragOnto(page: import("@playwright/test").Page, fromId: string, t
   await page.mouse.up();
 }
 
-async function dragAcross(
-  page: import("@playwright/test").Page,
-  fromId: string,
-  viaId: string,
-  toId: string,
-) {
-  const start = await page.locator(fromId).boundingBox();
-  const via = await page.locator(viaId).boundingBox();
-  const end = await page.locator(toId).boundingBox();
-  if (!start || !via || !end) {
-    throw new Error("Geen positie voor slepen");
-  }
-
-  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(start.x + start.width / 2 + 12, start.y + start.height / 2 + 12, {
-    steps: 4,
-  });
-  await page.mouse.move(via.x + via.width / 2, via.y + via.height / 2, { steps: 12 });
-  await page.waitForTimeout(120);
-  await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 12 });
-  await page.mouse.up();
-}
-
 async function touchDragOnto(page: import("@playwright/test").Page, fromId: string, toId: string) {
   const start = await page.locator(fromId).boundingBox();
   const end = await page.locator(toId).boundingBox();
@@ -105,7 +81,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "playing");
   });
 
-  test("toont een liggende as met twee uiteinden", async ({ page }) => {
+  test("toont een wormas met schroef en wiel", async ({ page }) => {
     await page.goto("/draaiwerk");
     await page.evaluate(() => {
       localStorage.setItem(
@@ -115,8 +91,26 @@ test.describe("draaiwerk op een landschapstablet", () => {
     });
     await page.reload();
 
-    await expect(page.getByRole("heading", { name: /De liggende as/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Liggende as/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /De wormas/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Wormas/ })).toBeVisible();
+  });
+
+  test("plaats een wormas met één tik", async ({ page }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 10, current: 9 }, version: 1 }),
+      );
+    });
+    await page.reload();
+
+    await page.getByRole("button", { name: /Wormas/ }).click();
+    await page.locator('[data-hole-id="2,2"]').click();
+
+    await expect(page.locator("[data-worm]")).toBeVisible();
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
   });
 
   test("sleept een tandwiel van de la naar het bord", async ({ page }) => {
@@ -128,7 +122,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
   });
 
-  test("sleept een riem in één beweging over twee tandwielen", async ({ page }) => {
+  test("hangt een riem eerst om één tandwiel en sleept hem dan verder", async ({ page }) => {
     await page.goto("/draaiwerk");
     await page.evaluate(() => {
       localStorage.setItem(
@@ -139,12 +133,12 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.reload();
     await expect(page.getByRole("heading", { name: /De riem/ })).toBeVisible();
 
-    await dragAcross(
-      page,
-      "[data-tray-id]",
-      '[data-gear-drop="motor"]',
-      '[data-gear-drop="output:target-1"]',
-    );
+    await dragOnto(page, "[data-tray-id]", '[data-gear-drop="motor"]');
+
+    await expect(page.locator('[data-loose-belt="0,2"]')).toBeVisible();
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "playing");
+
+    await dragOnto(page, '[data-placed-key="loose:0,2"]', '[data-gear-drop="output:target-1"]');
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
@@ -180,14 +174,14 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.evaluate(() => {
       localStorage.setItem(
         "games.draaiwerk.v1",
-        JSON.stringify({ state: { unlocked: 16, current: 12 }, version: 1 }),
+        JSON.stringify({ state: { unlocked: 16, current: 13 }, version: 1 }),
       );
     });
     await page.reload();
 
     await page.locator("[data-tray-id]").first().click();
     await page.locator('[data-gear-key="motor"]').click();
-    await page.locator('[data-gear-key="output:generator-1"]').click();
+    await page.locator('[data-gear-key="output:lift-1"]').click();
     await expect(page.locator('[data-placed-key^="belt:"]')).toBeVisible();
 
     await dragOnto(page, '[data-placed-key^="belt:"]', "[data-tray-drop]");

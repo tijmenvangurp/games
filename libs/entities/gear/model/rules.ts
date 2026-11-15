@@ -29,12 +29,13 @@ interface GearNode {
   holeId: string;
   size: GearSize;
   center: Point;
-  /** Two nodes on one lying axle share this id and never mesh. */
-  asGroup?: string;
+  visual?: "worm-shaft" | "worm-wheel";
+  /** The two ends of one worm assembly share this id and never mesh. */
+  wormGroup?: string;
 }
 
 interface GearEdge {
-  kind: "mesh" | "rigid" | ConnectionKind;
+  kind: "mesh" | "rigid" | "worm" | ConnectionKind;
   from: string;
   to: string;
   /** Signed speed factor from `from` to `to`. */
@@ -100,23 +101,30 @@ function buildNodes(level: Level, placements: readonly Placement[]): GearNode[] 
       });
     }
 
-    if (placement.kind === "lying-as") {
-      const occupiedAlready = occupied.has(placement.holeA) || occupied.has(placement.holeB);
-      if (!holeIds.has(placement.holeA) || !holeIds.has(placement.holeB) || occupiedAlready) {
+    if (placement.kind === "worm") {
+      const occupiedAlready =
+        occupied.has(placement.shaftHoleId) || occupied.has(placement.wheelHoleId);
+      if (
+        !holeIds.has(placement.shaftHoleId) ||
+        !holeIds.has(placement.wheelHoleId) ||
+        occupiedAlready
+      ) {
         continue;
       }
-      const group = `as:${placement.holeA}:${placement.holeB}`;
+      const group = `worm:${placement.shaftHoleId}:${placement.wheelHoleId}`;
       add({
-        key: `as:${placement.holeA}`,
-        holeId: placement.holeA,
-        size: placement.sizeA,
-        asGroup: group,
+        key: `worm:${placement.shaftHoleId}`,
+        holeId: placement.shaftHoleId,
+        size: placement.shaftSize,
+        visual: "worm-shaft",
+        wormGroup: group,
       });
       add({
-        key: `as:${placement.holeB}`,
-        holeId: placement.holeB,
-        size: placement.sizeB,
-        asGroup: group,
+        key: `worm:${placement.wheelHoleId}`,
+        holeId: placement.wheelHoleId,
+        size: placement.wheelSize,
+        visual: "worm-wheel",
+        wormGroup: group,
       });
     }
   }
@@ -143,7 +151,7 @@ function buildEdges(
     for (let second = first + 1; second < nodes.length; second += 1) {
       const a = nodes[first] as GearNode;
       const b = nodes[second] as GearNode;
-      if (a.asGroup && a.asGroup === b.asGroup) {
+      if (a.wormGroup && a.wormGroup === b.wormGroup) {
         continue;
       }
       const contact = gearRadius(a.size) + gearRadius(b.size);
@@ -168,37 +176,41 @@ function buildEdges(
     }
   }
 
-  const axleGroups = new Map<string, GearNode[]>();
+  const wormGroups = new Map<string, GearNode[]>();
   for (const node of nodes) {
-    if (!node.asGroup) {
+    if (!node.wormGroup) {
       continue;
     }
-    const group = axleGroups.get(node.asGroup);
+    const group = wormGroups.get(node.wormGroup);
     if (group) {
       group.push(node);
     } else {
-      axleGroups.set(node.asGroup, [node]);
+      wormGroups.set(node.wormGroup, [node]);
     }
   }
-  for (const group of axleGroups.values()) {
-    const a = group[0];
-    const b = group[1];
-    if (!a || !b || group.length !== 2) {
+  for (const group of wormGroups.values()) {
+    const shaft = group.find((node) => node.visual === "worm-shaft");
+    const wheel = group.find((node) => node.visual === "worm-wheel");
+    if (!shaft || !wheel || group.length !== 2) {
       continue;
     }
+    const placement = placements.find(
+      (candidate) =>
+        candidate.kind === "worm" &&
+        candidate.shaftHoleId === shaft.holeId &&
+        candidate.wheelHoleId === wheel.holeId,
+    );
+    if (!placement || placement.kind !== "worm") {
+      continue;
+    }
+    // A worm drive is deliberately one-way: the motor drives the shaft, the
+    // wheel is the output. It does not back-drive.
     addEdge(adjacency, {
-      kind: "rigid",
-      from: a.key,
-      to: b.key,
-      speedFactor: 1,
-      phase: "rigid",
-    });
-    addEdge(adjacency, {
-      kind: "rigid",
-      from: b.key,
-      to: a.key,
-      speedFactor: 1,
-      phase: "rigid",
+      kind: "worm",
+      from: shaft.key,
+      to: wheel.key,
+      speedFactor: placement.direction * placement.ratio,
+      phase: "free",
     });
   }
 
@@ -325,6 +337,7 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
       direction: speed >= 0 ? 1 : -1,
       speed,
       phase: rotor ? rotor.phase : 0,
+      visual: node.visual,
       layer: "front",
       driven: rotor ? rotor.driven : false,
       jammed: rotor ? rotor.jammed : false,
@@ -409,10 +422,10 @@ export function gearSlots(level: Level, placements: readonly Placement[]): GearS
     if (placement.kind === "gear") {
       slots.push({ holeId: placement.holeId, size: placement.size });
     }
-    if (placement.kind === "lying-as") {
-      const group = `as:${placement.holeA}:${placement.holeB}`;
-      slots.push({ holeId: placement.holeA, size: placement.sizeA, group });
-      slots.push({ holeId: placement.holeB, size: placement.sizeB, group });
+    if (placement.kind === "worm") {
+      const group = `worm:${placement.shaftHoleId}:${placement.wheelHoleId}`;
+      slots.push({ holeId: placement.shaftHoleId, size: placement.shaftSize, group });
+      slots.push({ holeId: placement.wheelHoleId, size: placement.wheelSize, group });
     }
   }
 
@@ -462,30 +475,33 @@ function canPlaceGear(
   return true;
 }
 
-function canPlaceLyingAs(
+function canPlaceWorm(
   holes: ReadonlyMap<string, Hole>,
   blocked: ReadonlySet<string>,
   occupied: ReadonlySet<string>,
   slots: readonly GearSlot[],
-  next: Extract<Placement, { kind: "lying-as" }>,
+  next: Extract<Placement, { kind: "worm" }>,
 ): boolean {
-  if (next.holeA === next.holeB) {
+  if (next.shaftHoleId === next.wheelHoleId) {
     return false;
   }
-  const from = holes.get(next.holeA);
-  const to = holes.get(next.holeB);
-  if (!from || !to || blocked.has(next.holeA) || blocked.has(next.holeB)) {
+  if (next.ratio <= 0 || next.ratio > 1) {
     return false;
   }
-  if (occupied.has(next.holeA) || occupied.has(next.holeB)) {
+  const shaft = holes.get(next.shaftHoleId);
+  const wheel = holes.get(next.wheelHoleId);
+  if (!shaft || !wheel || blocked.has(next.shaftHoleId) || blocked.has(next.wheelHoleId)) {
+    return false;
+  }
+  if (occupied.has(next.shaftHoleId) || occupied.has(next.wheelHoleId)) {
     return false;
   }
 
-  const fromCenter = holePoint(from);
-  const toCenter = holePoint(to);
-  const fromRadius = gearRadius(next.sizeA);
-  const toRadius = gearRadius(next.sizeB);
-  if (distanceBetween(fromCenter, toCenter) <= fromRadius + toRadius + CONTACT_TOLERANCE) {
+  const shaftCenter = holePoint(shaft);
+  const wheelCenter = holePoint(wheel);
+  const shaftRadius = gearRadius(next.shaftSize);
+  const wheelRadius = gearRadius(next.wheelSize);
+  if (distanceBetween(shaftCenter, wheelCenter) <= shaftRadius + wheelRadius + CONTACT_TOLERANCE) {
     return false;
   }
 
@@ -496,14 +512,27 @@ function canPlaceLyingAs(
     }
     const center = holePoint(other);
     const radius = gearRadius(slot.size);
-    if (distanceBetween(fromCenter, center) < fromRadius + radius - CONTACT_TOLERANCE) {
+    if (distanceBetween(shaftCenter, center) < shaftRadius + radius - CONTACT_TOLERANCE) {
       return false;
     }
-    if (distanceBetween(toCenter, center) < toRadius + radius - CONTACT_TOLERANCE) {
+    if (distanceBetween(wheelCenter, center) < wheelRadius + radius - CONTACT_TOLERANCE) {
       return false;
     }
   }
   return true;
+}
+
+function canPlaceLooseBelt(
+  slots: readonly GearSlot[],
+  placements: readonly Placement[],
+  next: Extract<Placement, { kind: "loose-belt" }>,
+): boolean {
+  if (!slots.some((slot) => slot.holeId === next.holeId)) {
+    return false;
+  }
+  return !placements.some(
+    (placement) => placement.kind === "loose-belt" && placement.holeId === next.holeId,
+  );
 }
 
 function canPlaceLink(
@@ -551,8 +580,11 @@ export function canPlace(level: Level, placements: readonly Placement[], next: P
   if (next.kind === "gear") {
     return canPlaceGear(holes, blocked, occupied, slots, next);
   }
-  if (next.kind === "lying-as") {
-    return canPlaceLyingAs(holes, blocked, occupied, slots, next);
+  if (next.kind === "worm") {
+    return canPlaceWorm(holes, blocked, occupied, slots, next);
+  }
+  if (next.kind === "loose-belt") {
+    return canPlaceLooseBelt(slots, placements, next);
   }
   return canPlaceLink(holes, slots, placements, next);
 }
@@ -561,11 +593,19 @@ export function trayItemMatches(item: TrayItem, placement: Placement): boolean {
   switch (placement.kind) {
     case "gear":
       return item.kind === "gear" && item.size === placement.size;
-    case "lying-as":
+    case "worm":
       return (
-        item.kind === "lying-as" &&
-        ((item.sizeA === placement.sizeA && item.sizeB === placement.sizeB) ||
-          (item.sizeA === placement.sizeB && item.sizeB === placement.sizeA))
+        item.kind === "worm" &&
+        item.ratio === placement.ratio &&
+        item.direction === placement.direction &&
+        item.shaftSize === placement.shaftSize &&
+        item.wheelSize === placement.wheelSize
+      );
+    case "loose-belt":
+      return (
+        (item.kind === "belt" && item.crossed !== true && placement.link === "open-belt") ||
+        (item.kind === "belt" && item.crossed === true && placement.link === "crossed-belt") ||
+        (item.kind === "chain" && placement.link === "chain")
       );
     case "open-belt":
       return item.kind === "belt" && item.crossed !== true;
@@ -609,8 +649,10 @@ function describePlacement(placement: Placement): string {
   switch (placement.kind) {
     case "gear":
       return `gear at ${placement.holeId}`;
-    case "lying-as":
-      return `lying-as ${placement.holeA} -> ${placement.holeB}`;
+    case "worm":
+      return `worm ${placement.shaftHoleId} -> ${placement.wheelHoleId}`;
+    case "loose-belt":
+      return `loose-belt at ${placement.holeId}`;
     case "open-belt":
     case "crossed-belt":
     case "chain":
@@ -618,10 +660,7 @@ function describePlacement(placement: Placement): string {
   }
 }
 
-export function validateLevel(level: Level): string[] {
-  const errors: string[] = [];
-  const holes = new Map<string, Hole>();
-
+function validateHoles(level: Level, holes: Map<string, Hole>, errors: string[]): void {
   if (level.cols < 1 || level.rows < 1) {
     errors.push(`Level ${level.id} needs a positive board size`);
   }
@@ -638,7 +677,9 @@ export function validateLevel(level: Level): string[] {
       errors.push(`Hole ${hole.id} falls outside the board`);
     }
   }
+}
 
+function validateOutputs(level: Level, holes: ReadonlyMap<string, Hole>, errors: string[]): void {
   const outputIds = new Set<string>();
   for (const output of level.outputs) {
     if (outputIds.has(output.id)) {
@@ -649,7 +690,9 @@ export function validateLevel(level: Level): string[] {
       errors.push(`Output ${output.id} is not on a hole`);
     }
   }
+}
 
+function validateTrayIds(level: Level, errors: string[]): void {
   const trayIds = new Set<string>();
   for (const item of level.tray) {
     if (trayIds.has(item.id)) {
@@ -657,7 +700,9 @@ export function validateLevel(level: Level): string[] {
     }
     trayIds.add(item.id);
   }
+}
 
+function validateCatalogue(level: Level, errors: string[]): void {
   const levels = allLevels();
   if (levels.filter((other) => other.id === level.id).length > 1) {
     errors.push(`Duplicate level id: ${level.id}`);
@@ -665,7 +710,13 @@ export function validateLevel(level: Level): string[] {
   if (levels.filter((other) => other.introduces === level.introduces).length > 1) {
     errors.push(`Duplicate introduces: ${level.introduces}`);
   }
+}
 
+function validateFixedParts(
+  level: Level,
+  holes: ReadonlyMap<string, Hole>,
+  errors: string[],
+): void {
   if (!holes.has(level.motor.holeId)) {
     errors.push(`Motor is not on a hole: ${level.motor.holeId}`);
   }
@@ -688,7 +739,9 @@ export function validateLevel(level: Level): string[] {
       errors.push(`Output ${output.id} stands on a blocked hole`);
     }
   }
+}
 
+function validateOverlaps(level: Level, holes: ReadonlyMap<string, Hole>, errors: string[]): void {
   const slots = gearSlots(level, level.solution);
   for (let first = 0; first < slots.length; first += 1) {
     for (let second = first + 1; second < slots.length; second += 1) {
@@ -710,7 +763,9 @@ export function validateLevel(level: Level): string[] {
       }
     }
   }
+}
 
+function validateTrayCover(level: Level, errors: string[]): void {
   if (
     !trayCanCover(
       level.tray,
@@ -720,25 +775,40 @@ export function validateLevel(level: Level): string[] {
   ) {
     errors.push("Tray does not contain the parts used by the solution");
   }
+}
 
+function validateWormGeometry(
+  level: Level,
+  holes: ReadonlyMap<string, Hole>,
+  errors: string[],
+): void {
   for (const placement of level.solution) {
-    if (placement.kind !== "lying-as") {
+    if (placement.kind !== "worm") {
       continue;
     }
-    const aHole = holes.get(placement.holeA);
-    const bHole = holes.get(placement.holeB);
-    if (!aHole || !bHole) {
-      errors.push(`Lying axle ${placement.holeA} -> ${placement.holeB} leaves the board`);
+    const shaftHole = holes.get(placement.shaftHoleId);
+    const wheelHole = holes.get(placement.wheelHoleId);
+    if (!shaftHole || !wheelHole) {
+      errors.push(`Wormas ${placement.shaftHoleId} -> ${placement.wheelHoleId} leaves the board`);
       continue;
+    }
+    if (placement.ratio <= 0 || placement.ratio > 1) {
+      errors.push(`Wormas ${placement.shaftHoleId} -> ${placement.wheelHoleId} needs a ratio`);
     }
     const gap =
-      distanceBetween(holePoint(aHole), holePoint(bHole)) -
-      (gearRadius(placement.sizeA) + gearRadius(placement.sizeB));
+      distanceBetween(holePoint(shaftHole), holePoint(wheelHole)) -
+      (gearRadius(placement.shaftSize) + gearRadius(placement.wheelSize));
     if (gap <= CONTACT_TOLERANCE) {
-      errors.push(`Lying axle ${placement.holeA} -> ${placement.holeB} touches itself`);
+      errors.push(`Wormas ${placement.shaftHoleId} -> ${placement.wheelHoleId} touches itself`);
     }
   }
+}
 
+function validateConnections(
+  level: Level,
+  holes: ReadonlyMap<string, Hole>,
+  errors: string[],
+): void {
   const finalSlots = slotsByHole(gearSlots(level, level.solution));
   for (const placement of level.solution) {
     if (
@@ -761,7 +831,9 @@ export function validateLevel(level: Level): string[] {
       errors.push(`Connection ${describePlacement(placement)} has no room between the wheels`);
     }
   }
+}
 
+function validatePlaceableSolution(level: Level, errors: string[]): void {
   const placed: Placement[] = [];
   for (const placement of level.solution) {
     if (!canPlace(level, placed, placement)) {
@@ -769,11 +841,30 @@ export function validateLevel(level: Level): string[] {
     }
     placed.push(placement);
   }
+}
 
+function validateSolved(level: Level, errors: string[]): void {
   const result = evaluate(level, level.solution);
   if (result !== "solved") {
     errors.push(`Solution does not solve level ${level.id} (${result})`);
   }
+}
+
+export function validateLevel(level: Level): string[] {
+  const errors: string[] = [];
+  const holes = new Map<string, Hole>();
+
+  validateHoles(level, holes, errors);
+  validateOutputs(level, holes, errors);
+  validateTrayIds(level, errors);
+  validateCatalogue(level, errors);
+  validateFixedParts(level, holes, errors);
+  validateOverlaps(level, holes, errors);
+  validateTrayCover(level, errors);
+  validateWormGeometry(level, holes, errors);
+  validateConnections(level, holes, errors);
+  validatePlaceableSolution(level, errors);
+  validateSolved(level, errors);
 
   return errors;
 }
@@ -790,8 +881,8 @@ export function trayLabel(item: TrayItem): string {
       const label = SIZE_LABELS[item.size];
       return `${label.charAt(0).toUpperCase()}${label.slice(1)} tandwiel`;
     }
-    case "lying-as":
-      return `Liggende as: ${SIZE_LABELS[item.sizeA]} + ${SIZE_LABELS[item.sizeB]}`;
+    case "worm":
+      return item.ratio <= 0.25 ? "Wormas, grote vertraging" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruiste riem" : "Open riem";
     case "chain":

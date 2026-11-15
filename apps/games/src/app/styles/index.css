@@ -630,6 +630,18 @@
     cursor: grabbing;
   }
 
+  .draaiwerk-loose-handle {
+    cursor: grab;
+  }
+
+  .draaiwerk-loose-handle:active {
+    cursor: grabbing;
+  }
+
+  .draaiwerk-worm-thread {
+    animation: draaiwerk-worm 1400ms linear infinite;
+  }
+
   .draaiwerk-direction {
     display: none;
   }
@@ -684,6 +696,12 @@
     }
   }
 
+  @keyframes draaiwerk-worm {
+    to {
+      stroke-dashoffset: -16;
+    }
+  }
+
   @keyframes draaiwerk-pulse {
     0%,
     100% {
@@ -712,6 +730,10 @@
     }
 
     .draaiwerk-belt-dash {
+      animation: none;
+    }
+
+    .draaiwerk-worm-thread {
       animation: none;
     }
 

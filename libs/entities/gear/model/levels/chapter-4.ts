@@ -1,5 +1,14 @@
 import type { Level } from "../types";
-import { createHoles, gearAt, holeId, lyingAsAt, trayBelt, trayGear, trayLyingAs } from "./helpers";
+import {
+  beltAt,
+  createHoles,
+  gearAt,
+  holeId,
+  trayBelt,
+  trayGear,
+  trayWorm,
+  wormAt,
+} from "./helpers";
 
 export const CHAPTER_4_LEVELS: readonly Level[] = [
   {
@@ -7,7 +16,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
     name: "Lamp aan",
     chapter: 4,
     introduces: "generator",
-    intro: "De generator moet snel genoeg draaien voor de lamp.",
+    intro: "De lamp brandt alleen als de generator snel genoeg draait.",
     cols: 10,
     rows: 5,
     holes: createHoles(10, 5),
@@ -19,18 +28,18 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         kind: "generator",
         holeId: holeId(9, 2),
         size: 1,
-        minSpeed: 1.5,
+        minSpeed: 0.9,
       },
     ],
-    tray: [trayBelt("riem-1"), trayLyingAs("as-1", 1, 2)],
-    solution: [lyingAsAt([2, 2], [6, 2], 1, 2)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 2, 1, 0.5)],
+    solution: [beltAt("open-belt", [0, 2], [9, 2])],
   },
   {
     id: "de-lift",
     name: "De lift",
     chapter: 4,
     introduces: "lift",
-    intro: "De lift heeft een langzame, sterke as nodig.",
+    intro: "De lift heeft een langzame, sterke wormas nodig.",
     cols: 10,
     rows: 5,
     holes: createHoles(10, 5),
@@ -40,13 +49,13 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
       {
         id: "lift-1",
         kind: "lift",
-        holeId: holeId(9, 2),
+        holeId: holeId(8, 2),
         size: 1,
         maxSpeed: 0.75,
       },
     ],
-    tray: [trayBelt("riem-1"), trayLyingAs("as-1", 2, 1)],
-    solution: [lyingAsAt([3, 2], [7, 2], 2, 1)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 1, 1, 0.5)],
+    solution: [wormAt([2, 2], [6, 2], 1, 1, 0.5)],
   },
   {
     id: "twee-kanten-op",
@@ -95,7 +104,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         kind: "generator",
         holeId: holeId(11, 2),
         size: 1,
-        minSpeed: 1.5,
+        minSpeed: 0.9,
       },
       {
         id: "lift-1",
@@ -109,15 +118,15 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
       trayGear("tandwiel-1", 1),
       trayGear("tandwiel-2", 1),
       trayGear("tandwiel-3", 1),
-      trayLyingAs("as-1", 2, 1),
-      trayLyingAs("as-2", 1, 2),
+      trayBelt("riem-1"),
+      trayWorm("worm-1", 1, 1, 0.5),
     ],
     solution: [
       gearAt(2, 4, 1),
-      gearAt(2, 2, 1),
       gearAt(2, 6, 1),
-      lyingAsAt([4, 2], [8, 2], 1, 2),
-      lyingAsAt([5, 6], [9, 6], 2, 1),
+      gearAt(4, 6, 1),
+      beltAt("open-belt", [2, 6], [11, 2]),
+      wormAt([6, 6], [9, 6], 1, 1, 0.5),
     ],
   },
 ];

@@ -93,6 +93,34 @@ De alternatieven:
   daarnaast een compacte as, rupsband, tandheugel en combinatieniveaus; die
   zijn bewust nog niet gebouwd.
 
+## Addendum 2026-11-15: wormas en tweetraps riem
+
+De liggende as uit de eerste release is vervangen door een **wormas**: een
+horizontale schroef die een wormwiel aandrijft. Dit supersedeert het punt
+"een wormwiel" in beslissing 8. De motivering is UX: twee gaatjes kiezen en dan
+nog een tweede tik was te veel werk voor één onderdeel.
+
+- **Eén tik of drag.** De wormas wordt op één gaatje geplaatst. De app zoekt
+  zelf de tweede plek, de hoek en de richting, op basis van wat er al op het
+  bord staat. De speler hoeft dus nooit twee gaatjes aan te wijzen.
+- **Eenrichtingsverkeer.** De schroef drijft het wiel aan, maar het wiel drijft
+  de schroef niet terug. In de graaf is dat één `worm`-edge van schroef naar
+  wiel met `speedFactor = direction * ratio`; de ratio is een echte vertraging
+  (0,5 of 0,25). De auto-plaatsing kiest de kant die het best op de motor en
+  het doel aansluit.
+- **Visueel.** De schroef is een metalen staaf met schuine schroefdraden; het
+  wiel is een bronzen tandwiel met schuine arcering. De tray toont dezelfde
+  combinatie, zodat het onderdeel naast de losse tandwielen herkenbaar is.
+- **Aangepaste levels.** De as-levels zijn herschreven: level 10 en 11 leren
+  0,5× en 0,25× vertraging, level 12 laat de meter het verschil met de riem
+  zien, level 13 gebruikt de riem voor een snelle lamp, level 14 de wormas voor
+  een langzame lift en level 16 combineert een riem (1×) met een wormas (0,5×).
+  De oude "snelle as" bestaat niet meer, omdat een worm nooit versnelt.
+- **Riem in twee stappen.** Een riem of ketting hangt na de eerste drop los om
+  één wiel. Een tweede drag aan het losse uiteinde, of een tweede tik op een
+  ander wiel, maakt pas daarna de verbinding. Dat maakt de tussenstap
+  zichtbaar en voorkomt dat de speler per ongeluk twee wielen verbindt.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)
