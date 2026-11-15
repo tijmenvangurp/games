@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   closestCenter,
   DndContext,
@@ -10,13 +10,20 @@ import {
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
+  type DragMoveEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
-import { drive, type TrayItem } from "@entities/gear";
+import { animate } from "motion";
+import { drive, type GearPose, type TrayItem } from "@entities/gear";
 import { playHaptic, playSound } from "@shared/lib";
-import { connectionKey, isLinkPlacement } from "../model/placement";
+import { connectionKey, isLinkPlacement, looseBeltTarget } from "../model/placement";
 import { useDraaiwerkStore, useSelectedTrayItem } from "../model/use-draaiwerk-store";
-import { DraaiwerkBoard } from "./draaiwerk-board";
+import {
+  boardPointFromClient,
+  DraaiwerkBoard,
+  tapDistanceThreshold,
+  type BeltGhost,
+} from "./draaiwerk-board";
 import { DraaiwerkHud } from "./draaiwerk-hud";
 import { DraaiwerkTray } from "./draaiwerk-tray";
 import { TrayArt } from "./gear-art";
@@ -33,6 +40,17 @@ function trayIdFromActive(id: string | number): string | null {
   return value.startsWith("tray:") ? value.slice("tray:".length) : null;
 }
 
+/** The viewport point of a pointer or touch event, without trusting its type. */
+function clientPointFromEvent(event: Event): { x: number; y: number } | null {
+  const pointer = event as Event & { clientX?: number; clientY?: number };
+  if (typeof pointer.clientX === "number" && typeof pointer.clientY === "number") {
+    return { x: pointer.clientX, y: pointer.clientY };
+  }
+  const touches = (event as Event & { changedTouches?: TouchList }).changedTouches;
+  const touch = touches?.[0];
+  return touch ? { x: touch.clientX, y: touch.clientY } : null;
+}
+
 export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: DraaiwerkPlayProps) {
   const level = useDraaiwerkStore((state) => state.level);
   const placements = useDraaiwerkStore((state) => state.placements);
@@ -40,6 +58,14 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
   const hintPlacement = useDraaiwerkStore((state) => state.hintPlacement);
   const [activeTrayId, setActiveTrayId] = useState<string | null>(null);
   const [activePlacedKey, setActivePlacedKey] = useState<string | null>(null);
+  const [ghost, setGhost] = useState<BeltGhost | null>(null);
+  const [settling, setSettling] = useState<BeltGhost | null>(null);
+  const boardRef = useRef<SVGSVGElement | null>(null);
+  const ghostRef = useRef<BeltGhost | null>(null);
+  const ghostOrigin = useRef<{ x: number; y: number } | null>(null);
+  const settleControls = useRef<{ stop: () => void } | null>(null);
+
+  useEffect(() => () => settleControls.current?.stop(), []);
 
   const result = useMemo(() => drive(level, placements), [level, placements]);
   const selectedItem = useSelectedTrayItem();
@@ -48,9 +74,12 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     : null;
   const canMovePlaced = !selectedItem && !activeTrayId && !result.solved;
 
+  // A short press is a tap, a longer movement is a drag. The same threshold
+  // also drives the sensors, which replaces the old wasDragging booleans.
+  const dragThreshold = useMemo(() => tapDistanceThreshold(), []);
   const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: dragThreshold } }),
+    useSensor(TouchSensor, { activationConstraint: { distance: dragThreshold } }),
   );
 
   const collisionDetection = useMemo<CollisionDetection>(
@@ -80,12 +109,39 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     [activeItem, activePlacedKey],
   );
 
+  const startBeltGhost = (holeId: string, activator: Event) => {
+    const placement = placements.find(
+      (candidate) => candidate.kind === "loose-belt" && candidate.holeId === holeId,
+    );
+    const anchor = result.gears.find((pose) => pose.holeId === holeId);
+    const origin = clientPointFromEvent(activator);
+    if (!placement || placement.kind !== "loose-belt" || !anchor || !origin) {
+      return;
+    }
+    const point = boardPointFromClient(boardRef.current, level, origin.x, origin.y);
+    if (!point) {
+      return;
+    }
+    const drag: BeltGhost = { anchorKey: anchor.key, link: placement.link, point };
+    ghostOrigin.current = origin;
+    ghostRef.current = drag;
+    setGhost(drag);
+  };
+
   const handleDragStart = (event: DragStartEvent) => {
     const id = String(event.active.id);
+    ghostOrigin.current = null;
+    ghostRef.current = null;
+    setGhost(null);
+
     if (id.startsWith("tray:")) {
       setActiveTrayId(id.slice("tray:".length));
     } else if (id.startsWith("placed:")) {
-      setActivePlacedKey(id.slice("placed:".length));
+      const placedKey = id.slice("placed:".length);
+      setActivePlacedKey(placedKey);
+      if (placedKey.startsWith("loose:")) {
+        startBeltGhost(placedKey.slice("loose:".length), event.activatorEvent);
+      }
     } else {
       return;
     }
@@ -93,26 +149,96 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     playHaptic("tap");
   };
 
+  const handleDragMove = (event: DragMoveEvent) => {
+    const drag = ghostRef.current;
+    const origin = ghostOrigin.current;
+    if (!drag || !origin) {
+      return;
+    }
+    const point = boardPointFromClient(
+      boardRef.current,
+      level,
+      origin.x + event.delta.x,
+      origin.y + event.delta.y,
+    );
+    if (!point) {
+      return;
+    }
+    const next: BeltGhost = { ...drag, point };
+    ghostRef.current = next;
+    setGhost(next);
+  };
+
+  const settleBelt = (drag: BeltGhost, anchorHoleId: string, target: GearPose) => {
+    settleControls.current?.stop();
+    const from = drag.point;
+    const to = target.center;
+    setSettling({ ...drag, locked: true });
+
+    settleControls.current = animate(0, 1, {
+      duration: 0.18,
+      ease: "easeOut",
+      onUpdate: (progress) => {
+        setSettling((current) =>
+          current
+            ? {
+                ...current,
+                point: {
+                  x: from.x + (to.x - from.x) * progress,
+                  y: from.y + (to.y - from.y) * progress,
+                },
+              }
+            : current,
+        );
+      },
+      onComplete: () => {
+        settleControls.current = null;
+        playSound("ratchet");
+        playHaptic("select");
+        setSettling(null);
+        useDraaiwerkStore.getState().extendLooseBelt(anchorHoleId, target.key);
+      },
+    });
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const over = event.over ? String(event.over.id) : null;
     const placedKey = activePlacedKey;
     const trayId = trayIdFromActive(event.active.id);
+    const beltGhost = ghostRef.current;
+    ghostOrigin.current = null;
+    ghostRef.current = null;
+    setGhost(null);
     setActiveTrayId(null);
     setActivePlacedKey(null);
 
-    if (placedKey) {
-      if (placedKey.startsWith("loose:")) {
-        if (over?.startsWith("gear:")) {
-          useDraaiwerkStore
-            .getState()
-            .extendLooseBelt(placedKey.slice("loose:".length), over.slice("gear:".length));
-          return;
-        }
-        if (over === "tray-remove") {
-          useDraaiwerkStore.getState().removePlaced(placedKey);
-        }
+    if (placedKey?.startsWith("loose:")) {
+      const anchorHoleId = placedKey.slice("loose:".length);
+      if (over === "tray-remove") {
+        useDraaiwerkStore.getState().removePlaced(placedKey);
         return;
       }
+      const target = beltGhost
+        ? looseBeltTarget(
+            level,
+            placements,
+            result.gears,
+            anchorHoleId,
+            beltGhost.link,
+            beltGhost.point,
+          )
+        : null;
+      if (beltGhost && target?.snapped) {
+        settleBelt(beltGhost, anchorHoleId, target.pose);
+        return;
+      }
+      if (over?.startsWith("gear:")) {
+        useDraaiwerkStore.getState().extendLooseBelt(anchorHoleId, over.slice("gear:".length));
+      }
+      return;
+    }
+
+    if (placedKey) {
       if (over?.startsWith("hole:")) {
         useDraaiwerkStore.getState().movePlaced(placedKey, over.slice("hole:".length));
         return;
@@ -149,17 +275,8 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       return pose ? { id: "drag", kind: "gear", size: pose.size } : null;
     }
     if (activePlacedKey.startsWith("loose:")) {
-      const holeId = activePlacedKey.slice("loose:".length);
-      const placement = placements.find(
-        (candidate) => candidate.kind === "loose-belt" && candidate.holeId === holeId,
-      );
-      if (!placement || placement.kind !== "loose-belt") {
-        return null;
-      }
-      if (placement.link === "chain") {
-        return { id: "drag", kind: "chain" };
-      }
-      return { id: "drag", kind: "belt", crossed: placement.link === "crossed-belt" };
+      // The belt itself is the ghost on the board; no tray token is needed.
+      return null;
     }
     if (activePlacedKey.startsWith("belt:")) {
       const wantedKey = activePlacedKey.slice("belt:".length);
@@ -196,7 +313,9 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       : null;
   }, [activePlacedKey, placements, result.gears]);
 
-  const overlayItem = activeItem ?? activePlacedItem;
+  // A loose belt drags as a real band on the board, not as a token from the tray.
+  const overlayItem =
+    activeItem ?? (activePlacedKey?.startsWith("loose:") ? null : activePlacedItem);
 
   return (
     <div className="flex min-h-0 flex-col gap-3 md:flex-1">
@@ -216,24 +335,31 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
         collisionDetection={collisionDetection}
         sensors={sensors}
         onDragCancel={() => {
+          ghostOrigin.current = null;
+          ghostRef.current = null;
+          setGhost(null);
           setActiveTrayId(null);
           setActivePlacedKey(null);
         }}
         onDragEnd={handleDragEnd}
+        onDragMove={handleDragMove}
         onDragStart={handleDragStart}
       >
         <div className="grid min-h-0 gap-3 md:flex-1 md:grid-cols-1 md:portrait:grid-rows-[minmax(0,1fr)_auto] md:landscape:grid-cols-7">
           <DraaiwerkBoard
             canMovePlaced={canMovePlaced}
+            ghost={settling ?? ghost}
             hintPlacement={hintPlacement}
             level={level}
             pendingGearKey={pendingGearKey}
             placements={placements}
             result={result}
             selectedItem={selectedItem}
+            svgRef={boardRef}
             onGear={(key) => useDraaiwerkStore.getState().tapGear(key)}
             onHole={(holeId) => useDraaiwerkStore.getState().tapHole(holeId)}
             onLoose={(holeId) => useDraaiwerkStore.getState().selectLooseBelt(holeId)}
+            onToggleBelt={(key) => useDraaiwerkStore.getState().toggleBeltKind(key)}
           />
           <DraaiwerkTray removing={Boolean(activePlacedKey)} />
         </div>

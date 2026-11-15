@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useRef, type MouseEvent } from "react";
+import { useMemo, useRef, useState, type MouseEvent, type Ref } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import {
+  beltTangentRuns,
   boardViewBox,
+  connectionPath,
   gearRadius,
   holeCenter,
   type DriveResult,
@@ -14,15 +16,23 @@ import {
   type TrayItem,
 } from "@entities/gear";
 import { outputName } from "../model/labels";
-import { holesForPlacement, occupiedHoleIds } from "../model/placement";
 import {
+  holesForPlacement,
+  looseBeltTarget,
+  occupiedHoleIds,
+  type LinkPlacementKind,
+} from "../model/placement";
+import {
+  BeltPreview,
   BoardGear,
+  ChainPreview,
   ConnectionBand,
   fixedGearTone,
   GearHitTarget,
   LampGlyph,
   LiftGlyph,
   playerGearTone,
+  StaticChain,
   TargetArc,
   WormBar,
   wormTone,
@@ -36,9 +46,59 @@ interface DraaiwerkBoardProps {
   canMovePlaced: boolean;
   pendingGearKey: string | null;
   hintPlacement: Placement | null;
+  /** The ghost pulley of a belt that is being dragged, in board coordinates. */
+  ghost?: BeltGhost | null;
+  svgRef?: Ref<SVGSVGElement>;
   onHole: (holeId: string) => void;
   onGear: (key: string) => void;
   onLoose: (holeId: string) => void;
+  onToggleBelt?: (key: string) => void;
+}
+
+/** A loose belt that follows the finger: one fixed pulley and one virtual one. */
+export interface BeltGhost {
+  anchorKey: string;
+  link: LinkPlacementKind;
+  point: { x: number; y: number };
+  /** The drop animation is in progress: keep the point as it is, do not snap. */
+  locked?: boolean;
+}
+
+const MIN_TAP_DISTANCE = 20;
+const TAP_DISTANCE_RATIO = 0.018;
+
+/** Movement below this many CSS pixels is still a tap; more becomes a drag. */
+export function tapDistanceThreshold(): number {
+  if (typeof window === "undefined") {
+    return MIN_TAP_DISTANCE;
+  }
+  return Math.max(MIN_TAP_DISTANCE, TAP_DISTANCE_RATIO * window.innerHeight);
+}
+
+/**
+ * Turns a viewport point into board coordinates, using the same viewBox and
+ * letterbox math as the board's tap handling.
+ */
+export function boardPointFromClient(
+  element: SVGSVGElement | null,
+  level: Level,
+  clientX: number,
+  clientY: number,
+): { x: number; y: number } | null {
+  if (!element) {
+    return null;
+  }
+  const rect = element.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    return null;
+  }
+  const [x, y, width, height] = boardViewBox(level).split(" ").map(Number);
+  const scale = Math.min(rect.width / (width as number), rect.height / (height as number));
+  return {
+    x: (x as number) + (clientX - rect.left - (rect.width - (width as number) * scale) / 2) / scale,
+    y:
+      (y as number) + (clientY - rect.top - (rect.height - (height as number) * scale) / 2) / scale,
+  };
 }
 
 type WormPlacement = Extract<Placement, { kind: "worm" }>;
@@ -105,7 +165,9 @@ function DraaiwerkHole({ level, hole, blocked, occupied, hint, onHole }: Draaiwe
         cx={center.x}
         cy={center.y}
         fill="transparent"
-        pointerEvents="none"
+        // A hole stays tappable where it sits inside the filled hit area of a
+        // belt, so it has to accept pointer events itself.
+        pointerEvents="all"
         r={22.5}
       />
       <circle
@@ -245,16 +307,23 @@ function PlacedConnectionHandle({
   );
 }
 
+/** A closed circle path, so a loose chain can use the same static link stroke. */
+function ringPath(cx: number, cy: number, radius: number): string {
+  return `M ${cx + radius} ${cy} A ${radius} ${radius} 0 1 0 ${cx - radius} ${cy} A ${radius} ${radius} 0 1 0 ${cx + radius} ${cy}`;
+}
+
 function LooseBeltBand({
   pose,
+  link,
   enabled,
   onLoose,
 }: {
   pose: GearPose;
+  link: LinkPlacementKind;
   enabled: boolean;
   onLoose: (holeId: string) => void;
 }) {
-  const radius = gearRadius(pose.size) + 10;
+  const radius = gearRadius(pose.size) + (link === "chain" ? 0 : 6);
   const start = {
     x: pose.center.x + radius * 0.26,
     y: pose.center.y + radius * 0.97,
@@ -267,52 +336,66 @@ function LooseBeltBand({
     id: `placed:loose:${pose.holeId}`,
     disabled: !enabled,
   });
-  const wasDragging = useRef(false);
-
-  useEffect(() => {
-    if (isDragging) {
-      wasDragging.current = true;
-    }
-  }, [isDragging]);
+  const pressPoint = useRef<{ x: number; y: number } | null>(null);
 
   const sway = `M ${start.x} ${start.y} Q ${start.x + 10} ${start.y + 12} ${tail.x} ${tail.y}`;
 
   return (
-    <g data-loose-belt={pose.holeId}>
-      <circle
-        cx={pose.center.x}
-        cy={pose.center.y}
-        fill="none"
-        opacity={0.92}
-        r={radius}
-        stroke="#d6cfbf"
-        strokeWidth={7}
-      />
-      <circle
-        className="draaiwerk-belt-dash"
-        cx={pose.center.x}
-        cy={pose.center.y}
-        fill="none"
-        r={radius}
-        stroke="#8a91a1"
-        strokeDasharray="5 7"
-        strokeWidth={1.5}
-      />
-      <path d={sway} fill="none" stroke="#d6cfbf" strokeLinecap="round" strokeWidth={7} />
-      <path
-        className="draaiwerk-belt-dash"
-        d={sway}
-        fill="none"
-        stroke="#8a91a1"
-        strokeDasharray="5 7"
-        strokeLinecap="round"
-        strokeWidth={1.5}
-      />
+    <g data-loose-belt={pose.holeId} data-dragging={isDragging ? "true" : "false"}>
+      {link === "chain" ? (
+        <>
+          <StaticChain path={ringPath(pose.center.x, pose.center.y, radius)} spacing={12} />
+          <StaticChain path={sway} spacing={12} />
+        </>
+      ) : (
+        <>
+          <circle
+            cx={pose.center.x}
+            cy={pose.center.y}
+            fill="none"
+            opacity={0.92}
+            r={radius}
+            stroke="#3f4652"
+            strokeWidth={11}
+          />
+          <circle
+            cx={pose.center.x}
+            cy={pose.center.y}
+            fill="none"
+            r={radius}
+            stroke="#e2dbc9"
+            strokeWidth={7}
+          />
+          <circle
+            cx={pose.center.x}
+            cy={pose.center.y}
+            fill="none"
+            r={radius}
+            stroke="#8b8477"
+            strokeDasharray="5 11"
+            strokeWidth={2.4}
+          />
+          <path d={sway} fill="none" stroke="#3f4652" strokeLinecap="round" strokeWidth={11} />
+          <path d={sway} fill="none" stroke="#e2dbc9" strokeLinecap="round" strokeWidth={7} />
+          <path
+            d={sway}
+            fill="none"
+            stroke="#8b8477"
+            strokeDasharray="5 11"
+            strokeLinecap="round"
+            strokeWidth={2.4}
+          />
+        </>
+      )}
       <g
         ref={(node) => setNodeRef(node as unknown as HTMLElement)}
         {...attributes}
         {...listeners}
-        aria-label="Trek de riem naar een ander tandwiel"
+        aria-label={
+          link === "chain"
+            ? "Trek de ketting naar een ander tandwiel"
+            : "Trek de riem naar een ander tandwiel"
+        }
         className="draaiwerk-loose-handle"
         data-placed-key={`loose:${pose.holeId}`}
         role="button"
@@ -320,9 +403,13 @@ function LooseBeltBand({
         tabIndex={enabled ? 0 : -1}
         onClick={(event) => {
           event.stopPropagation();
-          if (wasDragging.current) {
-            wasDragging.current = false;
-            return;
+          const start = pressPoint.current;
+          pressPoint.current = null;
+          if (start) {
+            const travel = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+            if (travel >= tapDistanceThreshold()) {
+              return;
+            }
           }
           onLoose(pose.holeId);
         }}
@@ -331,6 +418,9 @@ function LooseBeltBand({
             event.preventDefault();
             onLoose(pose.holeId);
           }
+        }}
+        onPointerDownCapture={(event) => {
+          pressPoint.current = { x: event.clientX, y: event.clientY };
         }}
       >
         <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={22} />
@@ -348,6 +438,75 @@ function LooseBeltBand({
   );
 }
 
+/**
+ * A placed belt is a button. The invisible hit path follows the whole loop, so
+ * a child never has to aim for the 7 px band itself.
+ */
+function BeltHitTarget({
+  connection,
+  enabled,
+  onToggle,
+}: {
+  connection: ConnectionPose;
+  enabled: boolean;
+  onToggle: (key: string) => void;
+}) {
+  const [focused, setFocused] = useState(false);
+
+  if (!enabled || connection.kind === "chain") {
+    return null;
+  }
+
+  const crossed = connection.kind === "crossed-belt";
+  const label = crossed ? "Riem, gekruist; tik om open te maken" : "Riem, open; tik om te kruisen";
+  const toggle = () => onToggle(connection.key);
+
+  return (
+    <g
+      aria-label={label}
+      data-belt-kind={connection.kind}
+      data-belt-toggle={connection.key}
+      onBlur={() => setFocused(false)}
+      onClick={(event) => {
+        event.stopPropagation();
+        toggle();
+      }}
+      onFocus={() => setFocused(true)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          toggle();
+        }
+      }}
+      role="button"
+      style={{ cursor: "pointer" }}
+      tabIndex={0}
+    >
+      <path
+        aria-hidden="true"
+        d={connection.path}
+        fill="transparent"
+        pointerEvents="all"
+        stroke="transparent"
+        strokeLinejoin="round"
+        strokeWidth={24}
+      />
+      {focused ? (
+        <path
+          aria-hidden="true"
+          d={connection.path}
+          fill="none"
+          pointerEvents="none"
+          stroke="var(--primary)"
+          strokeDasharray="6 5"
+          strokeWidth={2}
+        />
+      ) : null}
+    </g>
+  );
+}
+
 export function DraaiwerkBoard({
   level,
   result,
@@ -356,9 +515,12 @@ export function DraaiwerkBoard({
   canMovePlaced,
   pendingGearKey,
   hintPlacement,
+  ghost = null,
+  svgRef,
   onHole,
   onGear,
   onLoose,
+  onToggleBelt,
 }: DraaiwerkBoardProps) {
   const layout = useMemo(() => {
     const [x, y, width, height] = boardViewBox(level).split(" ").map(Number);
@@ -396,20 +558,22 @@ export function DraaiwerkBoard({
 
   const handleBackgroundTap = (event: MouseEvent<SVGSVGElement>) => {
     const target = event.target as Element;
-    if (target.closest("[data-hole-id]") || target.closest("[data-gear-key]")) {
+    if (
+      target.closest("[data-hole-id]") ||
+      target.closest("[data-gear-key]") ||
+      target.closest("[data-belt-toggle]")
+    ) {
       return;
     }
 
+    const point = boardPointFromClient(event.currentTarget, level, event.clientX, event.clientY);
+    if (!point) {
+      return;
+    }
+    const boardX = point.x;
+    const boardY = point.y;
     const rect = event.currentTarget.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
-      return;
-    }
-
     const scale = Math.min(rect.width / layout.width, rect.height / layout.height);
-    const boardX =
-      layout.x + (event.clientX - rect.left - (rect.width - layout.width * scale) / 2) / scale;
-    const boardY =
-      layout.y + (event.clientY - rect.top - (rect.height - layout.height * scale) / 2) / scale;
     const reach = 28 / scale;
 
     let nearestHole: { id: string; distance: number } | null = null;
@@ -444,6 +608,55 @@ export function DraaiwerkBoard({
     }
   };
 
+  const ghostArt = useMemo(() => {
+    if (!ghost) {
+      return null;
+    }
+    const anchor = result.gears.find((pose) => pose.key === ghost.anchorKey);
+    if (!anchor) {
+      return null;
+    }
+
+    const target = looseBeltTarget(
+      level,
+      placements,
+      result.gears,
+      anchor.holeId,
+      ghost.link,
+      ghost.point,
+    );
+    const anchorRadius = gearRadius(anchor.size);
+    const snapped = target?.snapped ? target.pose : null;
+    const virtual = snapped && !ghost.locked ? snapped.center : ghost.point;
+    const virtualRadius = gearRadius(target?.pose.size ?? anchor.size);
+    const span = Math.hypot(virtual.x - anchor.center.x, virtual.y - anchor.center.y);
+    const reachable = span > anchorRadius + virtualRadius + 1;
+    const runs = reachable
+      ? beltTangentRuns(
+          anchor.center,
+          anchorRadius,
+          virtual,
+          virtualRadius,
+          ghost.link === "crossed-belt" ? 1 : 0,
+        )
+      : null;
+    const chainPath = reachable
+      ? connectionPath("chain", anchor.center, anchorRadius, virtual, virtualRadius)
+      : null;
+
+    return {
+      runs,
+      chainPath,
+      kind: ghost.link,
+      target: snapped,
+      virtual,
+      virtualRadius,
+    };
+  }, [ghost, level, placements, result.gears]);
+
+  const beltConnections = result.connections.filter((connection) => connection.kind !== "chain");
+  const chainConnections = result.connections.filter((connection) => connection.kind === "chain");
+
   return (
     <section
       aria-label={`Tandwielbord van ${level.name}`}
@@ -453,6 +666,7 @@ export function DraaiwerkBoard({
       data-status={status}
     >
       <svg
+        ref={svgRef}
         aria-label={`Tandwielbord van ${level.name}`}
         className="draaiwerk-board h-full w-full touch-manipulation select-none"
         preserveAspectRatio="xMidYMid meet"
@@ -485,10 +699,44 @@ export function DraaiwerkBoard({
         />
 
         <g>
-          {result.connections.map((connection) => (
-            <ConnectionBand connection={connection} key={connection.key} />
+          {beltConnections.map((connection) => (
+            <ConnectionBand
+              connection={connection}
+              key={`belt:${connection.fromKey}:${connection.toKey}`}
+            />
           ))}
         </g>
+
+        {ghostArt ? (
+          <g aria-hidden="true" data-belt-ghost="true" pointerEvents="none">
+            {ghostArt.kind === "chain" ? (
+              ghostArt.chainPath ? (
+                <ChainPreview path={ghostArt.chainPath} />
+              ) : null
+            ) : ghostArt.runs ? (
+              <BeltPreview active runs={ghostArt.runs} />
+            ) : null}
+            <circle
+              cx={ghostArt.virtual.x}
+              cy={ghostArt.virtual.y}
+              fill="none"
+              r={ghostArt.virtualRadius}
+              stroke="var(--muted-foreground)"
+              strokeDasharray="4 6"
+              strokeWidth={1.5}
+            />
+            {ghostArt.target ? (
+              <circle
+                cx={ghostArt.target.center.x}
+                cy={ghostArt.target.center.y}
+                fill="none"
+                r={gearRadius(ghostArt.target.size) + 8}
+                stroke="var(--primary)"
+                strokeWidth={2}
+              />
+            ) : null}
+          </g>
+        ) : null}
 
         <g>
           {worms.map((worm) => (
@@ -522,6 +770,28 @@ export function DraaiwerkBoard({
               />
             );
           })}
+        </g>
+
+        {/* A chain sits on the tooth tips, so it is drawn over the wheels. */}
+        <g data-chain-layer="true">
+          {chainConnections.map((connection) => (
+            <ConnectionBand
+              connection={connection}
+              key={`chain:${connection.fromKey}:${connection.toKey}`}
+            />
+          ))}
+        </g>
+
+        {/* The whole loop of a belt is a button: tap it to cross or open it. */}
+        <g>
+          {result.connections.map((connection) => (
+            <BeltHitTarget
+              connection={connection}
+              enabled={!result.solved && !selectedItem && !pendingGearKey && Boolean(onToggleBelt)}
+              key={`toggle:${connection.fromKey}:${connection.toKey}`}
+              onToggle={(key) => onToggleBelt?.(key)}
+            />
+          ))}
         </g>
 
         <g>
@@ -619,6 +889,7 @@ export function DraaiwerkBoard({
               <LooseBeltBand
                 key={`loose:${loose.holeId}`}
                 enabled={canMovePlaced}
+                link={loose.link}
                 pose={pose}
                 onLoose={onLoose}
               />

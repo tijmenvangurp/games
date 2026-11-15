@@ -1,8 +1,10 @@
 import {
+  canPlace,
   gearRadius,
   gearSlots,
   holeCenter,
   trayItemMatches,
+  type GearPose,
   type Level,
   type Placement,
   type TrayItem,
@@ -11,6 +13,9 @@ import {
 export type LinkTrayItem = Extract<TrayItem, { kind: "belt" | "chain" }>;
 
 export type LinkPlacementKind = "open-belt" | "crossed-belt" | "chain";
+
+/** How close the virtual pulley must be to a wheel before it snaps, in board units. */
+const GEAR_SNAP_DISTANCE = 16;
 
 function distance(first: { x: number; y: number }, second: { x: number; y: number }): number {
   return Math.hypot(first.x - second.x, first.y - second.y);
@@ -275,4 +280,53 @@ export function linkPlacementKind(item: LinkTrayItem): LinkPlacementKind {
     return "chain";
   }
   return item.crossed === true ? "crossed-belt" : "open-belt";
+}
+
+export interface LooseBeltTarget {
+  pose: GearPose;
+  distance: number;
+  /** The virtual pulley is close enough to snap onto this wheel. */
+  snapped: boolean;
+}
+
+/**
+ * The wheel a dragged loose belt would connect to from `point`: the nearest one
+ * where the link is actually allowed. Returns null when no wheel can take it.
+ */
+export function looseBeltTarget(
+  level: Level,
+  placements: readonly Placement[],
+  gears: readonly GearPose[],
+  anchorHoleId: string,
+  link: LinkPlacementKind,
+  point: { x: number; y: number },
+): LooseBeltTarget | null {
+  const without = placements.filter(
+    (placement) => !(placement.kind === "loose-belt" && placement.holeId === anchorHoleId),
+  );
+
+  let best: LooseBeltTarget | null = null;
+  for (const gear of gears) {
+    if (gear.holeId === anchorHoleId) {
+      continue;
+    }
+    const next: LinkPlacement = {
+      kind: link,
+      fromHoleId: anchorHoleId,
+      toHoleId: gear.holeId,
+    };
+    if (!canPlace(level, without, next)) {
+      continue;
+    }
+    const span = distance(gear.center, point);
+    if (best && span >= best.distance) {
+      continue;
+    }
+    best = {
+      pose: gear,
+      distance: span,
+      snapped: span <= gearRadius(gear.size) + GEAR_SNAP_DISTANCE,
+    };
+  }
+  return best;
 }

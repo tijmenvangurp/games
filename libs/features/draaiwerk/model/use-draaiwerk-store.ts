@@ -21,6 +21,7 @@ import {
   nextSolutionPlacement,
   rejectionFor,
   selectedTrayItem,
+  type LinkPlacement,
 } from "./placement";
 import {
   DEFAULT_DRAAIWERK_PROGRESS,
@@ -52,6 +53,7 @@ interface DraaiwerkStore {
   dropTray: (id: string, target: { kind: "hole" | "gear"; targetId: string }) => void;
   extendLooseBelt: (anchorHoleId: string, toGearKey: string) => void;
   selectLooseBelt: (anchorHoleId: string) => void;
+  toggleBeltKind: (key: string) => void;
   movePlaced: (key: string, targetHoleId: string) => void;
   removePlaced: (key: string) => void;
   tapHole: (holeId: string) => void;
@@ -284,6 +286,52 @@ function selectLooseBeltAction(set: DraaiwerkSet, get: DraaiwerkGet, anchorHoleI
   playHaptic("select");
 }
 
+/**
+ * A placed belt is itself a button: tap it to swap between an open and a
+ * crossed belt. Every other placement stays exactly where it was.
+ */
+function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void {
+  const state = get();
+  if (state.status === "solved") {
+    return;
+  }
+  const placement = state.placements.find(
+    (candidate): candidate is LinkPlacement =>
+      isLinkPlacement(candidate) && connectionKey(candidate) === key,
+  );
+  if (!placement || placement.kind === "chain") {
+    return;
+  }
+
+  const nextKind: LinkPlacement = {
+    kind: placement.kind === "open-belt" ? "crossed-belt" : "open-belt",
+    fromHoleId: placement.fromHoleId,
+    toHoleId: placement.toHoleId,
+  };
+  const nextPlacements = state.placements.map((candidate) =>
+    candidate === placement ? nextKind : candidate,
+  );
+  const without = state.placements.filter((candidate) => candidate !== placement);
+
+  if (!canPlace(state.level, without, nextKind)) {
+    set({
+      feedback: "Deze riem kan niet van stand wisselen.",
+      feedbackTone: "warn",
+    });
+    playSound("almost");
+    playHaptic("almost");
+    return;
+  }
+
+  applyPlacements(set, get, nextPlacements);
+  if (get().feedback === null) {
+    set({
+      feedback: nextKind.kind === "crossed-belt" ? "Riem gekruist." : "Riem open.",
+      feedbackTone: "info",
+    });
+  }
+}
+
 interface FoundPlacement {
   placement: Placement;
   end?: "shaft" | "wheel";
@@ -351,15 +399,32 @@ function attachedPlacements(state: DraaiwerkStore, removed: Placement): Placemen
 
 function trayIdsForPlacements(state: DraaiwerkStore, placements: readonly Placement[]): string[] {
   const available = [...state.usedTrayIds];
+  const take = (predicate: (item: TrayItem) => boolean): string | null => {
+    const index = available.findIndex((id) => {
+      const item = state.level.tray.find((candidate) => candidate.id === id);
+      return item ? predicate(item) : false;
+    });
+    if (index < 0) {
+      return null;
+    }
+    return available.splice(index, 1)[0] ?? null;
+  };
   const ids: string[] = [];
   for (const placement of placements) {
-    const found = available.find((id) => {
-      const item = state.level.tray.find((candidate) => candidate.id === id);
-      return item ? trayItemMatches(item, placement) : false;
-    });
+    // A belt can be toggled between open and crossed, so after a toggle the
+    // used tray id no longer matches the placement exactly. Fall back to the
+    // same material (belt or chain) so the tray card is released again.
+    const found =
+      take((item) => trayItemMatches(item, placement)) ??
+      (isLinkPlacement(placement)
+        ? take(
+            (item) =>
+              (placement.kind === "chain" && item.kind === "chain") ||
+              (placement.kind !== "chain" && item.kind === "belt"),
+          )
+        : null);
     if (found) {
       ids.push(found);
-      available.splice(available.indexOf(found), 1);
     }
   }
   return ids;
@@ -575,7 +640,10 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
     set({
       selectedTrayId: null,
       pendingGearKey: key,
-      feedback: "Trek de riem nu naar een ander tandwiel.",
+      feedback:
+        item.kind === "chain"
+          ? "Trek de ketting nu naar een ander tandwiel."
+          : "Trek de riem nu naar een ander tandwiel.",
       feedbackTone: "info",
     });
   }
@@ -643,6 +711,7 @@ export const useDraaiwerkStore = create<DraaiwerkStore>()(
       extendLooseBelt: (anchorHoleId, toGearKey) =>
         extendLooseBeltAction(set, get, anchorHoleId, toGearKey),
       selectLooseBelt: (anchorHoleId) => selectLooseBeltAction(set, get, anchorHoleId),
+      toggleBeltKind: (key) => toggleBeltKindAction(set, get, key),
       movePlaced: (key, targetHoleId) => movePlacedAction(set, get, key, targetHoleId),
       removePlaced: (key) => removePlacedAction(set, get, key),
       tapHole: (holeId) => tapHoleAction(set, get, holeId),

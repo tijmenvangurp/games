@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-type SoundName = "tap" | "select" | "match" | "hint" | "almost" | "win";
+type SoundName = "tap" | "select" | "match" | "hint" | "almost" | "win" | "ratchet";
 
 interface Tone {
   frequency: number;
@@ -28,6 +28,11 @@ const SOUND_PATTERNS: Record<SoundName, readonly Tone[]> = {
     { frequency: 523, delay: 0, duration: 0.1, type: "sine", volume: 0.05 },
     { frequency: 659, delay: 0.1, duration: 0.1, type: "sine", volume: 0.05 },
     { frequency: 784, delay: 0.2, duration: 0.18, type: "sine", volume: 0.05 },
+  ],
+  // A belt that clicks onto a pulley: two short, dry clicks, never a tune.
+  ratchet: [
+    { frequency: 196, delay: 0, duration: 0.028, type: "square", volume: 0.035 },
+    { frequency: 147, delay: 0.046, duration: 0.032, type: "square", volume: 0.03 },
   ],
 };
 
