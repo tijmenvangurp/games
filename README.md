@@ -63,7 +63,7 @@ De memory en de quiz **Wie is deze Pokémon?** gebruiken de 151 Pokémon uit Gen
 
 ## Wie was het?
 
-**Wie was het?** (in ontwikkeling) gebruikt de MIT-engine uit [LifeValuable/murdoku](https://github.com/LifeValuable/murdoku), 1:1 overgenomen in `libs/entities/murdoku/model/engine`. De engine is pure TypeScript: model, aanwijzingen, solver, level-io en generator. De map `model` heet in de kopie `domain`, omdat Steiger een geneste `model`-map afkeurt; de code en bestandsnamen zijn verder ongewijzigd en `oxfmt` slaat de vendored map over. De volledige MIT-tekst staat in [`LICENSES/murdoku-MIT.txt`](LICENSES/murdoku-MIT.txt). De levelbestanden, namen en teksten uit die repository zijn niet overgenomen; de zaken van het spel zijn eigen werk. De generator draait build-time en gaat niet mee de client in.
+**Wie was het?** (in ontwikkeling) gebruikt de MIT-engine uit [LifeValuable/murdoku](https://github.com/LifeValuable/murdoku), 1:1 overgenomen in `libs/entities/murdoku/model/engine`, en de bijbehorende canvas-renderlaag in `libs/features/murdoku-game/lib/vendored`. De engine is pure TypeScript: model, aanwijzingen, solver, level-io en generator. De map `model` heet in de kopie `domain`, omdat Steiger een geneste `model`-map afkeurt; de code en bestandsnamen zijn verder ongewijzigd en `oxfmt` slaat de vendored mappen over. De volledige MIT-tekst staat in [`LICENSES/murdoku-MIT.txt`](LICENSES/murdoku-MIT.txt). De levelbestanden, namen en teksten uit die repository zijn niet overgenomen; de zaken van het spel zijn eigen werk. De generator draait build-time en gaat niet mee de client in. De enige bitmap uit de bron, `armchair.png`, staat lokaal in `libs/features/murdoku-game/ui/assets` en wordt via Vite gebundeld.
 
 ## Audio
 
