@@ -2,21 +2,24 @@ import { useMemo } from "react";
 import type { Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
 import { Check, X } from "@shared/ui";
-import { murdokuLegend } from "../lib/legend";
-import { createMurdokuText } from "../lib/text";
+import { MURDOKU_V1_LEGEND, murdokuLegend } from "../lib/legend";
+import { MurdokuObjectIcon } from "./murdoku-object-icon";
 
 interface MurdokuObjectLegendProps {
-  puzzle: Puzzle;
+  /** De zaak waarvan de legenda uit het bord komt. Weglaten bij de uitleg. */
+  puzzle?: Puzzle;
   className?: string;
 }
 
 /**
  * De objectlegenda: op welke meubels mag een persoon staan en welke objecten
- * blokkeren een vakje? Een raam is geen vakje en staat daarom apart.
+ * blokkeren een vakje? Zonder zaak toont hij de vaste legenda van de eerste
+ * versie, zodat de uitleg dezelfde objecten laat zien als elke zaak.
+ *
+ * Een raam is geen vakje en staat daarom apart.
  */
 export function MurdokuObjectLegend({ puzzle, className }: MurdokuObjectLegendProps) {
-  const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
-  const legend = useMemo(() => murdokuLegend(puzzle), [puzzle]);
+  const legend = useMemo(() => (puzzle ? murdokuLegend(puzzle) : MURDOKU_V1_LEGEND), [puzzle]);
   const groups = [
     { occupiable: true, label: "Hier mag je staan" },
     { occupiable: false, label: "Hier mag je niet staan" },
@@ -40,9 +43,13 @@ export function MurdokuObjectLegend({ puzzle, className }: MurdokuObjectLegendPr
               .map((item) => (
                 <li
                   key={item.type}
-                  className="rounded-md bg-muted px-2.5 py-1 text-sm leading-snug"
+                  className={cn(
+                    "flex items-center gap-1.5 rounded-md px-2.5 py-1 text-sm leading-snug",
+                    group.occupiable ? "bg-success/10" : "bg-muted",
+                  )}
                 >
-                  {text.objectName(item.type)}
+                  <MurdokuObjectIcon className="size-4" type={item.type} />
+                  {item.name}
                 </li>
               ))}
           </ul>

@@ -10,6 +10,7 @@ export { useMurdokuStore } from "./model/use-murdoku-store";
 export { createMurdokuText } from "./lib/text";
 export type { MurdokuText } from "./lib/text";
 export { MurdokuBoard } from "./ui/murdoku-board";
+export { MurdokuLesson } from "./ui/murdoku-lesson";
 export type { MurdokuBoardHighlight } from "./ui/murdoku-board";
 export { MurdokuClueCards } from "./ui/murdoku-clue-cards";
 export { MurdokuObjectLegend } from "./ui/murdoku-object-legend";
