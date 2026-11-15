@@ -670,6 +670,10 @@
     transform: translateY(-56px) scale(1.5);
   }
 
+  .draaiwerk-drag-token[data-lift="true"][data-token="worm"] {
+    transform: translateY(-56px) scale(2);
+  }
+
   .draaiwerk-placed-handle {
     cursor: grab;
   }

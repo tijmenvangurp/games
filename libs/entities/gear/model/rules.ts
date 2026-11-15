@@ -121,11 +121,20 @@ function buildEdges(
   placements: readonly Placement[],
 ): Map<string, GearEdge[]> {
   const adjacency = new Map<string, GearEdge[]>();
+  // A worm shaft couples its two gears; they do not also mesh tooth-on-tooth.
+  const wormPairs = new Set(
+    placements
+      .filter((placement) => placement.kind === "worm")
+      .map((placement) => [placement.fromHoleId, placement.toHoleId].sort().join("|")),
+  );
 
   for (let first = 0; first < nodes.length; first += 1) {
     for (let second = first + 1; second < nodes.length; second += 1) {
       const a = nodes[first] as GearNode;
       const b = nodes[second] as GearNode;
+      if (wormPairs.has([a.holeId, b.holeId].sort().join("|"))) {
+        continue;
+      }
       const contact = gearRadius(a.size) + gearRadius(b.size);
       if (Math.abs(distanceBetween(a.center, b.center) - contact) > MESH_TOLERANCE) {
         continue;

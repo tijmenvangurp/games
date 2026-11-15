@@ -95,10 +95,10 @@ const INTRODUCES = [
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
-const WORM_SLOW = worm([0, 2], [8, 2], 0.5, -1);
-const WORM_STRONG = worm([0, 2], [8, 2], 0.25, -1);
+const WORM_SLOW = worm([0, 2], [3, 2], 0.5, -1);
+const WORM_STRONG = worm([0, 2], [3, 2], 0.25, -1);
 const WORM_METER = worm([0, 2], [9, 2], 0.5, 1);
-const WORM_LIFT = worm([0, 2], [9, 2], 0.25, 1);
+const WORM_LIFT = worm([0, 2], [4, 2], 0.25, 1);
 
 describe("gear levels: catalogue", () => {
   it("holds sixteen levels in the brief's order", () => {
@@ -229,8 +229,12 @@ describe("gear levels: speed bands", () => {
     expect(outputAt(level)).toMatchObject({ kind: "lift", satisfied: true });
     expect(outputAt(level).speed).toBeCloseTo(0.25, 6);
 
-    expect(canPlace(level, [], BELT_TO_FAR_TARGET)).toBe(true);
-    expect(evaluate(level, [BELT_TO_FAR_TARGET])).toBe("playing");
+    expect(canPlace(level, [], { kind: "open-belt", fromHoleId: "0,2", toHoleId: "4,2" })).toBe(
+      true,
+    );
+    expect(evaluate(level, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "4,2" }])).toBe(
+      "playing",
+    );
     expect(evaluate(level, [WORM_LIFT])).toBe("solved");
   });
 });

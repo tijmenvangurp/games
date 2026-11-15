@@ -477,7 +477,7 @@ describe("draaiwerk: onderdelen verplaatsen", () => {
     const placed: Placement = {
       kind: "worm",
       fromHoleId: "0,2",
-      toHoleId: "8,2",
+      toHoleId: "3,2",
       ratio: worm.ratio,
       direction: worm.direction,
     };
@@ -600,7 +600,7 @@ describe("draaiwerk: wormas en losse riem", () => {
     expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
       kind: "worm",
       fromHoleId: "0,2",
-      toHoleId: "8,2",
+      toHoleId: "3,2",
     });
 
     useDraaiwerkStore.getState().removeLast();
@@ -1034,7 +1034,7 @@ describe("draaiwerk: statusmeldingen", () => {
     expect(
       statusMessage(
         liftLevel,
-        drive(liftLevel, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "9,2" }]),
+        drive(liftLevel, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "4,2" }]),
         null,
         "i",
         false,

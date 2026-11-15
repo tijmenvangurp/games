@@ -510,27 +510,27 @@ export function WormBar({
       <g transform={`translate(${(from.x + to.x) / 2} ${(from.y + to.y) / 2}) rotate(${angle})`}>
         <defs>
           <clipPath id={clipId}>
-            <rect height={12} rx={6} width={Math.max(0, length - 4)} x={-length / 2 + 2} y={-6} />
+            <rect height={16} rx={8} width={Math.max(0, length - 4)} x={-length / 2 + 2} y={-8} />
           </clipPath>
         </defs>
         <rect
           fill="#8f98a2"
-          height={12}
-          rx={6}
+          height={16}
+          rx={8}
           stroke="#4f5862"
           strokeWidth={1.2}
           width={length}
           x={-length / 2}
-          y={-6}
+          y={-8}
         />
         <rect
           fill="#d9dee3"
-          height={2.4}
+          height={3}
           opacity={0.8}
-          rx={1.2}
+          rx={1.5}
           width={Math.max(0, length - 12)}
           x={-length / 2 + 6}
-          y={-4.4}
+          y={-6}
         />
         <g className="draaiwerk-worm-ribs" clipPath={`url(#${clipId})`}>
           {Array.from({ length: ribs + 1 }, (_, index) => {
@@ -538,19 +538,19 @@ export function WormBar({
             return (
               <g key={`rib-${index}`}>
                 <path
-                  d={`M ${x - 3.2} -6 Q ${x + 0.8} 0 ${x + 3.2} 6`}
+                  d={`M ${x - 4} -8 Q ${x + 1} 0 ${x + 4} 8`}
                   fill="none"
                   stroke="#4b545e"
                   strokeLinecap="round"
-                  strokeWidth={2.2}
+                  strokeWidth={2.6}
                 />
                 <path
-                  d={`M ${x - 4.6} -6 Q ${x - 0.6} 0 ${x + 1.8} 6`}
+                  d={`M ${x - 5.6} -8 Q ${x - 0.6} 0 ${x + 2.4} 8`}
                   fill="none"
                   opacity={0.7}
                   stroke="#d4dade"
                   strokeLinecap="round"
-                  strokeWidth={0.9}
+                  strokeWidth={1}
                 />
               </g>
             );
@@ -559,14 +559,14 @@ export function WormBar({
         {[-length / 2, length / 2].map((x) => (
           <rect
             fill="#b8c0c8"
-            height={15}
+            height={19}
             key={`collar-${x}`}
             rx={2}
             stroke="#646d78"
             strokeWidth={1}
-            width={5}
-            x={x - 2.5}
-            y={-7.5}
+            width={6}
+            x={x - 3}
+            y={-9.5}
           />
         ))}
       </g>
@@ -610,40 +610,42 @@ export function TrayArt({ item }: { item: TrayItem }) {
       <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
         <rect
           fill="#8f98a2"
-          height={10}
-          rx={5}
+          height={14}
+          rx={7}
           stroke="#4f5862"
           strokeWidth={1}
-          width={50}
-          x={7}
-          y={17}
+          width={52}
+          x={6}
+          y={15}
         />
-        <rect fill="#d9dee3" height={2} opacity={0.8} rx={1} width={42} x={11} y={18.6} />
-        <g stroke="#4b545e" strokeLinecap="round" strokeWidth={1.8}>
-          {Array.from({ length: 7 }, (_, index) => {
-            const x = 13 + index * 6.5;
-            return <path key={`tray-rib-${index}`} d={`M ${x - 2} 17 Q ${x + 1} 22 ${x + 2} 27`} />;
+        <rect fill="#d9dee3" height={3} opacity={0.8} rx={1.5} width={44} x={10} y={17} />
+        <g stroke="#4b545e" strokeLinecap="round" strokeWidth={2.2}>
+          {Array.from({ length: 8 }, (_, index) => {
+            const x = 12 + index * 6;
+            return (
+              <path key={`tray-rib-${index}`} d={`M ${x - 2.5} 15 Q ${x + 1} 22 ${x + 2.5} 29`} />
+            );
           })}
         </g>
         <rect
           fill="#b8c0c8"
-          height={14}
+          height={18}
           rx={1.8}
           stroke="#646d78"
           strokeWidth={1}
-          width={5}
-          x={4}
-          y={15}
+          width={6}
+          x={3}
+          y={13}
         />
         <rect
           fill="#b8c0c8"
-          height={14}
+          height={18}
           rx={1.8}
           stroke="#646d78"
           strokeWidth={1}
-          width={5}
+          width={6}
           x={55}
-          y={15}
+          y={13}
         />
       </svg>
     );

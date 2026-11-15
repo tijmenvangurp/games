@@ -428,6 +428,7 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
             <div
               className="draaiwerk-drag-token flex h-full w-full items-center justify-center"
               data-lift={liftDragToken ? "true" : "false"}
+              data-token={overlayItem.kind}
             >
               <TrayArt item={overlayItem} />
             </div>
