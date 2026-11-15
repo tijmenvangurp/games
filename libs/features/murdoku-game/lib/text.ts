@@ -10,7 +10,7 @@ import { Renderer } from "./vendored/renderer";
  * ("Anna stond naast een tafel"), zodat een kind niet hoeft te raden over wie
  * "zij" gaat. Hints en uitleg kunnen dezelfde renderer gebruiken.
  */
-interface MurdokuText {
+export interface MurdokuText {
   /** De volledige, met naam begonnen zin van één aanwijzing. */
   clue(clue: Clue, subjectId: PersonId): string;
   /** Een engine-uitleg (hint, foutmelding) als lopende tekst. */
@@ -21,6 +21,8 @@ interface MurdokuText {
   objectName(type: string): string;
   /** Een richting in gewone taal ("links", "boven"). */
   direction(direction: string): string;
+  /** Een vaste bordregel, bijvoorbeeld de regel over het slachtoffer. */
+  rule(name: "aloneWithVictim" | "oneEachLine"): string;
 }
 
 export function createMurdokuText(puzzle: Puzzle): MurdokuText {
@@ -37,5 +39,6 @@ export function createMurdokuText(puzzle: Puzzle): MurdokuText {
     roomName: (nameKey) => (renderer.lookup(nameKey) ?? nameKey).replace(/^(de|het) /, ""),
     objectName: (type) => renderer.resolveParam("objName", type),
     direction: (direction) => renderer.resolveParam("direction", direction),
+    rule: (name) => renderer.lookup(`rule.${name}`) ?? name,
   };
 }

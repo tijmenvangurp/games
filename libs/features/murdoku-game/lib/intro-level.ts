@@ -2,10 +2,9 @@ import type { Cell, LevelJson, PersonId } from "@entities/murdoku";
 import { roomTint } from "./palette";
 
 /**
- * Eigen 4×4-fixture voor de tijdelijke bordpreview van ticket #119. Geen boekzaak:
- * plattegrond, meubels en namen zijn eigen werk. De fixture laat vier kamers,
- * drie tapijten, een stoel, een bed, twee tafels, twee boekenkasten, een raam en
- * drie portretten zien.
+ * De eigen 4×4-instapzaak van Wie was het?. Geen boekzaak: plattegrond, meubels
+ * en namen zijn eigen werk. De zaak laat vier kamers, drie tapijten, een stoel,
+ * een bed, twee tafels, twee boekenkasten, een raam en drie verdachten zien.
  *
  * Plattegrond (rijen × kolommen):
  *
@@ -17,10 +16,13 @@ import { roomTint } from "./palette";
  * Bezetbaar: (0,1) tapijt, (1,0) stoel, (2,0)+(2,1) bed, (2,3) tapijt,
  * (3,2) tapijt. De oplossing hieronder gebruikt rij en kolom één keer en zet
  * Cato als enige bij Vera in kamer 4.
+ *
+ * Deze zaak is het instaplevel van Wie was het?. Het bord start leeg; het kind
+ * plaatst de drie verdachten zelf. Het slachtoffer volgt in #123.
  */
-export const MURDOKU_PREVIEW_LEVEL: LevelJson = {
+export const MURDOKU_INTRO_LEVEL: LevelJson = {
   schema: 1,
-  id: "voorbeeld-4x4-verjaardag",
+  id: "intro-4x4-verjaardag",
   title: "De verdwenen taart",
   size: { width: 4, height: 4 },
   rooms: {
@@ -66,21 +68,13 @@ export const MURDOKU_PREVIEW_LEVEL: LevelJson = {
   },
 };
 
-/** De oplossing van {@link MURDOKU_PREVIEW_LEVEL}, voor de preview en het testbeeld. */
-export const MURDOKU_PREVIEW_SOLUTION: ReadonlyMap<PersonId, Cell> = new Map([
+/**
+ * De oplossing van {@link MURDOKU_INTRO_LEVEL}. Het bord start leeg; deze kaart
+ * is de fixture voor de regels, de latere controle en de tests.
+ */
+export const MURDOKU_INTRO_SOLUTION: ReadonlyMap<PersonId, Cell> = new Map([
   ["A", 1],
   ["B", 4],
   ["C", 11],
   ["victim", 14],
-]);
-
-/**
- * De preview toont de drie verdachten. Het slachtofferteken is in de MIT-bron een
- * emoji-schedel; dat zowel off-theme als emoji-afhankelijk is, dus de echte
- * onthulling en het slachtofferportret horen bij #120/#123.
- */
-export const MURDOKU_PREVIEW_PLACEMENTS: ReadonlyMap<PersonId, Cell> = new Map([
-  ["A", 1],
-  ["B", 4],
-  ["C", 11],
 ]);

@@ -1,11 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadMurdokuLevel } from "@entities/murdoku";
-import {
-  MURDOKU_PREVIEW_LEVEL,
-  MURDOKU_PREVIEW_SOLUTION,
-  MurdokuBoard,
-} from "@features/murdoku-game";
+import { MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION, MurdokuBoard } from "@features/murdoku-game";
 
 /**
  * jsdom tekent geen canvas. Voor de mount- en aria-test is een stille 2D-context
@@ -28,7 +24,7 @@ function silentContext(): CanvasRenderingContext2D {
   }) as unknown as CanvasRenderingContext2D;
 }
 
-const puzzle = loadMurdokuLevel(MURDOKU_PREVIEW_LEVEL);
+const puzzle = loadMurdokuLevel(MURDOKU_INTRO_LEVEL);
 
 beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => silentContext());
@@ -51,7 +47,7 @@ describe("MurdokuBoard", () => {
   it("toont één canvas met een beschrijvend label", () => {
     render(
       <MurdokuBoard
-        placements={MURDOKU_PREVIEW_SOLUTION}
+        placements={MURDOKU_INTRO_SOLUTION}
         puzzle={puzzle}
         title="De verdwenen taart"
       />,
@@ -69,11 +65,12 @@ describe("MurdokuBoard", () => {
     render(<MurdokuBoard puzzle={puzzle} title="De verdwenen taart" />);
 
     const canvas = screen.getByRole("img") as HTMLCanvasElement;
-    // jsdom meet geen breedte: de fallback van 320 px geeft 4 × 80 px vakjes.
-    expect(canvas.width).toBe(640);
-    expect(canvas.height).toBe(640);
-    expect(canvas.style.width).toBe("320px");
-    expect(canvas.style.height).toBe("320px");
+    // jsdom meet geen breedte: de fallback van 320 px min 22 px rijlabels geeft
+    // 4 × 74 px vakjes, op dpr 2 dus 592 × 592 pixels.
+    expect(canvas.width).toBe(592);
+    expect(canvas.height).toBe(592);
+    expect(canvas.style.width).toBe("296px");
+    expect(canvas.style.height).toBe("296px");
   });
 
   it("blijft werken zonder plaatsingen", () => {

@@ -7,8 +7,8 @@ import {
 } from "@entities/murdoku";
 import {
   MURDOKU_NL_TEXTS,
-  MURDOKU_PREVIEW_LEVEL,
-  MURDOKU_PREVIEW_SOLUTION,
+  MURDOKU_INTRO_LEVEL,
+  MURDOKU_INTRO_SOLUTION,
   createMurdokuText,
 } from "@features/murdoku-game";
 import { MURDOKU_FIXTURE } from "./murdoku-fixtures";
@@ -134,6 +134,13 @@ describe("Nederlandse aanwijzingen", () => {
     expect(text.direction("west")).toBe("links");
   });
 
+  it("levert de vaste bordregels als lopende tekst", () => {
+    expect(text.rule("aloneWithVictim")).toBe(
+      "Het slachtoffer is alleen in een kamer met precies één verdachte.",
+    );
+    expect(text.rule("oneEachLine")).toBe("Iedereen staat in een eigen rij en kolom.");
+  });
+
   it("gebruikt het juiste lidwoord bij een het-kamer", () => {
     const forestLevel: LevelJson = {
       ...TEXT_LEVEL,
@@ -174,19 +181,19 @@ describe("Nederlandse aanwijzingen", () => {
   });
 });
 
-describe("voorbeeldzaak", () => {
-  it("laadt de 4×4-fixture met vier kamers en acht objecten", () => {
-    const preview = loadMurdokuLevel(MURDOKU_PREVIEW_LEVEL);
+describe("instapzaak", () => {
+  it("laadt de 4×4-fixture met vier kamers en drie verdachten", () => {
+    const intro = loadMurdokuLevel(MURDOKU_INTRO_LEVEL);
 
-    expect(preview.board.width).toBe(4);
-    expect(preview.board.height).toBe(4);
-    expect([...preview.board.rooms.keys()]).toEqual(["1", "2", "3", "4"]);
-    expect(preview.suspects).toHaveLength(3);
+    expect(intro.board.width).toBe(4);
+    expect(intro.board.height).toBe(4);
+    expect([...intro.board.rooms.keys()]).toEqual(["1", "2", "3", "4"]);
+    expect(intro.suspects).toHaveLength(3);
   });
 
   it("heeft een kloppende oplossing en één dader in de kamer van het slachtoffer", () => {
-    expect(validateMurdokuPlacement(MURDOKU_PREVIEW_LEVEL, MURDOKU_PREVIEW_SOLUTION)).toEqual([]);
-    expect(findMurdokuMurderer(MURDOKU_PREVIEW_LEVEL, MURDOKU_PREVIEW_SOLUTION)).toMatchObject({
+    expect(validateMurdokuPlacement(MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION)).toEqual([]);
+    expect(findMurdokuMurderer(MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION)).toMatchObject({
       suspectId: "C",
       roomId: "4",
     });

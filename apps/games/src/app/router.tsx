@@ -18,12 +18,12 @@ import { LettersPage } from "@pages/letter";
 import { TypepretPage } from "@pages/typepret";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
+import { MurdokuPage } from "@pages/murdoku";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
 import { SudokuPage } from "@pages/sudoku";
 import { WordSearchPage } from "@pages/word-search";
-import { MurdokuPreview } from "@features/murdoku-game";
 import { BoardEditorPage } from "./board-editor-page";
 
 export function createAppRouter(history?: RouterHistory) {
@@ -57,9 +57,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/ganzenbord", GanzenbordPage),
     gameRoute("/ganzenbord/bord", BoardEditorPage),
     gameRoute("/mengelmoes", AlchemyPage),
-    // TIJDELIJK (ticket #119): preview van de bordrenderer. Verdwijnt zodra #120
-    // de echte pagina levert.
-    gameRoute("/murdoku-voorbeeld", MurdokuPreview),
+    gameRoute("/mysterie", MurdokuPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),

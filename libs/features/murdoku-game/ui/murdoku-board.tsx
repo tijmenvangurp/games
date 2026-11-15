@@ -1,12 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, type RefObject } from "react";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
-import { suspectColor } from "../lib/palette";
+import type { MurdokuMode } from "../model/play";
 import { createMurdokuText } from "../lib/text";
-import { avatarDataUri } from "../lib/vendored/avatar";
-import { drawBoard } from "../lib/vendored/boardRender";
 import type { HelpMarks } from "../lib/vendored/helpMarks";
-import { onArtReady } from "../lib/vendored/objectArt";
+import { MurdokuCellGrid, MurdokuColumnLabels, MurdokuRowLabels } from "./murdoku-board-parts";
+import { useBoardCellSize, LABEL_SIZE } from "./use-board-cell-size";
+import { useMurdokuCanvas } from "./use-murdoku-canvas";
+
+/** De onthulling na een goede controle: de dader en het slachtoffer. */
+interface MurdokuBoardReveal {
+  murdererId: PersonId;
+  victimCell: Cell;
+}
 
 interface MurdokuBoardProps {
   puzzle: Puzzle;
@@ -21,24 +27,119 @@ interface MurdokuBoardProps {
   crosses?: ReadonlySet<Cell>;
   /** Rustige referentiemarkeringen van de aanwijzingen (kameromtrek, objectring). */
   helpMarks?: HelpMarks | null;
+  /** Omlijnt één kamer, bijvoorbeeld de kamer van het slachtoffer bij de afloop. */
+  outlineRoomId?: string | null;
+  /** De onthulling: de dader krijgt een ring en het slachtoffer staat op het bord. */
+  reveal?: MurdokuBoardReveal | null;
+  /** De gekozen persoon, voor de toegankelijke vakjeslabels. */
+  selectedPerson?: PersonId | null;
+  /** De tikstand; bepaalt of een tik plaatst of wegstreept. */
+  mode?: MurdokuMode;
+  /** Eén tik op een vakje. Zonder handler is het bord alleen een weergave. */
+  onCellTap?: (cell: Cell) => void;
   /** Maximale grootte van één vakje in CSS-px (tablet). */
   maxCellSize?: number;
   className?: string;
 }
 
-/** Fallbackbreedte als de wrapper nog niet is gemeten (SSR, verborgen tab, test). */
-const FALLBACK_WIDTH = 320;
-const MIN_CELL = 24;
 const NO_CELLS: ReadonlySet<Cell> = new Set();
+const NO_PLACEMENTS: ReadonlyMap<PersonId, Cell> = new Map();
+
+function cellLabel(
+  puzzle: Puzzle,
+  text: ReturnType<typeof createMurdokuText>,
+  placements: ReadonlyMap<PersonId, Cell>,
+  crosses: ReadonlySet<Cell>,
+  cell: Cell,
+): string {
+  const { board } = puzzle;
+  const { row, col } = board.rc(cell);
+  const occupiable = board.isOccupiable(cell);
+  const person = [...placements].find(([, placed]) => placed === cell)?.[0] ?? null;
+  const tile = board.tileAt(cell);
+  const room = board.rooms.get(board.roomIdOf(cell));
+  const objects = tile.objects().map((object) => text.objectName(object.type));
+  const state = person
+    ? puzzle.nameOf(person)
+    : !occupiable
+      ? "geen plek"
+      : crosses.has(cell)
+        ? "kruisje"
+        : "leeg";
+
+  return [
+    state,
+    !occupiable && "hier mag niemand staan",
+    `rij ${row + 1}`,
+    `kolom ${col + 1}`,
+    room ? text.roomName(room.nameKey) : null,
+    objects.length > 0 ? objects.join(" en ") : null,
+  ]
+    .filter((part): part is string => Boolean(part))
+    .join(", ");
+}
+
+/** De toegankelijke naam van elk vakje, in bordvolgorde. */
+function boardLabels(
+  puzzle: Puzzle,
+  text: ReturnType<typeof createMurdokuText>,
+  placed: ReadonlyMap<PersonId, Cell>,
+  crosses: ReadonlySet<Cell>,
+): string[] {
+  const total = puzzle.board.width * puzzle.board.height;
+  return Array.from({ length: total }, (_, cell) => cellLabel(puzzle, text, placed, crosses, cell));
+}
+
+interface BoardGridProps {
+  title: string;
+  width: number;
+  height: number;
+  cell: number;
+  canvasRef: RefObject<HTMLCanvasElement | null>;
+  labels: readonly string[];
+  mode: MurdokuMode;
+  selectedPerson: PersonId | null;
+  onCellTap?: (cell: Cell) => void;
+}
+
+/** Het canvas met het transparante knoppenrooster eroverheen. */
+function BoardGrid({
+  title,
+  width,
+  height,
+  cell,
+  canvasRef,
+  labels,
+  mode,
+  selectedPerson,
+  onCellTap,
+}: BoardGridProps) {
+  return (
+    <div className="relative" style={{ width: width * cell, height: height * cell }}>
+      <canvas
+        ref={canvasRef}
+        aria-label={`Plattegrond van ${title}, ${width} bij ${height}`}
+        className="block rounded-sm"
+        role="img"
+      />
+      <MurdokuCellGrid
+        height={height}
+        labels={labels}
+        mode={mode}
+        onCellTap={onCellTap}
+        selectedPerson={selectedPerson}
+        width={width}
+      />
+    </div>
+  );
+}
 
 /**
  * Eén canvas met de plattegrond van een zaak: kamers, vloeren, meubels, ramen,
- * kamernamen en de geplaatste portretten.
- *
- * Het bord schaalt met zijn wrapper (ResizeObserver) en tekent op
- * device-pixel-ratio, zodat lijnen op een telefoon en tablet scherp blijven. Er
- * zit nog geen interactie in; die komt in #121. Het canvas is één afbeelding voor
- * hulptechnologie; de toegankelijke bediening komt als overlay bovenop het bord.
+ * kamernamen en de geplaatste portretten. Boven en links staan de kolom- en
+ * rijlabels; over het canvas ligt een transparant knoppenrooster met per vakje
+ * een Nederlandse toegankelijke naam. Zo blijven de pixels snel en is de
+ * bediening echt met rollen en namen te testen.
  */
 export function MurdokuBoard({
   puzzle,
@@ -48,118 +149,55 @@ export function MurdokuBoard({
   highlightColor,
   crosses = NO_CELLS,
   helpMarks = null,
+  outlineRoomId = null,
+  reveal = null,
+  selectedPerson = null,
+  mode = "place",
+  onCellTap,
   maxCellSize = 128,
   className,
 }: MurdokuBoardProps) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const avatarsRef = useRef<Map<PersonId, HTMLImageElement>>(new Map());
-  const [cell, setCell] = useState(48);
-
   const width = puzzle.board.width;
   const height = puzzle.board.height;
+  const { wrapRef, cell } = useBoardCellSize(width, maxCellSize);
   const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
-  const suspectIndex = useMemo(
-    () => new Map(puzzle.suspects.map((suspect, index) => [suspect.id, index])),
-    [puzzle],
+  const placed = placements ?? NO_PLACEMENTS;
+  const labels = useMemo(
+    () => boardLabels(puzzle, text, placed, crosses),
+    [puzzle, text, placed, crosses],
   );
-
-  // Bewaar de laatste tekenfunctie zodat een async beeld-load het bord opnieuw
-  // kan tekenen zonder een verouderde closure te gebruiken.
-  const drawRef = useRef<() => void>(() => {});
-
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    if (!wrap) return;
-
-    const measure = () => {
-      const available = wrap.clientWidth || FALLBACK_WIDTH;
-      const next = Math.max(MIN_CELL, Math.min(maxCellSize, Math.floor(available / width)));
-      setCell(next);
-    };
-
-    measure();
-    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
-    observer?.observe(wrap);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer?.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [width, maxCellSize]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const boardWidth = width * cell;
-    const boardHeight = height * cell;
-
-    const draw = () => {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.round(boardWidth * dpr));
-      canvas.height = Math.max(1, Math.round(boardHeight * dpr));
-      canvas.style.width = `${boardWidth}px`;
-      canvas.style.height = `${boardHeight}px`;
-
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, boardWidth, boardHeight);
-      drawBoard(ctx, {
-        puzzle,
-        cell,
-        origin: { x: 0, y: 0 },
-        roomName: (nameKey) => text.roomName(nameKey),
-        suspectIndex,
-        placements: new Map(placements ?? []),
-        marks: new Map(),
-        crosses: new Set(crosses),
-        highlight: highlight ? new Set(highlight) : null,
-        highlightColor,
-        helpMarks,
-        reveal: null,
-        avatars: avatarsRef.current,
-      });
-    };
-
-    drawRef.current = draw;
-    draw();
-
-    return onArtReady(draw);
-  }, [
+  const canvasRef = useMurdokuCanvas({
     puzzle,
     cell,
-    width,
-    height,
-    placements,
+    text,
+    placed,
+    crosses,
     highlight,
     highlightColor,
-    crosses,
     helpMarks,
-    text,
-    suspectIndex,
-  ]);
-
-  // Portretten zijn lokale SVG-data-URI's; zodra ze geladen zijn tekent het bord
-  // opnieuw. Er gaat geen netwerkrequest aan te pas.
-  useEffect(() => {
-    const map = new Map<PersonId, HTMLImageElement>();
-    puzzle.suspects.forEach((suspect, index) => {
-      const image = new Image();
-      image.onload = () => drawRef.current();
-      image.src = avatarDataUri(suspect.attributes, suspectColor(index), suspect.id);
-      map.set(suspect.id, image);
-    });
-    avatarsRef.current = map;
-    drawRef.current();
-  }, [puzzle]);
-
-  const label = `Plattegrond van ${title}, ${width} bij ${height}`;
+    outlineRoomId,
+    reveal,
+  });
 
   return (
-    <div ref={wrapRef} className={cn("flex w-full justify-center", className)}>
-      <canvas ref={canvasRef} aria-label={label} className="block rounded-sm" role="img" />
+    <div ref={wrapRef} className={cn("flex w-full flex-col items-center", className)}>
+      <div className="mx-auto" style={{ width: LABEL_SIZE + width * cell }}>
+        <MurdokuColumnLabels cell={cell} labelSize={LABEL_SIZE} width={width} />
+        <div className="flex">
+          <MurdokuRowLabels cell={cell} height={height} labelSize={LABEL_SIZE} />
+          <BoardGrid
+            canvasRef={canvasRef}
+            cell={cell}
+            height={height}
+            labels={labels}
+            mode={mode}
+            selectedPerson={selectedPerson}
+            title={title}
+            width={width}
+            onCellTap={onCellTap}
+          />
+        </div>
+      </div>
     </div>
   );
 }
