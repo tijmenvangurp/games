@@ -11,6 +11,8 @@ import {
   findRecipesFor,
   getHint,
   getElement,
+  hintCandidates,
+  hintIngredient,
   isElementId,
   pairKey,
   reachableElementIds,
@@ -103,6 +105,32 @@ describe("alchemy rules", () => {
     expect(getHint(everything)).toBeNull();
   });
 
+  it("orders hint candidates and never hints at a known result", () => {
+    const bases = new Set(BASE_ELEMENT_IDS);
+    const candidates = hintCandidates(bases);
+
+    expect(candidates[0]).toEqual({ a: "water", b: "earth", result: "mud" });
+
+    const firstSingle = candidates.findIndex((hint) => !(bases.has(hint.a) && bases.has(hint.b)));
+    expect(firstSingle).toBeGreaterThan(0);
+    expect(
+      candidates.slice(firstSingle).every((hint) => !(bases.has(hint.a) && bases.has(hint.b))),
+    ).toBe(true);
+
+    for (const hint of candidates) {
+      expect(bases.has(hint.result)).toBe(false);
+      expect(bases.has(hint.a) || bases.has(hint.b)).toBe(true);
+    }
+
+    expect(hintCandidates(new Set(ELEMENTS.map((element) => element.id)))).toEqual([]);
+
+    expect(hintIngredient({ a: "earth", b: "fire", result: "lava" }, bases)).toBe("earth");
+    expect(hintIngredient({ a: "water", b: "rain", result: "plant" }, new Set(["rain"]))).toBe(
+      "rain",
+    );
+    expect(hintIngredient({ a: "water", b: "rain", result: "plant" }, new Set())).toBe("water");
+  });
+
   it("grows without leaving new elements without a recipe", () => {
     expect(ELEMENTS.length).toBeGreaterThanOrEqual(90);
     expect(RECIPES.length).toBeGreaterThanOrEqual(ELEMENTS.length - BASE_ELEMENT_IDS.length);
@@ -114,6 +142,7 @@ describe("alchemy rules", () => {
     expect(combine("stone", "stone")).toBe("mountain");
     expect(combine("house", "house")).toBe("village");
     expect(combine("star", "star")).toBe("galaxy");
+    expect(combine("flat", "flat")).toBe("wolkenkrabber");
   });
 
   it("keeps wind reachable now that two airs make a storm", () => {
@@ -191,6 +220,36 @@ describe("alchemy rules", () => {
     expect(combine("stone", "human")).toBe("statue");
     expect(combine("statue", "snow")).toBe("snowman");
     expect(combine("statue", "house")).toBe("museum");
+  });
+
+  it("adds a second batch of discoveries for a six-year-old", () => {
+    expect(combine("boat", "wind")).toBe("sailboat");
+    expect(combine("boat", "motor")).toBe("speedboat");
+    expect(combine("hospital", "car")).toBe("ambulance");
+    expect(combine("hospital", "human")).toBe("doctor");
+    expect(combine("book", "book")).toBe("library");
+    expect(combine("book", "house")).toBe("school");
+    expect(combine("chicken", "egg")).toBe("chick");
+    expect(combine("tree", "egg")).toBe("nest");
+    expect(combine("egg", "fire")).toBe("friedegg");
+    expect(combine("flour", "egg")).toBe("pasta");
+    expect(combine("banana", "milk")).toBe("milkshake");
+    expect(combine("sugar", "water")).toBe("lemonade");
+    expect(combine("fruit", "sugar")).toBe("jam");
+    expect(combine("sea", "ice")).toBe("iceberg");
+    expect(combine("mountain", "snow")).toBe("ski");
+    expect(combine("moon", "star")).toBe("night");
+    expect(combine("beach", "sun")).toBe("holiday");
+    expect(combine("paint", "human")).toBe("painter");
+    expect(combine("computer", "human")).toBe("programmer");
+    expect(combine("horse", "cart")).toBe("carriage");
+    expect(combine("panda", "grass")).toBe("bamboo");
+    expect(combine("dragon", "egg")).toBe("dragonegg");
+    expect(combine("planet", "planet")).toBe("solarsystem");
+    expect(combine("rocket", "moon")).toBe("moonlanding");
+    expect(combine("wood", "fire")).toBe("campfire");
+    expect(combine("clock", "sun")).toBe("sundial");
+    expect(combine("city", "crown")).toBe("capital");
   });
 
   it("grows a farm-to-table chain", () => {

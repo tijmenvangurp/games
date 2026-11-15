@@ -120,13 +120,23 @@ describe("mengelmoes", () => {
     expect(useAlchemyStore.getState().discovered).not.toContain("mud");
   });
 
-  it("shows a hint that uses discovered elements", async () => {
+  it("shows a hint that names only one ingredient", async () => {
     await renderAlchemy();
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
 
-    expect(await screen.findByText(/Probeer Water \+ Aarde/i)).toBeTruthy();
+    expect(await screen.findByText("Probeer Water met iets anders.")).toBeTruthy();
     expect(useAlchemyStore.getState().hint?.result).toBe("mud");
+  });
+
+  it("gives a different tip when the hint button is pressed again", async () => {
+    await renderAlchemy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+    expect(await screen.findByText("Probeer Water met iets anders.")).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Hint" }));
+    expect(await screen.findByText("Probeer Aarde met iets anders.")).toBeTruthy();
   });
 
   it("opens the lab book and shows undiscovered elements as question marks", async () => {
@@ -177,7 +187,7 @@ describe("mengelmoes", () => {
     expect(within(dialog).getByRole("button", { name: "Bekijk Vuur" })).toBeTruthy();
   });
 
-  it("shows recipes and uses in the element detail", async () => {
+  it("shows recipes and made combinations in the element detail", async () => {
     await renderAlchemy();
     await makeSteam();
 
@@ -189,10 +199,47 @@ describe("mengelmoes", () => {
     expect(within(dialog).getByText("Gemaakt van")).toBeTruthy();
     expect(within(dialog).getAllByText("Water").length).toBeGreaterThan(0);
     expect(within(dialog).getAllByText("Vuur").length).toBeGreaterThan(0);
-    expect(within(dialog).getByText("Kan maken met")).toBeTruthy();
+    expect(within(dialog).getByText("Gelukte combinaties")).toBeTruthy();
+    expect(within(dialog).getByText("Nog 2 combinaties om te ontdekken.")).toBeTruthy();
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Terug naar labboek" }));
     expect(within(dialog).getByRole("button", { name: "Bekijk Stoom" })).toBeTruthy();
+  });
+
+  it("does not reveal which elements still combine", async () => {
+    await renderAlchemy();
+    await makeSteam();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Stoom" }));
+
+    const uses = within(dialog).getByText("Gelukte combinaties").closest("section");
+    if (!uses) {
+      throw new Error("Gelukte combinaties-section niet gevonden");
+    }
+
+    expect(within(uses).queryByText("Lucht")).toBeNull();
+    expect(within(uses).getByText("Nog niets mee gemaakt.")).toBeTruthy();
+    expect(within(uses).getByText("Nog 2 combinaties om te ontdekken.")).toBeTruthy();
+  });
+
+  it("lists combinations that are already made", async () => {
+    act(() => useAlchemyStore.setState({ discovered: [...BASE_ELEMENT_IDS, "steam", "cloud"] }));
+    await renderAlchemy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Labboek" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Stoom" }));
+
+    const uses = within(dialog).getByText("Gelukte combinaties").closest("section");
+    if (!uses) {
+      throw new Error("Gelukte combinaties-section niet gevonden");
+    }
+
+    expect(within(uses).getByText("Lucht")).toBeTruthy();
+    expect(within(uses).getByText("Wolk")).toBeTruthy();
+    expect(within(uses).getByText("Nog 1 combinatie om te ontdekken.")).toBeTruthy();
   });
 
   it("keeps undiscovered recipe ingredients hidden in the element detail", async () => {
@@ -225,8 +272,8 @@ describe("mengelmoes", () => {
     const dialog = await screen.findByRole("dialog");
     fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk Eenhoorn" }));
 
-    expect(within(dialog).queryByText("Kan maken met")).toBeNull();
-    expect(within(dialog).queryByText("Dit element is nog nergens voor gebruikt.")).toBeNull();
+    expect(within(dialog).queryByText("Gelukte combinaties")).toBeNull();
+    expect(within(dialog).queryByText("Nog niets mee gemaakt.")).toBeNull();
   });
 
   it("clears the workbench without losing discoveries", async () => {
@@ -249,7 +296,7 @@ describe("mengelmoes", () => {
     act(() => useAlchemyStore.setState({ discovered: ["water"] }));
 
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));
-    expect(await screen.findByText("Probeer Water + Water.")).toBeTruthy();
+    expect(await screen.findByText("Probeer twee keer Water.")).toBeTruthy();
 
     act(() => useAlchemyStore.setState({ discovered: ["fire"], hint: null }));
     fireEvent.click(screen.getByRole("button", { name: "Hint" }));

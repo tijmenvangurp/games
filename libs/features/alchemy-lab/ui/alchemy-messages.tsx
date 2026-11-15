@@ -1,20 +1,18 @@
 import { useEffect } from "react";
 import { AnimatePresence, m } from "motion/react";
-import { elementName, type ElementId, type Hint } from "@entities/alchemy";
+import { elementName, hintIngredient, type ElementId, type Hint } from "@entities/alchemy";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import type { AlchemyFeedback } from "../model/use-alchemy-store";
 
-function hintText(hint: Hint, discovered: readonly ElementId[]): string {
-  const firstKnown = discovered.includes(hint.a);
-  const secondKnown = discovered.includes(hint.b);
+function hintText(hint: Hint, discovered: ReadonlySet<ElementId>): string {
+  // A recipe with the same ingredient twice is its own kind of hint: the child
+  // cannot find that one by pairing two different elements.
+  if (hint.a === hint.b) {
+    return `Probeer twee keer ${elementName(hint.a)}.`;
+  }
 
-  if (firstKnown && secondKnown) {
-    return `Probeer ${elementName(hint.a)} + ${elementName(hint.b)}.`;
-  }
-  if (firstKnown) {
-    return `Probeer ${elementName(hint.a)} met iets anders.`;
-  }
-  return `Probeer ${elementName(hint.b)} met iets anders.`;
+  // Name one ingredient only, so the child still has to find the partner.
+  return `Probeer ${elementName(hintIngredient(hint, discovered))} met iets anders.`;
 }
 
 function feedbackText(
@@ -40,6 +38,8 @@ interface AlchemyMessagesProps {
 }
 
 export function AlchemyMessages({ discovered, feedback, hint }: AlchemyMessagesProps) {
+  const discoveredSet = new Set(discovered);
+
   useEffect(() => {
     if (!feedback || feedback.kind === "new") {
       return;
@@ -58,7 +58,7 @@ export function AlchemyMessages({ discovered, feedback, hint }: AlchemyMessagesP
           className="rounded-2xl border border-amber-300 bg-amber-50 px-3 py-2 text-center text-sm font-bold text-amber-900"
           role="status"
         >
-          {hintText(hint, discovered)}
+          {hintText(hint, discoveredSet)}
         </p>
       ) : null}
 

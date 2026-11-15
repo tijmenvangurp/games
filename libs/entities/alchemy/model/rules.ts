@@ -84,6 +84,50 @@ export function elementName(id: ElementId): string {
 }
 
 /**
+ * The ingredient a hint names: the one the child already has. For a recipe
+ * with two identical ingredients that is the ingredient itself.
+ */
+export function hintIngredient(hint: Hint, discovered: ReadonlySet<ElementId>): ElementId {
+  if (discovered.has(hint.a)) {
+    return hint.a;
+  }
+  if (discovered.has(hint.b)) {
+    return hint.b;
+  }
+  return hint.a;
+}
+
+/**
+ * Lists the recipes that can still yield something new. Recipes whose
+ * ingredients are both known come first, because they are the easiest next
+ * step; recipes with one known ingredient follow. A discovered result is
+ * never a hint.
+ */
+export function hintCandidates(
+  discovered: ReadonlySet<ElementId>,
+  recipes: readonly Recipe[] = RECIPES,
+): Hint[] {
+  const bothKnown: Hint[] = [];
+  const oneKnown: Hint[] = [];
+
+  for (const recipe of recipes) {
+    if (discovered.has(recipe.result)) {
+      continue;
+    }
+
+    const firstKnown = discovered.has(recipe.a);
+    const secondKnown = discovered.has(recipe.b);
+    if (firstKnown && secondKnown) {
+      bothKnown.push(recipe);
+    } else if (firstKnown || secondKnown) {
+      oneKnown.push(recipe);
+    }
+  }
+
+  return [...bothKnown, ...oneKnown];
+}
+
+/**
  * Gives the most useful next experiment. Prefers a recipe whose ingredients
  * are both known, then one with a single known ingredient. Never reveals an
  * element that is already discovered.
@@ -92,19 +136,7 @@ export function getHint(
   discovered: ReadonlySet<ElementId>,
   recipes: readonly Recipe[] = RECIPES,
 ): Hint | null {
-  const bothKnown = recipes.find(
-    (recipe) =>
-      !discovered.has(recipe.result) && discovered.has(recipe.a) && discovered.has(recipe.b),
-  );
-  if (bothKnown) {
-    return bothKnown;
-  }
-
-  const oneKnown = recipes.find(
-    (recipe) =>
-      !discovered.has(recipe.result) && (discovered.has(recipe.a) || discovered.has(recipe.b)),
-  );
-  return oneKnown ?? null;
+  return hintCandidates(discovered, recipes)[0] ?? null;
 }
 
 export function totalElements(): number {
