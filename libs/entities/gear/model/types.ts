@@ -106,12 +106,12 @@ export interface ConnectionPose {
   active: boolean;
   /** Signed oppervlaktesnelheid in board-eenheden per seconde. */
   surfaceSpeed: number;
-  /** Twee rechte banden voor een riem; null voor een ketting. */
+  /** Twee rechte raaklijnen; de tekenlaag gebruikt `path`. */
   runs: readonly [BeltRun, BeltRun] | null;
   /** Lengte van het gesloten pad in board-eenheden. */
   length: number;
-  /** Steek van de ketting op de kleinste sprocket; null voor een riem. */
-  chainPitch: number | null;
+  /** Steek van de ketting op de kleinste sprocket. */
+  chainPitch: number;
 }
 
 export interface OutputPose {

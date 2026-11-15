@@ -50,10 +50,10 @@ export const CHAPTER_1_LEVELS: readonly Level[] = [
   },
   {
     id: "de-riem",
-    name: "De riem",
+    name: "De gesloten ketting",
     chapter: 1,
     introduces: "open-belt",
-    intro: "Een riem verbindt twee wielen zonder tanden.",
+    intro: "Een ketting verbindt twee wielen zonder tanden.",
     cols: 7,
     rows: 5,
     holes: createHoles(7, 5),
@@ -73,7 +73,7 @@ export const CHAPTER_1_LEVELS: readonly Level[] = [
   },
   {
     id: "de-ketting",
-    name: "De ketting",
+    name: "De lange ketting",
     chapter: 1,
     introduces: "chain",
     intro: "Een ketting brengt de beweging over een lange afstand.",

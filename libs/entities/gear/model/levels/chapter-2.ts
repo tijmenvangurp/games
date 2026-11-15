@@ -7,7 +7,7 @@ export const CHAPTER_2_LEVELS: readonly Level[] = [
     name: "Gekruist",
     chapter: 2,
     introduces: "crossed-belt",
-    intro: "Een gekruiste riem draait de richting om.",
+    intro: "Een gekruiste ketting draait de richting om.",
     cols: 6,
     rows: 5,
     holes: createHoles(6, 5),

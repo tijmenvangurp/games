@@ -372,10 +372,7 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
     const surfaceSpeed = (fromRotor?.speed ?? 0) * MOTOR_ANGULAR_SPEED * fromRadius;
     // De kettingsteek volgt de kleinste sprocket: 2 * r * sin(PI / tanden).
     const smallest: GearSize = from.size <= to.size ? from.size : to.size;
-    const chainPitch =
-      placement.kind === "chain"
-        ? 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest))
-        : null;
+    const chainPitch = 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest));
     connections.push({
       key: `${placement.kind}:${placement.fromHoleId}:${placement.toHoleId}`,
       kind: placement.kind,
@@ -907,7 +904,7 @@ export function trayLabel(item: TrayItem): string {
     case "worm":
       return item.ratio <= 0.25 ? "Wormas, grote vertraging" : "Wormas";
     case "belt":
-      return item.crossed === true ? "Gekruiste riem" : "Open riem";
+      return item.crossed === true ? "Gekruiste ketting" : "Ketting";
     case "chain":
       return "Ketting";
   }
