@@ -235,7 +235,7 @@ function readExplanation(value: unknown, depth: number): Explanation | null {
   };
 }
 
-function readHintLine(value: unknown, puzzle: Puzzle): MurdokuHintState["line"] | undefined {
+function readHintLine(value: unknown, puzzle: Puzzle): MurdokuHintState["line"] {
   if (!isRecord(value) || (value.axis !== "row" && value.axis !== "col")) {
     return null;
   }
