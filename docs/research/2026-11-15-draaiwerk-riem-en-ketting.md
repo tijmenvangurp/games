@@ -385,6 +385,15 @@ De eerste implementatie tekende de riem als twee rechte banden, naar Beltz. In d
 
 De twee-bandengeometrie (`beltTangentRuns`, `ConnectionPose.runs`) blijft als pure meetkunde voor tests en een latere preview, maar de tekenlaag gebruikt `connection.path`. De ketting volgt dezelfde gesloten lus, met schakels op de steekcirkel.
 
+## Addendum 2026-11-15: alleen kettingen
+
+De riem is uit het spel verdwenen. Open en gekruiste verbindingen worden nu als kettingen getekend; de interne soorten `open-belt` en `crossed-belt` blijven de richting en overbrenging bepalen, maar de speler ziet en leest alleen nog een ketting. Dat maakt de mechanically identieke onderdelen visueel consistent en voorkomt dat een kind een riem en een ketting als twee verschillende dingen moet leren.
+
+- De ketting ligt op de steekcirkel en wordt over de tandwielen getekend.
+- Een losse ketting hangt als een grote lus over het tandwiel, met de greep onderaan.
+- De tray toont een ketting in plaats van een lederen strap; de gekruiste variant toont twee kruisende kettingstrengen.
+- De teksten, levelnamen en feedback zeggen nu "ketting" in plaats van "riem".
+
 ## Bronnen
 
 - Huidige implementatie `feat/draaiwerk`, commit `61d4066`; de code staat lokaal in `libs/entities/gear/model/` en `libs/features/draaiwerk/`.
