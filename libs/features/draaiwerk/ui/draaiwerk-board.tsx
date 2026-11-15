@@ -333,7 +333,7 @@ function LooseBeltBand({
           }
         }}
       >
-        <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={18} />
+        <circle cx={tail.x} cy={tail.y} fill="transparent" pointerEvents="all" r={22} />
         <circle
           cx={tail.x}
           cy={tail.y}
