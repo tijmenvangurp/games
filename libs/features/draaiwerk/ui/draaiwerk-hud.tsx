@@ -163,10 +163,10 @@ export function DraaiwerkHud({
 
       {result.solved ? (
         <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-success/30 bg-success/10 p-2">
-          <Confetti pieces={celebrate ? 28 : 16} variant={celebrate ? "shower" : "burst"} />
+          <Confetti pieces={celebrate ? 48 : 30} variant="shower" />
           <Trophy aria-hidden="true" className="size-5 text-success" />
           <p className="min-w-0 flex-1 text-sm font-bold text-success">
-            {hasNext ? "Gelukt! Bekijk je machine." : "Alle levels gehaald!"}
+            {hasNext ? "Gelukt!" : "Alle levels gehaald!"}
           </p>
           <Button size="sm" variant="success" onClick={onNext}>
             {hasNext ? "Volgende level" : "Opnieuw spelen"}
