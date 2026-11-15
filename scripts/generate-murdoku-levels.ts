@@ -32,6 +32,6 @@ if (check) {
   }
 } else {
   const data = buildMurdokuLevels();
-  await writeFile(MURDOKU_LEVELS_FILE, renderMurdokuLevels(data), "utf8");
+  await writeFile(MURDOKU_LEVELS_FILE, await renderMurdokuLevels(data), "utf8");
   console.log(`${data.cases.length} eigen zaken geschreven naar ${MURDOKU_LEVELS_FILE}`);
 }

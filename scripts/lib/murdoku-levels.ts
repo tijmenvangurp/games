@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { format } from "oxfmt";
 import { MURDOKU_CASE_SPECS } from "../../libs/entities/murdoku/model/cases/specs";
 import type { MurdokuCaseSpec } from "../../libs/entities/murdoku/model/cases/specs";
 import {
@@ -332,7 +333,11 @@ export async function checkMurdokuLevelsFile(file = MURDOKU_LEVELS_FILE): Promis
   return compareCases(expected, actual);
 }
 
-/** Schrijft het bestand in de vorm die de app importeert. */
-export function renderMurdokuLevels(data: GeneratedMurdokuLevels): string {
-  return `${JSON.stringify(data, null, 2)}\n`;
+/** Schrijft het bestand in de vorm die de app importeert, met de repo-opmaak. */
+export async function renderMurdokuLevels(data: GeneratedMurdokuLevels): Promise<string> {
+  const result = await format(MURDOKU_LEVELS_FILE, `${JSON.stringify(data, null, 2)}\n`);
+  if (result.errors.length > 0) {
+    throw new Error(`De zaken-JSON is niet te formatteren: ${result.errors[0]?.message ?? "?"}`);
+  }
+  return result.code.endsWith("\n") ? result.code : `${result.code}\n`;
 }
