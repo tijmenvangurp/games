@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
@@ -210,5 +210,32 @@ describe("vier op een rij", () => {
 
     startGame();
     expect(useFourInARowStore.getState().match).toEqual({ mode: "computer", level: "moeilijk" });
+  });
+
+  it("toont de hint alleen bij hover en toetsenbordfocus", async () => {
+    await openSetup();
+    startGame();
+
+    const column = screen.getByRole("button", { name: "Kolom 1" });
+
+    // Op een aanraakscherm zou de hint alleen maar flitsen.
+    fireEvent.pointerOver(column, { pointerType: "touch" });
+    expect(column.querySelector(".opacity-40")).toBeNull();
+
+    fireEvent.pointerOver(column, { pointerType: "mouse" });
+    expect(column.querySelector(".opacity-40")).not.toBeNull();
+
+    fireEvent.pointerOut(column);
+    expect(column.querySelector(".opacity-40")).toBeNull();
+
+    // Een tik op een aanraakscherm kan ook focus geven; dan geen hint.
+    fireEvent.pointerDown(column, { pointerType: "touch" });
+    act(() => column.focus());
+    expect(column.querySelector(".opacity-40")).toBeNull();
+
+    act(() => column.blur());
+    fireEvent.pointerDown(column, { pointerType: "mouse" });
+    act(() => column.focus());
+    expect(column.querySelector(".opacity-40")).not.toBeNull();
   });
 });
