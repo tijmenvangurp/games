@@ -16,6 +16,9 @@ export {
   validateMurdokuPlacement,
 } from "./model/murdoku";
 
+export { nextMurdokuHint } from "./model/hints";
+export type { MurdokuHint } from "./model/hints";
+
 export { VICTIM_ID } from "./model/engine/domain/types";
 export type { Cell, PersonId } from "./model/engine/domain/types";
 export type { LevelJson } from "./model/engine/io/index";

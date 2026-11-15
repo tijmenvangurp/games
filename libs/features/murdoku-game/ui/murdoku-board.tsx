@@ -1,8 +1,10 @@
-import { useMemo, type RefObject } from "react";
+import { useMemo, type ReactNode, type RefObject } from "react";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
 import type { MurdokuMode } from "../model/play";
-import { createMurdokuText } from "../lib/text";
+import { MURDOKU_HINT_COLOR } from "../lib/palette";
+import type { MurdokuText } from "../lib/text";
+import { useMurdokuText } from "./use-murdoku-text";
 import type { HelpMarks } from "../lib/vendored/helpMarks";
 import { MurdokuCellGrid, MurdokuColumnLabels, MurdokuRowLabels } from "./murdoku-board-parts";
 import { useBoardCellSize, LABEL_SIZE } from "./use-board-cell-size";
@@ -14,6 +16,12 @@ interface MurdokuBoardReveal {
   victimCell: Cell;
 }
 
+/** Een laag vakjes die oplicht, met een eigen wash- en ringkleur. */
+export interface MurdokuBoardHighlight {
+  cells: ReadonlySet<Cell>;
+  color?: { wash: string; ring: string };
+}
+
 interface MurdokuBoardProps {
   puzzle: Puzzle;
   /** Werktitel van de zaak; gebruikt voor het toegankelijke label. */
@@ -21,8 +29,9 @@ interface MurdokuBoardProps {
   /** Geplaatste personen. Zonder plaatsingen toont het bord alleen de plattegrond. */
   placements?: ReadonlyMap<PersonId, Cell>;
   /** Kandidaatvakjes van de gekozen persoon (primaire hintwash). */
-  highlight?: ReadonlySet<Cell> | null;
-  highlightColor?: { wash: string; ring: string };
+  highlight?: MurdokuBoardHighlight | null;
+  /** Vakjes die bij een hint of een tik op een woord oplichten (hintkleur). */
+  focus?: MurdokuBoardHighlight | null;
   /** Weggekruiste vakjes. */
   crosses?: ReadonlySet<Cell>;
   /** Rustige referentiemarkeringen van de aanwijzingen (kameromtrek, objectring). */
@@ -45,11 +54,26 @@ interface MurdokuBoardProps {
 const NO_CELLS: ReadonlySet<Cell> = new Set();
 const NO_PLACEMENTS: ReadonlyMap<PersonId, Cell> = new Map();
 
+/**
+ * Welke vakjes met welke kleur opgelicht worden. Een hint of een tik op een
+ * woord gaat vóór de kandidaatwash van de gekozen persoon: het bord toont één
+ * uitleg tegelijk.
+ */
+function drawnHighlight(
+  focus: MurdokuBoardHighlight | null,
+  highlight: MurdokuBoardHighlight | null,
+): { cells: ReadonlySet<Cell> | null; color: { wash: string; ring: string } | undefined } {
+  if (focus) return { cells: focus.cells, color: focus.color ?? MURDOKU_HINT_COLOR };
+  if (highlight) return { cells: highlight.cells, color: highlight.color };
+  return { cells: null, color: undefined };
+}
+
 function cellLabel(
   puzzle: Puzzle,
-  text: ReturnType<typeof createMurdokuText>,
+  text: MurdokuText,
   placements: ReadonlyMap<PersonId, Cell>,
   crosses: ReadonlySet<Cell>,
+  focus: ReadonlySet<Cell> | null,
   cell: Cell,
 ): string {
   const { board } = puzzle;
@@ -69,6 +93,7 @@ function cellLabel(
 
   return [
     state,
+    focus?.has(cell) === true && "licht op",
     !occupiable && "hier mag niemand staan",
     `rij ${row + 1}`,
     `kolom ${col + 1}`,
@@ -82,12 +107,15 @@ function cellLabel(
 /** De toegankelijke naam van elk vakje, in bordvolgorde. */
 function boardLabels(
   puzzle: Puzzle,
-  text: ReturnType<typeof createMurdokuText>,
+  text: MurdokuText,
   placed: ReadonlyMap<PersonId, Cell>,
   crosses: ReadonlySet<Cell>,
+  focus: ReadonlySet<Cell> | null,
 ): string[] {
   const total = puzzle.board.width * puzzle.board.height;
-  return Array.from({ length: total }, (_, cell) => cellLabel(puzzle, text, placed, crosses, cell));
+  return Array.from({ length: total }, (_, cell) =>
+    cellLabel(puzzle, text, placed, crosses, focus, cell),
+  );
 }
 
 interface BoardGridProps {
@@ -134,6 +162,30 @@ function BoardGrid({
   );
 }
 
+interface BoardFrameProps {
+  wrapRef: RefObject<HTMLDivElement | null>;
+  width: number;
+  height: number;
+  cell: number;
+  className?: string;
+  children: ReactNode;
+}
+
+/** De kolomlabels, rijlabels en het bord binnen veilige vaste maten. */
+function BoardFrame({ wrapRef, width, height, cell, className, children }: BoardFrameProps) {
+  return (
+    <div ref={wrapRef} className={cn("flex w-full flex-col items-center", className)}>
+      <div className="mx-auto" style={{ width: LABEL_SIZE + width * cell }}>
+        <MurdokuColumnLabels cell={cell} labelSize={LABEL_SIZE} width={width} />
+        <div className="flex">
+          <MurdokuRowLabels cell={cell} height={height} labelSize={LABEL_SIZE} />
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /**
  * Eén canvas met de plattegrond van een zaak: kamers, vloeren, meubels, ramen,
  * kamernamen en de geplaatste portretten. Boven en links staan de kolom- en
@@ -146,7 +198,7 @@ export function MurdokuBoard({
   title,
   placements,
   highlight = null,
-  highlightColor,
+  focus = null,
   crosses = NO_CELLS,
   helpMarks = null,
   outlineRoomId = null,
@@ -160,44 +212,36 @@ export function MurdokuBoard({
   const width = puzzle.board.width;
   const height = puzzle.board.height;
   const { wrapRef, cell } = useBoardCellSize(width, maxCellSize);
-  const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
+  const text = useMurdokuText(puzzle);
   const placed = placements ?? NO_PLACEMENTS;
-  const labels = useMemo(
-    () => boardLabels(puzzle, text, placed, crosses),
-    [puzzle, text, placed, crosses],
-  );
+  const labels = boardLabels(puzzle, text, placed, crosses, focus?.cells ?? null);
+  const drawn = drawnHighlight(focus, highlight);
   const canvasRef = useMurdokuCanvas({
     puzzle,
     cell,
     text,
     placed,
     crosses,
-    highlight,
-    highlightColor,
+    highlight: drawn.cells,
+    highlightColor: drawn.color,
     helpMarks,
     outlineRoomId,
     reveal,
   });
 
   return (
-    <div ref={wrapRef} className={cn("flex w-full flex-col items-center", className)}>
-      <div className="mx-auto" style={{ width: LABEL_SIZE + width * cell }}>
-        <MurdokuColumnLabels cell={cell} labelSize={LABEL_SIZE} width={width} />
-        <div className="flex">
-          <MurdokuRowLabels cell={cell} height={height} labelSize={LABEL_SIZE} />
-          <BoardGrid
-            canvasRef={canvasRef}
-            cell={cell}
-            height={height}
-            labels={labels}
-            mode={mode}
-            selectedPerson={selectedPerson}
-            title={title}
-            width={width}
-            onCellTap={onCellTap}
-          />
-        </div>
-      </div>
-    </div>
+    <BoardFrame cell={cell} className={className} height={height} width={width} wrapRef={wrapRef}>
+      <BoardGrid
+        canvasRef={canvasRef}
+        cell={cell}
+        height={height}
+        labels={labels}
+        mode={mode}
+        selectedPerson={selectedPerson}
+        title={title}
+        width={width}
+        onCellTap={onCellTap}
+      />
+    </BoardFrame>
   );
 }

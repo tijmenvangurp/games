@@ -17,10 +17,18 @@ export interface MurdokuText {
   explanation(explanation: Explanation, subjectId?: PersonId): string;
   /** De Nederlandse kamernaam bij een `room.*`-key. */
   roomName(nameKey: string): string;
+  /** De kamer met lidwoord bij een kamer-id ("de keuken"). */
+  roomPhrase(roomId: string): string;
+  /** Een rij of kolom zoals de aanwijzing hem noemt ("rij 2"). */
+  linePhrase(axis: "row" | "col", index: number): string;
   /** De zelfstandig naamwoordvorm van een objecttype ("Tafel"). */
   objectName(type: string): string;
+  /** Het object zoals de aanwijzing het noemt ("een tafel", "elke tafel"). */
+  objectPhrase(type: string, form?: "nom" | "every" | "same"): string;
   /** Een richting in gewone taal ("links", "boven"). */
   direction(direction: string): string;
+  /** Een los woord uit de woordenlijst, bijvoorbeeld "in een hoek". */
+  word(name: string): string;
   /** Een vaste bordregel, bijvoorbeeld de regel over het slachtoffer. */
   rule(name: "aloneWithVictim" | "oneEachLine"): string;
 }
@@ -37,8 +45,22 @@ export function createMurdokuText(puzzle: Puzzle): MurdokuText {
       ),
     /** De kamernaam zonder lidwoord, voor het bord ("keuken", niet "de keuken"). */
     roomName: (nameKey) => (renderer.lookup(nameKey) ?? nameKey).replace(/^(de|het) /, ""),
+    roomPhrase: (roomId) => renderer.resolveParam("room", roomId),
+    linePhrase: (axis, index) => `${renderer.lookup(`line.${axis}`) ?? axis} ${index + 1}`,
     objectName: (type) => renderer.resolveParam("objName", type),
+    objectPhrase: (type, form) =>
+      renderer.resolveParam(
+        form === "nom"
+          ? "objectNom"
+          : form === "every"
+            ? "objectEvery"
+            : form === "same"
+              ? "objectSame"
+              : "object",
+        type,
+      ),
     direction: (direction) => renderer.resolveParam("direction", direction),
+    word: (name) => renderer.lookup(`word.${name}`) ?? name,
     rule: (name) => renderer.lookup(`rule.${name}`) ?? name,
   };
 }

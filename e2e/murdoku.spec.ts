@@ -34,9 +34,9 @@ test.describe("Wie was het? op een telefoon", () => {
     const check = page.getByRole("button", { name: "Controleer" });
     await expect(check).toBeDisabled();
 
-    await placeOnBoard(page, /^Anna\. Anna stond in de keuken/, /^leeg, rij 1, kolom 2/);
-    await placeOnBoard(page, /^Bram\. Bram stond op een stoel/, /^leeg, rij 2, kolom 1/);
-    await placeOnBoard(page, /^Cato\. Cato stond in de badkamer/, /rij 3, kolom 1/);
+    await placeOnBoard(page, /^Anna$/, /^leeg, rij 1, kolom 2/);
+    await placeOnBoard(page, /^Bram$/, /^leeg, rij 2, kolom 1/);
+    await placeOnBoard(page, /^Cato$/, /rij 3, kolom 1/);
     await expect(check).toBeEnabled();
 
     // Een fout geeft neutrale feedback en laat het bord staan.

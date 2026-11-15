@@ -31,19 +31,37 @@ export function MurdokuPage() {
   const navigate = useNavigate();
   const puzzle = useMemo(() => loadMurdokuLevel(MURDOKU_INTRO_LEVEL), []);
   const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
-  const { start, selectPerson, setMode, tapCell, undo, check, storedPlay, historyLength } =
-    useMurdokuStore(
-      useShallow((state) => ({
-        start: state.start,
-        selectPerson: state.selectPerson,
-        setMode: state.setMode,
-        tapCell: state.tapCell,
-        undo: state.undo,
-        check: state.check,
-        storedPlay: state.play,
-        historyLength: state.history.length,
-      })),
-    );
+  const {
+    start,
+    selectPerson,
+    setMode,
+    tapCell,
+    undo,
+    check,
+    showHint,
+    focusClue,
+    storedPlay,
+    historyLength,
+    hint,
+    clueFocus,
+    clueFocusLabel,
+  } = useMurdokuStore(
+    useShallow((state) => ({
+      start: state.start,
+      selectPerson: state.selectPerson,
+      setMode: state.setMode,
+      tapCell: state.tapCell,
+      undo: state.undo,
+      check: state.check,
+      showHint: state.showHint,
+      focusClue: state.focusClue,
+      storedPlay: state.play,
+      historyLength: state.history.length,
+      hint: state.hint,
+      clueFocus: state.clueFocus,
+      clueFocusLabel: state.clueFocusLabel,
+    })),
+  );
   const [showCelebration, setShowCelebration] = useState(true);
   const title = MURDOKU_INTRO_LEVEL.title ?? "de zaak";
 
@@ -59,6 +77,10 @@ export function MurdokuPage() {
   const toggleCross = () => setMode(play.mode === "cross" ? "place" : "cross");
   const canCheck = play.phase === "playing" && everyonePlaced(puzzle, play);
   const revealSentence = revealSentenceFor(puzzle, text, play);
+  const hintMessage = hint ? text.explanation(hint.explanation) : null;
+  const clueMessage = clueFocusLabel
+    ? text.explanation({ key: "board.wordOn", params: { word: clueFocusLabel } })
+    : null;
 
   /** Een nieuwe poging: leeg bord en de viering weer beschikbaar. */
   const restart = () => {
@@ -82,12 +104,17 @@ export function MurdokuPage() {
         <MurdokuBoardSection
           canCheck={canCheck}
           canUndo={historyLength > 0}
+          clueFocus={clueFocus}
+          clueMessage={clueMessage}
           feedback={feedbackFor(play, revealSentence)}
+          hint={hint}
+          hintMessage={hintMessage}
           play={play}
           puzzle={puzzle}
           title={title}
           onCellTap={tapCell}
           onCheck={() => check(MURDOKU_INTRO_SOLUTION)}
+          onHint={showHint}
           onToggleCross={toggleCross}
           onUndo={undo}
         />
@@ -101,7 +128,13 @@ export function MurdokuPage() {
           <p className="text-sm leading-relaxed text-muted-foreground">
             {text.rule("aloneWithVictim")}
           </p>
-          <MurdokuClueCards puzzle={puzzle} selectedId={play.selected} onSelect={selectPerson} />
+          <MurdokuClueCards
+            activeWord={clueFocus}
+            puzzle={puzzle}
+            selectedId={play.selected}
+            onFocusWord={focusClue}
+            onSelect={selectPerson}
+          />
         </section>
 
         <section aria-labelledby="murdoku-legenda" className="flex flex-col gap-2.5">

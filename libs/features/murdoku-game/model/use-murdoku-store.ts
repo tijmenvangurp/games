@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
+import { sameClueFocus, type MurdokuClueFocus } from "../lib/clue-words";
+import { applyMurdokuHint, planMurdokuHint, type MurdokuHintState } from "./hints";
 import {
   checkMurdokuPlay,
   createMurdokuPlay,
@@ -19,6 +21,14 @@ interface MurdokuStore {
   play: MurdokuPlayState | null;
   /** Eerdere bordtoestanden, voor ongedaan maken. */
   history: MurdokuPlayState[];
+  /** De hint die nu op het bord staat; `null` als het kind niets vroeg. */
+  hint: MurdokuHintState | null;
+  /** Hoe vaak er om een hint is gevraagd. Nooit een straf, alleen een telling. */
+  hintsUsed: number;
+  /** Het woord uit een aanwijzing dat nu op het bord oplicht. */
+  clueFocus: MurdokuClueFocus | null;
+  /** Dat woord zoals het in de zin stond, voor de melding onder het bord. */
+  clueFocusLabel: string | null;
   start: (puzzle: Puzzle) => void;
   selectPerson: (person: PersonId) => void;
   setMode: (mode: MurdokuMode) => void;
@@ -26,22 +36,39 @@ interface MurdokuStore {
   undo: () => void;
   /** Controleert de zaak tegen de oplossing; zie {@link checkMurdokuPlay}. */
   check: (solution: ReadonlyMap<PersonId, Cell>) => void;
+  /**
+   * Eén tik op de hintknop: eerst wijzen (rij, kolom of kamer), daarna één
+   * gedwongen zet. De deductie-engine bepaalt de stap; de hint straft nooit.
+   */
+  showHint: () => void;
+  /** Een tik op een woord in een aanwijzing; nog eens tikken heft het op. */
+  focusClue: (focus: MurdokuClueFocus, label: string) => void;
 }
 
 function withHistory(history: MurdokuPlayState[], play: MurdokuPlayState): MurdokuPlayState[] {
   return [...history, play].slice(-MAX_HISTORY);
 }
 
+const CLEARED_HINT = { hint: null, clueFocus: null, clueFocusLabel: null } as const;
+
 export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
   puzzle: null,
   play: null,
   history: [],
+  hint: null,
+  hintsUsed: 0,
+  clueFocus: null,
+  clueFocusLabel: null,
 
   start: (puzzle) =>
     set({
       puzzle,
       play: createMurdokuPlay(puzzle.id),
       history: [],
+      hint: null,
+      hintsUsed: 0,
+      clueFocus: null,
+      clueFocusLabel: null,
     }),
 
   selectPerson: (person) =>
@@ -54,7 +81,7 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
     if (!puzzle || !play) return;
     const next = tapMurdokuCell(puzzle, play, cell);
     if (next === play) return;
-    set({ play: next, history: withHistory(get().history, play) });
+    set({ play: next, history: withHistory(get().history, play), ...CLEARED_HINT });
   },
 
   undo: () =>
@@ -62,7 +89,11 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
       if (state.play?.phase === "solved") return {};
       const previous = state.history.at(-1);
       if (!previous) return {};
-      return { play: previous, history: state.history.slice(0, -1) };
+      return {
+        play: previous,
+        history: state.history.slice(0, -1),
+        ...CLEARED_HINT,
+      };
     }),
 
   check: (solution) => {
@@ -71,6 +102,33 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
     const next = checkMurdokuPlay(puzzle, play, solution);
     if (next === play) return;
     // Controleren verandert hooguit de afloop, nooit de bordgeschiedenis.
-    set({ play: next });
+    set({ play: next, ...CLEARED_HINT });
   },
+
+  showHint: () => {
+    const { puzzle, play, hint, hintsUsed, history } = get();
+    if (!puzzle || !play || play.phase === "solved") return;
+
+    const plan = planMurdokuHint(puzzle, play, hint);
+    const nextPlay = plan.apply ? applyMurdokuHint(puzzle, play, plan.apply) : play;
+    set({
+      play: nextPlay,
+      history: nextPlay === play ? history : withHistory(history, play),
+      hint: plan.state,
+      hintsUsed: hintsUsed + 1,
+      // Een hint vervangt de markering van een woord; het bord toont één uitleg.
+      clueFocus: null,
+      clueFocusLabel: null,
+    });
+  },
+
+  focusClue: (focus, label) =>
+    set((state) => {
+      const active = sameClueFocus(state.clueFocus, focus);
+      return {
+        clueFocus: active ? null : focus,
+        clueFocusLabel: active ? null : label,
+        hint: null,
+      };
+    }),
 }));
