@@ -1,6 +1,6 @@
-import { Technique } from './Technique.ts'
-import type { SolveContext } from '../SolveContext.ts'
-import type { DeductionStep, Elimination } from '../DeductionStep.ts'
+import { Technique } from "./Technique.ts";
+import type { SolveContext } from "../SolveContext.ts";
+import type { DeductionStep, Elimination } from "../DeductionStep.ts";
 
 /**
  * "Plus / cross" elimination. If every cell a person can still occupy lies in ONE
@@ -18,44 +18,44 @@ import type { DeductionStep, Elimination } from '../DeductionStep.ts'
  * exactly one occupant in a full permutation), which is impossible.
  */
 export class CrossCenterTechnique extends Technique {
-  readonly name = 'crossCenter'
-  readonly difficulty = 3
+  readonly name = "crossCenter";
+  readonly difficulty = 3;
 
   apply(ctx: SolveContext): DeductionStep | null {
-    if (!ctx.fullPermutation) return null
+    if (!ctx.fullPermutation) return null;
     for (const id of ctx.state.unplaced()) {
-      const cells = [...ctx.state.domain(id)]
-      if (cells.length < 2) continue // a single cell is a naked single
-      const rows = new Set(cells.map((c) => ctx.axisOf(c, 'row')))
-      if (rows.size < 2) continue // confined to one row → hidden single's job
+      const cells = [...ctx.state.domain(id)];
+      if (cells.length < 2) continue; // a single cell is a naked single
+      const rows = new Set(cells.map((c) => ctx.axisOf(c, "row")));
+      if (rows.size < 2) continue; // confined to one row → hidden single's job
       for (const row of rows) {
         // Columns of the cells OUTSIDE this row — they must all share one column for
         // the candidates to fit on the cross through (row, col).
-        const outCols = new Set<number>()
-        for (const c of cells) if (ctx.axisOf(c, 'row') !== row) outCols.add(ctx.axisOf(c, 'col'))
-        if (outCols.size !== 1) continue
-        const col = [...outCols][0]
-        const center = ctx.board.idx(row, col)
-        if (!ctx.board.isOccupiable(center)) continue
-        if (ctx.state.domain(id).has(center)) continue // the person COULD be there → not empty
+        const outCols = new Set<number>();
+        for (const c of cells) if (ctx.axisOf(c, "row") !== row) outCols.add(ctx.axisOf(c, "col"));
+        if (outCols.size !== 1) continue;
+        const col = [...outCols][0];
+        const center = ctx.board.idx(row, col);
+        if (!ctx.board.isOccupiable(center)) continue;
+        if (ctx.state.domain(id).has(center)) continue; // the person COULD be there → not empty
 
-        const eliminated: Elimination[] = []
+        const eliminated: Elimination[] = [];
         for (const other of ctx.state.unplaced()) {
-          const removed = ctx.removeWhere(other, (c) => c === center)
-          if (removed.length > 0) eliminated.push({ personId: other, cells: removed })
+          const removed = ctx.removeWhere(other, (c) => c === center);
+          if (removed.length > 0) eliminated.push({ personId: other, cells: removed });
         }
         if (eliminated.length > 0) {
           return {
-            technique: 'crossCenter',
+            technique: "crossCenter",
             eliminated,
             explanation: {
-              key: 'step.crossCenter',
+              key: "step.crossCenter",
               params: { name: id, cell: center, row: row + 1, col: col + 1 },
             },
-          }
+          };
         }
       }
     }
-    return null
+    return null;
   }
 }

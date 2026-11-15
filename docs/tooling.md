@@ -62,6 +62,17 @@ corepack pnpm run build
 
 `NX_DAEMON=false` is alleen een laatste redmiddel voor een bewuste parallelle run. Het is geen oplossing voor package-installatie en hoeft niet standaard gebruikt te worden. Voor dat laatste redmiddel staat een expliciete allow-regel in `opencode.jsonc`, zodat een bewuste keuze geen prompt oplevert.
 
+## Fallow-baseline voor vendored code
+
+`fallow audit` vergelijkt met de dead-codebaseline in `tools/fallow-dead-code-baseline.json`, ingesteld via `audit.deadCodeBaseline` in `.fallowrc.json`. Die baseline bevat de ongebruikte exports, types en class members van de 1:1 overgenomen murdoku-engine: wij gebruiken een deel van de engine, upstream levert de volledige API. Nieuwe dode code faalt gewoon, ook in onze wrapper en UI, want die vallen buiten de baseline. Zie [VENDORED.md](../VENDORED.md) en [ADR 0031](adr/0031-vendored-murdoku-engine.md).
+
+Na een upstream-update of wanneer onze public API kleiner wordt:
+
+```sh
+corepack pnpm exec fallow dead-code --save-baseline tools/fallow-dead-code-baseline.json
+corepack pnpm exec fallow baselines prune
+```
+
 ## Elementiconen (Mengelmoes)
 
 De iconen in `apps/games/public/elements/` worden gegenereerd uit lokale Iconify-pakketten. Er gaat geen netwerkrequest aan te pas: de sets staan als dev-dependency in `pnpm-lock.yaml`.
