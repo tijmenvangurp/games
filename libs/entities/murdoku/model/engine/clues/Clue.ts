@@ -1,7 +1,7 @@
-import type { Board } from '../domain/Board.ts'
-import type { Solution } from '../domain/Solution.ts'
-import type { Puzzle } from '../domain/Puzzle.ts'
-import type { Cell, Explanation, PersonId } from '../domain/types.ts'
+import type { Board } from "../domain/Board.ts";
+import type { Solution } from "../domain/Solution.ts";
+import type { Puzzle } from "../domain/Puzzle.ts";
+import type { Cell, Explanation, PersonId } from "../domain/types.ts";
 
 /**
  * A clue constrains where a subject (a suspect) can stand.
@@ -16,10 +16,10 @@ import type { Cell, Explanation, PersonId } from '../domain/types.ts'
  * - `describe` returns an i18n descriptor — never hard-coded text.
  */
 export abstract class Clue {
-  abstract test(subjectId: PersonId, solution: Solution, puzzle: Puzzle): boolean
+  abstract test(subjectId: PersonId, solution: Solution, puzzle: Puzzle): boolean;
 
   candidateCells(_board: Board): Set<Cell> | null {
-    return null
+    return null;
   }
 
   /**
@@ -30,11 +30,11 @@ export abstract class Clue {
    * "true" cells, so negating it never removes a legitimate placement.
    */
   definiteCells(_board: Board): Set<Cell> | null {
-    return null
+    return null;
   }
 
   forbiddenForOthers(_board: Board): Set<Cell> | null {
-    return null
+    return null;
   }
 
   /**
@@ -47,24 +47,24 @@ export abstract class Clue {
     _placement: ReadonlyMap<PersonId, Cell>,
     _puzzle: Puzzle,
   ): boolean {
-    return false
+    return false;
   }
 
-  abstract describe(): Explanation
+  abstract describe(): Explanation;
 }
 
 /** Base for clues whose candidate set is fixed and independent of other people. */
 export abstract class UnaryClue extends Clue {
-  abstract override candidateCells(board: Board): Set<Cell>
+  abstract override candidateCells(board: Board): Set<Cell>;
 
   override test(subjectId: PersonId, solution: Solution, puzzle: Puzzle): boolean {
-    return this.candidateCells(puzzle.board).has(solution.cellOf(subjectId))
+    return this.candidateCells(puzzle.board).has(solution.cellOf(subjectId));
   }
 
   // A unary clue is true exactly on its candidate cells (independent of others), so
   // those are also its definite cells. Subclasses that add an others-dependent check
   // (e.g. occupancy) override this to null (hence the nullable return type).
   override definiteCells(board: Board): Set<Cell> | null {
-    return this.candidateCells(board)
+    return this.candidateCells(board);
   }
 }

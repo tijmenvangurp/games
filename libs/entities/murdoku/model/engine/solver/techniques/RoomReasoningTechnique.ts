@@ -1,4 +1,4 @@
-import { Technique } from './Technique.ts'
+import { Technique } from "./Technique.ts";
 import {
   AloneClue,
   AloneWithClue,
@@ -6,16 +6,16 @@ import {
   RoomAttributeClue,
   RoomCompanionClue,
   RoomExistsClue,
-} from '../../clues/socialClues.ts'
-import { SameRoomClue } from '../../clues/relationalClues.ts'
-import { SameRoomAsObjectClue } from '../../clues/objectClues.ts'
-import { InRoomClue } from '../../clues/unaryClues.ts'
-import { AndClue, NotClue } from '../../clues/compositeClues.ts'
-import type { Clue } from '../../clues/Clue.ts'
-import type { Axis, SolveContext } from '../SolveContext.ts'
-import type { DeductionStep, Elimination } from '../DeductionStep.ts'
-import type { Cell, Explanation, PersonId } from '../../domain/types.ts'
-import type { Puzzle } from '../../domain/Puzzle.ts'
+} from "../../clues/socialClues.ts";
+import { SameRoomClue } from "../../clues/relationalClues.ts";
+import { SameRoomAsObjectClue } from "../../clues/objectClues.ts";
+import { InRoomClue } from "../../clues/unaryClues.ts";
+import { AndClue, NotClue } from "../../clues/compositeClues.ts";
+import type { Clue } from "../../clues/Clue.ts";
+import type { Axis, SolveContext } from "../SolveContext.ts";
+import type { DeductionStep, Elimination } from "../DeductionStep.ts";
+import type { Cell, Explanation, PersonId } from "../../domain/types.ts";
+import type { Puzzle } from "../../domain/Puzzle.ts";
 
 /**
  * "Alone in their room" clues that are CERTAIN (top-level or inside an AND — an OR
@@ -24,67 +24,67 @@ import type { Puzzle } from '../../domain/Puzzle.ts'
  * ("alone", or "alone in a room with an OBJECT" — an object is no roommate).
  */
 function aloneClues(clue: Clue): { companion: PersonId | null }[] {
-  if (clue instanceof AloneClue) return [{ companion: null }]
+  if (clue instanceof AloneClue) return [{ companion: null }];
   // "In room R, alone" (inRoom + occupancy 'alone') — the subject is that room's SOLE
   // occupant, so nobody else (not even the victim) may be there. Same force as AloneClue.
-  if (clue instanceof InRoomClue && clue.occupancy === 'alone') return [{ companion: null }]
-  if (clue instanceof SameRoomClue && clue.alone) return [{ companion: clue.target }]
-  if (clue instanceof SameRoomAsObjectClue && clue.alone) return [{ companion: null }]
-  if (clue instanceof AndClue) return clue.clues.flatMap(aloneClues)
-  return []
+  if (clue instanceof InRoomClue && clue.occupancy === "alone") return [{ companion: null }];
+  if (clue instanceof SameRoomClue && clue.alone) return [{ companion: clue.target }];
+  if (clue instanceof SameRoomAsObjectClue && clue.alone) return [{ companion: null }];
+  if (clue instanceof AndClue) return clue.clues.flatMap(aloneClues);
+  return [];
 }
 
 /** "not(some X)" is exactly "none X" and "not(none X)" is "some X", so a negated
  *  room-attribute clue reduces to the opposite quantifier. ("not all" has no single
  *  quantifier — it just means ≥1 non-matching other — so it yields nothing here.) */
 function negateRoomAttribute(inner: Clue): RoomAttributeClue | null {
-  if (!(inner instanceof RoomAttributeClue)) return null
+  if (!(inner instanceof RoomAttributeClue)) return null;
   // Only the plain "≥1" some folds cleanly to none. not(≥N) is "≤N−1" and not(exactly N)
   // is "≠N" — neither is a single quantifier, so a counted/exact clue yields no forward
   // rule here (it still evaluates correctly via the generic NotClue's test()).
-  if (inner.quantifier === 'some' && inner.count === 1 && !inner.exact)
-    return new RoomAttributeClue('none', inner.attribute, inner.value, inner.excludeSelf)
-  if (inner.quantifier === 'none')
-    return new RoomAttributeClue('some', inner.attribute, inner.value, inner.excludeSelf)
-  return null
+  if (inner.quantifier === "some" && inner.count === 1 && !inner.exact)
+    return new RoomAttributeClue("none", inner.attribute, inner.value, inner.excludeSelf);
+  if (inner.quantifier === "none")
+    return new RoomAttributeClue("some", inner.attribute, inner.value, inner.excludeSelf);
+  return null;
 }
 
 function roomAttributes(clue: Clue): RoomAttributeClue[] {
-  if (clue instanceof RoomAttributeClue) return [clue]
+  if (clue instanceof RoomAttributeClue) return [clue];
   // "Niemand mit X in seinem Raum" is authored as not(some X); fold the negation
   // into the equivalent quantifier so the room reasoning below sees the constraint.
   if (clue instanceof NotClue) {
-    const flipped = negateRoomAttribute(clue.inner)
-    return flipped ? [flipped] : []
+    const flipped = negateRoomAttribute(clue.inner);
+    return flipped ? [flipped] : [];
   }
-  if (clue instanceof AndClue) return clue.clues.flatMap(roomAttributes)
-  return []
+  if (clue instanceof AndClue) return clue.clues.flatMap(roomAttributes);
+  return [];
 }
 
 function roomCompanions(clue: Clue): RoomCompanionClue[] {
-  if (clue instanceof RoomCompanionClue) return [clue]
-  if (clue instanceof AndClue) return clue.clues.flatMap(roomCompanions)
-  return []
+  if (clue instanceof RoomCompanionClue) return [clue];
+  if (clue instanceof AndClue) return clue.clues.flatMap(roomCompanions);
+  return [];
 }
 
 function roomExistsList(clue: Clue): RoomExistsClue[] {
-  if (clue instanceof RoomExistsClue) return [clue]
-  if (clue instanceof AndClue) return clue.clues.flatMap(roomExistsList)
-  return []
+  if (clue instanceof RoomExistsClue) return [clue];
+  if (clue instanceof AndClue) return clue.clues.flatMap(roomExistsList);
+  return [];
 }
 
 /** Certain "alone with [people] and N matching extras" clues (top-level or in an
  *  AND — an OR branch isn't certain). Shared with the group-room technique. */
 export function aloneWithList(clue: Clue): AloneWithClue[] {
-  if (clue instanceof AloneWithClue) return [clue]
-  if (clue instanceof AndClue) return clue.clues.flatMap(aloneWithList)
-  return []
+  if (clue instanceof AloneWithClue) return [clue];
+  if (clue instanceof AndClue) return clue.clues.flatMap(aloneWithList);
+  return [];
 }
 
 function notAloneList(clue: Clue): NotAloneClue[] {
-  if (clue instanceof NotAloneClue) return [clue]
-  if (clue instanceof AndClue) return clue.clues.flatMap(notAloneList)
-  return []
+  if (clue instanceof NotAloneClue) return [clue];
+  if (clue instanceof AndClue) return clue.clues.flatMap(notAloneList);
+  return [];
 }
 
 /**
@@ -96,107 +96,113 @@ function notAloneList(clue: Clue): NotAloneClue[] {
  *   X-person, and once guaranteed a room, every X-person leaves it.
  */
 export class RoomReasoningTechnique extends Technique {
-  readonly name = 'roomReasoning'
-  readonly difficulty = 4
+  readonly name = "roomReasoning";
+  readonly difficulty = 4;
 
   apply(ctx: SolveContext): DeductionStep | null {
-    const guaranteed = this.guaranteedRooms(ctx)
+    const guaranteed = this.guaranteedRooms(ctx);
 
     for (const suspect of ctx.puzzle.suspects) {
       // Room exclusivity of an "alone" suspect holds even after they're PLACED — their
       // room admits no one else — so this runs regardless of placement. The same goes
       // for the roomExists occupied-spot rule (the companion's spot stays reserved).
       for (const { companion } of suspect.clues.flatMap(aloneClues)) {
-        const step = this.applyAlone(ctx, suspect.id, guaranteed, companion)
-        if (step) return step
+        const step = this.applyAlone(ctx, suspect.id, guaranteed, companion);
+        if (step) return step;
       }
       for (const re of suspect.clues.flatMap(roomExistsList)) {
-        const step = this.applyRoomExists(ctx, suspect.id, re)
-        if (step) return step
-        const only = this.applyRoomExistsMatcher(ctx, suspect.id, re)
-        if (only) return only
+        const step = this.applyRoomExists(ctx, suspect.id, re);
+        if (step) return step;
+        const only = this.applyRoomExistsMatcher(ctx, suspect.id, re);
+        if (only) return only;
       }
       // The positive "not alone" rules hold even once the subject is PLACED (their room
       // is then certain), so run them before the placed-skip. Occupancy first (it can
       // pin the companion CELLS in a full permutation), then the single-companion force.
       if (suspect.clues.flatMap(notAloneList).length > 0) {
-        const occ = this.applyNotAloneOccupancy(ctx, suspect.id)
-        if (occ) return occ
-        const force = this.applyNotAloneForce(ctx, suspect.id)
-        if (force) return force
+        const occ = this.applyNotAloneOccupancy(ctx, suspect.id);
+        if (occ) return occ;
+        const force = this.applyNotAloneForce(ctx, suspect.id);
+        if (force) return force;
       }
       // Companion rules ("alone with N matching X") hold once the subject's room is FIXED —
       // including when they're PLACED: the unique matching companion is forced into the room,
       // and every non-matching person must leave it. (Brenda placed in the Lobby, alone with
       // one man; only George can be that man ⇒ George is in the Lobby.)
       for (const rcomp of suspect.clues.flatMap(roomCompanions)) {
-        const cforce = this.applyCompanionForce(ctx, suspect.id, rcomp)
-        if (cforce) return cforce
-        const creserve = this.applyCompanionReserve(ctx, suspect.id, rcomp)
-        if (creserve) return creserve
+        const cforce = this.applyCompanionForce(ctx, suspect.id, rcomp);
+        if (cforce) return cforce;
+        const creserve = this.applyCompanionReserve(ctx, suspect.id, rcomp);
+        if (creserve) return creserve;
       }
-      if (ctx.state.placed.has(suspect.id)) continue
+      if (ctx.state.placed.has(suspect.id)) continue;
       for (const rc of suspect.clues.flatMap(roomAttributes)) {
-        if (rc.quantifier === 'none') {
-          const step = this.applyRoomAttribute(ctx, suspect.id, rc, guaranteed)
-          if (step) return step
-          const pigeon = this.applyAttrPigeonhole(ctx, suspect.id, rc)
-          if (pigeon) return pigeon
+        if (rc.quantifier === "none") {
+          const step = this.applyRoomAttribute(ctx, suspect.id, rc, guaranteed);
+          if (step) return step;
+          const pigeon = this.applyAttrPigeonhole(ctx, suspect.id, rc);
+          if (pigeon) return pigeon;
         } else if (rc.excludeSelf) {
           // 'some' → the room must hold ≥ count matching others (= count when `exact`);
           // 'all' → no non-matching other. (Only when excludeSelf, so the subject never
           // counts — otherwise a matching subject could satisfy it trivially.)
-          const match = (other: PersonId) => ctx.puzzle.attributesOf(other)[rc.attribute] === rc.value
-          const some = rc.quantifier === 'some'
+          const match = (other: PersonId) =>
+            ctx.puzzle.attributesOf(other)[rc.attribute] === rc.value;
+          const some = rc.quantifier === "some";
           const step = this.applyComposition(ctx, suspect.id, {
             match,
             includeVictim: true,
             min: some ? rc.count : null,
             max: some && rc.exact ? rc.count : null,
-            forbidNonMatching: rc.quantifier === 'all',
-            key: some ? (rc.exact ? 'step.attrExactRoom' : 'step.attrSomeRoom') : 'step.attrAllRoom',
+            forbidNonMatching: rc.quantifier === "all",
+            key: some
+              ? rc.exact
+                ? "step.attrExactRoom"
+                : "step.attrSomeRoom"
+              : "step.attrAllRoom",
             attribute: rc.attribute,
             count: rc.count,
-          })
-          if (step) return step
+          });
+          if (step) return step;
           // Mirror of the companion-force rule for "≥/= N matching others": once the
           // subject's room is certain and exactly N matching SUSPECTS can fill it, every
           // free one is forced in. (G needs 2 men in room 4; only A and B can be — A is
           // certain, so B must join.) Count ≥ 2 only, so the victim never counts (it
           // shares its room with one suspect, so it can't be a second matching person).
           if (some && rc.count >= 2) {
-            const force = this.applyAttrForce(ctx, suspect.id, rc)
-            if (force) return force
+            const force = this.applyAttrForce(ctx, suspect.id, rc);
+            if (force) return force;
           }
         }
       }
       for (const rcomp of suspect.clues.flatMap(roomCompanions)) {
         // "alone with `count` people matching X" — the room must hold exactly that
         // many matching others and no one else (victim excluded, like the clue).
-        const match = (other: PersonId) => ctx.puzzle.attributesOf(other)[rcomp.attribute] === rcomp.value
+        const match = (other: PersonId) =>
+          ctx.puzzle.attributesOf(other)[rcomp.attribute] === rcomp.value;
         const step = this.applyComposition(ctx, suspect.id, {
           match,
           includeVictim: false,
           min: rcomp.count,
           max: rcomp.count,
           forbidNonMatching: true,
-          key: 'step.companionRoom',
+          key: "step.companionRoom",
           attribute: rcomp.attribute,
           count: rcomp.count,
-        })
-        if (step) return step
+        });
+        if (step) return step;
         // force + reserve already ran above (they hold for placed subjects too).
       }
       for (const aw of suspect.clues.flatMap(aloneWithList)) {
-        const step = this.applyAloneWith(ctx, suspect.id, aw)
-        if (step) return step
+        const step = this.applyAloneWith(ctx, suspect.id, aw);
+        if (step) return step;
       }
       if (suspect.clues.flatMap(notAloneList).length > 0) {
-        const step = this.applyNotAlone(ctx, suspect.id)
-        if (step) return step
+        const step = this.applyNotAlone(ctx, suspect.id);
+        if (step) return step;
       }
     }
-    return null
+    return null;
   }
 
   /** "{subject} was NOT alone": a cell is impossible when no one else could share
@@ -205,25 +211,25 @@ export class RoomReasoningTechnique extends Technique {
    *  only possible roommate sits in the same row. */
   private applyNotAlone(ctx: SolveContext, id: PersonId): DeductionStep | null {
     const removed = ctx.removeWhere(id, (cell) => {
-      const room = ctx.roomOf(cell)
-      const me = ctx.board.rc(cell)
+      const room = ctx.roomOf(cell);
+      const me = ctx.board.rc(cell);
       for (const person of ctx.puzzle.people()) {
-        if (person.id === id) continue
+        if (person.id === id) continue;
         for (const d of ctx.cellsOf(person.id)) {
-          if (ctx.roomOf(d) !== room || d === cell) continue
-          const p = ctx.board.rc(d)
-          if (p.row !== me.row && p.col !== me.col) return false
+          if (ctx.roomOf(d) !== room || d === cell) continue;
+          const p = ctx.board.rc(d);
+          if (p.row !== me.row && p.col !== me.col) return false;
         }
       }
-      return true
-    })
-    if (removed.length === 0) return null
+      return true;
+    });
+    if (removed.length === 0) return null;
     return {
-      technique: 'roomReasoning',
+      technique: "roomReasoning",
       personId: id,
       eliminated: [{ personId: id, cells: removed }],
-      explanation: { key: 'step.notAloneRoom', params: { name: id } },
-    }
+      explanation: { key: "step.notAloneRoom", params: { name: id } },
+    };
   }
 
   /** "Not alone" needs ≥2 people in the subject's room, and in a full permutation each
@@ -234,47 +240,47 @@ export class RoomReasoningTechnique extends Technique {
    *  only fit on {(3,4),(5,3)} ⇒ both occupied ⇒ Dennis and G fall out directly.) Sound:
    *  the real solution seats ≥2 distinct-row/col people there, all among the live cells. */
   private applyNotAloneOccupancy(ctx: SolveContext, id: PersonId): DeductionStep | null {
-    if (!ctx.fullPermutation) return null
-    const placed = ctx.state.placed.get(id)
-    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id)
-    if (!room) return null
+    if (!ctx.fullPermutation) return null;
+    const placed = ctx.state.placed.get(id);
+    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id);
+    if (!room) return null;
     // Cells of R someone (any suspect or the victim) can still occupy.
-    const live: Cell[] = []
+    const live: Cell[] = [];
     for (const cell of ctx.board.cellsInRoom(room)) {
-      if (ctx.puzzle.people().some((p) => ctx.cellsOf(p.id).includes(cell))) live.push(cell)
+      if (ctx.puzzle.people().some((p) => ctx.cellsOf(p.id).includes(cell))) live.push(cell);
     }
     const hasDistinctPair = (cells: Cell[]): boolean => {
       for (let i = 0; i < cells.length; i++) {
         for (let j = i + 1; j < cells.length; j++) {
-          const a = ctx.board.rc(cells[i])
-          const b = ctx.board.rc(cells[j])
-          if (a.row !== b.row && a.col !== b.col) return true
+          const a = ctx.board.rc(cells[i]);
+          const b = ctx.board.rc(cells[j]);
+          if (a.row !== b.row && a.col !== b.col) return true;
         }
       }
-      return false
-    }
-    if (!hasDistinctPair(live)) return null
+      return false;
+    };
+    if (!hasDistinctPair(live)) return null;
     for (const c of live) {
-      if (hasDistinctPair(live.filter((x) => x !== c))) continue
-      const { row, col } = ctx.board.rc(c)
-      const eliminated: Elimination[] = []
+      if (hasDistinctPair(live.filter((x) => x !== c))) continue;
+      const { row, col } = ctx.board.rc(c);
+      const eliminated: Elimination[] = [];
       for (const p of ctx.state.unplaced()) {
         const removed = ctx.removeWhere(p, (x) => {
-          if (x === c) return false
-          const rc = ctx.board.rc(x)
-          return rc.row === row || rc.col === col
-        })
-        if (removed.length > 0) eliminated.push({ personId: p, cells: removed })
+          if (x === c) return false;
+          const rc = ctx.board.rc(x);
+          return rc.row === row || rc.col === col;
+        });
+        if (removed.length > 0) eliminated.push({ personId: p, cells: removed });
       }
       if (eliminated.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           eliminated,
-          explanation: { key: 'step.notAloneOccupied', params: { name: id, room, cell: c } },
-        }
+          explanation: { key: "step.notAloneOccupied", params: { name: id, room, cell: c } },
+        };
       }
     }
-    return null
+    return null;
   }
 
   /** Positive side of "not alone": when the subject is confined to one room R and
@@ -283,29 +289,29 @@ export class RoomReasoningTechnique extends Technique {
    *  (G is not alone in the study and only Dennis can still join him ⇒ Dennis is in
    *  the study.) Sound: the only person able to satisfy "not alone" has to be there. */
   private applyNotAloneForce(ctx: SolveContext, id: PersonId): DeductionStep | null {
-    const placed = ctx.state.placed.get(id)
-    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id)
-    if (!room) return null
-    const possible: PersonId[] = []
+    const placed = ctx.state.placed.get(id);
+    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id);
+    if (!room) return null;
+    const possible: PersonId[] = [];
     for (const person of ctx.puzzle.people()) {
-      if (person.id === id) continue
-      const pc = ctx.state.placed.get(person.id)
+      if (person.id === id) continue;
+      const pc = ctx.state.placed.get(person.id);
       if (pc !== undefined) {
-        if (ctx.roomOf(pc) === room) return null // a companion is already present
-        continue
+        if (ctx.roomOf(pc) === room) return null; // a companion is already present
+        continue;
       }
-      if (ctx.cellsOf(person.id).some((c) => ctx.roomOf(c) === room)) possible.push(person.id)
+      if (ctx.cellsOf(person.id).some((c) => ctx.roomOf(c) === room)) possible.push(person.id);
     }
-    if (possible.length !== 1) return null
-    const companion = possible[0]
-    const removed = ctx.removeWhere(companion, (c) => ctx.roomOf(c) !== room)
-    if (removed.length === 0) return null
+    if (possible.length !== 1) return null;
+    const companion = possible[0];
+    const removed = ctx.removeWhere(companion, (c) => ctx.roomOf(c) !== room);
+    if (removed.length === 0) return null;
     return {
-      technique: 'roomReasoning',
+      technique: "roomReasoning",
       personId: companion,
       eliminated: [{ personId: companion, cells: removed }],
-      explanation: { key: 'step.notAloneForce', params: { name: id, target: companion, room } },
-    }
+      explanation: { key: "step.notAloneForce", params: { name: id, target: companion, room } },
+    };
   }
 
   /**
@@ -317,31 +323,35 @@ export class RoomReasoningTechnique extends Technique {
    *    is dead for everyone, only fitting companions may take the cell itself,
    *    and a sole remaining candidate is pinned onto it.
    */
-  private applyRoomExists(ctx: SolveContext, id: PersonId, clue: RoomExistsClue): DeductionStep | null {
-    const victim = ctx.puzzle.victim.id
+  private applyRoomExists(
+    ctx: SolveContext,
+    id: PersonId,
+    clue: RoomExistsClue,
+  ): DeductionStep | null {
+    const victim = ctx.puzzle.victim.id;
     const matchers = ctx.puzzle.suspects
       .map((s) => s.id)
-      .filter((p) => p !== id && p !== victim && clue.matchesPerson(ctx.puzzle, p))
-    for (const room of [...ctx.roomsOf(id)]) {
-      if (ctx.state.placed.has(id)) break // placed: only the spot rule below applies
+      .filter((p) => p !== id && p !== victim && clue.matchesPerson(ctx.puzzle, p));
+    for (const room of ctx.roomsOf(id)) {
+      if (ctx.state.placed.has(id)) break; // placed: only the spot rule below applies
       const canHold = matchers.some((m) =>
         ctx.cellsOf(m).some((c) => clue.qualifies(ctx.board, c, room)),
-      )
-      if (canHold) continue
-      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room)
+      );
+      if (canHold) continue;
+      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated: [{ personId: id, cells: removed }],
           explanation: {
-            key: 'step.roomExistsRoom',
+            key: "step.roomExistsRoom",
             params: { name: id, room, pos: clue.posToken() },
           },
-        }
+        };
       }
     }
-    return this.applyRoomExistsSpot(ctx, id, clue, matchers)
+    return this.applyRoomExistsSpot(ctx, id, clue, matchers);
   }
 
   /** The occupied-spot rule: subject's room certain + a single possible companion
@@ -352,68 +362,68 @@ export class RoomReasoningTechnique extends Technique {
     clue: RoomExistsClue,
     matchers: PersonId[],
   ): DeductionStep | null {
-    const placed = ctx.state.placed.get(id)
-    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id)
-    if (!room) return null
+    const placed = ctx.state.placed.get(id);
+    const room = placed !== undefined ? ctx.roomOf(placed) : ctx.guaranteedRoomOf(id);
+    if (!room) return null;
 
     // All cells a fitting companion could still satisfy the clue on.
-    const spots = new Set<Cell>()
-    const takers = new Set<PersonId>()
+    const spots = new Set<Cell>();
+    const takers = new Set<PersonId>();
     for (const m of matchers) {
       for (const c of ctx.cellsOf(m)) {
         if (clue.qualifies(ctx.board, c, room)) {
-          spots.add(c)
-          takers.add(m)
+          spots.add(c);
+          takers.add(m);
         }
       }
     }
-    if (spots.size !== 1) return null
-    const spot = [...spots][0]
-    const { row, col } = ctx.board.rc(spot)
+    if (spots.size !== 1) return null;
+    const spot = [...spots][0];
+    const { row, col } = ctx.board.rc(spot);
 
     // (a) the spot is occupied → the rest of its row/column is dead for everyone,
     //     and the cell itself only fits the possible companions.
-    const eliminated: Elimination[] = []
+    const eliminated: Elimination[] = [];
     for (const p of ctx.state.unplaced()) {
       const removed = ctx.removeWhere(p, (d) => {
-        if (d === spot) return p === id || !takers.has(p)
-        const rc = ctx.board.rc(d)
-        return rc.row === row || rc.col === col
-      })
-      if (removed.length > 0) eliminated.push({ personId: p, cells: removed })
+        if (d === spot) return p === id || !takers.has(p);
+        const rc = ctx.board.rc(d);
+        return rc.row === row || rc.col === col;
+      });
+      if (removed.length > 0) eliminated.push({ personId: p, cells: removed });
     }
     if (eliminated.length > 0) {
       return {
-        technique: 'roomReasoning',
+        technique: "roomReasoning",
         personId: id,
         eliminated,
         explanation: {
-          key: 'step.roomExistsSpot',
+          key: "step.roomExistsSpot",
           params: { name: id, room, pos: clue.posToken(), cell: spot },
         },
-      }
+      };
     }
 
     // (b) only one candidate left for the occupied spot → they sit there.
     const candidates = [...takers].filter(
       (m) => !ctx.state.placed.has(m) && ctx.state.domain(m).has(spot),
-    )
+    );
     if (candidates.length === 1) {
-      const m = candidates[0]
-      const removed = ctx.removeWhere(m, (d) => d !== spot)
+      const m = candidates[0];
+      const removed = ctx.removeWhere(m, (d) => d !== spot);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated: [{ personId: m, cells: removed }],
           explanation: {
-            key: 'step.roomExistsOccupant',
+            key: "step.roomExistsOccupant",
             params: { name: id, target: m, room, pos: clue.posToken(), cell: spot },
           },
-        }
+        };
       }
     }
-    return null
+    return null;
   }
 
   /**
@@ -430,60 +440,60 @@ export class RoomReasoningTechnique extends Technique {
     id: PersonId,
     clue: RoomExistsClue,
   ): DeductionStep | null {
-    if (ctx.state.placed.has(id)) return null // room known → the spot rules handle it
-    const victim = ctx.puzzle.victim.id
-    const subjectRooms = ctx.roomsOf(id)
+    if (ctx.state.placed.has(id)) return null; // room known → the spot rules handle it
+    const victim = ctx.puzzle.victim.id;
+    const subjectRooms = ctx.roomsOf(id);
     // Rooms (within the subject's still-possible rooms) where `m` could stand on a
     // qualifying cell — the rooms in which m could play the matcher beside the subject.
     const qualRooms = (m: PersonId): Set<string> => {
-      const rooms = new Set<string>()
+      const rooms = new Set<string>();
       for (const cell of ctx.cellsOf(m)) {
-        const room = ctx.roomOf(cell)
-        if (subjectRooms.has(room) && clue.qualifies(ctx.board, cell, room)) rooms.add(room)
+        const room = ctx.roomOf(cell);
+        if (subjectRooms.has(room) && clue.qualifies(ctx.board, cell, room)) rooms.add(room);
       }
-      return rooms
-    }
-    let only: { m: PersonId; rooms: Set<string> } | null = null
+      return rooms;
+    };
+    let only: { m: PersonId; rooms: Set<string> } | null = null;
     for (const suspect of ctx.puzzle.suspects) {
-      const m = suspect.id
-      if (m === id || m === victim || !clue.matchesPerson(ctx.puzzle, m)) continue
+      const m = suspect.id;
+      if (m === id || m === victim || !clue.matchesPerson(ctx.puzzle, m)) continue;
       // An "alone" / "alone with someone other than the subject" matcher can't share
       // the subject's room, so it can never be the someone there.
-      if (suspect.clues.flatMap(aloneClues).some((a) => a.companion !== id)) continue
+      if (suspect.clues.flatMap(aloneClues).some((a) => a.companion !== id)) continue;
       // A PLACED matcher has no domain to confine. If it already qualifies in a room the
       // subject could share, the clue may be met by it, so the "unique matcher" inference
       // is unsafe → bail; otherwise it's irrelevant here → skip it.
-      const placedCell = ctx.state.placed.get(m)
+      const placedCell = ctx.state.placed.get(m);
       if (placedCell !== undefined) {
-        const room = ctx.roomOf(placedCell)
-        if (subjectRooms.has(room) && clue.qualifies(ctx.board, placedCell, room)) return null
-        continue
+        const room = ctx.roomOf(placedCell);
+        if (subjectRooms.has(room) && clue.qualifies(ctx.board, placedCell, room)) return null;
+        continue;
       }
-      const rooms = qualRooms(m)
-      if (rooms.size === 0) continue
-      if (only) return null // ≥2 possible matchers → can't pin
-      only = { m, rooms }
+      const rooms = qualRooms(m);
+      if (rooms.size === 0) continue;
+      if (only) return null; // ≥2 possible matchers → can't pin
+      only = { m, rooms };
     }
-    if (!only) return null
+    if (!only) return null;
 
-    const eliminated: Elimination[] = []
-    const removedSubj = ctx.removeWhere(id, (c) => !only!.rooms.has(ctx.roomOf(c)))
-    if (removedSubj.length > 0) eliminated.push({ personId: id, cells: removedSubj })
+    const eliminated: Elimination[] = [];
+    const removedSubj = ctx.removeWhere(id, (c) => !only!.rooms.has(ctx.roomOf(c)));
+    if (removedSubj.length > 0) eliminated.push({ personId: id, cells: removedSubj });
     const removedMate = ctx.removeWhere(only.m, (c) => {
-      const room = ctx.roomOf(c)
-      return !(only!.rooms.has(room) && clue.qualifies(ctx.board, c, room))
-    })
-    if (removedMate.length > 0) eliminated.push({ personId: only.m, cells: removedMate })
-    if (eliminated.length === 0) return null
+      const room = ctx.roomOf(c);
+      return !(only!.rooms.has(room) && clue.qualifies(ctx.board, c, room));
+    });
+    if (removedMate.length > 0) eliminated.push({ personId: only.m, cells: removedMate });
+    if (eliminated.length === 0) return null;
     return {
-      technique: 'roomReasoning',
+      technique: "roomReasoning",
       personId: id,
       eliminated,
       explanation: {
-        key: 'step.roomExistsOnlyMatcher',
+        key: "step.roomExistsOnlyMatcher",
         params: { name: id, target: only.m, pos: clue.posToken() },
       },
-    }
+    };
   }
 
   /**
@@ -492,48 +502,52 @@ export class RoomReasoningTechnique extends Technique {
    * named people and (matching) extras — so the victim and any non-matching, non-named
    * suspect leave it.
    */
-  private applyAloneWith(ctx: SolveContext, id: PersonId, clue: AloneWithClue): DeductionStep | null {
-    const victim = ctx.puzzle.victim.id
-    const matches = (p: PersonId) => ctx.puzzle.attributesOf(p)[clue.attribute] === clue.value
+  private applyAloneWith(
+    ctx: SolveContext,
+    id: PersonId,
+    clue: AloneWithClue,
+  ): DeductionStep | null {
+    const victim = ctx.puzzle.victim.id;
+    const matches = (p: PersonId) => ctx.puzzle.attributesOf(p)[clue.attribute] === clue.value;
 
     // (1) Each named person shares the subject's room (mutual room confinement).
-    const subjRooms = ctx.roomsOf(id)
+    const subjRooms = ctx.roomsOf(id);
     for (const p of clue.people) {
-      if (ctx.state.placed.has(p)) continue
-      const pRooms = ctx.roomsOf(p)
-      const removedS = ctx.removeWhere(id, (c) => !pRooms.has(ctx.roomOf(c)))
+      if (ctx.state.placed.has(p)) continue;
+      const pRooms = ctx.roomsOf(p);
+      const removedS = ctx.removeWhere(id, (c) => !pRooms.has(ctx.roomOf(c)));
       if (removedS.length > 0) {
-        return this.step(id, id, removedS, 'step.aloneWithRoom', { name: id })
+        return this.step(id, id, removedS, "step.aloneWithRoom", { name: id });
       }
-      const removedP = ctx.removeWhere(p, (c) => !subjRooms.has(ctx.roomOf(c)))
+      const removedP = ctx.removeWhere(p, (c) => !subjRooms.has(ctx.roomOf(c)));
       if (removedP.length > 0) {
-        return this.step(id, p, removedP, 'step.aloneWithRoom', { name: p })
+        return this.step(id, p, removedP, "step.aloneWithRoom", { name: p });
       }
     }
 
     // (2) Once the subject's room is known, only the named people and matching extras
     // may share it — the victim and any non-matching non-named suspect are out.
-    const room = ctx.guaranteedRoomOf(id)
+    const room = ctx.guaranteedRoomOf(id);
     if (room) {
-      const allowed = new Set<PersonId>([id, ...clue.people])
-      const eliminated: Elimination[] = []
+      const allowed = new Set<PersonId>([id, ...clue.people]);
+      const eliminated: Elimination[] = [];
       for (const other of ctx.state.unplaced()) {
-        if (allowed.has(other)) continue
+        if (allowed.has(other)) continue;
         if (other === victim || !matches(other)) {
-          const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room)
-          if (removed.length > 0) eliminated.push({ personId: other, cells: removed })
+          const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room);
+          if (removed.length > 0) eliminated.push({ personId: other, cells: removed });
         }
       }
       if (eliminated.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated,
-          explanation: { key: 'step.aloneWithReserve', params: { name: id, room } },
-        }
+          explanation: { key: "step.aloneWithReserve", params: { name: id, room } },
+        };
       }
     }
-    return null
+    return null;
   }
 
   /**
@@ -549,42 +563,45 @@ export class RoomReasoningTechnique extends Technique {
     rcomp: RoomCompanionClue,
   ): DeductionStep | null {
     // Their room is fixed whether they're PLACED or their whole domain lies in one room.
-    const placedCell = ctx.state.placed.get(id)
-    const room = placedCell !== undefined ? ctx.roomOf(placedCell) : ctx.guaranteedRoomOf(id)
-    if (!room) return null
-    const victim = ctx.puzzle.victim.id
+    const placedCell = ctx.state.placed.get(id);
+    const room = placedCell !== undefined ? ctx.roomOf(placedCell) : ctx.guaranteedRoomOf(id);
+    if (!room) return null;
+    const victim = ctx.puzzle.victim.id;
     const matches = (o: PersonId): boolean =>
-      o !== id && o !== victim && ctx.puzzle.attributesOf(o)[rcomp.attribute] === rcomp.value
+      o !== id && o !== victim && ctx.puzzle.attributesOf(o)[rcomp.attribute] === rcomp.value;
 
     // Count matching suspects already certain in R, and those that could still be there.
-    let already = 0
-    const free: PersonId[] = []
+    let already = 0;
+    const free: PersonId[] = [];
     for (const s of ctx.puzzle.suspects) {
-      const o = s.id
-      if (!matches(o)) continue
-      const placed = ctx.state.placed.get(o)
+      const o = s.id;
+      if (!matches(o)) continue;
+      const placed = ctx.state.placed.get(o);
       if (placed !== undefined) {
-        if (ctx.roomOf(placed) === room) already++
-        continue
+        if (ctx.roomOf(placed) === room) already++;
+        continue;
       }
-      if (![...ctx.state.domain(o)].some((c) => ctx.roomOf(c) === room)) continue
-      if (ctx.guaranteedRoomOf(o) === room) already++
-      else free.push(o)
+      if (![...ctx.state.domain(o)].some((c) => ctx.roomOf(c) === room)) continue;
+      if (ctx.guaranteedRoomOf(o) === room) already++;
+      else free.push(o);
     }
     // Exactly `count` matching suspects can fill the slots → every free one must take it.
-    if (already + free.length !== rcomp.count || free.length === 0) return null
+    if (already + free.length !== rcomp.count || free.length === 0) return null;
     for (const o of free) {
-      const removed = ctx.removeWhere(o, (c) => ctx.roomOf(c) !== room)
+      const removed = ctx.removeWhere(o, (c) => ctx.roomOf(c) !== room);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: o,
           eliminated: [{ personId: o, cells: removed }],
-          explanation: { key: 'step.companionForce', params: { name: id, target: o, room, count: rcomp.count } },
-        }
+          explanation: {
+            key: "step.companionForce",
+            params: { name: id, target: o, room, count: rcomp.count },
+          },
+        };
       }
     }
-    return null
+    return null;
   }
 
   /**
@@ -599,42 +616,42 @@ export class RoomReasoningTechnique extends Technique {
     id: PersonId,
     rc: RoomAttributeClue,
   ): DeductionStep | null {
-    const room = ctx.guaranteedRoomOf(id)
-    if (!room) return null
-    const victim = ctx.puzzle.victim.id
+    const room = ctx.guaranteedRoomOf(id);
+    if (!room) return null;
+    const victim = ctx.puzzle.victim.id;
     const matches = (o: PersonId): boolean =>
-      o !== id && o !== victim && ctx.puzzle.attributesOf(o)[rc.attribute] === rc.value
+      o !== id && o !== victim && ctx.puzzle.attributesOf(o)[rc.attribute] === rc.value;
 
-    let already = 0
-    const free: PersonId[] = []
+    let already = 0;
+    const free: PersonId[] = [];
     for (const s of ctx.puzzle.suspects) {
-      const o = s.id
-      if (!matches(o)) continue
-      const placed = ctx.state.placed.get(o)
+      const o = s.id;
+      if (!matches(o)) continue;
+      const placed = ctx.state.placed.get(o);
       if (placed !== undefined) {
-        if (ctx.roomOf(placed) === room) already++
-        continue
+        if (ctx.roomOf(placed) === room) already++;
+        continue;
       }
-      if (![...ctx.state.domain(o)].some((c) => ctx.roomOf(c) === room)) continue
-      if (ctx.guaranteedRoomOf(o) === room) already++
-      else free.push(o)
+      if (![...ctx.state.domain(o)].some((c) => ctx.roomOf(c) === room)) continue;
+      if (ctx.guaranteedRoomOf(o) === room) already++;
+      else free.push(o);
     }
-    if (already + free.length !== rc.count || free.length === 0) return null
+    if (already + free.length !== rc.count || free.length === 0) return null;
     for (const o of free) {
-      const removed = ctx.removeWhere(o, (c) => ctx.roomOf(c) !== room)
+      const removed = ctx.removeWhere(o, (c) => ctx.roomOf(c) !== room);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: o,
           eliminated: [{ personId: o, cells: removed }],
           explanation: {
-            key: 'step.attrForce',
+            key: "step.attrForce",
             params: { name: id, target: o, room, count: rc.count },
           },
-        }
+        };
       }
     }
-    return null
+    return null;
   }
 
   /**
@@ -647,26 +664,26 @@ export class RoomReasoningTechnique extends Technique {
     id: PersonId,
     rcomp: RoomCompanionClue,
   ): DeductionStep | null {
-    const placedCell = ctx.state.placed.get(id)
-    const room = placedCell !== undefined ? ctx.roomOf(placedCell) : ctx.guaranteedRoomOf(id)
-    if (!room) return null
-    const victim = ctx.puzzle.victim.id
-    const eliminated: Elimination[] = []
+    const placedCell = ctx.state.placed.get(id);
+    const room = placedCell !== undefined ? ctx.roomOf(placedCell) : ctx.guaranteedRoomOf(id);
+    if (!room) return null;
+    const victim = ctx.puzzle.victim.id;
+    const eliminated: Elimination[] = [];
     for (const other of ctx.state.unplaced()) {
-      if (other === id) continue
+      if (other === id) continue;
       const isMatch =
-        other !== victim && ctx.puzzle.attributesOf(other)[rcomp.attribute] === rcomp.value
-      if (isMatch) continue // a matching companion may legitimately share the room
-      const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room)
-      if (removed.length > 0) eliminated.push({ personId: other, cells: removed })
+        other !== victim && ctx.puzzle.attributesOf(other)[rcomp.attribute] === rcomp.value;
+      if (isMatch) continue; // a matching companion may legitimately share the room
+      const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room);
+      if (removed.length > 0) eliminated.push({ personId: other, cells: removed });
     }
-    if (eliminated.length === 0) return null
+    if (eliminated.length === 0) return null;
     return {
-      technique: 'roomReasoning',
+      technique: "roomReasoning",
       personId: id,
       eliminated,
-      explanation: { key: 'step.companionReserve', params: { name: id, room } },
-    }
+      explanation: { key: "step.companionReserve", params: { name: id, room } },
+    };
   }
 
   /** Small helper to build a single-person elimination step. */
@@ -678,11 +695,11 @@ export class RoomReasoningTechnique extends Technique {
     params: Record<string, string | number>,
   ): DeductionStep {
     return {
-      technique: 'roomReasoning',
+      technique: "roomReasoning",
       personId: subject,
       eliminated: [{ personId: person, cells }],
       explanation: { key, params },
-    }
+    };
   }
 
   override relevant(puzzle: Puzzle): boolean {
@@ -696,11 +713,11 @@ export class RoomReasoningTechnique extends Technique {
           aloneWithList(clue).length > 0 ||
           notAloneList(clue).length > 0
         ) {
-          return true
+          return true;
         }
       }
     }
-    return false
+    return false;
   }
 
   /**
@@ -718,59 +735,58 @@ export class RoomReasoningTechnique extends Technique {
     ctx: SolveContext,
     id: PersonId,
     opts: {
-      match: (other: PersonId) => boolean
-      includeVictim: boolean
-      min: number | null
-      max: number | null
-      forbidNonMatching: boolean
-      key: string
-      attribute: string
-      count?: number
+      match: (other: PersonId) => boolean;
+      includeVictim: boolean;
+      min: number | null;
+      max: number | null;
+      forbidNonMatching: boolean;
+      key: string;
+      attribute: string;
+      count?: number;
     },
   ): DeductionStep | null {
-    const victim = ctx.puzzle.victim.id
-    const counts = (pid: PersonId): boolean =>
-      pid !== id && (opts.includeVictim || pid !== victim)
-    for (const room of [...ctx.roomsOf(id)]) {
-      let placedMatch = 0
-      let placedBad = 0
+    const victim = ctx.puzzle.victim.id;
+    const counts = (pid: PersonId): boolean => pid !== id && (opts.includeVictim || pid !== victim);
+    for (const room of ctx.roomsOf(id)) {
+      let placedMatch = 0;
+      let placedBad = 0;
       for (const [pid, pc] of ctx.state.placed) {
-        if (!counts(pid) || ctx.roomOf(pc) !== room) continue
-        if (opts.match(pid)) placedMatch++
-        else placedBad++
+        if (!counts(pid) || ctx.roomOf(pc) !== room) continue;
+        if (opts.match(pid)) placedMatch++;
+        else placedBad++;
       }
-      let sureMatch = 0
-      let sureBad = 0
-      let couldMatch = 0
+      let sureMatch = 0;
+      let sureBad = 0;
+      let couldMatch = 0;
       for (const o of ctx.state.unplaced()) {
-        if (!counts(o)) continue
+        if (!counts(o)) continue;
         if (opts.match(o) && [...ctx.state.domain(o)].some((c) => ctx.roomOf(c) === room)) {
-          couldMatch++
+          couldMatch++;
         }
-        if (ctx.guaranteedRoomOf(o) !== room) continue
-        if (opts.match(o)) sureMatch++
-        else sureBad++
+        if (ctx.guaranteedRoomOf(o) !== room) continue;
+        if (opts.match(o)) sureMatch++;
+        else sureBad++;
       }
       // Placed-only violations keep their established wording; violations that need the
       // CONFINED (guaranteed) occupants get the "surely already N others" wording.
       const placedInvalid =
         (opts.forbidNonMatching && placedBad > 0) ||
         (opts.max !== null && placedMatch > opts.max) ||
-        (opts.min !== null && placedMatch + couldMatch < opts.min)
+        (opts.min !== null && placedMatch + couldMatch < opts.min);
       const sureInvalid =
         !placedInvalid &&
         ((opts.forbidNonMatching && sureBad > 0) ||
-          (opts.max !== null && placedMatch + sureMatch > opts.max))
-      if (!placedInvalid && !sureInvalid) continue
-      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room)
+          (opts.max !== null && placedMatch + sureMatch > opts.max));
+      if (!placedInvalid && !sureInvalid) continue;
+      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room);
       if (removed.length > 0) {
-        const busy = sureInvalid && opts.key === 'step.companionRoom'
+        const busy = sureInvalid && opts.key === "step.companionRoom";
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated: [{ personId: id, cells: removed }],
           explanation: {
-            key: busy ? 'step.companionRoomBusy' : opts.key,
+            key: busy ? "step.companionRoomBusy" : opts.key,
             params: {
               name: id,
               room,
@@ -779,21 +795,21 @@ export class RoomReasoningTechnique extends Technique {
               sure: placedMatch + placedBad + sureMatch + sureBad,
             },
           },
-        }
+        };
       }
     }
-    return null
+    return null;
   }
 
   /** Room each person is guaranteed to be in (placed cell, or confined domain). */
   private guaranteedRooms(ctx: SolveContext): Map<PersonId, string> {
-    const guaranteed = new Map<PersonId, string>()
-    for (const [id, cell] of ctx.state.placed) guaranteed.set(id, ctx.roomOf(cell))
+    const guaranteed = new Map<PersonId, string>();
+    for (const [id, cell] of ctx.state.placed) guaranteed.set(id, ctx.roomOf(cell));
     for (const id of ctx.state.unplaced()) {
-      const room = ctx.guaranteedRoomOf(id)
-      if (room) guaranteed.set(id, room)
+      const room = ctx.guaranteedRoomOf(id);
+      if (room) guaranteed.set(id, room);
     }
-    return guaranteed
+    return guaranteed;
   }
 
   private applyAlone(
@@ -805,32 +821,32 @@ export class RoomReasoningTechnique extends Technique {
     // Already placed: the only thing left to enforce is that their room admits no one
     // else (the companion excepted). `place()` clears just the row/column/cell, so the
     // rest of the room must still be vacated here.
-    const placedCell = ctx.state.placed.get(id)
+    const placedCell = ctx.state.placed.get(id);
     if (placedCell !== undefined) {
-      const room = ctx.roomOf(placedCell)
-      const eliminated = this.removeRoomFromOthers(ctx, id, room, (other) => other !== companion)
+      const room = ctx.roomOf(placedCell);
+      const eliminated = this.removeRoomFromOthers(ctx, id, room, (other) => other !== companion);
       return eliminated.length > 0
         ? {
-            technique: 'roomReasoning',
+            technique: "roomReasoning",
             personId: id,
             eliminated,
-            explanation: { key: 'step.aloneReserve', params: { name: id, room } },
+            explanation: { key: "step.aloneReserve", params: { name: id, room } },
           }
-        : null
+        : null;
     }
 
     // The subject can't sit in a room already guaranteed to someone else — except
     // the companion they're explicitly alone WITH (that shared room is the point).
     for (const [otherId, room] of guaranteed) {
-      if (otherId === id || otherId === companion) continue
-      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room)
+      if (otherId === id || otherId === companion) continue;
+      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated: [{ personId: id, cells: removed }],
-          explanation: { key: 'step.aloneExcludeRoom', params: { name: id, room } },
-        }
+          explanation: { key: "step.aloneExcludeRoom", params: { name: id, room } },
+        };
       }
     }
 
@@ -845,56 +861,61 @@ export class RoomReasoningTechnique extends Technique {
     if (companion === null && ctx.fullPermutation) {
       for (const room of ctx.roomsOf(id)) {
         const occupies = (axis: Axis, line: number) =>
-          [...ctx.state.domain(id)].some((c) => ctx.axisOf(c, axis) === line)
-        for (const axis of ['row', 'col'] as Axis[]) {
-          const full = ctx.fullLinesIn(room, axis)
-          const forcedOther = full.some((line) => !occupies(axis, line))
-          if (full.length < 2 && !forcedOther) continue
-          const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room)
+          [...ctx.state.domain(id)].some((c) => ctx.axisOf(c, axis) === line);
+        for (const axis of ["row", "col"] as Axis[]) {
+          const full = ctx.fullLinesIn(room, axis);
+          const forcedOther = full.some((line) => !occupies(axis, line));
+          if (full.length < 2 && !forcedOther) continue;
+          const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room);
           if (removed.length > 0) {
             return {
-              technique: 'roomReasoning',
+              technique: "roomReasoning",
               personId: id,
               eliminated: [{ personId: id, cells: removed }],
               explanation: {
-                key: 'step.aloneExcludeLine',
+                key: "step.aloneExcludeLine",
                 params: { name: id, room, line: axis, num: (full[0] ?? 0) + 1 },
               },
-            }
+            };
           }
         }
       }
     }
 
-    const myRoom = ctx.guaranteedRoomOf(id)
+    const myRoom = ctx.guaranteedRoomOf(id);
     if (myRoom) {
       // Once the subject is pinned to a room, everyone else leaves it — except the
       // companion they're alone with (who belongs there too).
-      const eliminated = this.removeRoomFromOthers(ctx, id, myRoom, (other) => other !== companion)
+      const eliminated = this.removeRoomFromOthers(ctx, id, myRoom, (other) => other !== companion);
       if (eliminated.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated,
-          explanation: { key: 'step.aloneReserve', params: { name: id, room: myRoom } },
-        }
+          explanation: { key: "step.aloneReserve", params: { name: id, room: myRoom } },
+        };
       }
     }
-    return null
+    return null;
   }
 
   /** Explanation for a "no one with X in my room" elimination. Gender reads as
    *  "darf keine Frau sein" (own `*Gender` wording via `who`/`whoNeg`); other traits
    *  reuse the "{{attribute}} haben" wording with the value-encoded trait token. */
-  private attrStep(baseKey: string, id: PersonId, room: string, rc: RoomAttributeClue): Explanation {
-    if (rc.attribute === 'gender') {
+  private attrStep(
+    baseKey: string,
+    id: PersonId,
+    room: string,
+    rc: RoomAttributeClue,
+  ): Explanation {
+    if (rc.attribute === "gender") {
       return {
         key: `${baseKey}Gender`,
         params: { name: id, room, who: `${rc.value}_nom`, whoNeg: `${rc.value}_nom_neg` },
-      }
+      };
     }
-    const token = rc.value === true ? rc.attribute : `${rc.attribute}_${rc.value}`
-    return { key: baseKey, params: { name: id, room, attribute: token } }
+    const token = rc.value === true ? rc.attribute : `${rc.attribute}_${rc.value}`;
+    return { key: baseKey, params: { name: id, room, attribute: token } };
   }
 
   private applyRoomAttribute(
@@ -904,33 +925,33 @@ export class RoomReasoningTechnique extends Technique {
     guaranteed: Map<PersonId, string>,
   ): DeductionStep | null {
     const matches = (other: PersonId): boolean =>
-      ctx.puzzle.attributesOf(other)[rc.attribute] === rc.value
+      ctx.puzzle.attributesOf(other)[rc.attribute] === rc.value;
 
     for (const [otherId, room] of guaranteed) {
-      if (otherId === id || !matches(otherId)) continue
-      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room)
+      if (otherId === id || !matches(otherId)) continue;
+      const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === room);
       if (removed.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated: [{ personId: id, cells: removed }],
-          explanation: this.attrStep('step.attrExcludeRoom', id, room, rc),
-        }
+          explanation: this.attrStep("step.attrExcludeRoom", id, room, rc),
+        };
       }
     }
-    const myRoom = ctx.guaranteedRoomOf(id)
+    const myRoom = ctx.guaranteedRoomOf(id);
     if (myRoom) {
-      const eliminated = this.removeRoomFromOthers(ctx, id, myRoom, matches)
+      const eliminated = this.removeRoomFromOthers(ctx, id, myRoom, matches);
       if (eliminated.length > 0) {
         return {
-          technique: 'roomReasoning',
+          technique: "roomReasoning",
           personId: id,
           eliminated,
-          explanation: this.attrStep('step.attrReserve', id, myRoom, rc),
-        }
+          explanation: this.attrStep("step.attrReserve", id, myRoom, rc),
+        };
       }
     }
-    return null
+    return null;
   }
 
   /**
@@ -945,42 +966,42 @@ export class RoomReasoningTechnique extends Technique {
     id: PersonId,
     rc: RoomAttributeClue,
   ): DeductionStep | null {
-    if (!ctx.fullPermutation) return null
+    if (!ctx.fullPermutation) return null;
     const matchers = ctx.state
       .unplaced()
       .filter((p) => p !== id && ctx.puzzle.attributesOf(p)[rc.attribute] === rc.value)
-      .map((p) => ({ rooms: ctx.roomsOf(p) }))
-    if (matchers.length === 0) return null
+      .map((p) => ({ rooms: ctx.roomsOf(p) }));
+    if (matchers.length === 0) return null;
 
     // The room universe to combine — every room any matcher can still be in. Room
     // counts are tiny; guard the 2^n subset scan anyway for unusually large maps.
-    const universe = new Set<string>()
-    for (const m of matchers) for (const r of m.rooms) universe.add(r)
-    if (universe.size > 12) return null
-    const roomList = [...universe]
+    const universe = new Set<string>();
+    for (const m of matchers) for (const r of m.rooms) universe.add(r);
+    if (universe.size > 12) return null;
+    const roomList = [...universe];
 
     for (const target of ctx.roomsOf(id)) {
-      if (!universe.has(target)) continue
+      if (!universe.has(target)) continue;
       for (let mask = 0; mask < 1 << roomList.length; mask++) {
-        const set = new Set<string>()
-        for (let i = 0; i < roomList.length; i++) if (mask & (1 << i)) set.add(roomList[i])
-        if (!set.has(target)) continue
-        const group = matchers.filter((m) => [...m.rooms].every((r) => set.has(r)))
-        if (group.length === 0) continue
-        const others = [...set].filter((r) => r !== target)
-        if (group.length <= ctx.roomsCapacity(others)) continue
-        const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === target)
+        const set = new Set<string>();
+        for (let i = 0; i < roomList.length; i++) if (mask & (1 << i)) set.add(roomList[i]);
+        if (!set.has(target)) continue;
+        const group = matchers.filter((m) => [...m.rooms].every((r) => set.has(r)));
+        if (group.length === 0) continue;
+        const others = [...set].filter((r) => r !== target);
+        if (group.length <= ctx.roomsCapacity(others)) continue;
+        const removed = ctx.removeWhere(id, (c) => ctx.roomOf(c) === target);
         if (removed.length > 0) {
           return {
-            technique: 'roomReasoning',
+            technique: "roomReasoning",
             personId: id,
             eliminated: [{ personId: id, cells: removed }],
-            explanation: this.attrStep('step.attrPigeonhole', id, target, rc),
-          }
+            explanation: this.attrStep("step.attrPigeonhole", id, target, rc),
+          };
         }
       }
     }
-    return null
+    return null;
   }
 
   private removeRoomFromOthers(
@@ -989,12 +1010,12 @@ export class RoomReasoningTechnique extends Technique {
     room: string,
     predicate: (other: PersonId) => boolean,
   ): Elimination[] {
-    const eliminated: Elimination[] = []
+    const eliminated: Elimination[] = [];
     for (const other of ctx.state.unplaced()) {
-      if (other === id || !predicate(other)) continue
-      const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room)
-      if (removed.length > 0) eliminated.push({ personId: other, cells: removed })
+      if (other === id || !predicate(other)) continue;
+      const removed = ctx.removeWhere(other, (c) => ctx.roomOf(c) === room);
+      if (removed.length > 0) eliminated.push({ personId: other, cells: removed });
     }
-    return eliminated
+    return eliminated;
   }
 }
