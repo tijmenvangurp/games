@@ -1,11 +1,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loadMurdokuLevel } from "@entities/murdoku";
-import {
-  MURDOKU_PREVIEW_LEVEL,
-  MURDOKU_PREVIEW_SOLUTION,
-  MurdokuBoard,
-} from "@features/murdoku-game";
+import { MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION, MurdokuBoard } from "@features/murdoku-game";
 
 /**
  * jsdom tekent geen canvas. Voor de mount- en aria-test is een stille 2D-context
@@ -28,7 +24,7 @@ function silentContext(): CanvasRenderingContext2D {
   }) as unknown as CanvasRenderingContext2D;
 }
 
-const puzzle = loadMurdokuLevel(MURDOKU_PREVIEW_LEVEL);
+const puzzle = loadMurdokuLevel(MURDOKU_INTRO_LEVEL);
 
 beforeEach(() => {
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => silentContext());
@@ -51,7 +47,7 @@ describe("MurdokuBoard", () => {
   it("toont één canvas met een beschrijvend label", () => {
     render(
       <MurdokuBoard
-        placements={MURDOKU_PREVIEW_SOLUTION}
+        placements={MURDOKU_INTRO_SOLUTION}
         puzzle={puzzle}
         title="De verdwenen taart"
       />,
