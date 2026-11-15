@@ -10,7 +10,7 @@ import { Renderer } from "./vendored/renderer";
  * ("Anna stond naast een tafel"), zodat een kind niet hoeft te raden over wie
  * "zij" gaat. Hints en uitleg kunnen dezelfde renderer gebruiken.
  */
-interface MurdokuText {
+export interface MurdokuText {
   /** De volledige, met naam begonnen zin van één aanwijzing. */
   clue(clue: Clue, subjectId: PersonId): string;
   /** Een engine-uitleg (hint, foutmelding) als lopende tekst. */

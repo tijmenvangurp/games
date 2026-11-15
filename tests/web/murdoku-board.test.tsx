@@ -65,11 +65,12 @@ describe("MurdokuBoard", () => {
     render(<MurdokuBoard puzzle={puzzle} title="De verdwenen taart" />);
 
     const canvas = screen.getByRole("img") as HTMLCanvasElement;
-    // jsdom meet geen breedte: de fallback van 320 px geeft 4 × 80 px vakjes.
-    expect(canvas.width).toBe(640);
-    expect(canvas.height).toBe(640);
-    expect(canvas.style.width).toBe("320px");
-    expect(canvas.style.height).toBe("320px");
+    // jsdom meet geen breedte: de fallback van 320 px min 22 px rijlabels geeft
+    // 4 × 74 px vakjes, op dpr 2 dus 592 × 592 pixels.
+    expect(canvas.width).toBe(592);
+    expect(canvas.height).toBe(592);
+    expect(canvas.style.width).toBe("296px");
+    expect(canvas.style.height).toBe("296px");
   });
 
   it("blijft werken zonder plaatsingen", () => {

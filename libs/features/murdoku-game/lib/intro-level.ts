@@ -17,8 +17,8 @@ import { roomTint } from "./palette";
  * (3,2) tapijt. De oplossing hieronder gebruikt rij en kolom één keer en zet
  * Cato als enige bij Vera in kamer 4.
  *
- * Deze zaak is het wandelskelet van #120: het bord toont de drie verdachten
- * alvast, zonder bediening. De interactie en de echte zaken volgen in #121.
+ * Deze zaak is het instaplevel van Wie was het?. Het bord start leeg; het kind
+ * plaatst de drie verdachten zelf. Het slachtoffer volgt in #123.
  */
 export const MURDOKU_INTRO_LEVEL: LevelJson = {
   schema: 1,
@@ -68,21 +68,13 @@ export const MURDOKU_INTRO_LEVEL: LevelJson = {
   },
 };
 
-/** De oplossing van {@link MURDOKU_INTRO_LEVEL}. */
+/**
+ * De oplossing van {@link MURDOKU_INTRO_LEVEL}. Het bord start leeg; deze kaart
+ * is de fixture voor de regels, de latere controle en de tests.
+ */
 export const MURDOKU_INTRO_SOLUTION: ReadonlyMap<PersonId, Cell> = new Map([
   ["A", 1],
   ["B", 4],
   ["C", 11],
   ["victim", 14],
-]);
-
-/**
- * Het bord toont in #120 de drie verdachten alvast. Het slachtofferteken is in de
- * MIT-bron een emoji-schedel; dat is zowel off-theme als emoji-afhankelijk, dus
- * het slachtofferportret en de onthulling horen bij #123.
- */
-export const MURDOKU_INTRO_PLACEMENTS: ReadonlyMap<PersonId, Cell> = new Map([
-  ["A", 1],
-  ["B", 4],
-  ["C", 11],
 ]);
