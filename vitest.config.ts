@@ -29,7 +29,15 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html", "json"],
       include: ["apps/games/src/**/*.{ts,tsx}", "libs/**/*.{ts,tsx}"],
-      exclude: ["apps/games/src/app/main.tsx", "libs/entities/sudoku/model/types.ts", "**/*.d.ts"],
+      // De MIT-engine in model/engine is 1:1 vendored (12.497 regels) en wordt via
+      // de publieke API in tests/node/murdoku-*.test.ts getest; losse regels tellen
+      // niet mee voor de dekking van ons eigen werk.
+      exclude: [
+        "apps/games/src/app/main.tsx",
+        "libs/entities/sudoku/model/types.ts",
+        "libs/entities/murdoku/model/engine/**",
+        "**/*.d.ts",
+      ],
       thresholds: {
         branches: 80,
         functions: 80,

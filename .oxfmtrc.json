@@ -1,1 +1,3 @@
-{}
+{
+  "ignorePatterns": ["libs/entities/murdoku/model/engine/**"]
+}
