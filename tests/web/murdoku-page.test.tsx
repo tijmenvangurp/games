@@ -3,6 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
+import { useMurdokuStore } from "@features/murdoku-game";
 
 /**
  * jsdom tekent geen canvas. Het bord roept alleen tekenmethodes aan; de pixels
@@ -27,6 +28,7 @@ function silentContext(): CanvasRenderingContext2D {
 beforeEach(() => {
   cleanup();
   localStorage.clear();
+  useMurdokuStore.setState({ puzzle: null, play: null, history: [] });
   vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => silentContext());
 });
 
@@ -83,5 +85,69 @@ describe("Wie was het? in de catalogus en de router", () => {
     expect(within(magNiet).getByText("Boekenkast")).toBeTruthy();
 
     expect(screen.getByText(/Een raam is geen vakje/)).toBeTruthy();
+  });
+
+  it("start met een leeg bord en toont rij- en kolomlabels", async () => {
+    renderApp("/mysterie");
+
+    expect(await screen.findByRole("heading", { name: "Wie was het?" })).toBeTruthy();
+    expect(screen.getByText("R1")).toBeTruthy();
+    expect(screen.getByText("K1")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^Anna, rij/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
+  });
+
+  it("plaatst een gekozen persoon en haalt hem met een tweede tik weg", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+    fireEvent.click(screen.getByRole("button", { name: /^Anna\. Anna stond in de keuken/ }));
+
+    const cell = screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ });
+    fireEvent.click(cell);
+
+    expect(useMurdokuStore.getState().play?.placements.get("A")).toBe(1);
+    expect(screen.getByRole("button", { name: /^Anna, rij 1, kolom 2/ })).toBeTruthy();
+    // Auto-kruis: de rij en kolom van Anna zijn weggestreept.
+    expect(screen.getByRole("button", { name: /^kruisje, rij 2, kolom 2/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /^Anna, rij 1, kolom 2/ }));
+
+    expect(useMurdokuStore.getState().play?.placements.has("A")).toBe(false);
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
+  });
+
+  it("kruist een vrij vakje weg en weigert een niet-bezetbaar vakje", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie was het?" });
+    fireEvent.click(screen.getByRole("button", { name: "Kruisjesstand" }));
+
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 3, kolom 1/ }));
+    expect(screen.getByRole("button", { name: /^kruisje, rij 3, kolom 1/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: /rij 1, kolom 3/ }));
+    expect(
+      screen.getByRole("button", { name: /hier mag niemand staan, rij 1, kolom 3/ }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /^kruisje, rij 1, kolom 3/ })).toBeNull();
+  });
+
+  it("maakt de laatste stap ongedaan", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+    const undo = screen.getByRole("button", { name: "Ongedaan maken" });
+    expect((undo as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /^Anna\. Anna stond in de keuken/ }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+    expect((undo as HTMLButtonElement).disabled).toBe(false);
+
+    fireEvent.click(undo);
+
+    expect(useMurdokuStore.getState().play?.placements.size).toBe(0);
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
+    expect((undo as HTMLButtonElement).disabled).toBe(true);
   });
 });
