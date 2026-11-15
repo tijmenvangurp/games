@@ -106,7 +106,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.reload();
 
     await page.getByRole("button", { name: /Wormas/ }).click();
-    await page.locator('[data-hole-id="2,2"]').click();
+    await page.locator('[data-gear-key="motor"]').click();
 
     await expect(page.locator("[data-worm]")).toBeVisible();
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");

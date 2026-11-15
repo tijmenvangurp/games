@@ -22,19 +22,15 @@ function gear(col: number, row: number, size: GearSize): Placement {
 }
 
 function worm(
-  shaft: readonly [number, number],
-  wheel: readonly [number, number],
-  shaftSize: GearSize,
-  wheelSize: GearSize,
+  from: readonly [number, number],
+  to: readonly [number, number],
   ratio = 0.5,
   direction: 1 | -1 = -1,
 ): Placement {
   return {
     kind: "worm",
-    shaftHoleId: hole(shaft[0], shaft[1]),
-    wheelHoleId: hole(wheel[0], wheel[1]),
-    shaftSize,
-    wheelSize,
+    fromHoleId: hole(from[0], from[1]),
+    toHoleId: hole(to[0], to[1]),
     ratio,
     direction,
   };
@@ -99,10 +95,10 @@ const INTRODUCES = [
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
-const WORM_SLOW = worm([2, 2], [6, 2], 1, 1, 0.5);
-const WORM_STRONG = worm([2, 2], [6, 2], 1, 1, 0.25);
-const WORM_METER = worm([3, 2], [7, 2], 2, 1, 0.5, 1);
-const WORM_LIFT = worm([2, 2], [6, 2], 1, 2, 0.25);
+const WORM_SLOW = worm([0, 2], [8, 2], 0.5, -1);
+const WORM_STRONG = worm([0, 2], [8, 2], 0.25, -1);
+const WORM_METER = worm([0, 2], [9, 2], 0.5, 1);
+const WORM_LIFT = worm([0, 2], [9, 2], 0.25, 1);
 
 describe("gear levels: catalogue", () => {
   it("holds sixteen levels in the brief's order", () => {
@@ -206,11 +202,11 @@ describe("gear levels: speed bands", () => {
     expect(level.solution).toEqual([BELT_TO_FAR_TARGET]);
     expect(evaluate(level, level.solution)).toBe("solved");
 
-    for (const alternative of [WORM_SLOW, WORM_METER]) {
+    for (const alternative of [WORM_METER]) {
       expect(canPlace(level, [], alternative)).toBe(true);
       expect(evaluate(level, [alternative])).toBe("playing");
     }
-    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.25, 6);
+    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.5, 6);
   });
 
   it("lights the level 13 lamp with the belt, not with the worm", () => {
@@ -223,7 +219,7 @@ describe("gear levels: speed bands", () => {
       expect(canPlace(level, [], alternative)).toBe(true);
       expect(evaluate(level, [alternative])).toBe("playing");
     }
-    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.25, 6);
+    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.5, 6);
   });
 
   it("moves the level 14 lift only with the slow worm", () => {
@@ -231,7 +227,7 @@ describe("gear levels: speed bands", () => {
 
     expect(level.solution).toEqual([WORM_LIFT]);
     expect(outputAt(level)).toMatchObject({ kind: "lift", satisfied: true });
-    expect(outputAt(level).speed).toBeCloseTo(-0.5, 6);
+    expect(outputAt(level).speed).toBeCloseTo(0.25, 6);
 
     expect(canPlace(level, [], BELT_TO_FAR_TARGET)).toBe(true);
     expect(evaluate(level, [BELT_TO_FAR_TARGET])).toBe("playing");

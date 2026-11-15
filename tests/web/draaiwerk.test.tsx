@@ -219,18 +219,18 @@ describe("draaiwerk", () => {
     }
 
     fireEvent.click(trayNode(worm.id));
-    fireEvent.click(holeNode(solution.shaftHoleId));
+    fireEvent.click(gearNode(gearKeyAt(level, solution.fromHoleId)));
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
     expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
     expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
       kind: "worm",
-      shaftHoleId: solution.shaftHoleId,
-      wheelHoleId: solution.wheelHoleId,
+      fromHoleId: solution.fromHoleId,
+      toHoleId: solution.toHoleId,
     });
   });
 
-  it("finds the same wormas when the player taps the wheel hole", () => {
+  it("finds the same wormas when the player taps the other gear", () => {
     useDraaiwerkStore.setState({ unlocked: 10 });
     useDraaiwerkStore.getState().startLevel(9);
     renderGame();
@@ -243,13 +243,13 @@ describe("draaiwerk", () => {
     }
 
     fireEvent.click(trayNode(worm.id));
-    fireEvent.click(holeNode(solution.wheelHoleId));
+    fireEvent.click(gearNode(gearKeyAt(level, solution.toHoleId)));
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
     expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
       kind: "worm",
-      shaftHoleId: solution.shaftHoleId,
-      wheelHoleId: solution.wheelHoleId,
+      fromHoleId: solution.fromHoleId,
+      toHoleId: solution.toHoleId,
     });
   });
 
@@ -272,7 +272,7 @@ describe("draaiwerk", () => {
     expect(screen.getByText("Dit tandwiel botst met een ander.")).toBeTruthy();
   });
 
-  it("rejects a wormas on an occupied hole", () => {
+  it("shows gear targets when a wormas is selected", () => {
     useDraaiwerkStore.setState({ unlocked: 10 });
     useDraaiwerkStore.getState().startLevel(9);
     renderGame();
@@ -283,10 +283,8 @@ describe("draaiwerk", () => {
     }
 
     fireEvent.click(trayNode(worm.id));
-    fireEvent.click(holeNode(levelAt(9).motor.holeId));
-
-    expect(screen.getByText("De wormas past daar niet.")).toBeTruthy();
-    expect(useDraaiwerkStore.getState().placements).toEqual([]);
+    expect(document.querySelector('[data-gear-key="motor"]')).toBeTruthy();
+    expect(document.querySelector('[data-gear-key="output:target-1"]')).toBeTruthy();
   });
 
   it("shows the speed gauge and lights the lamp", () => {
@@ -327,38 +325,31 @@ describe("draaiwerk", () => {
 
     expect(screen.getByRole("img", { name: /Snelheid lamp/ })).toBeTruthy();
     expect(screen.getByRole("img", { name: /Snelheid lift/ })).toBeTruthy();
-    expect(document.querySelectorAll("[data-tray-id]")).toHaveLength(5);
+    expect(document.querySelectorAll("[data-tray-id]")).toHaveLength(2);
     expect(document.querySelectorAll("[data-output-id]")).toHaveLength(2);
   });
 
-  it("bouwt level 16 met een riem voor de lamp en een worm voor de lift", () => {
+  it("bouwt level 16 met een ketting voor de lamp en een worm voor de lift", () => {
     useDraaiwerkStore.setState({ unlocked: 16 });
     useDraaiwerkStore.getState().startLevel(15);
     renderGame();
 
     const level = levelAt(15);
-    const gears = level.tray.filter((item) => item.kind === "gear");
     const belt = level.tray.find((item) => item.kind === "belt");
     const worm = level.tray.find((item) => item.kind === "worm");
-    if (gears.length !== 3 || !belt || !worm) {
+    if (!belt || !worm) {
       throw new Error("Level 16 does not have the expected tray");
     }
 
-    useDraaiwerkStore.getState().selectTray(gears[0]!.id);
-    useDraaiwerkStore.getState().tapHole("2,4");
-    useDraaiwerkStore.getState().selectTray(gears[1]!.id);
-    useDraaiwerkStore.getState().tapHole("2,6");
-    useDraaiwerkStore.getState().selectTray(gears[2]!.id);
-    useDraaiwerkStore.getState().tapHole("4,6");
-
     useDraaiwerkStore.getState().selectTray(belt.id);
-    useDraaiwerkStore.getState().tapGear("gear:2,6");
+    useDraaiwerkStore.getState().tapGear("motor");
     useDraaiwerkStore.getState().tapGear("output:generator-1");
 
     useDraaiwerkStore.getState().selectTray(worm.id);
-    useDraaiwerkStore.getState().tapHole("6,6");
+    useDraaiwerkStore.getState().tapGear("motor");
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
+    expect(useDraaiwerkStore.getState().placements).toHaveLength(2);
     const result = drive(level, useDraaiwerkStore.getState().placements);
     expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
   });
@@ -485,22 +476,18 @@ describe("draaiwerk: onderdelen verplaatsen", () => {
     }
     const placed: Placement = {
       kind: "worm",
-      shaftHoleId: "2,0",
-      wheelHoleId: "6,0",
-      shaftSize: worm.shaftSize,
-      wheelSize: worm.wheelSize,
+      fromHoleId: "0,2",
+      toHoleId: "8,2",
       ratio: worm.ratio,
       direction: worm.direction,
     };
 
-    useDraaiwerkStore.setState({ placements: [placed], usedTrayIds: [worm.id] });
-    useDraaiwerkStore.getState().movePlaced("worm:2,0", "2,2");
-    expect(useDraaiwerkStore.getState().status).toBe("solved");
-
-    useDraaiwerkStore.setState({ placements: [placed], usedTrayIds: [worm.id] });
-    useDraaiwerkStore.getState().startLevel(9);
-    useDraaiwerkStore.setState({ placements: [placed], usedTrayIds: [worm.id], status: "playing" });
-    useDraaiwerkStore.getState().removePlaced("worm:2,0");
+    useDraaiwerkStore.setState({
+      placements: [placed],
+      usedTrayIds: [worm.id],
+      status: "playing",
+    });
+    useDraaiwerkStore.getState().removePlaced("worm:0,2");
 
     expect(useDraaiwerkStore.getState().placements).toEqual([]);
     expect(useDraaiwerkStore.getState().usedTrayIds).toEqual([]);
@@ -608,12 +595,12 @@ describe("draaiwerk: wormas en losse riem", () => {
       throw new Error("Level 10 has no wormas");
     }
 
-    useDraaiwerkStore.getState().dropTray(worm.id, { kind: "hole", targetId: "2,2" });
+    useDraaiwerkStore.getState().dropTray(worm.id, { kind: "gear", targetId: "motor" });
     expect(useDraaiwerkStore.getState().status).toBe("solved");
     expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
       kind: "worm",
-      shaftHoleId: "2,2",
-      wheelHoleId: "6,2",
+      fromHoleId: "0,2",
+      toHoleId: "8,2",
     });
 
     useDraaiwerkStore.getState().removeLast();
@@ -656,31 +643,6 @@ describe("draaiwerk: wormas en losse riem", () => {
       kind: "loose-belt",
     });
   });
-
-  it("haalt een riem mee als het tandwiel eronder weggaat", () => {
-    useDraaiwerkStore.setState({ unlocked: 16, finished: false });
-    useDraaiwerkStore.getState().startLevel(15);
-    const level = levelAt(15);
-    const gears = level.tray.filter((item) => item.kind === "gear");
-    const belt = level.tray.find((item) => item.kind === "belt");
-    if (gears.length !== 3 || !belt) {
-      throw new Error("Level 16 does not have the expected tray");
-    }
-
-    useDraaiwerkStore.getState().selectTray(gears[0]!.id);
-    useDraaiwerkStore.getState().tapHole("2,4");
-    useDraaiwerkStore.getState().selectTray(gears[1]!.id);
-    useDraaiwerkStore.getState().tapHole("2,6");
-    useDraaiwerkStore.getState().selectTray(belt.id);
-    useDraaiwerkStore.getState().tapGear("gear:2,6");
-    useDraaiwerkStore.getState().tapGear("output:generator-1");
-    expect(useDraaiwerkStore.getState().placements).toHaveLength(3);
-
-    useDraaiwerkStore.getState().removePlaced("gear:2,6");
-
-    expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
-    expect(useDraaiwerkStore.getState().usedTrayIds).toHaveLength(1);
-  });
 });
 
 function solveBeltLevel(): void {
@@ -705,23 +667,22 @@ function solveBeltLevel(): void {
 }
 
 function placeBeltBetweenGears(): void {
-  useDraaiwerkStore.setState({ unlocked: 16, finished: false });
-  useDraaiwerkStore.getState().startLevel(15);
-  const level = levelAt(15);
-  const gears = level.tray.filter((item) => item.kind === "gear");
+  useDraaiwerkStore.setState({ unlocked: 3, finished: false });
+  useDraaiwerkStore.getState().startLevel(2);
+  const level = levelAt(2);
   const belt = level.tray.find((item) => item.kind === "belt");
-  if (gears.length !== 3 || !belt) {
-    throw new Error("Level 16 does not have the expected tray");
+  if (!belt) {
+    throw new Error("Level 3 has no belt");
   }
-  useDraaiwerkStore.getState().selectTray(gears[0]!.id);
-  useDraaiwerkStore.getState().tapHole("2,4");
-  useDraaiwerkStore.getState().selectTray(gears[1]!.id);
-  useDraaiwerkStore.getState().tapHole("2,6");
-  useDraaiwerkStore.getState().selectTray(gears[2]!.id);
-  useDraaiwerkStore.getState().tapHole("4,6");
-  useDraaiwerkStore.getState().selectTray(belt.id);
-  useDraaiwerkStore.getState().tapGear("gear:2,4");
-  useDraaiwerkStore.getState().tapGear("gear:2,6");
+  useDraaiwerkStore.setState({
+    placements: [
+      { kind: "gear", holeId: "2,2", size: 1 },
+      { kind: "gear", holeId: "4,2", size: 1 },
+      { kind: "open-belt", fromHoleId: "2,2", toHoleId: "4,2" },
+    ],
+    usedTrayIds: [belt.id],
+    status: "playing",
+  });
 }
 
 describe("draaiwerk: riem en ketting", () => {
@@ -756,7 +717,7 @@ describe("draaiwerk: riem en ketting", () => {
     renderGame();
 
     const before = useDraaiwerkStore.getState();
-    expect(before.placements).toHaveLength(4);
+    expect(before.placements).toHaveLength(3);
     expect(document.querySelectorAll("[data-chain-links]")).toHaveLength(1);
 
     const toggle = document.querySelector("[data-belt-toggle]");
@@ -790,8 +751,7 @@ describe("draaiwerk: riem en ketting", () => {
     expect(opened.placements.filter((placement) => placement.kind === "open-belt")).toHaveLength(1);
     expect(opened.usedTrayIds).toEqual(before.usedTrayIds);
     expect(opened.status).toBe("playing");
-    // Een open riem tussen twee al vertande wielen botst met de tandwielketen.
-    expect(drive(levelAt(15), opened.placements).jammed).toBe(true);
+    expect(drive(levelAt(2), opened.placements).jammed).toBe(true);
     expect(opened.feedback).toContain("Vastgelopen");
   });
 
@@ -916,38 +876,6 @@ describe("draaiwerk: randen van de store", () => {
     expect(useDraaiwerkStore.getState().status).toBe("solved");
   });
 
-  it("verplaatst een wormas aan het wieluiteinde", () => {
-    useDraaiwerkStore.setState({ unlocked: 10, finished: false });
-    useDraaiwerkStore.getState().startLevel(9);
-    const worm = levelAt(9).tray.find((candidate) => candidate.kind === "worm");
-    if (!worm || worm.kind !== "worm") {
-      throw new Error("Level 10 has no wormas");
-    }
-    useDraaiwerkStore.setState({
-      placements: [
-        {
-          kind: "worm",
-          shaftHoleId: "2,0",
-          wheelHoleId: "6,0",
-          shaftSize: worm.shaftSize,
-          wheelSize: worm.wheelSize,
-          ratio: worm.ratio,
-          direction: worm.direction,
-        },
-      ],
-      usedTrayIds: [worm.id],
-      status: "playing",
-    });
-
-    useDraaiwerkStore.getState().movePlaced("worm:6,0", "6,2");
-
-    expect(useDraaiwerkStore.getState().status).toBe("solved");
-    expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
-      shaftHoleId: "2,2",
-      wheelHoleId: "6,2",
-    });
-  });
-
   it("negeert verplaatsen, verwijderen en tikken zonder onderdeel", () => {
     useDraaiwerkStore.setState({ unlocked: 3, finished: false });
     useDraaiwerkStore.getState().startLevel(2);
@@ -1048,10 +976,8 @@ describe("draaiwerk: statusmeldingen", () => {
         drive(meterLevel, [
           {
             kind: "worm",
-            shaftHoleId: "3,2",
-            wheelHoleId: "7,2",
-            shaftSize: 2,
-            wheelSize: 1,
+            fromHoleId: "0,2",
+            toHoleId: "9,2",
             ratio: 0.5,
             direction: 1,
           },
@@ -1069,10 +995,8 @@ describe("draaiwerk: statusmeldingen", () => {
         drive(generatorLevel, [
           {
             kind: "worm",
-            shaftHoleId: "3,2",
-            wheelHoleId: "7,2",
-            shaftSize: 2,
-            wheelSize: 1,
+            fromHoleId: "0,2",
+            toHoleId: "9,2",
             ratio: 0.5,
             direction: -1,
           },
