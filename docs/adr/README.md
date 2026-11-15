@@ -36,6 +36,7 @@ context verrassend is en die uit een echte afweging komt. Kopieer
 | [0028](0028-ganzenbord.md)                             | Ganzenbord met een hergebruikte klassieke kaart               | Accepted                         |
 | [0029](0029-agent-harness.md)                          | Gedeelde agent-harness met skills en MCP's                    | Accepted                         |
 | [0030](0030-typepret.md)                               | Typepret met react-simple-keyboard en eigen invoerlogica      | Accepted                         |
+| [0031](0031-vendored-murdoku-engine.md)                | 1:1 vendored murdoku-engine en renderlaag                     | Accepted                         |
 
 Nieuwe beslissingen krijgen een volgend nummer. Werk na het toevoegen zowel
 deze index als `docs/README.md` bij.

@@ -1,6 +1,6 @@
-import { Technique } from './Technique.ts'
-import type { SolveContext } from '../SolveContext.ts'
-import type { DeductionStep, Elimination } from '../DeductionStep.ts'
+import { Technique } from "./Technique.ts";
+import type { SolveContext } from "../SolveContext.ts";
+import type { DeductionStep, Elimination } from "../DeductionStep.ts";
 
 /**
  * Crossing-lines ("rectangle") elimination: if a person's few possible cells all
@@ -11,42 +11,42 @@ import type { DeductionStep, Elimination } from '../DeductionStep.ts'
  * checking, so this is cheap and fires before the forcing fallbacks.
  */
 export class RectangleTechnique extends Technique {
-  readonly name = 'rectangle'
-  readonly difficulty = 3
+  readonly name = "rectangle";
+  readonly difficulty = 3;
 
   apply(ctx: SolveContext): DeductionStep | null {
     for (const id of ctx.state.unplaced()) {
-      const domain = [...ctx.state.domain(id)]
-      if (domain.length < 2 || domain.length > 4) continue
-      const rows = new Set(domain.map((c) => ctx.board.rc(c).row))
-      const cols = new Set(domain.map((c) => ctx.board.rc(c).col))
+      const domain = [...ctx.state.domain(id)];
+      if (domain.length < 2 || domain.length > 4) continue;
+      const rows = new Set(domain.map((c) => ctx.board.rc(c).row));
+      const cols = new Set(domain.map((c) => ctx.board.rc(c).col));
       for (const r of rows) {
         for (const c of cols) {
-          const d = ctx.board.idx(r, c)
-          if (domain.includes(d)) continue
+          const d = ctx.board.idx(r, c);
+          if (domain.includes(d)) continue;
           // D is always blocked iff every candidate shares D's row or column.
           const alwaysBlocks = domain.every((cand) => {
-            const p = ctx.board.rc(cand)
-            return p.row === r || p.col === c
-          })
-          if (!alwaysBlocks) continue
-          const eliminated: Elimination[] = []
+            const p = ctx.board.rc(cand);
+            return p.row === r || p.col === c;
+          });
+          if (!alwaysBlocks) continue;
+          const eliminated: Elimination[] = [];
           for (const other of ctx.state.unplaced()) {
-            if (other === id) continue
-            const removed = ctx.removeWhere(other, (x) => x === d)
-            if (removed.length > 0) eliminated.push({ personId: other, cells: removed })
+            if (other === id) continue;
+            const removed = ctx.removeWhere(other, (x) => x === d);
+            if (removed.length > 0) eliminated.push({ personId: other, cells: removed });
           }
           if (eliminated.length > 0) {
             return {
-              technique: 'rectangle',
+              technique: "rectangle",
               personId: id,
               eliminated,
-              explanation: { key: 'step.rectangle', params: { name: id, cell: d } },
-            }
+              explanation: { key: "step.rectangle", params: { name: id, cell: d } },
+            };
           }
         }
       }
     }
-    return null
+    return null;
   }
 }

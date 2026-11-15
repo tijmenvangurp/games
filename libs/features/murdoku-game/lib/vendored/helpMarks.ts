@@ -45,32 +45,32 @@ import {
   type Board,
   type Cell,
   type Clue,
-} from '@entities/murdoku'
+} from "@entities/murdoku";
 
 /** One area/line clue's referenced region, traced as its own dashed outline. */
 export interface AreaMark {
-  cells: Set<Cell>
+  cells: Set<Cell>;
   /** Negated clue → traced in red ("not this band"). */
-  neg: boolean
+  neg: boolean;
 }
 
 export interface HelpMarks {
   /** Area/line references (row/col, corner, wall, outside, same line as object).
    *  Each clue contributes its OWN region so two overlapping areas (e.g. a row and
    *  a column) read as two outlines, not one merged blob. */
-  areas: AreaMark[]
+  areas: AreaMark[];
   /** Referenced object cells, drawn as a dashed ring only (no wash). */
-  ring: Set<Cell>
+  ring: Set<Cell>;
   /** Rooms whose outline is traced. */
-  rooms: Set<string>
+  rooms: Set<string>;
   /** Light up all window / door symbols. */
-  windows: boolean
-  doors: boolean
+  windows: boolean;
+  doors: boolean;
   /** The same shapes for NEGATED clues, drawn in red ("not here"). */
-  redRing: Set<Cell>
-  redRooms: Set<string>
-  redWindows: boolean
-  redDoors: boolean
+  redRing: Set<Cell>;
+  redRooms: Set<string>;
+  redWindows: boolean;
+  redDoors: boolean;
 }
 
 function empty(): HelpMarks {
@@ -84,7 +84,7 @@ function empty(): HelpMarks {
     redRooms: new Set(),
     redWindows: false,
     redDoors: false,
-  }
+  };
 }
 
 export function hasMarks(marks: HelpMarks): boolean {
@@ -98,28 +98,28 @@ export function hasMarks(marks: HelpMarks): boolean {
     marks.redRooms.size > 0 ||
     marks.redWindows ||
     marks.redDoors
-  )
+  );
 }
 
 const addAll = (target: Set<Cell>, cells: Iterable<Cell>): void => {
-  for (const c of cells) target.add(c)
-}
+  for (const c of cells) target.add(c);
+};
 
 /** ALL cells carrying the object type — including blocked ones (a lamp is never
  *  occupiable, yet it IS the reference the player needs to find). */
 function objectRef(board: Board, type: string): Cell[] {
-  return board.objectCells(type)
+  return board.objectCells(type);
 }
 
 function addClue(clue: Clue, board: Board, neg: boolean, out: HelpMarks): void {
-  if (clue instanceof NotClue) return addClue(clue.inner, board, !neg, out)
+  if (clue instanceof NotClue) return addClue(clue.inner, board, !neg, out);
   if (clue instanceof AndClue || clue instanceof OrClue) {
-    for (const child of clue.clues) addClue(child, board, neg, out)
-    return
+    for (const child of clue.clues) addClue(child, board, neg, out);
+    return;
   }
 
-  const ring = neg ? out.redRing : out.ring
-  const rooms = neg ? out.redRooms : out.rooms
+  const ring = neg ? out.redRing : out.ring;
+  const rooms = neg ? out.redRooms : out.rooms;
 
   // Area / line clues → their region, outlined on its own (no wash). Negated → red.
   if (
@@ -130,16 +130,16 @@ function addClue(clue: Clue, board: Board, neg: boolean, out: HelpMarks): void {
     clue instanceof OutsideClue ||
     clue instanceof UniqueOutsideClue
   ) {
-    out.areas.push({ cells: clue.candidateCells(board), neg })
-    return
+    out.areas.push({ cells: clue.candidateCells(board), neg });
+    return;
   }
 
   // "Same row/column as an object": outline the line, plus a chalk ring on the
   // anchoring object(s) so the player sees what the line is pinned to.
   if (clue instanceof SameLineAsObjectClue) {
-    out.areas.push({ cells: clue.candidateCells(board), neg })
-    addAll(ring, objectRef(board, clue.object))
-    return
+    out.areas.push({ cells: clue.candidateCells(board), neg });
+    addAll(ring, objectRef(board, clue.object));
+    return;
   }
 
   // Object references → only the object itself (on it / beside it / the same one).
@@ -150,47 +150,47 @@ function addClue(clue: Clue, board: Board, neg: boolean, out: HelpMarks): void {
     clue instanceof UniqueNearObjectClue ||
     clue instanceof BesideSameObjectClue
   ) {
-    addAll(ring, objectRef(board, clue.object))
-    return
+    addAll(ring, objectRef(board, clue.object));
+    return;
   }
   if (clue instanceof NearAnyObjectClue) {
-    for (const type of clue.objects) addAll(ring, objectRef(board, type))
-    return
+    for (const type of clue.objects) addAll(ring, objectRef(board, type));
+    return;
   }
   if (clue instanceof DirectionFromObjectClue) {
     // Anchored ("… the tree at G7") → only that tile; otherwise every object of the type.
-    const cells = objectRef(board, clue.object).filter((c) => clue.at === null || c === clue.at)
-    addAll(ring, cells)
-    return
+    const cells = objectRef(board, clue.object).filter((c) => clue.at === null || c === clue.at);
+    addAll(ring, cells);
+    return;
   }
   if (clue instanceof SameRoomAsObjectClue) {
-    const cells = objectRef(board, clue.object)
-    addAll(ring, cells)
-    for (const c of cells) rooms.add(board.roomIdOf(c))
-    return
+    const cells = objectRef(board, clue.object);
+    addAll(ring, cells);
+    for (const c of cells) rooms.add(board.roomIdOf(c));
+    return;
   }
 
   if (clue instanceof InRoomClue) {
-    rooms.add(clue.room)
-    return
+    rooms.add(clue.room);
+    return;
   }
 
   if (clue instanceof NearWindowClue || clue instanceof UniqueNearWindowClue) {
-    if (neg) out.redWindows = true
-    else out.windows = true
-    return
+    if (neg) out.redWindows = true;
+    else out.windows = true;
+    return;
   }
   if (clue instanceof NearDoorClue || clue instanceof UniqueNearDoorClue) {
-    if (neg) out.redDoors = true
-    else out.doors = true
-    return
+    if (neg) out.redDoors = true;
+    else out.doors = true;
+    return;
   }
   // Relational / social / board clues: no reference to mark (as in full mode).
 }
 
 /** The reduced-help marks for a suspect's clues (all shown together). */
 export function helpMarks(clues: readonly Clue[], board: Board): HelpMarks {
-  const out = empty()
-  for (const clue of clues) addClue(clue, board, false, out)
-  return out
+  const out = empty();
+  for (const clue of clues) addClue(clue, board, false, out);
+  return out;
 }

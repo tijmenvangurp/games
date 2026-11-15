@@ -1,4 +1,4 @@
-import type { GameObject } from './GameObject.ts'
+import type { GameObject } from "./GameObject.ts";
 
 /**
  * A single grid cell. Objects are layered: `ground` (e.g. carpet) and `top`
@@ -18,16 +18,16 @@ export class Tile {
   ) {}
 
   get occupiable(): boolean {
-    if (this.top) return this.top.occupiable
-    if (this.ground) return this.ground.occupiable
-    return true
+    if (this.top) return this.top.occupiable;
+    if (this.ground) return this.ground.occupiable;
+    return true;
   }
 
   hasObjectType(type: string): boolean {
-    return this.top?.type === type || this.ground?.type === type
+    return this.top?.type === type || this.ground?.type === type;
   }
 
   objects(): GameObject[] {
-    return [this.ground, this.top].filter((o): o is GameObject => o !== null)
+    return [this.ground, this.top].filter((o): o is GameObject => o !== null);
   }
 }

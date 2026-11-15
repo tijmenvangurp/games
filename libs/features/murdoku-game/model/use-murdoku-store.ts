@@ -21,6 +21,8 @@ interface MurdokuStore {
   play: MurdokuPlayState | null;
   /** Eerdere bordtoestanden, voor ongedaan maken. */
   history: MurdokuPlayState[];
+  /** Zaken die in deze sessie zijn opgelost; de zaakkeuze toont ze. */
+  solvedCaseIds: ReadonlySet<string>;
   /** De hint die nu op het bord staat; `null` als het kind niets vroeg. */
   hint: MurdokuHintState | null;
   /** Hoe vaak er om een hint is gevraagd. Nooit een straf, alleen een telling. */
@@ -55,13 +57,14 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
   puzzle: null,
   play: null,
   history: [],
+  solvedCaseIds: new Set(),
   hint: null,
   hintsUsed: 0,
   clueFocus: null,
   clueFocusLabel: null,
 
   start: (puzzle) =>
-    set({
+    set((state) => ({
       puzzle,
       play: createMurdokuPlay(puzzle.id),
       history: [],
@@ -69,7 +72,9 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
       hintsUsed: 0,
       clueFocus: null,
       clueFocusLabel: null,
-    }),
+      // Opgeloste zaken blijven staan als het kind een nieuwe zaak kiest.
+      solvedCaseIds: state.solvedCaseIds,
+    })),
 
   selectPerson: (person) =>
     set((state) => (state.play ? { play: selectPerson(state.play, person) } : {})),
@@ -97,12 +102,13 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
     }),
 
   check: (solution) => {
-    const { puzzle, play } = get();
+    const { puzzle, play, solvedCaseIds } = get();
     if (!puzzle || !play) return;
     const next = checkMurdokuPlay(puzzle, play, solution);
     if (next === play) return;
     // Controleren verandert hooguit de afloop, nooit de bordgeschiedenis.
-    set({ play: next, ...CLEARED_HINT });
+    const solved = next.phase === "solved" ? new Set([...solvedCaseIds, puzzle.id]) : solvedCaseIds;
+    set({ play: next, solvedCaseIds: solved, ...CLEARED_HINT });
   },
 
   showHint: () => {

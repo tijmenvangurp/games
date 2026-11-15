@@ -16,6 +16,10 @@ export {
   validateMurdokuPlacement,
 } from "./model/murdoku";
 
+export { MURDOKU_CASES, MURDOKU_DEFAULT_CASE_ID, murdokuCaseById } from "./model/cases/cases";
+export { validateMurdokuCases } from "./model/cases/validate";
+export type { MurdokuCase } from "./model/cases/types";
+
 export { nextMurdokuHint } from "./model/hints";
 export type { MurdokuHint } from "./model/hints";
 

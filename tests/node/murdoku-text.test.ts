@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  MURDOKU_CASES,
   findMurdokuMurderer,
   loadMurdokuLevel,
   validateMurdokuPlacement,
@@ -177,6 +178,26 @@ describe("Nederlandse aanwijzingen", () => {
     ]) {
       expect(clue[key]).toBeTypeOf("string");
       expect(clue[key]).not.toBe("");
+    }
+  });
+});
+
+describe("de twaalf eigen zaken", () => {
+  it("maakt van elke aanwijzing een Nederlandse zin zonder sleutels", () => {
+    for (const entry of MURDOKU_CASES) {
+      const casePuzzle = loadMurdokuLevel(entry.level);
+      const caseText = createMurdokuText(casePuzzle);
+
+      for (const suspect of casePuzzle.suspects) {
+        for (const clue of suspect.clues) {
+          const sentence = caseText.clue(clue, suspect.id);
+          expect(sentence).toMatch(/^[A-Z].*\.$/);
+          expect(sentence).not.toMatch(/\b(?:clue|room|object|attr|dir)\.|[[{]/);
+        }
+      }
+      for (const room of casePuzzle.board.rooms.values()) {
+        expect(caseText.roomName(room.nameKey)).not.toMatch(/^room\./);
+      }
     }
   });
 });
