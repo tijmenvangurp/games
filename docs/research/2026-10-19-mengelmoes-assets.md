@@ -162,8 +162,15 @@ De kaart is ook een natuurlijk moment voor `aria-live`: "Nieuw element ontdekt: 
 - Filters als chips per categorie.
 - Raster van elementmunten; ontdekt in kleur, onontdekt als donkere silhouette met een vraagteken.
 - Tik op een ontdekt element voor een detailkaart met een weetje en de gebruikte combinatie. Onontdekte ingrediënten van alternatieve recepten blijven een vraagteken; ze tonen pas naam en icoon als het kind ze zelf heeft ontdekt.
-- Heeft een element geen enkele combinatie, dan vervalt de sectie "Kan maken met" in plaats van een lege mededeling.
+- De detailkaart noemt alleen combinaties die al gelukt zijn. Van de rest telt hij hoeveel er nog zijn, zonder de andere elementen te verklappen.
+- Heeft een element geen enkele combinatie, dan vervalt de sectie "Gelukte combinaties" in plaats van een lege mededeling.
 - Geen timer, geen "je mist er nog één"-druk. Wel een subtiele "nieuw"-badge.
+
+### 3.6.1 Hints
+
+- De hintknop noemt één ingrediënt en zegt "met iets anders"; alleen bij een combinatie van hetzelfde element noemt hij beide ("Probeer twee keer water").
+- Nog een keer drukken geeft een andere tip in plaats van dezelfde.
+- Een hint verwijst nooit naar een element dat al ontdekt is.
 
 ### 3.7 Geluid en haptiek
 

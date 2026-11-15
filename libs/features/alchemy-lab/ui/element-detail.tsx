@@ -51,14 +51,14 @@ interface ElementDetailProps {
 
 export function ElementDetail({ element, discovered, onBack }: ElementDetailProps) {
   const madeFrom = findRecipesFor(element.id);
-  const canMake = recipesUsing(element.id);
-  const knownUses = canMake
+  const combinations = recipesUsing(element.id);
+  const knownUses = combinations
     .map((recipe) => ({
       recipe,
       otherId: recipe.a === element.id ? recipe.b : recipe.a,
     }))
-    .filter(({ otherId }) => discovered.has(otherId));
-  const hiddenUses = canMake.length - knownUses.length;
+    .filter(({ recipe, otherId }) => discovered.has(otherId) && discovered.has(recipe.result));
+  const hiddenUses = combinations.length - knownUses.length;
   const isBase = BASE_ELEMENT_IDS.includes(element.id);
 
   return (
@@ -102,10 +102,10 @@ export function ElementDetail({ element, discovered, onBack }: ElementDetailProp
         )}
       </section>
 
-      {knownUses.length > 0 || hiddenUses > 0 ? (
+      {combinations.length > 0 ? (
         <section>
           <h4 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
-            Kan maken met
+            Gelukte combinaties
           </h4>
           {knownUses.length > 0 ? (
             <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
@@ -118,18 +118,16 @@ export function ElementDetail({ element, discovered, onBack }: ElementDetailProp
                   <span aria-hidden="true" className="text-xs font-black text-muted-foreground">
                     →
                   </span>
-                  <ElementChip discovered={discovered} elementId={recipe.result} mystery />
+                  <ElementChip discovered={discovered} elementId={recipe.result} />
                 </div>
               ))}
             </div>
           ) : (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Probeer meer elementen te ontdekken.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Nog niets mee gemaakt.</p>
           )}
-          {knownUses.length > 0 && hiddenUses > 0 ? (
+          {hiddenUses > 0 ? (
             <p className="mt-2 text-xs text-muted-foreground">
-              Nog {hiddenUses} combinaties te ontdekken.
+              Nog {hiddenUses} {hiddenUses === 1 ? "combinatie" : "combinaties"} om te ontdekken.
             </p>
           ) : null}
         </section>
