@@ -766,7 +766,7 @@ describe("draaiwerk: statusmeldingen", () => {
     expect(
       statusMessage(
         liftLevel,
-        drive(liftLevel, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "8,2" }]),
+        drive(liftLevel, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "9,2" }]),
         null,
         "i",
         false,

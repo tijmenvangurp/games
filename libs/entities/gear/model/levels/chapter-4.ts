@@ -49,13 +49,13 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
       {
         id: "lift-1",
         kind: "lift",
-        holeId: holeId(8, 2),
+        holeId: holeId(9, 2),
         size: 1,
         maxSpeed: 0.75,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 1, 1, 0.5)],
-    solution: [wormAt([2, 2], [6, 2], 1, 1, 0.5)],
+    tray: [trayBelt("riem-1"), trayWorm("worm-1", 1, 2, 0.25)],
+    solution: [wormAt([2, 2], [6, 2], 1, 2, 0.25)],
   },
   {
     id: "twee-kanten-op",

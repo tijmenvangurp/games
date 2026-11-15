@@ -102,6 +102,7 @@ const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
 const WORM_SLOW = worm([2, 2], [6, 2], 1, 1, 0.5);
 const WORM_STRONG = worm([2, 2], [6, 2], 1, 1, 0.25);
 const WORM_METER = worm([3, 2], [7, 2], 2, 1, 0.5, 1);
+const WORM_LIFT = worm([2, 2], [6, 2], 1, 2, 0.25);
 
 describe("gear levels: catalogue", () => {
   it("holds sixteen levels in the brief's order", () => {
@@ -228,13 +229,13 @@ describe("gear levels: speed bands", () => {
   it("moves the level 14 lift only with the slow worm", () => {
     const level = levelAt(13);
 
-    expect(level.solution).toEqual([WORM_SLOW]);
+    expect(level.solution).toEqual([WORM_LIFT]);
     expect(outputAt(level)).toMatchObject({ kind: "lift", satisfied: true });
     expect(outputAt(level).speed).toBeCloseTo(-0.5, 6);
 
-    expect(canPlace(level, [], link("open-belt", [0, 2], [8, 2]))).toBe(true);
-    expect(evaluate(level, [link("open-belt", [0, 2], [8, 2])])).toBe("playing");
-    expect(evaluate(level, [WORM_SLOW])).toBe("solved");
+    expect(canPlace(level, [], BELT_TO_FAR_TARGET)).toBe(true);
+    expect(evaluate(level, [BELT_TO_FAR_TARGET])).toBe("playing");
+    expect(evaluate(level, [WORM_LIFT])).toBe("solved");
   });
 });
 
