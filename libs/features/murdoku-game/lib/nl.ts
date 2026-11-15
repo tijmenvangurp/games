@@ -180,6 +180,10 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
     washok: "de wasruimte",
     berging: "de berging",
     overloop: "de overloop",
+    binnenplaats: "de binnenplaats",
+    schuur: "de schuur",
+    serre: "de serre",
+    balkon: "het balkon",
 
     // Standaardkamers uit de engine (thema's van de generator).
     editor1: "de kamer 1",
