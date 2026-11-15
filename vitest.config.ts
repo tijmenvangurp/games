@@ -36,6 +36,9 @@ export default defineConfig({
         "apps/games/src/app/main.tsx",
         "libs/entities/sudoku/model/types.ts",
         "libs/entities/murdoku/model/engine/**",
+        // 1:1 overgenomen MIT-renderlaag (8 bestanden, ~6.000 regels). Onze eigen
+        // teksten, preview-fixture en componenten vallen hier bewust buiten.
+        "libs/features/murdoku-game/lib/vendored/**",
         "**/*.d.ts",
       ],
       thresholds: {

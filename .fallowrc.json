@@ -5,11 +5,22 @@
     {
       "file": "libs/entities/murdoku/model/engine/**",
       "exports": ["*"]
+    },
+    {
+      "file": "libs/features/murdoku-game/lib/vendored/**",
+      "exports": ["*"]
     }
   ],
   "overrides": [
     {
       "files": ["libs/entities/murdoku/model/engine/**"],
+      "rules": {
+        "unused-types": "off",
+        "unused-class-members": "off"
+      }
+    },
+    {
+      "files": ["libs/features/murdoku-game/lib/vendored/**"],
       "rules": {
         "unused-types": "off",
         "unused-class-members": "off"
@@ -40,7 +51,11 @@
     "css-selector-complexity": "error"
   },
   "duplicates": {
-    "ignore": ["scripts/generate-sounds.ts", "libs/entities/murdoku/model/engine/**"]
+    "ignore": [
+      "scripts/generate-sounds.ts",
+      "libs/entities/murdoku/model/engine/**",
+      "libs/features/murdoku-game/lib/vendored/**"
+    ]
   },
   "health": {
     "coverage": "coverage/coverage-final.json",
@@ -86,6 +101,14 @@
         "maxCrap": 4000,
         "maxUnitSize": 500,
         "reason": "1:1 vendored MIT-engine (LifeValuable/murdoku); de complexiteit en duplicatie zijn eigendom van de upstream-bron en worden niet door ons onderhouden. Onze eigen wrapper en public API vallen buiten deze override en blijven volledig getest."
+      },
+      {
+        "files": ["libs/features/murdoku-game/lib/vendored/**"],
+        "maxCyclomatic": 130,
+        "maxCognitive": 260,
+        "maxCrap": 4000,
+        "maxUnitSize": 500,
+        "reason": "1:1 vendored MIT-renderlaag (LifeValuable/murdoku): canvas-art voor meubels, vloeren en portretten. De complexiteit is eigendom van de upstream-bron; onze eigen teksten, palette, preview-fixture en bordcomponent vallen buiten deze override en zijn getest."
       }
     ]
   },
