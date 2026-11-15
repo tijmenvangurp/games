@@ -114,6 +114,7 @@ describe("alchemy rules", () => {
     expect(combine("stone", "stone")).toBe("mountain");
     expect(combine("house", "house")).toBe("village");
     expect(combine("star", "star")).toBe("galaxy");
+    expect(combine("flat", "flat")).toBe("wolkenkrabber");
   });
 
   it("keeps wind reachable now that two airs make a storm", () => {

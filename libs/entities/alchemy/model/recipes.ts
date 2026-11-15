@@ -247,4 +247,5 @@ export const RECIPES: readonly Recipe[] = [
   { a: "stone", b: "human", result: "statue" },
   { a: "statue", b: "snow", result: "snowman" },
   { a: "statue", b: "house", result: "museum" },
+  { a: "flat", b: "flat", result: "wolkenkrabber" },
 ];

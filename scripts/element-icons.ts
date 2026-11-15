@@ -218,6 +218,7 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   bath: fluent("bathtub"),
   brick: fluent("brick"),
   flat: fluent("office-building"),
+  wolkenkrabber: { custom: true },
   hospital: fluent("hospital"),
   pilot: fluent("pilot"),
   fireworks: fluent("fireworks"),
@@ -226,7 +227,7 @@ export const ELEMENT_ICONS: Readonly<Record<string, ElementIconSource>> = {
   statue: fluent("moai"),
   museum: fluent("classical-building"),
   // Fluent Emoji has no forest, flour, sand, tadpole, rainbow-dragon, windmill,
-  // dough, herd, lava or oven sprite; these are custom flat icons. The forest
+  // dough, herd, lava, oven or skyscraper sprite; these are custom flat icons. The forest
   // is a cluster of three deciduous trees. The rainbow dragon adapts the Fluent
   // dragon body with a rainbow gradient. Replace them with an Iconify reference
   // when a suitable set is added.

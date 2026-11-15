@@ -1455,6 +1455,13 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     fact: "Een flat is een hoog huis met veel woningen boven elkaar.",
   },
   {
+    id: "wolkenkrabber",
+    name: "Wolkenkrabber",
+    icon: "/elements/wolkenkrabber.svg",
+    category: "tech",
+    fact: "Een wolkenkrabber is zo hoog dat hij bijna de wolken raakt.",
+  },
+  {
     id: "hospital",
     name: "Ziekenhuis",
     icon: "/elements/hospital.svg",
