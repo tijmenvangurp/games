@@ -1,10 +1,13 @@
 import { useMemo, type MouseEvent } from "react";
+import { useDroppable } from "@dnd-kit/core";
 import {
   boardViewBox,
   gearPath,
   gearRadius,
   holeCenter,
   type DriveResult,
+  type GearPose,
+  type Hole,
   type Level,
   type Output,
   type Placement,
@@ -29,6 +32,7 @@ interface DraaiwerkBoardProps {
   result: DriveResult;
   placements: readonly Placement[];
   selectedItem: TrayItem | null;
+  linkDrag: boolean;
   pendingHoleId: string | null;
   pendingGearKey: string | null;
   hintPlacement: Placement | null;
@@ -55,11 +59,152 @@ function isLyingAs(placement: Placement): placement is AsPlacement {
   return placement.kind === "lying-as";
 }
 
+interface DraaiwerkHoleProps {
+  level: Level;
+  hole: Hole;
+  blocked: boolean;
+  occupied: boolean;
+  hint: boolean;
+  pending: boolean;
+  onHole: (holeId: string) => void;
+}
+
+function DraaiwerkHole({
+  level,
+  hole,
+  blocked,
+  occupied,
+  hint,
+  pending,
+  onHole,
+}: DraaiwerkHoleProps) {
+  const { isOver, setNodeRef } = useDroppable({ id: `hole:${hole.id}` });
+  const center = holeCenter(level, hole.id);
+  const label = `Gat ${hole.col}, ${hole.row}${
+    blocked ? ", geblokkeerd" : occupied ? ", bezet" : ""
+  }`;
+
+  return (
+    <g
+      ref={(node) => setNodeRef(node as unknown as HTMLElement)}
+      aria-label={label}
+      className="draaiwerk-hole"
+      data-blocked={blocked ? "true" : "false"}
+      data-drop-over={isOver ? "true" : "false"}
+      data-hole-id={hole.id}
+      role="button"
+      tabIndex={occupied ? -1 : 0}
+      onClick={(event) => {
+        event.stopPropagation();
+        onHole(hole.id);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onHole(hole.id);
+        }
+      }}
+    >
+      {isOver ? (
+        <circle
+          aria-hidden="true"
+          cx={center.x}
+          cy={center.y}
+          fill="var(--primary)"
+          fillOpacity={0.1}
+          r={19}
+          stroke="var(--primary)"
+          strokeWidth={2}
+        />
+      ) : null}
+      <circle
+        className="draaiwerk-focus-ring"
+        cx={center.x}
+        cy={center.y}
+        fill="none"
+        r={13.5}
+        stroke="var(--primary)"
+        strokeWidth={2}
+      />
+      {hint && !occupied ? (
+        <circle
+          className="draaiwerk-hint"
+          cx={center.x}
+          cy={center.y}
+          data-hint="true"
+          fill="none"
+          r={19}
+          stroke="var(--warning)"
+          strokeDasharray="4 4"
+          strokeWidth={2}
+        />
+      ) : null}
+      {pending ? (
+        <circle
+          cx={center.x}
+          cy={center.y}
+          fill="none"
+          r={12}
+          stroke="var(--warning)"
+          strokeWidth={2.4}
+        />
+      ) : null}
+      {blocked ? (
+        <g aria-hidden="true" opacity={0.85}>
+          <circle cx={center.x} cy={center.y} fill="var(--muted)" r={6} />
+          <path
+            d={`M ${center.x - 3} ${center.y - 3} L ${center.x + 3} ${center.y + 3} M ${center.x + 3} ${center.y - 3} L ${center.x - 3} ${center.y + 3}`}
+            stroke="var(--muted-foreground)"
+            strokeLinecap="round"
+            strokeWidth={1.6}
+          />
+        </g>
+      ) : occupied ? null : (
+        <circle
+          aria-hidden="true"
+          cx={center.x}
+          cy={center.y}
+          fill="var(--foreground)"
+          opacity={0.24}
+          r={2.6}
+        />
+      )}
+    </g>
+  );
+}
+
+function GearDropZone({ pose, enabled }: { pose: GearPose; enabled: boolean }) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: `gear:${pose.key}`,
+    disabled: !enabled,
+  });
+
+  if (!enabled) {
+    return null;
+  }
+
+  return (
+    <circle
+      ref={(node) => setNodeRef(node as unknown as HTMLElement)}
+      aria-hidden="true"
+      cx={pose.center.x}
+      cy={pose.center.y}
+      data-drop-over={isOver ? "true" : "false"}
+      data-gear-drop={pose.key}
+      fill={isOver ? "var(--primary)" : "transparent"}
+      fillOpacity={isOver ? 0.12 : 0}
+      pointerEvents="none"
+      r={gearRadius(pose.size) + 8}
+    />
+  );
+}
+
 export function DraaiwerkBoard({
   level,
   result,
   placements,
   selectedItem,
+  linkDrag,
   pendingHoleId,
   pendingGearKey,
   hintPlacement,
@@ -258,91 +403,24 @@ export function DraaiwerkBoard({
         </g>
 
         <g>
-          {level.holes.map((hole) => {
-            const isBlocked = blocked.has(hole.id);
-            const isOccupied = occupied.has(hole.id);
-            const isHint = hint.has(hole.id);
-            const isPending = pendingHoleId === hole.id;
-            const center = holeCenter(level, hole.id);
-            const label = `Gat ${hole.col}, ${hole.row}${
-              isBlocked ? ", geblokkeerd" : isOccupied ? ", bezet" : ""
-            }`;
+          {result.gears.map((pose) => (
+            <GearDropZone key={`drop:${pose.key}`} enabled={linkDrag} pose={pose} />
+          ))}
+        </g>
 
-            return (
-              <g
-                aria-label={label}
-                className="draaiwerk-hole"
-                data-blocked={isBlocked ? "true" : "false"}
-                data-hole-id={hole.id}
-                key={hole.id}
-                role="button"
-                tabIndex={isOccupied ? -1 : 0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onHole(hole.id);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onHole(hole.id);
-                  }
-                }}
-              >
-                <circle
-                  className="draaiwerk-focus-ring"
-                  cx={center.x}
-                  cy={center.y}
-                  fill="none"
-                  r={13.5}
-                  stroke="var(--primary)"
-                  strokeWidth={2}
-                />
-                {isHint && !isOccupied ? (
-                  <circle
-                    className="draaiwerk-hint"
-                    cx={center.x}
-                    cy={center.y}
-                    data-hint="true"
-                    fill="none"
-                    r={19}
-                    stroke="var(--warning)"
-                    strokeDasharray="4 4"
-                    strokeWidth={2}
-                  />
-                ) : null}
-                {isPending ? (
-                  <circle
-                    cx={center.x}
-                    cy={center.y}
-                    fill="none"
-                    r={12}
-                    stroke="var(--warning)"
-                    strokeWidth={2.4}
-                  />
-                ) : null}
-                {isBlocked ? (
-                  <g aria-hidden="true" opacity={0.85}>
-                    <circle cx={center.x} cy={center.y} fill="var(--muted)" r={6} />
-                    <path
-                      d={`M ${center.x - 3} ${center.y - 3} L ${center.x + 3} ${center.y + 3} M ${center.x + 3} ${center.y - 3} L ${center.x - 3} ${center.y + 3}`}
-                      stroke="var(--muted-foreground)"
-                      strokeLinecap="round"
-                      strokeWidth={1.6}
-                    />
-                  </g>
-                ) : isOccupied ? null : (
-                  <circle
-                    aria-hidden="true"
-                    cx={center.x}
-                    cy={center.y}
-                    fill="var(--foreground)"
-                    opacity={0.24}
-                    r={2.6}
-                  />
-                )}
-              </g>
-            );
-          })}
+        <g>
+          {level.holes.map((hole) => (
+            <DraaiwerkHole
+              key={hole.id}
+              blocked={blocked.has(hole.id)}
+              hint={hint.has(hole.id)}
+              hole={hole}
+              level={level}
+              occupied={occupied.has(hole.id)}
+              pending={pendingHoleId === hole.id}
+              onHole={onHole}
+            />
+          ))}
         </g>
 
         <g>

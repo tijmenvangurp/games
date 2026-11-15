@@ -48,6 +48,7 @@ interface DraaiwerkStore {
   mistakes: number;
   startLevel: (index: number) => void;
   selectTray: (id: string) => void;
+  dropTray: (id: string, target: { kind: "hole" | "gear"; targetId: string }) => void;
   tapHole: (holeId: string) => void;
   tapGear: (key: string) => void;
   removeLast: () => void;
@@ -143,13 +144,16 @@ function startLevelAction(set: DraaiwerkSet, get: DraaiwerkGet, index: number): 
   });
 }
 
+function selectableTrayItem(state: DraaiwerkStore, id: string): TrayItem | null {
+  if (state.status === "solved" || state.usedTrayIds.includes(id)) {
+    return null;
+  }
+  return state.level.tray.find((candidate) => candidate.id === id) ?? null;
+}
+
 function selectTrayAction(set: DraaiwerkSet, get: DraaiwerkGet, id: string): void {
   const state = get();
-  if (state.status === "solved" || state.usedTrayIds.includes(id)) {
-    return;
-  }
-  const item = state.level.tray.find((candidate) => candidate.id === id);
-  if (!item) {
+  if (!selectableTrayItem(state, id)) {
     return;
   }
 
@@ -163,6 +167,31 @@ function selectTrayAction(set: DraaiwerkSet, get: DraaiwerkGet, id: string): voi
   });
   playSound("select");
   playHaptic("select");
+}
+
+function dropTrayAction(
+  set: DraaiwerkSet,
+  get: DraaiwerkGet,
+  id: string,
+  target: { kind: "hole" | "gear"; targetId: string },
+): void {
+  if (!selectableTrayItem(get(), id)) {
+    return;
+  }
+
+  set({
+    selectedTrayId: id,
+    pendingHoleId: null,
+    pendingGearKey: null,
+    feedback: null,
+    feedbackTone: null,
+  });
+
+  if (target.kind === "hole") {
+    get().tapHole(target.targetId);
+  } else {
+    get().tapGear(target.targetId);
+  }
 }
 
 function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): void {
@@ -385,6 +414,7 @@ export const useDraaiwerkStore = create<DraaiwerkStore>()(
 
       startLevel: (index) => startLevelAction(set, get, index),
       selectTray: (id) => selectTrayAction(set, get, id),
+      dropTray: (id, target) => dropTrayAction(set, get, id, target),
       tapHole: (holeId) => tapHoleAction(set, get, holeId),
       tapGear: (key) => tapGearAction(set, get, key),
       removeLast: () => removeLastAction(set, get),

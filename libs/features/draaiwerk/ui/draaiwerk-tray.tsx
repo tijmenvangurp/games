@@ -1,9 +1,83 @@
+import { useEffect, useRef } from "react";
+import { useDraggable } from "@dnd-kit/core";
 import { Check } from "@shared/ui";
 import { cn } from "@shared/lib";
-import { trayLabel } from "@entities/gear";
+import { trayLabel, type TrayItem } from "@entities/gear";
 import { trayShortLabel } from "../model/labels";
 import { useDraaiwerkStore } from "../model/use-draaiwerk-store";
 import { TrayArt } from "./gear-art";
+
+function TrayCard({
+  item,
+  used,
+  selected,
+  solving,
+}: {
+  item: TrayItem;
+  used: boolean;
+  selected: boolean;
+  solving: boolean;
+}) {
+  const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
+    id: `tray:${item.id}`,
+    disabled: used || solving,
+  });
+  const wasDragging = useRef(false);
+  const dndPointerDown = listeners?.onPointerDown;
+  const label = trayLabel(item);
+
+  useEffect(() => {
+    if (isDragging) {
+      wasDragging.current = true;
+    }
+  }, [isDragging]);
+
+  return (
+    <button
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
+      aria-pressed={selected}
+      className={cn(
+        "relative flex min-h-16 min-w-28 shrink-0 touch-none flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] md:landscape:min-w-0 md:landscape:shrink",
+        used
+          ? "border-dashed border-border bg-muted/30 opacity-50"
+          : "border-border bg-card hover:bg-muted/40",
+        selected && "border-primary bg-primary/5 ring-2 ring-primary/25",
+        isDragging && "opacity-30",
+      )}
+      data-selected={selected ? "true" : "false"}
+      data-tray-id={item.id}
+      data-used={used ? "true" : "false"}
+      disabled={used || solving}
+      type="button"
+      onClick={() => {
+        if (wasDragging.current) {
+          wasDragging.current = false;
+          return;
+        }
+        useDraaiwerkStore.getState().selectTray(item.id);
+      }}
+      onPointerDown={(event) => {
+        wasDragging.current = false;
+        dndPointerDown?.(event);
+      }}
+    >
+      <span className="grid flex-1 place-items-center rounded-lg bg-muted/50 py-1">
+        <TrayArt item={item} />
+      </span>
+      <span className="mt-1 block px-0.5 text-[10px] font-bold leading-tight">
+        {trayShortLabel(item)}
+      </span>
+      {used ? (
+        <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-success text-white">
+          <Check aria-hidden="true" className="size-2.5" />
+        </span>
+      ) : null}
+    </button>
+  );
+}
 
 export function DraaiwerkTray() {
   const level = useDraaiwerkStore((state) => state.level);
@@ -28,54 +102,25 @@ export function DraaiwerkTray() {
 
       <div
         className={cn(
-          "game-scrollbar flex min-h-0 min-w-0 gap-2 overflow-x-auto pb-1 md:portrait:overflow-y-hidden md:landscape:flex-1 md:landscape:grid md:landscape:overflow-x-hidden md:landscape:overflow-y-auto md:landscape:pr-1",
+          "game-scrollbar grid min-h-0 min-w-0 gap-2 overflow-y-auto pb-1 md:landscape:flex-1",
           level.tray.length <= 2
-            ? "md:landscape:grid-cols-1 md:landscape:content-center"
-            : "md:landscape:grid-cols-2 md:landscape:content-start",
+            ? "grid-cols-1 md:landscape:content-center"
+            : "grid-cols-2 content-start",
         )}
       >
         {level.tray.length === 0 ? (
           <p className="py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
         ) : null}
 
-        {level.tray.map((item) => {
-          const used = usedTrayIds.includes(item.id);
-          const selected = selectedTrayId === item.id;
-          const label = trayLabel(item);
-
-          return (
-            <button
-              key={item.id}
-              aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
-              aria-pressed={selected}
-              className={cn(
-                "relative flex min-h-16 min-w-28 shrink-0 flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] md:landscape:min-w-0 md:landscape:shrink",
-                used
-                  ? "border-dashed border-border bg-muted/30 opacity-50"
-                  : "border-border bg-card hover:bg-muted/40",
-                selected && "border-primary bg-primary/5 ring-2 ring-primary/25",
-              )}
-              data-selected={selected ? "true" : "false"}
-              data-tray-id={item.id}
-              data-used={used ? "true" : "false"}
-              disabled={used || solving}
-              type="button"
-              onClick={() => useDraaiwerkStore.getState().selectTray(item.id)}
-            >
-              <span className="grid flex-1 place-items-center rounded-lg bg-muted/50 py-1">
-                <TrayArt item={item} />
-              </span>
-              <span className="mt-1 block px-0.5 text-[10px] font-bold leading-tight">
-                {trayShortLabel(item)}
-              </span>
-              {used ? (
-                <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-success text-white">
-                  <Check aria-hidden="true" className="size-2.5" />
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
+        {level.tray.map((item) => (
+          <TrayCard
+            key={item.id}
+            item={item}
+            selected={selectedTrayId === item.id}
+            solving={solving}
+            used={usedTrayIds.includes(item.id)}
+          />
+        ))}
       </div>
     </section>
   );
