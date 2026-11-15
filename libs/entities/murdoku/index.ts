@@ -16,6 +16,10 @@ export {
   validateMurdokuPlacement,
 } from "./model/murdoku";
 
+export { MURDOKU_CASES, MURDOKU_DEFAULT_CASE_ID, murdokuCaseById } from "./model/cases/cases";
+export { validateMurdokuCases } from "./model/cases/validate";
+export type { MurdokuCase } from "./model/cases/types";
+
 export { VICTIM_ID } from "./model/engine/domain/types";
 export type { Cell, PersonId } from "./model/engine/domain/types";
 export type { LevelJson } from "./model/engine/io/index";
