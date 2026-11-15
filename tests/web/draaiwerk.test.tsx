@@ -198,7 +198,7 @@ describe("draaiwerk", () => {
       holeId: link.fromHoleId,
     });
     expect(useDraaiwerkStore.getState().pendingGearKey).not.toBeNull();
-    expect(screen.getByText("Trek de riem nu naar een ander tandwiel.")).toBeTruthy();
+    expect(screen.getByText("Trek de ketting nu naar een ander tandwiel.")).toBeTruthy();
 
     fireEvent.click(gearNode(gearKeyAt(level, link.toHoleId)));
 
@@ -739,19 +739,15 @@ describe("draaiwerk: riem en ketting", () => {
     expect(band?.getAttribute("data-active")).toBe("true");
     expect(band?.getAttribute("data-connection-key")).toBe(connection.key);
 
-    const ribbon = band?.querySelector('[data-belt="true"]');
-    expect(Number(ribbon?.getAttribute("data-speed"))).toBeCloseTo(connection.surfaceSpeed, 6);
-    expect(ribbon?.getAttribute("data-moving")).toBe("true");
-    expect(ribbon?.getAttribute("data-preview")).toBe("false");
-
-    // Donkere rand, lederen band en de bewegende groef over hetzelfde pad.
-    expect(ribbon?.querySelectorAll("path")).toHaveLength(3);
-
-    const tread = band?.querySelectorAll(".draaiwerk-belt-tread") ?? [];
-    expect(tread).toHaveLength(1);
-    expect(tread[0]?.getAttribute("data-moving")).toBe("true");
-    expect(tread[0]?.getAttribute("data-reverse")).toBe("false");
-    expect(band?.querySelector("[data-chain-links]")).toBeNull();
+    const chain = band?.querySelector("[data-chain-links]");
+    expect(Number(chain?.getAttribute("data-chain-links"))).toBeGreaterThan(0);
+    expect(Number(chain?.getAttribute("data-speed"))).toBeCloseTo(connection.surfaceSpeed, 6);
+    expect(chain?.getAttribute("data-moving")).toBe("true");
+    const links = band?.querySelectorAll("[data-chain-link]") ?? [];
+    expect(links).toHaveLength(Number(chain?.getAttribute("data-chain-links")));
+    expect(links.length).toBeGreaterThan(8);
+    expect(band?.querySelectorAll("animateMotion")).toHaveLength(links.length);
+    expect(band?.querySelector("[data-chain-static]")).toBeNull();
   });
 
   it("wisselt een riem tussen open en gekruist en laat de andere onderdelen staan", () => {
@@ -761,17 +757,17 @@ describe("draaiwerk: riem en ketting", () => {
 
     const before = useDraaiwerkStore.getState();
     expect(before.placements).toHaveLength(4);
-    expect(document.querySelectorAll('[data-belt="true"]')).toHaveLength(1);
+    expect(document.querySelectorAll("[data-chain-links]")).toHaveLength(1);
 
     const toggle = document.querySelector("[data-belt-toggle]");
-    expect(toggle?.getAttribute("aria-label")).toBe("Riem, open; tik om te kruisen");
+    expect(toggle?.getAttribute("aria-label")).toBe("Ketting, open; tik om te kruisen");
 
     fireEvent.focus(toggle as Element);
     fireEvent.keyDown(toggle as Element, { key: "Enter" });
 
     expect(document.querySelector('[data-kind="crossed-belt"]')).toBeTruthy();
     expect(document.querySelector("[data-belt-toggle]")?.getAttribute("aria-label")).toBe(
-      "Riem, gekruist; tik om open te maken",
+      "Ketting, gekruist; tik om open te maken",
     );
     const crossed = useDraaiwerkStore.getState();
     expect(crossed.placements).toHaveLength(before.placements.length);
@@ -780,8 +776,11 @@ describe("draaiwerk: riem en ketting", () => {
     ).toHaveLength(1);
     expect(crossed.usedTrayIds).toEqual(before.usedTrayIds);
     expect(crossed.status).toBe("playing");
-    expect(crossed.feedback).toBe("Riem gekruist.");
-    expect(document.querySelectorAll('[data-belt="true"]')).toHaveLength(1);
+    expect(crossed.feedback).toBe("Ketting gekruist.");
+    expect(document.querySelectorAll("[data-chain-links]")).toHaveLength(1);
+    expect(document.querySelectorAll('[data-kind="crossed-belt"] [data-chain-links]')).toHaveLength(
+      1,
+    );
 
     fireEvent.click(document.querySelector("[data-belt-toggle]") as Element);
 
@@ -902,7 +901,7 @@ describe("draaiwerk: randen van de store", () => {
     useDraaiwerkStore.getState().toggleBeltKind("open-belt:2,2:3,2");
 
     expect(useDraaiwerkStore.getState().placements).toHaveLength(1);
-    expect(useDraaiwerkStore.getState().feedback).toBe("Deze riem kan niet van stand wisselen.");
+    expect(useDraaiwerkStore.getState().feedback).toBe("Deze ketting kan niet van stand wisselen.");
   });
 
   it("negeert losse-riemacties en tikken op een opgelost bord", () => {

@@ -161,9 +161,9 @@ describe("connection length", () => {
     const to = { x: 140, y: 0 };
     const radius = gearRadius(1);
 
-    // Gelijke poelies: twee halve cirkels op de velg plus twee rechte banden.
+    // Gelijke poelies: twee halve cirkels op de steekcirkel plus twee rechte banden.
     expect(connectionLength("open-belt", from, radius, to, radius)).toBeCloseTo(
-      2 * Math.PI * (radius + 4) + 2 * 140,
+      2 * Math.PI * radius + 2 * 140,
       6,
     );
     expect(connectionLength("chain", from, radius, to, radius)).toBeCloseTo(
@@ -180,11 +180,10 @@ describe("connection length", () => {
     for (const kind of ["open-belt", "crossed-belt", "chain"] as const) {
       expect(connectionLength(kind, from, 28, to, 56)).toBeGreaterThan(distance);
     }
-    expect(connectionLength("chain", from, 28, to, 56)).toBeLessThan(
+    // Alles ligt nu op de steekcirkel, dus de open band en de ketting zijn gelijk.
+    expect(connectionLength("chain", from, 28, to, 56)).toBeCloseTo(
       connectionLength("open-belt", from, 28, to, 56),
-    );
-    expect(connectionLength("crossed-belt", from, 28, to, 56)).toBeLessThan(
-      connectionLength("open-belt", from, 28, to, 56),
+      9,
     );
   });
 

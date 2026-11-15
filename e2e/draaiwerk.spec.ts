@@ -131,7 +131,7 @@ test.describe("draaiwerk op een landschapstablet", () => {
       );
     });
     await page.reload();
-    await expect(page.getByRole("heading", { name: /De riem/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /De gesloten ketting/ })).toBeVisible();
 
     await dragOnto(page, "[data-tray-id]", '[data-gear-drop="motor"]');
 

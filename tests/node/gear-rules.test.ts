@@ -487,14 +487,11 @@ describe("gear rules: belt runs and surface speed", () => {
         expect(connection.length).toBeGreaterThan(0);
         expect(connection.length).toBeCloseTo(expected, 9);
 
-        if (connection.kind === "chain") {
-          const smallest = from.size <= to.size ? from.size : to.size;
-          const pitch = 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest));
-          expect(connection.chainPitch).toBeCloseTo(pitch, 9);
-          expect(connection.chainPitch).toBeCloseTo(12.46, 1);
-        } else {
-          expect(connection.chainPitch).toBeNull();
-        }
+        const smallest = from.size <= to.size ? from.size : to.size;
+        const pitch = 2 * gearRadius(smallest) * Math.sin(Math.PI / gearTeeth(smallest));
+        expect(connection.chainPitch).toBeCloseTo(pitch, 9);
+        expect(connection.chainPitch).toBeCloseTo(12.46, 1);
+        expect(connection.chainPitch).toBeGreaterThan(0);
       }
     }
 
@@ -791,7 +788,7 @@ describe("gear rules: levels", () => {
 
   it("labels the tray in Dutch", () => {
     expect(trayLabel(levelAt(0).tray[0] as TrayItem)).toBe("Klein tandwiel");
-    expect(trayLabel(levelAt(2).tray[0] as TrayItem)).toBe("Open riem");
+    expect(trayLabel(levelAt(2).tray[0] as TrayItem)).toBe("Ketting");
     expect(trayLabel(levelAt(3).tray[0] as TrayItem)).toBe("Ketting");
     expect(
       trayLabel({
@@ -813,7 +810,7 @@ describe("gear rules: levels", () => {
         direction: -1,
       }),
     ).toBe("Wormas, grote vertraging");
-    expect(trayLabel({ id: "belt", kind: "belt", crossed: true })).toBe("Gekruiste riem");
+    expect(trayLabel({ id: "belt", kind: "belt", crossed: true })).toBe("Gekruiste ketting");
     expect(trayLabel({ id: "gear", kind: "gear", size: 3 })).toBe("Groot tandwiel");
   });
 });
