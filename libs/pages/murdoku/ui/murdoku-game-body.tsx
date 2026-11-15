@@ -29,6 +29,8 @@ interface MurdokuGameBodyProps {
   onCheck: () => void;
   onRestart: () => void;
   onSelectPerson: (person: PersonId) => void;
+  /** Opent de uitleg met de zes schermen en de woordenlijst. */
+  onHelp: () => void;
   onHome: () => void;
 }
 
@@ -118,6 +120,7 @@ export function MurdokuGameBody({
   onCheck,
   onRestart,
   onSelectPerson,
+  onHelp,
   onHome,
 }: MurdokuGameBodyProps) {
   const [showCelebration, setShowCelebration] = useState(true);
@@ -133,9 +136,15 @@ export function MurdokuGameBody({
     <>
       <div className="flex flex-col gap-5 pb-2">
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{intro}</p>
-        <Button asChild className="min-h-11 self-start" variant="outline">
-          <Link to="/mysterie/zaken">Kies een andere zaak</Link>
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild className="min-h-11" variant="outline">
+            <Link to="/mysterie/zaken">Kies een andere zaak</Link>
+          </Button>
+          <Button asChild className="min-h-11" variant="outline">
+            <Link to="/mysterie/les">Zo werkt het</Link>
+          </Button>
+        </div>
+
         <MurdokuBoardSection
           autoCross={settings.autoCross}
           canCheck={canCheck}
@@ -150,6 +159,7 @@ export function MurdokuGameBody({
           title={title}
           onCellTap={onCellTap}
           onCheck={onCheck}
+          onHelp={onHelp}
           onHint={onHint}
           onToggleCross={onToggleCross}
           onUndo={onUndo}

@@ -100,6 +100,7 @@ export function MurdokuPage() {
         settingsView={{ settings, onAutoCross: setAutoCross, onCrossOnBlocked: setCrossOnBlocked }}
         onCellTap={tapCell}
         onCheck={() => check(solution)}
+        onHelp={() => navigate({ to: "/mysterie/les" })}
         onHome={() => navigate({ to: "/" })}
         onRestart={() => start(puzzle)}
         onSelectPerson={selectPerson}

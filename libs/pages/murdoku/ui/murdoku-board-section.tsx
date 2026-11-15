@@ -11,7 +11,7 @@ import {
   type MurdokuHintState,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
-import { Button, Check, Lightbulb, Undo2, X } from "@shared/ui";
+import { Button, Check, CircleQuestionMark, Lightbulb, Undo2, X } from "@shared/ui";
 
 interface MurdokuBoardSectionProps {
   puzzle: Puzzle;
@@ -34,11 +34,24 @@ interface MurdokuBoardSectionProps {
   clueFocus?: MurdokuClueFocus | null;
   /** Melding bij dat woord, bijvoorbeeld "De keuken licht op." */
   clueMessage?: string | null;
+  /** Opent de uitleg en de woordenlijst; weglaten verbergt de ?-knop. */
+  onHelp?: () => void;
   onCellTap: (cell: Cell) => void;
   onUndo: () => void;
   onToggleCross: () => void;
   onCheck: () => void;
   onHint: () => void;
+}
+
+/** De regel onder het bord: feedback gaat vóór de hint, het woord en de hulpregel. */
+function boardStatus(
+  puzzle: Puzzle,
+  play: MurdokuPlayState,
+  feedback: string | null,
+  hintMessage: string | null,
+  clueMessage: string | null,
+): string {
+  return feedback ?? hintMessage ?? clueMessage ?? statusText(puzzle, play);
 }
 
 function statusText(puzzle: Puzzle, play: MurdokuPlayState): string {
@@ -60,9 +73,10 @@ interface MurdokuControlsProps {
   onUndo: () => void;
   onCheck: () => void;
   onHint: () => void;
+  onHelp?: () => void;
 }
 
-/** De vier grote knoppen onder het bord. */
+/** De knoppen onder het bord, met de ? voor de uitleg. */
 function MurdokuControls({
   mode,
   solved,
@@ -72,6 +86,7 @@ function MurdokuControls({
   onUndo,
   onCheck,
   onHint,
+  onHelp,
 }: MurdokuControlsProps) {
   return (
     <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
@@ -97,6 +112,17 @@ function MurdokuControls({
         <Check aria-hidden="true" className="size-5" />
         Controleer
       </Button>
+      {onHelp ? (
+        <Button
+          aria-label="Uitleg en woordenlijst"
+          className="min-h-11"
+          size="icon"
+          variant="outline"
+          onClick={onHelp}
+        >
+          <CircleQuestionMark aria-hidden="true" className="size-5" />
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -224,6 +250,7 @@ export function MurdokuBoardSection({
   hintMessage = null,
   clueFocus = null,
   clueMessage = null,
+  onHelp,
   onCellTap,
   onUndo,
   onToggleCross,
@@ -232,7 +259,7 @@ export function MurdokuBoardSection({
 }: MurdokuBoardSectionProps) {
   const wordView = useMemo(() => focusView(puzzle, clueFocus), [puzzle, clueFocus]);
   const solved = play.phase === "solved";
-  const status = feedback ?? hintMessage ?? clueMessage ?? statusText(puzzle, play);
+  const status = boardStatus(puzzle, play, feedback, hintMessage, clueMessage);
 
   return (
     <section aria-labelledby="murdoku-plattegrond">
@@ -254,6 +281,7 @@ export function MurdokuBoardSection({
         mode={play.mode}
         solved={solved}
         onCheck={onCheck}
+        onHelp={onHelp}
         onHint={onHint}
         onToggleCross={onToggleCross}
         onUndo={onUndo}
