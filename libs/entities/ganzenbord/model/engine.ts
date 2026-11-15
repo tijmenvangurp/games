@@ -1,5 +1,6 @@
 import { FINISH } from "./board";
 import { movePlayer } from "./movement";
+import { DEFAULT_PLAYER_COLORS, normalizePlayerName } from "./player";
 import {
   MAX_PLAYERS,
   MIN_PLAYERS,
@@ -51,15 +52,20 @@ export function createGame(setups: readonly PlayerSetup[], first?: PlayerId): Ga
   }
 
   const ordered = PLAYER_IDS.filter((id) => ids.has(id));
-  const controllers = new Map(setups.map((setup) => [setup.id, setup.controller]));
-  const players: PlayerState[] = ordered.map((id) => ({
-    id,
-    controller: controllers.get(id) ?? "human",
-    position: 0,
-    skipTurns: 0,
-    stuckOn: null,
-    firstRollDone: false,
-  }));
+  const setupsById = new Map(setups.map((setup) => [setup.id, setup]));
+  const players: PlayerState[] = ordered.map((id) => {
+    const setup = setupsById.get(id);
+    return {
+      id,
+      controller: setup?.controller ?? "human",
+      color: setup?.color ?? DEFAULT_PLAYER_COLORS[id],
+      name: normalizePlayerName(setup?.name),
+      position: 0,
+      skipTurns: 0,
+      stuckOn: null,
+      firstRollDone: false,
+    };
+  });
 
   const startingPlayer = first && ids.has(first) ? first : players[0].id;
 

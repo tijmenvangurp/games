@@ -24,6 +24,25 @@ export function eventCard(step: AnimationStep | undefined): TurnEvent | undefine
   return step.event;
 }
 
+/** De vakken met een eigen verhaal; die krijgen een ander geluid dan een stap. */
+const SPECIAL_CARD_KINDS: ReadonlySet<TurnEvent["kind"]> = new Set([
+  "goose",
+  "bounce",
+  "bridge",
+  "inn",
+  "well",
+  "prison",
+  "maze",
+  "death",
+  "win",
+]);
+
+/** De kaart van een speciaal vak, of `undefined` bij een gewone stap. */
+export function specialEvent(step: AnimationStep | undefined): TurnEvent | undefined {
+  const card = eventCard(step);
+  return card && SPECIAL_CARD_KINDS.has(card.kind) ? card : undefined;
+}
+
 const STEP_MS = 260;
 const LANDING_MS = 750;
 const JUMP_MS = 1300;

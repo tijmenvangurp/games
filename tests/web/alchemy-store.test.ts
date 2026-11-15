@@ -158,6 +158,17 @@ describe("alchemy store", () => {
     expect(useAlchemyStore.getState().hint).toBeNull();
   });
 
+  it("cycles through hints when asked again", () => {
+    useAlchemyStore.getState().showHint();
+    expect(useAlchemyStore.getState().hint).toMatchObject({ result: "mud" });
+
+    useAlchemyStore.getState().showHint();
+    expect(useAlchemyStore.getState().hint).toMatchObject({ result: "lava" });
+
+    useAlchemyStore.getState().showHint();
+    expect(useAlchemyStore.getState().hint).toMatchObject({ result: "energy" });
+  });
+
   it("reports when everything is already discovered", () => {
     useAlchemyStore.setState({ discovered: ELEMENTS.map((element) => element.id) });
 

@@ -3,7 +3,8 @@ import {
   BASE_ELEMENT_IDS,
   combine,
   firstIncompleteMission,
-  getHint,
+  hintCandidates,
+  hintIngredient,
   nextMission as findNextMission,
   type ElementId,
   type Hint,
@@ -109,6 +110,11 @@ function persist(get: StoreGet): void {
 
 function rejectCombination(set: StoreSet): void {
   set({ selected: null, feedback: { kind: "wrong" }, hint: null });
+}
+
+/** Two hints that name the same ingredient would read as the same tip. */
+function hintKey(hint: Hint, discovered: ReadonlySet<ElementId>): string {
+  return hint.a === hint.b ? `self:${hint.a}` : `ingredient:${hintIngredient(hint, discovered)}`;
 }
 
 function finishCombination(
@@ -269,7 +275,22 @@ export const useAlchemyStore = create<AlchemyStore>((set, get) => ({
   },
 
   showHint: () => {
-    const hint = getHint(new Set(get().discovered));
+    const discovered = new Set(get().discovered);
+    const candidates = hintCandidates(discovered);
+    const current = get().hint;
+    // Tapping Hint again cycles to another tip instead of repeating the same one.
+    const currentIndex = current
+      ? candidates.findIndex((candidate) => candidate.a === current.a && candidate.b === current.b)
+      : -1;
+    const ordered =
+      candidates.length > 0
+        ? [...candidates.slice(currentIndex + 1), ...candidates.slice(0, currentIndex + 1)]
+        : [];
+    const currentKey = current ? hintKey(current, discovered) : null;
+    const hint =
+      ordered.find((candidate) => hintKey(candidate, discovered) !== currentKey) ??
+      ordered[0] ??
+      null;
     set({
       hint,
       feedback: hint ? null : { kind: "all-found" },
