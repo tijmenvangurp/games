@@ -11,6 +11,8 @@ import {
   findRecipesFor,
   getHint,
   getElement,
+  hintCandidates,
+  hintIngredient,
   isElementId,
   pairKey,
   reachableElementIds,
@@ -101,6 +103,32 @@ describe("alchemy rules", () => {
 
     const everything = new Set(ELEMENTS.map((element) => element.id));
     expect(getHint(everything)).toBeNull();
+  });
+
+  it("orders hint candidates and never hints at a known result", () => {
+    const bases = new Set(BASE_ELEMENT_IDS);
+    const candidates = hintCandidates(bases);
+
+    expect(candidates[0]).toEqual({ a: "water", b: "earth", result: "mud" });
+
+    const firstSingle = candidates.findIndex((hint) => !(bases.has(hint.a) && bases.has(hint.b)));
+    expect(firstSingle).toBeGreaterThan(0);
+    expect(
+      candidates.slice(firstSingle).every((hint) => !(bases.has(hint.a) && bases.has(hint.b))),
+    ).toBe(true);
+
+    for (const hint of candidates) {
+      expect(bases.has(hint.result)).toBe(false);
+      expect(bases.has(hint.a) || bases.has(hint.b)).toBe(true);
+    }
+
+    expect(hintCandidates(new Set(ELEMENTS.map((element) => element.id)))).toEqual([]);
+
+    expect(hintIngredient({ a: "earth", b: "fire", result: "lava" }, bases)).toBe("earth");
+    expect(hintIngredient({ a: "water", b: "rain", result: "plant" }, new Set(["rain"]))).toBe(
+      "rain",
+    );
+    expect(hintIngredient({ a: "water", b: "rain", result: "plant" }, new Set())).toBe("water");
   });
 
   it("grows without leaving new elements without a recipe", () => {
