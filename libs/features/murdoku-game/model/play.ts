@@ -1,7 +1,27 @@
-import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
+import {
+  VICTIM_ID,
+  findMurdokuMurderer,
+  validateMurdokuPlacement,
+  type Cell,
+  type PersonId,
+  type Puzzle,
+} from "@entities/murdoku";
 
 /** De twee tikstanden van het bord: iemand plaatsen of een vakje wegstrepen. */
 export type MurdokuMode = "place" | "cross";
+
+/** De fase van één zaak: spelen of opgelost. */
+export type MurdokuPhase = "playing" | "solved";
+
+/** De afloop van een opgeloste zaak, zoals het bord en de pagina die tonen. */
+export interface MurdokuResolution {
+  /** De enige verdachte in de kamer van het slachtoffer. */
+  murdererId: PersonId;
+  /** Het vaste vakje van het slachtoffer; bij de afloop onthuld. */
+  victimCell: Cell;
+  /** De kamer van het slachtoffer; het bord omlijnt die. */
+  roomId: string;
+}
 
 /**
  * De speltoestand van één zaak. Alles wat het bord tekent is hieruit af te
@@ -15,6 +35,12 @@ export interface MurdokuPlayState {
   manualCrosses: ReadonlySet<Cell>;
   selected: PersonId | null;
   mode: MurdokuMode;
+  /** `solved` zodra een controle klopte; het bord staat dan vast. */
+  phase: MurdokuPhase;
+  /** De laatste controle klopte niet. Neutraal: geen straf en geen foutkleur. */
+  wrongCheck: boolean;
+  /** De onthulling na een goede controle. */
+  resolution: MurdokuResolution | null;
 }
 
 /** Een leeg bord voor een zaak. */
@@ -25,7 +51,20 @@ export function createMurdokuPlay(levelId: string): MurdokuPlayState {
     manualCrosses: new Set(),
     selected: null,
     mode: "place",
+    phase: "playing",
+    wrongCheck: false,
+    resolution: null,
   };
+}
+
+/** Of alle verdachten van de zaak op het bord staan; het slachtoffer volgt bij de afloop. */
+export function everyonePlaced(puzzle: Puzzle, play: MurdokuPlayState): boolean {
+  return puzzle.suspects.every((suspect) => play.placements.has(suspect.id));
+}
+
+/** Een opgelost bord staat vast: tikken, kruisen en ongedaan maken doen niets meer. */
+function isLocked(play: MurdokuPlayState): boolean {
+  return play.phase === "solved";
 }
 
 /** De persoon op een vakje, of `null`. */
@@ -85,16 +124,18 @@ export function candidateCells(puzzle: Puzzle, play: MurdokuPlayState): Set<Cell
  * tikstand terug naar plaatsen: wie een persoon aanraakt, wil hem kwijt kunnen.
  */
 export function selectPerson(play: MurdokuPlayState, person: PersonId): MurdokuPlayState {
+  if (isLocked(play)) return play;
   if (play.selected === person) {
-    return { ...play, selected: null };
+    return { ...play, selected: null, wrongCheck: false };
   }
-  return { ...play, selected: person, mode: "place" };
+  return { ...play, selected: person, mode: "place", wrongCheck: false };
 }
 
 /** Wisselt tussen plaatsen en kruisjes zetten. */
 export function setMurdokuMode(play: MurdokuPlayState, mode: MurdokuMode): MurdokuPlayState {
+  if (isLocked(play)) return play;
   const selected = mode === "cross" ? null : play.selected;
-  return { ...play, mode, selected };
+  return { ...play, mode, selected, wrongCheck: false };
 }
 
 /**
@@ -156,7 +197,75 @@ export function tapMurdokuCell(
   play: MurdokuPlayState,
   cell: Cell,
 ): MurdokuPlayState {
-  return play.mode === "cross"
-    ? tapCrossCell(puzzle, play, cell)
-    : tapPlacementCell(puzzle, play, cell);
+  if (isLocked(play)) return play;
+  const next =
+    play.mode === "cross" ? tapCrossCell(puzzle, play, cell) : tapPlacementCell(puzzle, play, cell);
+  if (next === play) return play;
+  return { ...next, wrongCheck: false };
+}
+
+/**
+ * Of een volledige plaatsing de bordregel volgt: één persoon per rij en per
+ * kolom. De engine bewaakt die regel in de solver, maar niet in de losse
+ * aanwijzingen, dus de controle toetst hem hier zelf.
+ */
+function onePersonEachLine(puzzle: Puzzle, placement: ReadonlyMap<PersonId, Cell>): boolean {
+  const rows = new Set<number>();
+  const cols = new Set<number>();
+  for (const cell of placement.values()) {
+    const { row, col } = puzzle.board.rc(cell);
+    if (rows.has(row) || cols.has(col)) return false;
+    rows.add(row);
+    cols.add(col);
+  }
+  return true;
+}
+
+/**
+ * Controleert de zaak. Pas als alle verdachten staan, anders gebeurt er niets.
+ *
+ * Het slachtoffer heeft een vast vakje in de zaak; de controle plaatst het
+ * slachtoffer uit de oplossing en toetst daarna alle aanwijzingen, de
+ * bordregel en de daderregel. Bij een fout blijft het bord staan en komt er
+ * alleen neutrale feedback. Bij een goede controle komt het slachtoffer op het
+ * bord, staan de plaatsingen vast en is de dader bekend.
+ */
+export function checkMurdokuPlay(
+  puzzle: Puzzle,
+  play: MurdokuPlayState,
+  solution: ReadonlyMap<PersonId, Cell>,
+): MurdokuPlayState {
+  if (isLocked(play) || !everyonePlaced(puzzle, play)) return play;
+
+  const victimCell = solution.get(VICTIM_ID);
+  if (victimCell === undefined) return play;
+
+  const placements = new Map(play.placements);
+  placements.set(VICTIM_ID, victimCell);
+  const murderer = findMurdokuMurderer(puzzle, placements);
+
+  if (
+    validateMurdokuPlacement(puzzle, placements).length > 0 ||
+    !onePersonEachLine(puzzle, placements) ||
+    !murderer.suspectId
+  ) {
+    return { ...play, wrongCheck: true };
+  }
+
+  const manualCrosses = new Set(play.manualCrosses);
+  manualCrosses.delete(victimCell);
+
+  return {
+    ...play,
+    placements,
+    manualCrosses,
+    selected: null,
+    phase: "solved",
+    wrongCheck: false,
+    resolution: {
+      murdererId: murderer.suspectId,
+      victimCell,
+      roomId: murderer.roomId,
+    },
+  };
 }
