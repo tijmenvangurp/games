@@ -292,14 +292,16 @@ function crossedBeltPath(from: Point, fromRadius: number, to: Point, toRadius: n
   }
 
   const [top, bottom] = runs;
-  const large = 2 * sweep > Math.PI ? 1 : 0;
+  // Een gekruiste ketting loopt aan de buitenkant om beide poelies; dat is de
+  // lange boog, niet de korte boog aan de kant van de andere poelie.
+  const large = 1;
 
   return [
     `M ${formatPoint(top.from)}`,
     `L ${formatPoint(top.to)}`,
-    `A ${round(toRadius)} ${round(toRadius)} 0 ${large} 0 ${formatPoint(bottom.to)}`,
+    `A ${round(toRadius)} ${round(toRadius)} 0 ${large} 1 ${formatPoint(bottom.to)}`,
     `L ${formatPoint(bottom.from)}`,
-    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${large} 1 ${formatPoint(top.from)}`,
+    `A ${round(fromRadius)} ${round(fromRadius)} 0 ${large} 0 ${formatPoint(top.from)}`,
     "Z",
   ].join(" ");
 }
@@ -370,9 +372,9 @@ export function connectionLength(
     return straight;
   }
   // Een open riem omsluit de grootste poelie over de lange boog en de kleine
-  // over de korte; een gekruiste riem heeft op beide poelies de korte boog.
+  // over de korte; een gekruiste riem heeft op beide poelies de lange boog.
   const arcs = crossed
-    ? 2 * sweep * (fromRim + toRim)
+    ? (TAU - 2 * sweep) * (fromRim + toRim)
     : (TAU - 2 * sweep) * fromRim + 2 * sweep * toRim;
 
   return arcs + straight;
