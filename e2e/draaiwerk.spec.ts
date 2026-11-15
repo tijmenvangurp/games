@@ -4,7 +4,8 @@ async function solveFirstLevel(page: import("@playwright/test").Page): Promise<v
   await page.getByRole("button", { name: "Klein tandwiel" }).click();
   await page.locator('[data-hole-id="2,2"]').click();
   await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
-  await expect(page.getByRole("heading", { name: "Gelukt!" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
 }
 
 async function dragOnto(page: import("@playwright/test").Page, fromId: string, toId: string) {
@@ -22,6 +23,30 @@ async function dragOnto(page: import("@playwright/test").Page, fromId: string, t
     steps: 4,
   });
   await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 16 });
+  await page.mouse.up();
+}
+
+async function dragAcross(
+  page: import("@playwright/test").Page,
+  fromId: string,
+  viaId: string,
+  toId: string,
+) {
+  const start = await page.locator(fromId).boundingBox();
+  const via = await page.locator(viaId).boundingBox();
+  const end = await page.locator(toId).boundingBox();
+  if (!start || !via || !end) {
+    throw new Error("Geen positie voor slepen");
+  }
+
+  await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(start.x + start.width / 2 + 12, start.y + start.height / 2 + 12, {
+    steps: 4,
+  });
+  await page.mouse.move(via.x + via.width / 2, via.y + via.height / 2, { steps: 12 });
+  await page.waitForTimeout(120);
+  await page.mouse.move(end.x + end.width / 2, end.y + end.height / 2, { steps: 12 });
   await page.mouse.up();
 }
 
@@ -100,7 +125,29 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await dragOnto(page, "[data-tray-id]", '[data-hole-id="2,2"]');
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
-    await expect(page.getByRole("heading", { name: "Gelukt!" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+  });
+
+  test("sleept een riem in één beweging over twee tandwielen", async ({ page }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 16, current: 2 }, version: 1 }),
+      );
+    });
+    await page.reload();
+    await expect(page.getByRole("heading", { name: /De riem/ })).toBeVisible();
+
+    await dragAcross(
+      page,
+      "[data-tray-id]",
+      '[data-gear-drop="motor"]',
+      '[data-gear-drop="output:target-1"]',
+    );
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
   });
 
   test("verplaatst een verkeerd geplaatst tandwiel", async ({ page }) => {
@@ -173,7 +220,7 @@ test.describe("draaiwerk op een telefoon", () => {
     await touchDragOnto(page, "[data-tray-id]", '[data-hole-id="2,2"]');
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
-    await expect(page.getByRole("heading", { name: "Gelukt!" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
   });
 
   test("verplaatst een geplaatst tandwiel met een vinger", async ({ page }) => {

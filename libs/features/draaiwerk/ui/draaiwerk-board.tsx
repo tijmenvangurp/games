@@ -33,7 +33,7 @@ interface DraaiwerkBoardProps {
   result: DriveResult;
   placements: readonly Placement[];
   selectedItem: TrayItem | null;
-  linkDrag: boolean;
+  linkFromKey: string | null;
   canMovePlaced: boolean;
   pendingHoleId: string | null;
   pendingGearKey: string | null;
@@ -183,15 +183,8 @@ function DraaiwerkHole({
   );
 }
 
-function GearDropZone({ pose, enabled }: { pose: GearPose; enabled: boolean }) {
-  const { isOver, setNodeRef } = useDroppable({
-    id: `gear:${pose.key}`,
-    disabled: !enabled,
-  });
-
-  if (!enabled) {
-    return null;
-  }
+function GearDropZone({ pose }: { pose: GearPose }) {
+  const { isOver, setNodeRef } = useDroppable({ id: `gear:${pose.key}` });
 
   return (
     <circle
@@ -286,7 +279,7 @@ export function DraaiwerkBoard({
   result,
   placements,
   selectedItem,
-  linkDrag,
+  linkFromKey,
   canMovePlaced,
   pendingHoleId,
   pendingGearKey,
@@ -487,8 +480,27 @@ export function DraaiwerkBoard({
 
         <g>
           {result.gears.map((pose) => (
-            <GearDropZone key={`drop:${pose.key}`} enabled={linkDrag} pose={pose} />
+            <GearDropZone key={`drop:${pose.key}`} pose={pose} />
           ))}
+        </g>
+
+        <g>
+          {result.gears
+            .filter((pose) => pose.key === linkFromKey)
+            .map((pose) => (
+              <circle
+                key={`link-from:${pose.key}`}
+                aria-hidden="true"
+                cx={pose.center.x}
+                cy={pose.center.y}
+                fill="none"
+                pointerEvents="none"
+                r={gearRadius(pose.size) + 10}
+                stroke="var(--primary)"
+                strokeDasharray="5 5"
+                strokeWidth={2.4}
+              />
+            ))}
         </g>
 
         <g>

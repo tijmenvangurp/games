@@ -10,6 +10,7 @@ import {
   useSensors,
   type CollisionDetection,
   type DragEndEvent,
+  type DragOverEvent,
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { drive, type TrayItem } from "@entities/gear";
@@ -23,6 +24,9 @@ import { TrayArt } from "./gear-art";
 
 interface DraaiwerkPlayProps {
   onLevels: () => void;
+  onNext: () => void;
+  hasNext: boolean;
+  celebrate: boolean;
 }
 
 function trayIdFromActive(id: string | number): string | null {
@@ -30,7 +34,7 @@ function trayIdFromActive(id: string | number): string | null {
   return value.startsWith("tray:") ? value.slice("tray:".length) : null;
 }
 
-export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
+export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: DraaiwerkPlayProps) {
   const level = useDraaiwerkStore((state) => state.level);
   const placements = useDraaiwerkStore((state) => state.placements);
   const pendingHoleId = useDraaiwerkStore((state) => state.pendingHoleId);
@@ -38,6 +42,7 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
   const hintPlacement = useDraaiwerkStore((state) => state.hintPlacement);
   const [activeTrayId, setActiveTrayId] = useState<string | null>(null);
   const [activePlacedKey, setActivePlacedKey] = useState<string | null>(null);
+  const [linkPath, setLinkPath] = useState<string[]>([]);
 
   const result = useMemo(() => drive(level, placements), [level, placements]);
   const selectedItem = useSelectedTrayItem();
@@ -78,6 +83,7 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
 
   const handleDragStart = (event: DragStartEvent) => {
     const id = String(event.active.id);
+    setLinkPath([]);
     if (id.startsWith("tray:")) {
       setActiveTrayId(id.slice("tray:".length));
     } else if (id.startsWith("placed:")) {
@@ -89,12 +95,32 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
     playHaptic("tap");
   };
 
+  const handleDragOver = (event: DragOverEvent) => {
+    if (!activeItem || (activeItem.kind !== "belt" && activeItem.kind !== "chain")) {
+      return;
+    }
+    const over = event.over ? String(event.over.id) : null;
+    if (!over?.startsWith("gear:")) {
+      return;
+    }
+    const key = over.slice("gear:".length);
+    setLinkPath((previous) => {
+      if (previous[previous.length - 1] === key) {
+        return previous;
+      }
+      return [...previous.slice(-3), key];
+    });
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const over = event.over ? String(event.over.id) : null;
     const placedKey = activePlacedKey;
     const trayId = trayIdFromActive(event.active.id);
+    const path = linkPath;
+    const isLinkTray = activeItem?.kind === "belt" || activeItem?.kind === "chain";
     setActiveTrayId(null);
     setActivePlacedKey(null);
+    setLinkPath([]);
 
     if (placedKey) {
       if (over?.startsWith("hole:")) {
@@ -108,6 +134,17 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
     }
 
     if (!trayId || !over) {
+      return;
+    }
+
+    if (isLinkTray && over.startsWith("gear:")) {
+      const finalGear = over.slice("gear:".length);
+      const previousGear = path[path.length - 2] ?? null;
+      if (previousGear && previousGear !== finalGear) {
+        useDraaiwerkStore.getState().connectTray(trayId, previousGear, finalGear);
+        return;
+      }
+      useDraaiwerkStore.getState().dropTray(trayId, { kind: "gear", targetId: finalGear });
       return;
     }
 
@@ -172,8 +209,11 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
       <DraaiwerkHud
         level={level}
         result={result}
+        celebrate={celebrate}
+        hasNext={hasNext}
         onHint={() => useDraaiwerkStore.getState().hint()}
         onLevels={onLevels}
+        onNext={onNext}
         onRemoveLast={() => useDraaiwerkStore.getState().removeLast()}
         onReset={() => useDraaiwerkStore.getState().reset()}
       />
@@ -181,8 +221,13 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
       <DndContext
         collisionDetection={collisionDetection}
         sensors={sensors}
-        onDragCancel={() => setActiveTrayId(null)}
+        onDragCancel={() => {
+          setActiveTrayId(null);
+          setActivePlacedKey(null);
+          setLinkPath([]);
+        }}
         onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
         onDragStart={handleDragStart}
       >
         <div className="grid min-h-0 gap-3 md:flex-1 md:grid-cols-1 md:portrait:grid-rows-[minmax(0,1fr)_auto] md:landscape:grid-cols-7">
@@ -190,7 +235,7 @@ export function DraaiwerkPlay({ onLevels }: DraaiwerkPlayProps) {
             canMovePlaced={canMovePlaced}
             hintPlacement={hintPlacement}
             level={level}
-            linkDrag={linkDrag}
+            linkFromKey={linkPath[linkPath.length - 2] ?? null}
             pendingGearKey={pendingGearKey}
             pendingHoleId={pendingHoleId}
             placements={placements}

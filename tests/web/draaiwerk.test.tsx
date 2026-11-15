@@ -118,7 +118,7 @@ describe("draaiwerk", () => {
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
     expect(boardNode().getAttribute("data-status")).toBe("solved");
-    expect(await screen.findByRole("heading", { name: "Gelukt!" })).toBeTruthy();
+    expect(await screen.findByRole("button", { name: "Volgende level" })).toBeTruthy();
 
     expect(JSON.parse(localStorage.getItem(DRAAIWERK_STORAGE_KEY) ?? "{}")).toMatchObject({
       state: { unlocked: 2, current: 0 },

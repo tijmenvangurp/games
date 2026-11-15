@@ -1,4 +1,4 @@
-import { Button, LayoutGrid, Lightbulb, RotateCcw, Undo2 } from "@shared/ui";
+import { Button, Confetti, LayoutGrid, Lightbulb, RotateCcw, Trophy, Undo2 } from "@shared/ui";
 import { cn } from "@shared/lib";
 import type { DriveResult, Level, TrayItem } from "@entities/gear";
 import { chapterName, outputName, sizeWord } from "../model/labels";
@@ -9,10 +9,13 @@ import { SpeedGauge } from "./speed-gauge";
 interface DraaiwerkHudProps {
   level: Level;
   result: DriveResult;
+  celebrate: boolean;
+  hasNext: boolean;
   onHint: () => void;
   onReset: () => void;
   onRemoveLast: () => void;
   onLevels: () => void;
+  onNext: () => void;
 }
 
 function instructionFor(
@@ -39,10 +42,13 @@ function instructionFor(
 export function DraaiwerkHud({
   level,
   result,
+  celebrate,
+  hasNext,
   onHint,
   onReset,
   onRemoveLast,
   onLevels,
+  onNext,
 }: DraaiwerkHudProps) {
   const levelIndex = useDraaiwerkStore((state) => state.levelIndex);
   const status = useDraaiwerkStore((state) => state.status);
@@ -155,9 +161,26 @@ export function DraaiwerkHud({
         </div>
       ) : null}
 
+      {result.solved ? (
+        <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-success/30 bg-success/10 p-2">
+          <Confetti pieces={celebrate ? 28 : 16} variant={celebrate ? "shower" : "burst"} />
+          <Trophy aria-hidden="true" className="size-5 text-success" />
+          <p className="min-w-0 flex-1 text-sm font-bold text-success">
+            {hasNext ? "Gelukt! Bekijk je machine." : "Alle levels gehaald!"}
+          </p>
+          <Button size="sm" variant="success" onClick={onNext}>
+            {hasNext ? "Volgende level" : "Opnieuw spelen"}
+          </Button>
+        </div>
+      ) : null}
+
       <p
         aria-live="polite"
-        className={cn("mt-1.5 min-h-4 text-xs font-semibold leading-snug", tone)}
+        className={cn(
+          "mt-1.5 min-h-4 text-xs font-semibold leading-snug",
+          tone,
+          result.solved && "sr-only",
+        )}
         data-status-text={statusText}
       >
         {statusText}

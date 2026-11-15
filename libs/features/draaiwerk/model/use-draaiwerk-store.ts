@@ -51,6 +51,7 @@ interface DraaiwerkStore {
   startLevel: (index: number) => void;
   selectTray: (id: string) => void;
   dropTray: (id: string, target: { kind: "hole" | "gear"; targetId: string }) => void;
+  connectTray: (id: string, fromGearKey: string, toGearKey: string) => void;
   movePlaced: (key: string, targetHoleId: string) => void;
   removePlaced: (key: string) => void;
   tapHole: (holeId: string) => void;
@@ -207,6 +208,42 @@ function dropTrayAction(
     get().tapHole(target.targetId);
   } else {
     get().tapGear(target.targetId);
+  }
+}
+
+function connectTrayAction(
+  set: DraaiwerkSet,
+  get: DraaiwerkGet,
+  id: string,
+  fromGearKey: string,
+  toGearKey: string,
+): void {
+  if (!selectableTrayItem(get(), id)) {
+    return;
+  }
+  const state = get();
+  const item = state.level.tray.find((candidate) => candidate.id === id);
+  if (!item || (item.kind !== "belt" && item.kind !== "chain")) {
+    return;
+  }
+  const fromHoleId = holeForGearKey(state.level, fromGearKey);
+  const toHoleId = holeForGearKey(state.level, toGearKey);
+  if (!fromHoleId || !toHoleId || fromHoleId === toHoleId) {
+    return;
+  }
+
+  const placed = attemptPlacement(
+    set,
+    get,
+    {
+      kind: linkPlacementKind(item),
+      fromHoleId,
+      toHoleId,
+    },
+    item.id,
+  );
+  if (placed) {
+    set({ selectedTrayId: null, pendingHoleId: null, pendingGearKey: null });
   }
 }
 
@@ -571,6 +608,8 @@ export const useDraaiwerkStore = create<DraaiwerkStore>()(
       startLevel: (index) => startLevelAction(set, get, index),
       selectTray: (id) => selectTrayAction(set, get, id),
       dropTray: (id, target) => dropTrayAction(set, get, id, target),
+      connectTray: (id, fromGearKey, toGearKey) =>
+        connectTrayAction(set, get, id, fromGearKey, toGearKey),
       movePlaced: (key, targetHoleId) => movePlacedAction(set, get, key, targetHoleId),
       removePlaced: (key) => removePlacedAction(set, get, key),
       tapHole: (holeId) => tapHoleAction(set, get, holeId),
