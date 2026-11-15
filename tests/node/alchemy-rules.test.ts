@@ -194,6 +194,36 @@ describe("alchemy rules", () => {
     expect(combine("statue", "house")).toBe("museum");
   });
 
+  it("adds a second batch of discoveries for a six-year-old", () => {
+    expect(combine("boat", "wind")).toBe("sailboat");
+    expect(combine("boat", "motor")).toBe("speedboat");
+    expect(combine("hospital", "car")).toBe("ambulance");
+    expect(combine("hospital", "human")).toBe("doctor");
+    expect(combine("book", "book")).toBe("library");
+    expect(combine("book", "house")).toBe("school");
+    expect(combine("chicken", "egg")).toBe("chick");
+    expect(combine("tree", "egg")).toBe("nest");
+    expect(combine("egg", "fire")).toBe("friedegg");
+    expect(combine("flour", "egg")).toBe("pasta");
+    expect(combine("banana", "milk")).toBe("milkshake");
+    expect(combine("sugar", "water")).toBe("lemonade");
+    expect(combine("fruit", "sugar")).toBe("jam");
+    expect(combine("sea", "ice")).toBe("iceberg");
+    expect(combine("mountain", "snow")).toBe("ski");
+    expect(combine("moon", "star")).toBe("night");
+    expect(combine("beach", "sun")).toBe("holiday");
+    expect(combine("paint", "human")).toBe("painter");
+    expect(combine("computer", "human")).toBe("programmer");
+    expect(combine("horse", "cart")).toBe("carriage");
+    expect(combine("panda", "grass")).toBe("bamboo");
+    expect(combine("dragon", "egg")).toBe("dragonegg");
+    expect(combine("planet", "planet")).toBe("solarsystem");
+    expect(combine("rocket", "moon")).toBe("moonlanding");
+    expect(combine("wood", "fire")).toBe("campfire");
+    expect(combine("clock", "sun")).toBe("sundial");
+    expect(combine("city", "crown")).toBe("capital");
+  });
+
   it("grows a farm-to-table chain", () => {
     expect(combine("house", "wind")).toBe("mill");
     expect(combine("mill", "wheat")).toBe("flour");
