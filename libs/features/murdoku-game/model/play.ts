@@ -10,6 +10,19 @@ import {
 /** De twee tikstanden van het bord: iemand plaatsen of een vakje wegstrepen. */
 export type MurdokuMode = "place" | "cross";
 
+/** Opties waarmee de store de twee instellingen aan de pure regels doorgeeft. */
+export interface MurdokuTapOptions {
+  /** Automatische kruisjes in de rij en kolom van een geplaatst persoon. */
+  autoCross?: boolean;
+  /** Sta een kruisje toe op een vakje waar niemand kan staan. */
+  crossOnBlocked?: boolean;
+}
+
+/** Opties voor het tonen van de kruisjes op het bord. */
+export interface MurdokuCrossOptions {
+  autoCross?: boolean;
+}
+
 /** De fase van één zaak: spelen of opgelost. */
 export type MurdokuPhase = "playing" | "solved";
 
@@ -101,7 +114,14 @@ function autoCrosses(puzzle: Puzzle, play: MurdokuPlayState): Set<Cell> {
 }
 
 /** Alle zichtbare kruisjes: handmatig gezet plus automatisch afgeleid. */
-export function crossedCells(puzzle: Puzzle, play: MurdokuPlayState): Set<Cell> {
+export function crossedCells(
+  puzzle: Puzzle,
+  play: MurdokuPlayState,
+  options: MurdokuCrossOptions = {},
+): Set<Cell> {
+  if (options.autoCross === false) {
+    return new Set(play.manualCrosses);
+  }
   return new Set([...play.manualCrosses, ...autoCrosses(puzzle, play)]);
 }
 
@@ -171,14 +191,24 @@ function tapPlacementCell(puzzle: Puzzle, play: MurdokuPlayState, cell: Cell): M
 /**
  * Eén tik in de kruisjesstand. Een kruisje kan alleen op een bezetbaar vakje
  * zonder persoon; een automatisch kruisje is niet met de hand weg te halen
- * zolang die persoon er staat.
+ * zolang die persoon er staat. Twee instellingen verzachten die regel: op een
+ * meubelstuk mag een kruisje als het kind dat wil, en zonder auto-kruis mag het
+ * kind die vakjes zelf markeren.
  */
-function tapCrossCell(puzzle: Puzzle, play: MurdokuPlayState, cell: Cell): MurdokuPlayState {
-  if (
-    !puzzle.board.isOccupiable(cell) ||
-    personAt(play, cell) ||
-    autoCrosses(puzzle, play).has(cell)
-  ) {
+function tapCrossCell(
+  puzzle: Puzzle,
+  play: MurdokuPlayState,
+  cell: Cell,
+  options: MurdokuTapOptions,
+): MurdokuPlayState {
+  const blocked = !puzzle.board.isOccupiable(cell);
+  if (blocked && options.crossOnBlocked !== true) {
+    return play;
+  }
+  if (personAt(play, cell)) {
+    return play;
+  }
+  if (options.autoCross !== false && autoCrosses(puzzle, play).has(cell)) {
     return play;
   }
 
@@ -196,10 +226,13 @@ export function tapMurdokuCell(
   puzzle: Puzzle,
   play: MurdokuPlayState,
   cell: Cell,
+  options: MurdokuTapOptions = {},
 ): MurdokuPlayState {
   if (isLocked(play)) return play;
   const next =
-    play.mode === "cross" ? tapCrossCell(puzzle, play, cell) : tapPlacementCell(puzzle, play, cell);
+    play.mode === "cross"
+      ? tapCrossCell(puzzle, play, cell, options)
+      : tapPlacementCell(puzzle, play, cell);
   if (next === play) return play;
   return { ...next, wrongCheck: false };
 }
