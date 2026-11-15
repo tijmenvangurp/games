@@ -374,6 +374,17 @@ Wat ik heb gecontroleerd:
 - **Open vraag:** wil je dat een ketting echt als een ketting leest (route B), of is een rustige, bewegende band met een duidelijk afwijkende textuur genoeg (route A)? Dat bepaalt of we aan SMIL beginnen.
 - **Open vraag:** mag de band tijdens het slepen echt rekken, of moet hij strak blijven en alleen de virtuele poelie volgen? Rekken voelt levendiger, maar kan op een klein scherm rommelig worden.
 
+## Addendum 2026-11-15: de band is een gesloten lus
+
+De eerste implementatie tekende de riem als twee rechte banden, naar Beltz. In de browser op 390 px bleken de ronde eindkapjes van die banden zichtbaar aan de velg: de band las als twee losse balken met een knop, niet als een band om de poelie. Daarom is de definitieve tekening een **gesloten lus** op de tandtop:
+
+- de band is een dunne lederen strook (5,8 px) met een donkere rand en een fijne bewegende groef;
+- de lus ligt op de tandtop, zodat het tandwiel de binnenste helft bedekt en de band zichtbaar om de poelie sluit;
+- een losse band is een 270°-wrap met één vrij uiteinde en een metalen oog, geen gesloten armband;
+- de bak toont een lederen strap met een gesp in plaats van een pil met twee stippen.
+
+De twee-bandengeometrie (`beltTangentRuns`, `ConnectionPose.runs`) blijft als pure meetkunde voor tests en een latere preview, maar de tekenlaag gebruikt `connection.path`. De ketting volgt dezelfde gesloten lus, met schakels op de steekcirkel.
+
 ## Bronnen
 
 - Huidige implementatie `feat/draaiwerk`, commit `61d4066`; de code staat lokaal in `libs/entities/gear/model/` en `libs/features/draaiwerk/`.
