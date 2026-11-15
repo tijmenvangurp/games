@@ -365,10 +365,6 @@ function trayIdsForPlacements(state: DraaiwerkStore, placements: readonly Placem
   return ids;
 }
 
-function trayIdForPlacement(state: DraaiwerkStore, placement: Placement): string | undefined {
-  return trayIdsForPlacements(state, [placement])[0];
-}
-
 function movePlacedAction(
   set: DraaiwerkSet,
   get: DraaiwerkGet,
@@ -440,6 +436,27 @@ function movePlacedAction(
   });
 }
 
+function removePlacements(
+  set: DraaiwerkSet,
+  state: DraaiwerkStore,
+  removed: readonly Placement[],
+  feedback: string | null,
+): void {
+  const removedTrayIds = trayIdsForPlacements(state, removed);
+  set({
+    placements: state.placements.filter((placement) => !removed.includes(placement)),
+    usedTrayIds: state.usedTrayIds.filter((id) => !removedTrayIds.includes(id)),
+    selectedTrayId: null,
+    pendingGearKey: null,
+    status: "playing",
+    hintPlacement: null,
+    feedback,
+    feedbackTone: feedback ? "info" : null,
+  });
+  playSound("tap");
+  playHaptic("tap");
+}
+
 function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void {
   const state = get();
   if (state.status === "solved") {
@@ -451,21 +468,12 @@ function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): 
   }
 
   const detached = attachedPlacements(state, found.placement);
-  const removed = [found.placement, ...detached];
-  const removedTrayIds = trayIdsForPlacements(state, removed);
-
-  set({
-    placements: state.placements.filter((placement) => !removed.includes(placement)),
-    usedTrayIds: state.usedTrayIds.filter((id) => !removedTrayIds.includes(id)),
-    selectedTrayId: null,
-    pendingGearKey: null,
-    status: "playing",
-    hintPlacement: null,
-    feedback: detached.length > 0 ? "Onderdeel en verbinding weggehaald." : "Onderdeel weggehaald.",
-    feedbackTone: "info",
-  });
-  playSound("tap");
-  playHaptic("tap");
+  removePlacements(
+    set,
+    state,
+    [found.placement, ...detached],
+    detached.length > 0 ? "Onderdeel en verbinding weggehaald." : "Onderdeel weggehaald.",
+  );
 }
 
 function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): void {
@@ -580,20 +588,8 @@ function removeLastAction(set: DraaiwerkSet, get: DraaiwerkGet): void {
     return;
   }
 
-  const trayId = trayIdForPlacement(state, last);
-
-  set({
-    placements: state.placements.slice(0, -1),
-    usedTrayIds: trayId ? state.usedTrayIds.filter((id) => id !== trayId) : state.usedTrayIds,
-    selectedTrayId: null,
-    pendingGearKey: null,
-    status: "playing",
-    hintPlacement: null,
-    feedback: null,
-    feedbackTone: null,
-  });
-  playSound("tap");
-  playHaptic("tap");
+  const detached = attachedPlacements(state, last);
+  removePlacements(set, state, [last, ...detached], null);
 }
 
 function resetAction(set: DraaiwerkSet): void {
