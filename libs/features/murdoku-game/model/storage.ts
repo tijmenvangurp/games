@@ -1,5 +1,7 @@
+import { clampLevelIndex, type AdaptiveState, type Attempt } from "@entities/adaptive";
 import {
   MURDOKU_CASES,
+  MURDOKU_LEVELS,
   VICTIM_ID,
   loadMurdokuLevel,
   murdokuCaseById,
@@ -8,29 +10,39 @@ import {
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
-import { isRecord } from "@shared/lib";
+import { isFiniteNumber, isNonNegativeInteger, isRecord } from "@shared/lib";
 import { MURDOKU_INTRO_LEVEL } from "../lib/intro-level";
 import type { MurdokuHintStage, MurdokuHintState } from "./hints";
 import type { MurdokuPlayState } from "./play";
 import { DEFAULT_MURDOKU_SETTINGS, type MurdokuSettings } from "./settings";
 
 /** De opslagsleutel van Wie was het?; de route heet `/mysterie`. */
-const STORAGE_KEY = "games.mysterie.v1";
+const STORAGE_KEY = "games.mysterie.v2";
+
+/** De sleutel uit #125; die wordt eenmalig naar versie 2 gemigreerd. */
+const LEGACY_STORAGE_KEY = "games.mysterie.v1";
 
 /**
  * Versie van de opgeslagen vorm. Versie 0 is de schets uit de onderzoeksnotitie
- * (`marks` in plaats van `crosses`, nog geen hintstand); die wordt bij het
- * lezen gemigreerd.
+ * (`marks` in plaats van `crosses`, nog geen hintstand); versie 1 is de vorm
+ * zonder adaptief niveau en pogingen. Beide worden bij het lezen gemigreerd.
  */
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
+
+/** Profielen volgen met ADR 0012; tot die tijd is er één lokaal profiel. */
+const PROFILE_ID = "local";
 
 /** Groter dan dit is geen echte opslag van dit spel; dan liever schoon beginnen. */
 const MAX_STORED_CHARS = 32_000;
+
+/** Het log is begrensd zodat localStorage niet volloopt (ADR 0026). */
+export const MAX_STORED_ATTEMPTS = 200;
 
 const MAX_CELLS = 36;
 const MAX_HINTS_USED = 999;
 const MAX_HINT_DEPTH = 4;
 const MAX_HINT_PARAMS = 24;
+const MAX_ITEM_ID_CHARS = 64;
 
 const HINT_STAGES: ReadonlySet<string> = new Set<MurdokuHintStage>([
   "focus",
@@ -63,9 +75,13 @@ export interface StoredMurdokuCurrent {
 
 export interface StoredMurdokuState {
   version: number;
+  /** Tot de profielen uit ADR 0012 komt: één lokaal profiel. */
+  profileId: string;
   current: StoredMurdokuCurrent | null;
   solved: string[];
   settings: MurdokuSettings;
+  adaptive: AdaptiveState;
+  attempts: readonly Attempt[];
 }
 
 /** Wat de store aan de opslag geeft; de opslag kiest de vorm en de grenzen. */
@@ -75,6 +91,8 @@ export interface MurdokuSaveInput {
   hintsUsed: number;
   solvedCaseIds: ReadonlySet<string>;
   settings: MurdokuSettings;
+  adaptive?: AdaptiveState;
+  attempts?: readonly Attempt[];
 }
 
 /** De staat zoals de store hem na het laden nodig heeft. */
@@ -85,14 +103,25 @@ export interface MurdokuRestoredState {
   hintsUsed: number;
   solvedCaseIds: ReadonlySet<string>;
   settings: MurdokuSettings;
+  adaptive: AdaptiveState;
+  attempts: readonly Attempt[];
 }
+
+/** De beginstand van de adaptieve ladder: de kleinste zaak. */
+export const DEFAULT_MURDOKU_ADAPTIVE: AdaptiveState = {
+  levelIndex: 0,
+  streak: 0,
+};
 
 function emptyMurdokuState(): StoredMurdokuState {
   return {
     version: STORAGE_VERSION,
+    profileId: PROFILE_ID,
     current: null,
     solved: [],
     settings: DEFAULT_MURDOKU_SETTINGS,
+    adaptive: DEFAULT_MURDOKU_ADAPTIVE,
+    attempts: [],
   };
 }
 
@@ -126,6 +155,38 @@ function readSolved(value: unknown): string[] {
     }
   }
   return [...seen].slice(0, MURDOKU_CASES.length);
+}
+
+function readAdaptive(value: unknown): AdaptiveState {
+  if (!isRecord(value)) {
+    return DEFAULT_MURDOKU_ADAPTIVE;
+  }
+  const levelIndex = isNonNegativeInteger(value.levelIndex)
+    ? clampLevelIndex(value.levelIndex, MURDOKU_LEVELS.length)
+    : DEFAULT_MURDOKU_ADAPTIVE.levelIndex;
+  const streak = isNonNegativeInteger(value.streak) ? value.streak : 0;
+  return { levelIndex, streak };
+}
+
+function isAttempt(value: unknown): value is Attempt {
+  return (
+    isRecord(value) &&
+    typeof value.itemId === "string" &&
+    value.itemId.length > 0 &&
+    value.itemId.length <= MAX_ITEM_ID_CHARS &&
+    typeof value.ok === "boolean" &&
+    isFiniteNumber(value.at) &&
+    isNonNegativeInteger(value.durationMs) &&
+    isNonNegativeInteger(value.hints)
+  );
+}
+
+/** Alleen geldige pogingen, in speelvolgorde, met een vaste bovengrens. */
+function readAttempts(value: unknown): Attempt[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.filter(isAttempt).slice(-MAX_STORED_ATTEMPTS);
 }
 
 function readCell(value: unknown, cellCount: number): Cell | null {
@@ -367,8 +428,9 @@ function normalize(value: unknown): Normalized {
     return { state: emptyMurdokuState(), puzzle: null };
   }
 
-  const legacy = value.version === 0 || value.version === undefined;
-  if (value.version !== STORAGE_VERSION && !legacy) {
+  const version = value.version;
+  const legacy = version === 0 || version === undefined || version === 1;
+  if (version !== STORAGE_VERSION && !legacy) {
     return { state: emptyMurdokuState(), puzzle: null };
   }
 
@@ -377,9 +439,15 @@ function normalize(value: unknown): Normalized {
   return {
     state: {
       version: STORAGE_VERSION,
+      profileId: PROFILE_ID,
       current: read?.current ?? null,
       solved: readSolved(value.solved),
+      // Een oudere vorm kent nog geen niveau, log of instellingen voor het
+      // adaptieve deel; die beginnen dan bij de kleinste zaak.
       settings: readSettings(value.settings),
+      adaptive:
+        version === STORAGE_VERSION ? readAdaptive(value.adaptive) : DEFAULT_MURDOKU_ADAPTIVE,
+      attempts: version === STORAGE_VERSION ? readAttempts(value.attempts) : [],
     },
     puzzle: read?.puzzle ?? null,
   };
@@ -390,7 +458,8 @@ function readRaw(): unknown {
     if (typeof localStorage === "undefined") {
       return null;
     }
-    const raw = localStorage.getItem(STORAGE_KEY);
+    // Een bestaande speler uit #125 staat nog onder de v1-sleutel.
+    const raw = localStorage.getItem(STORAGE_KEY) ?? localStorage.getItem(LEGACY_STORAGE_KEY);
     if (!raw || raw.length > MAX_STORED_CHARS) {
       return null;
     }
@@ -429,6 +498,8 @@ export function restoreMurdokuState(): MurdokuRestoredState {
     hintsUsed: current?.hintsUsed ?? 0,
     solvedCaseIds: new Set(state.solved),
     settings: state.settings,
+    adaptive: state.adaptive,
+    attempts: state.attempts,
   };
 }
 
@@ -457,11 +528,14 @@ export function saveMurdokuState(input: MurdokuSaveInput): void {
     }
     const state: StoredMurdokuState = {
       version: STORAGE_VERSION,
+      profileId: PROFILE_ID,
       current: input.play ? currentFromPlay(input.play, input.hint, input.hintsUsed) : null,
       solved: [...input.solvedCaseIds]
         .filter((id) => CASE_IDS.has(id))
         .slice(0, MURDOKU_CASES.length),
       settings: input.settings,
+      adaptive: readAdaptive(input.adaptive ?? DEFAULT_MURDOKU_ADAPTIVE),
+      attempts: readAttempts(input.attempts ?? []),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {

@@ -1,6 +1,11 @@
 export { MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION } from "./lib/intro-level";
 export { CANDIDATE_BLUE as MURDOKU_CANDIDATE_COLOR } from "./lib/palette";
 export { MURDOKU_NL_TEXTS } from "./lib/nl";
+export {
+  MURDOKU_ADAPTIVE_CONFIG,
+  evaluateMurdokuRound,
+  murdokuCaseForLevel,
+} from "./model/adaptive";
 export { candidateCells, createMurdokuPlay, crossedCells, everyonePlaced } from "./model/play";
 export type { MurdokuPlayState } from "./model/play";
 export { DEFAULT_MURDOKU_SETTINGS } from "./model/settings";
