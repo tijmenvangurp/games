@@ -53,11 +53,11 @@ export const CHAPTER_2_LEVELS: readonly Level[] = [
     name: "Precies genoeg",
     chapter: 2,
     introduces: "limited-tray",
-    intro: "Er liggen precies genoeg onderdelen. Eén is een instinker.",
+    intro: "Er liggen precies genoeg onderdelen.",
     cols: 7,
     rows: 5,
     holes: createHoles(7, 5),
-    blockedHoleIds: [holeId(3, 2)],
+    blockedHoleIds: [],
     motor: { holeId: holeId(0, 2), size: 1, direction: 1 },
     outputs: [
       {

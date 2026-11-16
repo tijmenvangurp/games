@@ -150,11 +150,14 @@ describe("gear levels: direction and speed", () => {
     });
   });
 
-  it("blocks the single big-gear shortcut in level 7", () => {
+  it("lets the big-gear shortcut in level 7 turn the wrong way", () => {
     const level = levelAt(6);
+    const shortcut = drive(level, [gear(3, 2, 2)]);
 
-    expect(canPlace(level, [], gear(3, 2, 2))).toBe(false);
-    expect(evaluate(level, [gear(3, 2, 2)])).not.toBe("solved");
+    expect(canPlace(level, [], gear(3, 2, 2))).toBe(true);
+    expect(shortcut.outputs[0]?.direction).toBe(1);
+    expect(evaluate(level, [gear(3, 2, 2)])).toBe("playing");
+    expect(evaluate(level, [gear(2, 2, 1), gear(4, 2, 1)])).toBe("solved");
   });
 
   it("fails level 8 with one big gear and solves it with two idlers", () => {
@@ -192,6 +195,17 @@ describe("gear levels: speed bands", () => {
     expect(level.solution).toEqual([link("open-belt", [0, 2], [6, 2])]);
     expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
     expect(outputAt(level).speed).toBeCloseTo(0.5, 6);
+  });
+
+  it("laat de gekruiste ketting op level 10 en 11 de verkeerde kant op draaien", () => {
+    for (const level of [levelAt(9), levelAt(10)]) {
+      const holeId = level.outputs[0]?.holeId ?? "9,2";
+      const [col, row] = holeId.split(",").map(Number);
+      const crossed = link("crossed-belt", [0, 2], [col as number, row as number]);
+      expect(canPlace(level, [], crossed), level.id).toBe(true);
+      expect(drive(level, [crossed]).outputs[0]?.direction, level.id).toBe(-1);
+      expect(evaluate(level, [crossed]), level.id).toBe("playing");
+    }
   });
 
   it("gives level 12 two different speeds from one motor", () => {

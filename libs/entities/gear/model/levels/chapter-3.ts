@@ -47,7 +47,7 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
         maxSpeed: 1.1,
       },
     ],
-    tray: [trayBelt("riem-1"), trayGear("tandwiel-1", 2)],
+    tray: [trayBelt("riem-1"), trayBelt("riem-2", true)],
     solution: [beltAt("open-belt", [0, 2], [9, 2])],
   },
   {
@@ -72,7 +72,7 @@ export const CHAPTER_3_LEVELS: readonly Level[] = [
         maxSpeed: 0.6,
       },
     ],
-    tray: [trayBelt("riem-1"), trayGear("tandwiel-1", 1)],
+    tray: [trayBelt("riem-1"), trayBelt("riem-2", true)],
     solution: [beltAt("open-belt", [0, 2], [6, 2])],
   },
   {
