@@ -14,8 +14,9 @@ import { useMurdokuSession } from "./use-murdoku-session";
  * plaatsen en nog eens om hem weg te halen. De kruisjesstand streep vakjes weg,
  * auto-kruis doet de rij en kolom van een geplaatst persoon, en ongedaan maken
  * zet de vorige bordtoestand terug. Zodra iedereen staat, controleert het kind
- * de zaak; een goede controle onthult de dader en de kamer van het slachtoffer.
- * Een hint licht eerst de rij, kolom of kamer op en doet daarna één stap voor.
+ * de zaak; een goede controle onthult de dief en de kamer van de buit.
+ * Een hint licht eerst de aanwijzing van een persoon op en daarna de reden en
+ * de gedwongen zet.
  */
 export function MurdokuPage() {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ export function MurdokuPage() {
       lastRound: state.lastRound,
     })),
   );
-  const { activeCase, puzzle, text, solution, title } = useMurdokuSession(storedPlay);
+  const { puzzle, text, solution, title, intro, loot } = useMurdokuSession(storedPlay);
 
   useEffect(() => {
     if (storedPlay?.levelId !== puzzle.id) {
@@ -75,9 +76,6 @@ export function MurdokuPage() {
   const clueMessage = clueFocusLabel
     ? text.explanation({ key: "board.wordOn", params: { word: clueFocusLabel } })
     : null;
-  const intro =
-    activeCase?.intro ??
-    `Er is iets gestolen. Lees de aanwijzingen, plaats iedereen en zoek wie als enige bij ${puzzle.victim.name} was.`;
 
   return (
     <GameShell
@@ -88,10 +86,11 @@ export function MurdokuPage() {
       showSpeech={false}
       subtitle={`${title} · ${puzzle.board.width} × ${puzzle.board.height}`}
       title="Wie was het?"
+      wideLandscape
     >
       <MurdokuGameBody
         canCheck={play.phase === "playing" && everyonePlaced(puzzle, play)}
-        caseView={{ puzzle, text, title, intro }}
+        caseView={{ puzzle, text, title, intro, loot }}
         historyLength={historyLength}
         hintView={{
           hint,

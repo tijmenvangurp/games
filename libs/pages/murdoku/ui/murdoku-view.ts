@@ -1,4 +1,4 @@
-import type { Puzzle } from "@entities/murdoku";
+import type { MurdokuLoot, Puzzle } from "@entities/murdoku";
 import type {
   MurdokuClueFocus,
   MurdokuHintState,
@@ -15,6 +15,8 @@ export interface MurdokuCaseView {
   text: MurdokuText;
   title: string;
   intro: string;
+  /** De buit van de zaak; de kaart en de legenda tonen zijn icoon. */
+  loot: MurdokuLoot;
 }
 
 /** De hint en de tikbare woorden van één zaak. */

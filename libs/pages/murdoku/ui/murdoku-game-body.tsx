@@ -60,7 +60,7 @@ function MurdokuInfoSections({
   onSelectPerson,
   onFocusWord,
 }: MurdokuInfoSectionsProps) {
-  const { puzzle, text } = caseView;
+  const { puzzle, text, loot } = caseView;
 
   return (
     <>
@@ -84,7 +84,7 @@ function MurdokuInfoSections({
         <h2 className="font-display text-xl" id="murdoku-legenda">
           Waar mag je staan?
         </h2>
-        <MurdokuObjectLegend puzzle={puzzle} />
+        <MurdokuObjectLegend lootName={loot.name} puzzle={puzzle} />
       </section>
     </>
   );
@@ -130,7 +130,7 @@ export function MurdokuGameBody({
   const [showCelebration, setShowCelebration] = useState(true);
   const [boardFocusToken, setBoardFocusToken] = useState(0);
   const revealRef = useRef<HTMLElement>(null);
-  const { puzzle, text, title, intro } = caseView;
+  const { puzzle, text, title, intro, loot } = caseView;
   const { settings, onAutoCross } = settingsView;
   const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
   const restart = () => {
@@ -164,45 +164,52 @@ export function MurdokuGameBody({
           </Button>
         </div>
 
-        <MurdokuBoardSection
-          autoCross={settings.autoCross}
-          canCheck={canCheck}
-          canUndo={historyLength > 0}
-          clueFocus={clueFocus}
-          clueMessage={clueMessage}
-          feedback={feedbackFor(play, revealSentence)}
-          focusToken={boardFocusToken}
-          hint={hint}
-          hintMessage={hintMessage}
-          play={play}
-          puzzle={puzzle}
-          title={title}
-          actions={{
-            cellTap: actions.cellTap,
-            undo: actions.undo,
-            reset: actions.restart,
-            toggleCross: actions.toggleCross,
-            check: actions.check,
-            hint: onHint,
-            help: actions.help,
-          }}
-        />
-        {revealSentence ? (
-          <MurdokuReveal
-            ref={revealRef}
-            progressMessage={progressMessage}
-            sentence={revealSentence}
-            onRestart={restart}
-          />
-        ) : null}
-        <MurdokuInfoSections
-          caseView={caseView}
-          clueFocus={clueFocus}
-          play={play}
-          onFocusWord={onFocusWord}
-          onSelectPerson={selectPerson}
-        />
-        <MurdokuSettingsSection settings={settings} onAutoCross={onAutoCross} />
+        <div className="flex min-w-0 flex-col gap-5 lg:landscape:grid lg:landscape:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] lg:landscape:items-start lg:landscape:gap-6">
+          <div className="min-w-0 lg:landscape:sticky lg:landscape:top-4 lg:landscape:self-start">
+            <MurdokuBoardSection
+              autoCross={settings.autoCross}
+              canCheck={canCheck}
+              canUndo={historyLength > 0}
+              clueFocus={clueFocus}
+              clueMessage={clueMessage}
+              feedback={feedbackFor(play, revealSentence)}
+              focusToken={boardFocusToken}
+              hint={hint}
+              hintMessage={hintMessage}
+              lootIcon={loot.icon}
+              play={play}
+              puzzle={puzzle}
+              title={title}
+              actions={{
+                cellTap: actions.cellTap,
+                undo: actions.undo,
+                reset: actions.restart,
+                toggleCross: actions.toggleCross,
+                check: actions.check,
+                hint: onHint,
+                help: actions.help,
+              }}
+            />
+          </div>
+          <div className="flex min-w-0 flex-col gap-5 lg:landscape:max-h-[calc(100svh_-_9rem)] lg:landscape:overflow-y-auto lg:landscape:overscroll-contain lg:landscape:pr-1">
+            {revealSentence ? (
+              <MurdokuReveal
+                ref={revealRef}
+                progressMessage={progressMessage}
+                sentence={revealSentence}
+                onRestart={restart}
+              />
+            ) : null}
+            <MurdokuInfoSections
+              caseView={caseView}
+              clueFocus={clueFocus}
+              play={play}
+              onFocusWord={onFocusWord}
+              onSelectPerson={selectPerson}
+            />
+            <MurdokuSettingsSection settings={settings} onAutoCross={onAutoCross} />
+          </div>
+        </div>
       </div>
 
       {revealSentence && showCelebration ? (

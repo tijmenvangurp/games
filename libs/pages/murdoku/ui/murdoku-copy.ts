@@ -2,7 +2,7 @@ import type { RoundSummary } from "@entities/adaptive";
 import type { Puzzle } from "@entities/murdoku";
 import type { MurdokuPlayState, MurdokuText } from "@features/murdoku-game";
 
-/** De Nederlandse afloopzin: wie was als enige bij het slachtoffer? */
+/** De Nederlandse afloopzin: wie was als enige bij de buit? */
 export function revealSentenceFor(
   puzzle: Puzzle,
   text: MurdokuText,

@@ -4,11 +4,14 @@ import {
   murdokuCaseById,
   type Cell,
   type MurdokuCase,
+  type MurdokuLoot,
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
 import {
+  MURDOKU_INTRO_INTRO,
   MURDOKU_INTRO_LEVEL,
+  MURDOKU_INTRO_LOOT,
   MURDOKU_INTRO_SOLUTION,
   createMurdokuText,
   type MurdokuPlayState,
@@ -22,6 +25,8 @@ interface MurdokuSession {
   text: MurdokuText;
   solution: ReadonlyMap<PersonId, Cell>;
   title: string;
+  intro: string;
+  loot: MurdokuLoot;
 }
 
 /**
@@ -43,6 +48,8 @@ export function useMurdokuSession(storedPlay: MurdokuPlayState | null): MurdokuS
     [activeCase],
   );
   const title = activeCase?.title ?? MURDOKU_INTRO_LEVEL.title ?? "de zaak";
+  const intro = activeCase?.intro ?? MURDOKU_INTRO_INTRO;
+  const loot = activeCase?.loot ?? MURDOKU_INTRO_LOOT;
 
-  return { activeCase, puzzle, text, solution, title };
+  return { activeCase, puzzle, text, solution, title, intro, loot };
 }
