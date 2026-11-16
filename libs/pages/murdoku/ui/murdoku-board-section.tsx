@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Cell, Puzzle } from "@entities/murdoku";
 import {
   MURDOKU_CANDIDATE_COLOR,
@@ -12,6 +12,17 @@ import {
   type MurdokuPlayState,
 } from "@features/murdoku-game";
 import { Button, Check, CircleQuestionMark, Lightbulb, Undo2, X } from "@shared/ui";
+
+/** De knoppen en tikacties van het bord, gebundeld zodat de sectie leesbaar blijft. */
+interface MurdokuBoardActions {
+  cellTap: (cell: Cell) => void;
+  undo: () => void;
+  toggleCross: () => void;
+  check: () => void;
+  hint: () => void;
+  /** Weglaten verbergt de ?-knop naar de uitleg en de woordenlijst. */
+  help?: () => void;
+}
 
 interface MurdokuBoardSectionProps {
   puzzle: Puzzle;
@@ -34,13 +45,9 @@ interface MurdokuBoardSectionProps {
   clueFocus?: MurdokuClueFocus | null;
   /** Melding bij dat woord, bijvoorbeeld "De keuken licht op." */
   clueMessage?: string | null;
-  /** Opent de uitleg en de woordenlijst; weglaten verbergt de ?-knop. */
-  onHelp?: () => void;
-  onCellTap: (cell: Cell) => void;
-  onUndo: () => void;
-  onToggleCross: () => void;
-  onCheck: () => void;
-  onHint: () => void;
+  /** Elke ophoging vraagt de focus: na een toetsenbordkeuze of een nieuw spel. */
+  focusToken?: number;
+  actions: MurdokuBoardActions;
 }
 
 /** De regel onder het bord: feedback gaat vóór de hint, het woord en de hulpregel. */
@@ -59,7 +66,13 @@ function statusText(puzzle: Puzzle, play: MurdokuPlayState): string {
     return "Kruisjesstand: tik op een vrij vakje om het weg te strepen.";
   }
   if (play.selected) {
-    return `${puzzle.nameOf(play.selected)} is gekozen. Tik op een vakje om te plaatsen.`;
+    const name = puzzle.nameOf(play.selected);
+    const cell = play.placements.get(play.selected);
+    if (cell !== undefined) {
+      const { row, col } = puzzle.board.rc(cell);
+      return `${name} staat op rij ${row + 1}, kolom ${col + 1}. Tik op een ander vakje om te verplaatsen, of op dit vakje om weg te halen.`;
+    }
+    return `${name} is gekozen. Tik op een vakje om te plaatsen.`;
   }
   return "Kies eerst een persoon hieronder.";
 }
@@ -145,13 +158,17 @@ function MurdokuStatus({
         </p>
       ) : null}
       <p
+        aria-atomic="true"
         aria-live="polite"
         className="mt-2 text-center text-sm text-muted-foreground"
         role="status"
       >
         {status}
       </p>
-      <p className="mt-1 text-center text-xs leading-relaxed text-muted-foreground">
+      <p
+        className="mt-1 text-center text-xs leading-relaxed text-muted-foreground"
+        id="murdoku-bordhulp"
+      >
         Rijen staan links (R), kolommen boven (K). Tik nog eens op een geplaatst persoon om hem weg
         te halen.
       </p>
@@ -176,6 +193,7 @@ interface MurdokuBoardPanelProps {
   autoCross: boolean;
   focus: MurdokuBoardHighlight | null;
   helpMarks: ReturnType<typeof focusView>["marks"] | null;
+  focusToken: number;
   onCellTap: (cell: Cell) => void;
 }
 
@@ -187,6 +205,7 @@ function MurdokuBoardPanel({
   autoCross,
   focus,
   helpMarks,
+  focusToken,
   onCellTap,
 }: MurdokuBoardPanelProps) {
   const crosses = useMemo(
@@ -211,9 +230,9 @@ function MurdokuBoardPanel({
         <MurdokuBoard
           crosses={crosses}
           focus={focus}
+          focusToken={focusToken}
           helpMarks={helpMarks}
           highlight={highlight}
-          maxCellSize={120}
           mode={play.mode}
           outlineRoomId={resolution?.roomId ?? null}
           placements={play.placements}
@@ -250,41 +269,52 @@ export function MurdokuBoardSection({
   hintMessage = null,
   clueFocus = null,
   clueMessage = null,
-  onHelp,
-  onCellTap,
-  onUndo,
-  onToggleCross,
-  onCheck,
-  onHint,
+  focusToken = 0,
+  actions,
 }: MurdokuBoardSectionProps) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const previousHint = useRef(hint);
   const wordView = useMemo(() => focusView(puzzle, clueFocus), [puzzle, clueFocus]);
   const solved = play.phase === "solved";
   const status = boardStatus(puzzle, play, feedback, hintMessage, clueMessage);
 
+  // Een nieuwe hint zet de focus op het eerste vakje dat hij aanwijst, zodat een
+  // toetsenbordgebruiker direct op het bord staat. De uitleg leest de
+  // schermlezer voor via de statusregel; een herstelde hint bij het openen van
+  // de pagina steelt geen focus.
+  useEffect(() => {
+    if (previousHint.current === hint) return;
+    previousHint.current = hint;
+    const target = hint?.cells[0];
+    if (target === undefined) return;
+    sectionRef.current?.querySelector<HTMLButtonElement>(`[data-cell="${target}"]`)?.focus();
+  }, [hint]);
+
   return (
-    <section aria-labelledby="murdoku-plattegrond">
+    <section ref={sectionRef} aria-labelledby="murdoku-plattegrond">
       <h2 className="sr-only" id="murdoku-plattegrond">
         De plattegrond
       </h2>
       <MurdokuBoardPanel
         autoCross={autoCross}
         focus={focusFor(hint, clueFocus, wordView.cells)}
+        focusToken={focusToken}
         helpMarks={clueFocus ? wordView.marks : null}
         play={play}
         puzzle={puzzle}
         title={title}
-        onCellTap={onCellTap}
+        onCellTap={actions.cellTap}
       />
       <MurdokuControls
         canCheck={canCheck}
         canUndo={canUndo}
         mode={play.mode}
         solved={solved}
-        onCheck={onCheck}
-        onHelp={onHelp}
-        onHint={onHint}
-        onToggleCross={onToggleCross}
-        onUndo={onUndo}
+        onCheck={actions.check}
+        onHelp={actions.help}
+        onHint={actions.hint}
+        onToggleCross={actions.toggleCross}
+        onUndo={actions.undo}
       />
       <MurdokuStatus canCheck={canCheck} solved={solved} status={status} />
     </section>

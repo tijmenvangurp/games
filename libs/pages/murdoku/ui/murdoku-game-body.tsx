@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import type { Cell, PersonId, Puzzle } from "@entities/murdoku";
 import {
@@ -14,6 +14,19 @@ import { MurdokuReveal } from "./murdoku-reveal";
 import { MurdokuSettingsSection } from "./murdoku-settings";
 import type { MurdokuCaseView, MurdokuHintView, MurdokuSettingsView } from "./murdoku-view";
 
+/** De acties van de pagina, gebundeld zodat de bedrading kort blijft. */
+interface MurdokuGameActions {
+  cellTap: (cell: Cell) => void;
+  undo: () => void;
+  toggleCross: () => void;
+  check: () => void;
+  restart: () => void;
+  selectPerson: (person: PersonId) => void;
+  /** Opent de uitleg met de zes schermen en de woordenlijst. */
+  help: () => void;
+  home: () => void;
+}
+
 interface MurdokuGameBodyProps {
   /** De zaak: bord, tekstlaag, titel en intro. */
   caseView: MurdokuCaseView;
@@ -23,22 +36,15 @@ interface MurdokuGameBodyProps {
   historyLength: number;
   revealSentence: string | null;
   hintView: MurdokuHintView;
-  onCellTap: (cell: Cell) => void;
-  onUndo: () => void;
-  onToggleCross: () => void;
-  onCheck: () => void;
-  onRestart: () => void;
-  onSelectPerson: (person: PersonId) => void;
-  /** Opent de uitleg met de zes schermen en de woordenlijst. */
-  onHelp: () => void;
-  onHome: () => void;
+  actions: MurdokuGameActions;
 }
 
 interface MurdokuInfoSectionsProps {
   caseView: MurdokuCaseView;
   play: MurdokuPlayState;
   clueFocus: MurdokuClueFocus | null;
-  onSelectPerson: (person: PersonId) => void;
+  /** De tweede parameter is `true` bij een toetsenbordactivering. */
+  onSelectPerson: (person: PersonId, fromKeyboard: boolean) => void;
   onFocusWord: (focus: MurdokuClueFocus, label: string) => void;
 }
 
@@ -114,22 +120,28 @@ export function MurdokuGameBody({
   historyLength,
   revealSentence,
   hintView,
-  onCellTap,
-  onUndo,
-  onToggleCross,
-  onCheck,
-  onRestart,
-  onSelectPerson,
-  onHelp,
-  onHome,
+  actions,
 }: MurdokuGameBodyProps) {
   const [showCelebration, setShowCelebration] = useState(true);
+  const [boardFocusToken, setBoardFocusToken] = useState(0);
+  const revealRef = useRef<HTMLElement>(null);
   const { puzzle, text, title, intro } = caseView;
   const { settings, onAutoCross, onCrossOnBlocked } = settingsView;
   const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
   const restart = () => {
     setShowCelebration(true);
-    onRestart();
+    actions.restart();
+    setBoardFocusToken((token) => token + 1);
+  };
+  /** Een toetsenbordkeuze brengt de focus naar het bord; een tik laat hem staan. */
+  const selectPerson = (person: PersonId, fromKeyboard: boolean) => {
+    actions.selectPerson(person);
+    if (fromKeyboard) setBoardFocusToken((token) => token + 1);
+  };
+  /** De viering wegklikken zet de focus op de onthulling, niet op de body. */
+  const showBoard = () => {
+    setShowCelebration(false);
+    requestAnimationFrame(() => revealRef.current?.focus());
   };
 
   return (
@@ -152,25 +164,30 @@ export function MurdokuGameBody({
           clueFocus={clueFocus}
           clueMessage={clueMessage}
           feedback={feedbackFor(play, revealSentence)}
+          focusToken={boardFocusToken}
           hint={hint}
           hintMessage={hintMessage}
           play={play}
           puzzle={puzzle}
           title={title}
-          onCellTap={onCellTap}
-          onCheck={onCheck}
-          onHelp={onHelp}
-          onHint={onHint}
-          onToggleCross={onToggleCross}
-          onUndo={onUndo}
+          actions={{
+            cellTap: actions.cellTap,
+            undo: actions.undo,
+            toggleCross: actions.toggleCross,
+            check: actions.check,
+            hint: onHint,
+            help: actions.help,
+          }}
         />
-        {revealSentence ? <MurdokuReveal sentence={revealSentence} onRestart={restart} /> : null}
+        {revealSentence ? (
+          <MurdokuReveal ref={revealRef} sentence={revealSentence} onRestart={restart} />
+        ) : null}
         <MurdokuInfoSections
           caseView={caseView}
           clueFocus={clueFocus}
           play={play}
           onFocusWord={onFocusWord}
-          onSelectPerson={onSelectPerson}
+          onSelectPerson={selectPerson}
         />
         <MurdokuSettingsSection
           settings={settings}
@@ -183,8 +200,8 @@ export function MurdokuGameBody({
         <MurdokuSolvedDialog
           sentence={revealSentence}
           onAgain={restart}
-          onChoose={() => setShowCelebration(false)}
-          onHome={onHome}
+          onChoose={showBoard}
+          onHome={actions.home}
         />
       ) : null}
     </>

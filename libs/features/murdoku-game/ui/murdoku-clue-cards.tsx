@@ -15,8 +15,11 @@ interface MurdokuClueCardsProps {
   puzzle: Puzzle;
   /** De gekozen persoon; zijn kaart licht op. */
   selectedId?: PersonId | null;
-  /** Een tik op de naam kiest die persoon (of heft de keuze op). */
-  onSelect?: (person: PersonId) => void;
+  /**
+   * Een tik op de naam kiest die persoon (of heft de keuze op). De tweede
+   * parameter is `true` als de browser de klik bij Enter of Spatie maakte.
+   */
+  onSelect?: (person: PersonId, fromKeyboard: boolean) => void;
   /** Het woord dat nu op het bord oplicht. */
   activeWord?: MurdokuClueFocus | null;
   /** Een tik op een woord in de aanwijzing laat dat op het bord oplichten. */
@@ -61,9 +64,9 @@ export function MurdokuClueCards({
             >
               <button
                 aria-pressed={selected}
-                className="flex min-h-11 min-w-0 items-center gap-2 rounded-md text-left focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40"
+                className="flex min-h-11 min-w-0 items-center gap-2 rounded-md text-left focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:outline-none"
                 type="button"
-                onClick={onSelect ? () => onSelect(suspect.id) : undefined}
+                onClick={onSelect ? (event) => onSelect(suspect.id, event.detail === 0) : undefined}
               >
                 <img
                   alt=""
@@ -88,7 +91,7 @@ export function MurdokuClueCards({
                           aria-label={`Toon ${word.text} op het bord`}
                           aria-pressed={sameClueFocus(activeWord, word.focus)}
                           className={cn(
-                            "-my-1 inline rounded-sm px-0.5 py-1 underline decoration-dotted decoration-2 underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/40",
+                            "relative -my-1 inline touch-manipulation rounded-sm px-0.5 py-1 underline decoration-dotted decoration-2 underline-offset-2 transition-colors before:absolute before:-inset-x-1 before:-inset-y-3 before:content-[''] focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:outline-none",
                             sameClueFocus(activeWord, word.focus)
                               ? "bg-warning/20 text-foreground"
                               : "decoration-primary/60 text-primary hover:bg-primary/10",
