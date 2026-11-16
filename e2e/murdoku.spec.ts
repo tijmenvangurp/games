@@ -82,11 +82,19 @@ async function playIntroCase(page: Page, keyboardFirst: boolean): Promise<void> 
   await page.getByRole("button", { name: ONGEDAAN }).click();
   await expect(page.getByRole("button", { name: /^Anna, rij 1, kolom 2/ })).toHaveCount(0);
 
-  // De hint wijst eerst en past daarna één gedwongen zet toe.
+  // De hint geeft eerst de aanwijzing van Bram, daarna de exacte cel met de
+  // reden en pas bij de derde tik de gedwongen zet.
   const hint = page.getByRole("button", { name: AANWIJZING });
   await hint.click();
-  await expect(page.getByRole("status")).toContainText("Kijk eens naar");
-  await expect(page.getByRole("button", { name: /^leeg, licht op, rij 1, kolom 1/ })).toBeFocused();
+  await expect(page.getByRole("status")).toContainText(
+    "Kijk eens naar de aanwijzing van Bram. Waar is nog een stoel?",
+  );
+  await expect(page.getByRole("button", { name: /^leeg, licht op, rij 2, kolom 1/ })).toBeFocused();
+
+  await hint.click();
+  await expect(page.getByRole("status")).toContainText(
+    "Bram stond op een stoel. Alleen de keuken blijft over",
+  );
 
   await hint.click();
   await expect(page.getByRole("status")).toContainText("Zet Bram");
@@ -111,7 +119,7 @@ async function playIntroCase(page: Page, keyboardFirst: boolean): Promise<void> 
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("heading", { name: "Opgelost!" })).toBeVisible();
-  await expect(dialog.getByText("Cato was als enige bij Vera in de badkamer.")).toBeVisible();
+  await expect(dialog.getByText("Cato was als enige bij de taart in de badkamer.")).toBeVisible();
   // Wacht tot de veer-animatie van de viering klaar is; anders meet de
   // raakvlakcontrole de knop nog verkleind.
   await page.waitForTimeout(500);
@@ -121,10 +129,10 @@ async function playIntroCase(page: Page, keyboardFirst: boolean): Promise<void> 
   await expect(page.getByRole("dialog")).toHaveCount(0);
 
   // De focus blijft na de viering op de onthulling, niet op de body.
-  const reveal = page.getByRole("region", { name: "De dader" });
+  const reveal = page.getByRole("region", { name: "De dief" });
   await expect(reveal).toBeFocused();
-  await expect(reveal).toContainText("Cato was als enige bij Vera in de badkamer.");
-  await expect(page.getByRole("button", { name: /^Vera, rij 4, kolom 3/ })).toBeVisible();
+  await expect(reveal).toContainText("Cato was als enige bij de taart in de badkamer.");
+  await expect(page.getByRole("button", { name: /^de taart, rij 4, kolom 3/ })).toBeVisible();
 }
 
 test.describe("Wie was het? op een telefoon", () => {
@@ -182,6 +190,26 @@ test.describe("Wie was het? op een tablet", () => {
     expect(overflows).toBe(false);
   });
 
+  test("zet op landscape het bord links en de kaarten rechts", async ({ page }) => {
+    await page.goto("/mysterie");
+
+    const board = page.getByRole("img", { name: /plattegrond van de verdwenen taart/i });
+    const cards = page.getByRole("heading", { name: "Wie is wie?" });
+    await expect(board).toBeVisible();
+    await expect(cards).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Anna$/ })).toBeVisible();
+
+    const boardBox = await board.boundingBox();
+    const cardsBox = await cards.boundingBox();
+    expect(boardBox).not.toBeNull();
+    expect(cardsBox).not.toBeNull();
+    expect((boardBox?.x ?? 0) + (boardBox?.width ?? 0)).toBeLessThan(cardsBox?.x ?? 0);
+
+    // Het bord loopt niet buiten de viewporthoogte.
+    expect((boardBox?.y ?? 0) + (boardBox?.height ?? 0)).toBeLessThanOrEqual(768 + 1);
+    expect(await page.evaluate(NO_HORIZONTAL_OVERFLOW)).toBe(false);
+  });
+
   test("speelt de volledige zaak op 1024 px", async ({ page }) => {
     await playIntroCase(page, false);
 
@@ -197,6 +225,24 @@ test.describe("Wie was het? op een tablet", () => {
 
     const overflows = (await page.evaluate(NO_HORIZONTAL_OVERFLOW)) as boolean;
     expect(overflows).toBe(false);
+  });
+});
+
+test.describe("Wie was het? op een groot tablet landscape", () => {
+  test.use({ viewport: { width: 1366, height: 1024 } });
+
+  test("houdt de tweedeling en de rechterkolom scrollbaar", async ({ page }) => {
+    await page.goto("/mysterie");
+
+    const board = page.getByRole("img", { name: /plattegrond van de verdwenen taart/i });
+    const cards = page.getByRole("heading", { name: "Wie is wie?" });
+    await expect(board).toBeVisible();
+    await expect(cards).toBeVisible();
+
+    const boardBox = await board.boundingBox();
+    const cardsBox = await cards.boundingBox();
+    expect((boardBox?.x ?? 0) + (boardBox?.width ?? 0)).toBeLessThan(cardsBox?.x ?? 0);
+    expect(await page.evaluate(NO_HORIZONTAL_OVERFLOW)).toBe(false);
   });
 });
 

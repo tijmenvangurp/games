@@ -49,7 +49,7 @@ describe("murdoku controleren en winnen", () => {
     expect(everyonePlaced(puzzle, store().play!)).toBe(true);
   });
 
-  it("onthult de dader en het slachtoffer bij een goede controle", () => {
+  it("onthult de dief en de buit bij een goede controle", () => {
     placeSuspects();
 
     store().check(MURDOKU_INTRO_SOLUTION);

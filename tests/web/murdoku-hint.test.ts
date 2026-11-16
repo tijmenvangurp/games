@@ -1,11 +1,22 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { loadMurdokuLevel } from "@entities/murdoku";
-import { MURDOKU_INTRO_LEVEL, crossedCells, useMurdokuStore } from "@features/murdoku-game";
-import { MURDOKU_GENERATED_FIXTURE, MURDOKU_FIXTURE } from "../node/murdoku-fixtures";
+import {
+  MURDOKU_INTRO_LEVEL,
+  createMurdokuText,
+  crossedCells,
+  useMurdokuStore,
+  type MurdokuHintState,
+} from "@features/murdoku-game";
+import {
+  MURDOKU_AQUARIUM_HINT_FIXTURE,
+  MURDOKU_FIXTURE,
+  MURDOKU_GENERATED_FIXTURE,
+} from "../node/murdoku-fixtures";
 
 const puzzle = loadMurdokuLevel(MURDOKU_INTRO_LEVEL);
 const generated = loadMurdokuLevel(MURDOKU_GENERATED_FIXTURE);
 const fixture = loadMurdokuLevel(MURDOKU_FIXTURE);
+const aquarium = loadMurdokuLevel(MURDOKU_AQUARIUM_HINT_FIXTURE);
 
 function resetStore(): void {
   useMurdokuStore.setState({
@@ -36,27 +47,36 @@ beforeEach(() => {
 });
 
 describe("hinttrap", () => {
-  it("begint met een lichte cue en past daarna één stap toe", () => {
+  it("begint met een clue-nudge en past na twee tikken één stap toe", () => {
     store().start(puzzle);
     store().showHint();
 
-    expect(store().hint?.stage).toBe("focus");
+    expect(store().hint?.stage).toBe("clue");
     expect(store().hint?.cells.length).toBeGreaterThan(0);
-    // Een lichte cue verandert het bord niet.
+    expect(store().hint?.explanation).toMatchObject({ key: "hint.clueNudgeObject" });
+    // Een clue-nudge verandert het bord niet en noemt de doelkamer niet.
     expect(store().play?.placements.size).toBe(0);
     expect(store().hintsUsed).toBe(1);
+
+    store().showHint();
+    expect(store().hint?.stage).toBe("focus");
+    expect(store().hint?.cells).toEqual([4]);
+    expect(store().play?.placements.size).toBe(0);
 
     store().showHint();
 
     expect(store().hint?.stage).toBe("place");
     expect(store().play?.placements.get("B")).toBe(4);
     expect(store().play?.wrongCheck).toBe(false);
-    // De tweede tik past dezelfde hintstap toe; hij telt niet als nieuwe hint.
+    // De tweede en derde tik horen bij dezelfde hintstap; ze tellen niet opnieuw.
     expect(store().hintsUsed).toBe(1);
   });
 
   it("streept één onmogelijk vakje weg in plaats van meteen te plaatsen", () => {
     store().start(generated);
+
+    store().showHint();
+    expect(store().hint?.stage).toBe("clue");
 
     store().showHint();
     expect(store().hint?.stage).toBe("focus");
@@ -75,7 +95,7 @@ describe("hinttrap", () => {
     store().start(puzzle);
     placeBramAndAnna();
 
-    for (let press = 0; press < 6; press += 1) store().showHint();
+    for (let press = 0; press < 18; press += 1) store().showHint();
 
     expect(store().play?.placements.has("C")).toBe(false);
     expect(store().play?.placements.size).toBe(2);
@@ -86,10 +106,15 @@ describe("hinttrap", () => {
 
     store().showHint();
     store().showHint();
+    expect(store().hint?.stage).toBe("focus");
+    expect(store().hint?.explanation.children?.[0]).toMatchObject({ key: "clue.onObject" });
+
+    store().showHint();
     expect(store().hint?.stage).toBe("place");
     expect(store().hint?.explanation).toMatchObject({ key: "hint.placeClue" });
 
     // De volgende trap plaatst Anna; haar aanwijzing laat vier vakjes open.
+    store().showHint();
     store().showHint();
     store().showHint();
 
@@ -117,6 +142,7 @@ describe("hinttrap", () => {
 
     store().showHint();
     store().showHint();
+    store().showHint();
 
     expect(store().hint?.stage).toBe("cross");
     expect(store().hint?.explanation).toMatchObject({ key: "hint.crossPlain" });
@@ -125,7 +151,7 @@ describe("hinttrap", () => {
 
   it("laat de laatste persoon altijd aan het kind", () => {
     store().start(fixture);
-    for (let press = 0; press < 8; press += 1) store().showHint();
+    for (let press = 0; press < 24; press += 1) store().showHint();
 
     // Bram en Anna staan; Cato is de laatste en komt er niet via de hint op.
     expect(store().play?.placements.get("B")).toBe(6);
@@ -140,8 +166,9 @@ describe("hinttrap", () => {
     store().showHint();
     store().showHint();
     store().showHint();
+    store().showHint();
 
-    // Tik één zet de hint op, tik twee past hem toe, tik drie begint een nieuwe stap.
+    // De eerste drie tikken zijn één stap; de vierde begint de volgende.
     expect(store().hintsUsed).toBe(2);
     expect(store().play?.wrongCheck).toBe(false);
     expect(store().play?.phase).toBe("playing");
@@ -162,6 +189,7 @@ describe("hinttrap", () => {
     store().start(puzzle);
     store().showHint();
     store().showHint();
+    store().showHint();
     expect(store().play?.placements.get("B")).toBe(4);
 
     store().undo();
@@ -173,10 +201,54 @@ describe("hinttrap", () => {
   it("geeft een rustige melding als er geen stap meer is", () => {
     store().start(puzzle);
     placeBramAndAnna();
-    for (let press = 0; press < 6; press += 1) store().showHint();
+    for (let press = 0; press < 18; press += 1) store().showHint();
 
     expect(store().hint?.stage).toBe("none");
     expect(store().hint?.cells).toEqual([]);
+  });
+
+  it("noemt in de eerste aquariumhint geen kamer en wijst daarna de exacte cel aan", () => {
+    store().start(aquarium);
+
+    let clueHint: MurdokuHintState | null = null;
+    let cellHint: MurdokuHintState | null = null;
+    for (let press = 0; press < 180; press += 1) {
+      store().showHint();
+      const hint = store().hint;
+      if (hint?.stage !== "clue" || hint.personId !== "A") continue;
+
+      clueHint = hint;
+      store().showHint();
+      const focus = store().hint;
+      if (focus?.stage === "focus" && focus.cells.length === 1) {
+        cellHint = focus;
+        break;
+      }
+    }
+
+    const text = createMurdokuText(aquarium);
+    expect(clueHint?.stage).toBe("clue");
+    expect(clueHint?.personId).toBe("A");
+    expect(clueHint?.explanation).toMatchObject({ key: "hint.clueNudgeObject" });
+    expect(text.explanation(clueHint!.explanation)).toBe(
+      "Kijk eens naar de aanwijzing van Daan. Waar is nog een tapijt?",
+    );
+    expect(text.explanation(clueHint!.explanation)).not.toContain("zolder");
+
+    expect(cellHint?.stage).toBe("focus");
+    expect(cellHint?.cells).toHaveLength(1);
+    expect(cellHint?.explanation.children?.[0]).toMatchObject({ key: "clue.roomExistsOn" });
+    const cellText = text.explanation(cellHint!.explanation);
+    expect(cellText).toContain("op een tapijt");
+    expect(cellText).toContain("Alleen de zolder blijft over");
+    expect(cellText).toContain("enige vrije vakje");
+
+    const cell = cellHint!.cells[0]!;
+    store().showHint();
+    expect(store().hint?.stage).toBe("place");
+    expect(store().play?.placements.get("A")).toBe(cell);
+    // De hint plaatst nooit de laatste persoon.
+    expect(store().play?.placements.size).toBeLessThan(aquarium.suspects.length);
   });
 });
 

@@ -15,14 +15,19 @@ import {
   checkMurdokuLevelsFile,
   murdokuV1ClueProblems,
 } from "../../scripts/lib/murdoku-levels";
-import { MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION } from "@features/murdoku-game";
+import {
+  MURDOKU_INTRO_LEVEL,
+  MURDOKU_INTRO_LOOT,
+  MURDOKU_INTRO_SOLUTION,
+} from "@features/murdoku-game";
 import { MURDOKU_FIXTURE, MURDOKU_SOLUTION } from "./murdoku-fixtures";
 
 function goodCase(overrides: Partial<MurdokuCase> = {}): MurdokuCase {
   return {
     id: "test-4x4-verjaardag",
     title: "De verdwenen taart",
-    intro: "Er is een taart verdwenen. Zoek uit wie er als enige bij Vera was.",
+    intro: "Er is een taart verdwenen. Zoek uit wie er als enige bij de buit was.",
+    loot: { name: "de taart", icon: "cake" },
     level: { ...MURDOKU_FIXTURE, id: "test-4x4-verjaardag" },
     solution: MURDOKU_SOLUTION,
     ...overrides,
@@ -44,14 +49,14 @@ describe("murdoku zaken", () => {
     expect(problems.join("\n")).toMatch(/oplossing/i);
   });
 
-  it("meldt een ontbrekend slachtoffer in de oplossing", () => {
+  it("meldt een ontbrekende buit in de oplossing", () => {
     const broken = goodCase({
       solution: Object.fromEntries(
         Object.entries(MURDOKU_SOLUTION).filter(([id]) => id !== VICTIM_ID),
       ),
     });
 
-    expect(validateMurdokuCases([broken]).join("\n")).toMatch(/slachtoffer/i);
+    expect(validateMurdokuCases([broken]).join("\n")).toMatch(/buit/i);
   });
 
   it("meldt een dubbele zaak-id en een lege titel", () => {
@@ -84,7 +89,8 @@ describe("de instapzaak van Wie was het?", () => {
     const intro: MurdokuCase = {
       id: MURDOKU_INTRO_LEVEL.id,
       title: MURDOKU_INTRO_LEVEL.title ?? "",
-      intro: "De taart is weg. Zoek uit wie er als enige bij Vera was.",
+      intro: "De taart is weg. Zoek uit wie er als enige bij de buit was.",
+      loot: MURDOKU_INTRO_LOOT,
       level: MURDOKU_INTRO_LEVEL,
       solution: Object.fromEntries(MURDOKU_INTRO_SOLUTION),
     };
@@ -123,6 +129,34 @@ describe("de twaalf eigen zaken van Wie was het?", () => {
       }
     }
   });
+
+  it("geeft elke zaak een buit met een lokaal icoon en dezelfde naam in het level", async () => {
+    for (const entry of MURDOKU_CASES) {
+      expect(entry.loot.name.trim(), entry.id).not.toBe("");
+      expect(entry.loot.icon, entry.id).toMatch(/^[a-z0-9-]+$/);
+      expect(entry.level.victim.name, entry.id).toBe(entry.loot.name);
+
+      const icon = await readFile(
+        path.join(process.cwd(), "apps", "games", "public", "elements", `${entry.loot.icon}.svg`),
+        "utf8",
+      );
+      expect(icon, entry.id).toContain("<svg");
+    }
+    expect(MURDOKU_INTRO_LEVEL.victim.name).toBe(MURDOKU_INTRO_LOOT.name);
+  });
+
+  it("laat titel en intro bij de buit passen en noemt geen verdwenen aquarium", () => {
+    const contentWord = (name: string): string =>
+      name.replace(/^(de|het|een)\s+/i, "").split(/\s+/)[0] ?? name;
+
+    for (const entry of MURDOKU_CASES) {
+      const word = contentWord(entry.loot.name);
+      const copy = `${entry.title} ${entry.intro}`.toLowerCase();
+      expect(copy, `${entry.id} noemt de buit "${word}"`).toContain(word.toLowerCase());
+      expect(copy, entry.id).not.toContain("aquarium");
+      expect(copy, entry.id).not.toMatch(/slachtoffer|dader|moord/);
+    }
+  });
 });
 
 describe("de v1-allowlist van de aanwijzingen", () => {
@@ -133,6 +167,63 @@ describe("de v1-allowlist van de aanwijzingen", () => {
 
     for (const entry of raw.cases) {
       expect(murdokuV1ClueProblems(entry.level), entry.id).toEqual([]);
+    }
+  });
+
+  it("bevat geen aanwijzing die de buit als persoon telt", async () => {
+    const forbidden = new Set([
+      "alone",
+      "notAlone",
+      "aloneWith",
+      "uniqueOnObject",
+      "uniqueNearObject",
+      "uniqueNearWindow",
+      "uniqueNearDoor",
+      "uniqueInside",
+      "uniqueOutside",
+      "roomExists",
+      "roomCompanion",
+      "roomAttribute",
+      "directionFromAttr",
+      "countOnObject",
+      "emptyRooms",
+      "everyRoomCount",
+    ]);
+    const raw = JSON.parse(await readFile(MURDOKU_LEVELS_FILE, "utf8")) as {
+      cases: {
+        id: string;
+        level: {
+          suspects: { clues?: unknown[] }[];
+          globalClues?: unknown[];
+          boardClues?: unknown[];
+        };
+      }[];
+    };
+
+    const leafTypes = (value: unknown, out: string[]): void => {
+      if (typeof value !== "object" || value === null) return;
+      const clue = value as { type?: string; clues?: unknown[]; clue?: unknown };
+      if (clue.type === "and" || clue.type === "or") {
+        for (const child of clue.clues ?? []) leafTypes(child, out);
+        return;
+      }
+      if (clue.type === "not") {
+        leafTypes(clue.clue, out);
+        return;
+      }
+      if (clue.type) out.push(clue.type);
+    };
+
+    for (const entry of raw.cases) {
+      const types: string[] = [];
+      for (const suspect of entry.level.suspects) {
+        for (const clue of suspect.clues ?? []) leafTypes(clue, types);
+      }
+      for (const clue of entry.level.globalClues ?? []) leafTypes(clue, types);
+      for (const type of types) {
+        expect(forbidden.has(type), `${entry.id}: ${type}`).toBe(false);
+      }
+      expect(entry.level.boardClues ?? [], entry.id).toEqual([]);
     }
   });
 
@@ -156,6 +247,34 @@ describe("de v1-allowlist van de aanwijzingen", () => {
     expect(problems.join("\n")).toMatch(/roomAttribute/);
     expect(problems.join("\n")).toMatch(/directionFromAttr/);
     expect(problems.join("\n")).toMatch(/diagonaal southeast/);
+  });
+
+  it("wijst aanwijzingen af die de buit als persoon tellen", () => {
+    const level = {
+      suspects: [
+        {
+          id: "A",
+          name: "Anna",
+          clues: [
+            { type: "alone" },
+            { type: "not", clue: { type: "notAlone" } },
+            { type: "uniqueOnObject", object: "chair" },
+            { type: "inRoom", room: "1", occupancy: "alone" },
+            { type: "sameRoom", as: "B", alone: true },
+          ],
+        },
+      ],
+      boardClues: [{ type: "emptyRooms", count: 1 }],
+    } as Parameters<typeof murdokuV1ClueProblems>[0];
+
+    const problems = murdokuV1ClueProblems(level).join("\n");
+
+    expect(problems).toMatch(/alone staat niet/);
+    expect(problems).toMatch(/notAlone staat niet/);
+    expect(problems).toMatch(/uniqueOnObject staat niet/);
+    expect(problems).toMatch(/inRoom met een bezetting/);
+    expect(problems).toMatch(/sameRoom met alone/);
+    expect(problems).toMatch(/bordbrede aanwijzing emptyRooms/);
   });
 });
 

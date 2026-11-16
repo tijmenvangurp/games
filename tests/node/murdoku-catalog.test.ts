@@ -22,7 +22,7 @@ describe("Wie was het? in de spelcatalogus", () => {
     expect(entry.name).toBe("Wie was het?");
     expect(entry.to).toBe("/mysterie");
     expect(entry.description).toBe(
-      "Lees de aanwijzingen, vul de plattegrond in en vind wie als enige bij het slachtoffer was.",
+      "Lees de aanwijzingen, vul de plattegrond in en vind de dief die als enige bij de buit was.",
     );
     expect(entry.speech).toEqual({
       kind: "visual",

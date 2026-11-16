@@ -48,6 +48,7 @@ const BROAD_CLUES: { clue: ClueJson; label: string }[] = [
     label: "een tafel",
   },
   { clue: { type: "sameRoomAsObject", object: "bed" }, label: "een bed" },
+  { clue: { type: "sameRoom", as: "P0" }, label: "Persoon 0" },
   {
     clue: { type: "directionFromObject", object: "table", dir: "north", room: "any" },
     label: "een tafel",
@@ -95,12 +96,15 @@ describe("tikbare woorden in een aanwijzing", () => {
     expect(words.map((word) => word.text).join("")).toBe("Bram stond op een stoel.");
   });
 
-  it("wijst een andere persoon aan", () => {
+  it("wijst een andere persoon en het halfvlak van de richting aan", () => {
     const words = wordsOf("C");
-    const person = words.find((word) => word.focus);
+    const person = words.find((word) => word.focus?.kind === "person");
+    const direction = words.find((word) => word.focus?.kind === "halfPlane");
 
     expect(person?.text).toBe("Anna");
     expect(person?.focus).toEqual({ kind: "person", personId: "A" });
+    expect(direction?.text).toBe("links van");
+    expect(direction?.focus).toEqual({ kind: "halfPlane", of: "A", direction: "west" });
     expect(words.map((word) => word.text).join("")).toBe("Cato stond links van Anna.");
   });
 
@@ -153,5 +157,20 @@ describe("tikbare woorden in een aanwijzing", () => {
     const area = focusView(puzzle, { kind: "area", cells: [0, 1] });
     expect([...area.cells]).toEqual([0, 1]);
     expect(area.marks.areas[0]?.cells.has(0)).toBe(true);
+  });
+
+  it("licht bij een richting het hele halfvlak op, niet één cel", () => {
+    const placements = new Map([["B", 6]]);
+    const south = focusView(puzzle, { kind: "halfPlane", of: "B", direction: "south" }, placements);
+
+    // B staat op rij 2, kolom 3. Elke lagere rij telt, ook andere kolommen.
+    expect(south.cells.has(8)).toBe(true);
+    expect(south.cells.has(13)).toBe(true);
+    expect(south.cells.has(3)).toBe(false);
+    expect(south.marks.areas).toHaveLength(1);
+
+    const north = focusView(puzzle, { kind: "halfPlane", of: "B", direction: "north" }, placements);
+    expect(north.cells.has(3)).toBe(true);
+    expect(north.cells.has(8)).toBe(false);
   });
 });

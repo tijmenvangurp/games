@@ -133,11 +133,82 @@ describe("Nederlandse aanwijzingen", () => {
     expect(text.objectName("shelf")).toBe("Boekenkast");
     expect(text.direction("north")).toBe("boven");
     expect(text.direction("west")).toBe("links");
+    expect(text.directionPhrase("north")).toBe("in een hogere rij dan");
+    expect(text.directionPhrase("south")).toBe("in een lagere rij dan");
+    expect(text.directionPhrase("east")).toBe("rechts van");
+    expect(text.directionPhrase("west")).toBe("links van");
+  });
+
+  it("maakt de vier richtingen expliciet en zonder 'van'-fout", () => {
+    const level: LevelJson = {
+      ...MURDOKU_FIXTURE,
+      suspects: [
+        {
+          id: "P0",
+          name: "Daan",
+          attributes: { gender: "m" },
+          clues: [{ type: "direction", of: "P1", dir: "north" }],
+        },
+        {
+          id: "P1",
+          name: "Cato",
+          attributes: { gender: "f" },
+          clues: [{ type: "direction", of: "P0", dir: "south" }],
+        },
+        {
+          id: "P2",
+          name: "Eva",
+          attributes: { gender: "f" },
+          clues: [{ type: "direction", of: "P0", dir: "east" }],
+        },
+        {
+          id: "P3",
+          name: "Finn",
+          attributes: { gender: "m" },
+          clues: [{ type: "direction", of: "P0", dir: "west" }],
+        },
+      ],
+    };
+    const directionPuzzle = loadMurdokuLevel(level);
+    const directionText = createMurdokuText(directionPuzzle);
+
+    expect(directionText.clue(directionPuzzle.suspects[0]!.clues[0], "P0")).toBe(
+      "Daan stond in een hogere rij dan Cato.",
+    );
+    expect(directionText.clue(directionPuzzle.suspects[1]!.clues[0], "P1")).toBe(
+      "Cato stond in een lagere rij dan Daan.",
+    );
+    expect(directionText.clue(directionPuzzle.suspects[2]!.clues[0], "P2")).toBe(
+      "Eva stond rechts van Daan.",
+    );
+    expect(directionText.clue(directionPuzzle.suspects[3]!.clues[0], "P3")).toBe(
+      "Finn stond links van Daan.",
+    );
+  });
+
+  it("gebruikt dezelfde richting in een object-aanwijzing", () => {
+    const level: LevelJson = {
+      ...MURDOKU_FIXTURE,
+      suspects: [
+        {
+          id: "A",
+          name: "Anna",
+          attributes: { gender: "f" },
+          clues: [{ type: "directionFromObject", object: "table", dir: "north", room: "any" }],
+        },
+      ],
+    };
+    const objectPuzzle = loadMurdokuLevel(level);
+    const objectText = createMurdokuText(objectPuzzle);
+
+    expect(objectText.clue(objectPuzzle.suspects[0]!.clues[0], "A")).toBe(
+      "Anna stond in een hogere rij dan een tafel.",
+    );
   });
 
   it("levert de vaste bordregels als lopende tekst", () => {
     expect(text.rule("aloneWithVictim")).toBe(
-      "Het slachtoffer is alleen in een kamer met precies één verdachte.",
+      "De buit is in een kamer met precies één verdachte. Die verdachte is de dief.",
     );
     expect(text.rule("oneEachLine")).toBe("Iedereen staat in een eigen rij en kolom.");
   });

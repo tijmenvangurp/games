@@ -24,6 +24,7 @@ const hint: MurdokuHintState = {
   roomId: null,
   cells: [0],
   personId: null,
+  focus: null,
 };
 
 function runningPlay(): MurdokuPlayState {
@@ -331,7 +332,7 @@ describe("murdoku opslag", () => {
     expect(state.attempts).toHaveLength(1);
   });
 
-  it("herstelt een opgeloste zaak met de dader en het slachtoffer", () => {
+  it("herstelt een opgeloste zaak met de dief en de buit", () => {
     const play: MurdokuPlayState = {
       ...runningPlay(),
       selected: null,
@@ -364,7 +365,7 @@ describe("murdoku opslag", () => {
     expect(restored.play?.placements.get("victim")).toBe(14);
   });
 
-  it("zet een opgeslagen oplossing zonder geldige dader terug naar spelen", () => {
+  it("zet een opgeslagen oplossing zonder geldige dief terug naar spelen", () => {
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify({

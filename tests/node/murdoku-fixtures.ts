@@ -58,7 +58,7 @@ export const MURDOKU_FIXTURE: LevelJson = {
       clues: [{ type: "inCol", col: 0 }],
     },
   ],
-  victim: { name: "Vera" },
+  victim: { name: "de taart" },
 };
 
 /** De unieke oplossing van {@link MURDOKU_FIXTURE}. */
@@ -149,4 +149,189 @@ export const MURDOKU_GENERATED_FIXTURE: LevelJson = {
   },
   title: "Violas letzte Nacht",
   titles: { de: "Violas letzte Nacht", en: "Viola's Last Night" },
+};
+
+/**
+ * De aquariumzaak zoals hij vóór de buit-fix werd gegenereerd. Alleen voor de
+ * hint-regressie: Daan moet naar de zolder, maar welke plek daar precies volgt,
+ * is pas later zeker. Deze fixture hoort niet bij `MURDOKU_CASES`.
+ */
+export const MURDOKU_AQUARIUM_HINT_FIXTURE: LevelJson = {
+  schema: 1,
+  id: "het-lege-aquarium",
+  difficulty: "hard",
+  size: {
+    width: 6,
+    height: 6,
+  },
+  rooms: {
+    "1": {
+      nameKey: "room.hal",
+      color: "#e9dcc2",
+    },
+    "2": {
+      nameKey: "room.zolder",
+      color: "#cfe0d4",
+    },
+    "3": {
+      nameKey: "room.kelder",
+      color: "#ecd3d3",
+    },
+  },
+  objects: {
+    r: {
+      type: "carpet",
+      occupiable: true,
+    },
+    s: {
+      type: "chair",
+      occupiable: true,
+    },
+    b: {
+      type: "bed",
+      occupiable: true,
+    },
+    t: {
+      type: "table",
+      occupiable: false,
+    },
+    f: {
+      type: "tv",
+      occupiable: false,
+    },
+    g: {
+      type: "shelf",
+      occupiable: false,
+    },
+    p: {
+      type: "plant",
+      occupiable: false,
+    },
+  },
+  roomMap: ["112222", "112222", "111222", "111332", "111333", "111333"],
+  groundMap: ["......", "......", ".r...r", "..rr..", "......", "......"],
+  topMap: [".gts..", "st.sts", "g.f...", "...bbp", "bb....", "..gf.p"],
+  windows: [],
+  doors: [],
+  suspects: [
+    {
+      id: "A",
+      name: "Daan",
+      attributes: {
+        gender: "m",
+        glasses: false,
+        beard: true,
+        bald: false,
+        hair: "white",
+      },
+      clues: [
+        {
+          type: "roomExists",
+          object: "carpet",
+          relation: "on",
+        },
+      ],
+    },
+    {
+      id: "B",
+      name: "Cato",
+      attributes: {
+        gender: "f",
+        glasses: false,
+        beard: false,
+        bald: false,
+        hair: "blond",
+      },
+      clues: [
+        {
+          type: "direction",
+          of: "A",
+          dir: "north",
+        },
+      ],
+    },
+    {
+      id: "C",
+      name: "Gijs",
+      attributes: {
+        gender: "m",
+        glasses: true,
+        beard: true,
+        bald: false,
+        hair: "red",
+      },
+      clues: [
+        {
+          type: "and",
+          clues: [
+            {
+              type: "not",
+              clue: {
+                type: "atWall",
+              },
+            },
+            {
+              type: "nearObject",
+              object: "carpet",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "D",
+      name: "Hugo",
+      attributes: {
+        gender: "m",
+        glasses: true,
+        beard: true,
+        bald: false,
+        hair: "red",
+      },
+      clues: [
+        {
+          type: "not",
+          clue: {
+            type: "nearObject",
+            object: "plant",
+          },
+        },
+      ],
+    },
+    {
+      id: "E",
+      name: "Hanna",
+      attributes: {
+        gender: "f",
+        glasses: true,
+        beard: false,
+        bald: false,
+        hair: "blond",
+      },
+      clues: [
+        {
+          type: "roomExists",
+          relation: "corner",
+        },
+      ],
+    },
+  ],
+  victim: {
+    name: "Sofie",
+    attributes: {
+      gender: "f",
+      glasses: false,
+      beard: false,
+      bald: false,
+      hair: "red",
+    },
+  },
+  boardClues: [
+    {
+      type: "countOnObject",
+      object: "chair",
+      count: 1,
+    },
+  ],
+  title: "Het lege aquarium",
 };

@@ -92,7 +92,9 @@ describe("Wie was het? in de catalogus en de router", () => {
 
     expect(await screen.findByRole("heading", { name: "Waar mag je staan?" })).toBeTruthy();
     expect(
-      screen.getByText("Het slachtoffer is alleen in een kamer met precies één verdachte."),
+      screen.getByText(
+        "De buit is in een kamer met precies één verdachte. Die verdachte is de dief.",
+      ),
     ).toBeTruthy();
 
     const magWel = screen.getByRole("list", { name: "Hier mag je staan" });
@@ -241,7 +243,7 @@ describe("Wie was het? controleren en de afloop", () => {
     const status = screen.getByRole("status");
     expect(status.textContent).toContain("Nog niet helemaal");
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(screen.queryByRole("region", { name: "De dader" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "De dief" })).toBeNull();
     expect(useMurdokuStore.getState().play?.wrongCheck).toBe(true);
     expect(useMurdokuStore.getState().play?.placements.get("C")).toBe(8);
     expect(screen.getByRole("button", { name: /^Cato, rij 3, kolom 1/ })).toBeTruthy();
@@ -256,18 +258,22 @@ describe("Wie was het? controleren en de afloop", () => {
     expect(await screen.findByRole("dialog")).toBeTruthy();
   });
 
-  it("onthult de dader en de kamer van het slachtoffer", async () => {
+  it("onthult de dief en de kamer van de buit", async () => {
     await renderSolvedIntro();
 
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByRole("heading", { name: "Opgelost!" })).toBeTruthy();
-    expect(within(dialog).getByText("Cato was als enige bij Vera in de badkamer.")).toBeTruthy();
+    expect(
+      within(dialog).getByText("Cato was als enige bij de taart in de badkamer."),
+    ).toBeTruthy();
 
-    const reveal = screen.getByRole("region", { name: "De dader" });
-    expect(within(reveal).getByText("Cato was als enige bij Vera in de badkamer.")).toBeTruthy();
+    const reveal = screen.getByRole("region", { name: "De dief" });
+    expect(
+      within(reveal).getByText("Cato was als enige bij de taart in de badkamer."),
+    ).toBeTruthy();
 
-    // Het slachtoffer staat nu op het bord en de dader is de enige in haar kamer.
-    expect(screen.getByRole("button", { name: /^Vera, rij 4, kolom 3/ })).toBeTruthy();
+    // De buit staat nu op het bord en de dief is de enige in die kamer.
+    expect(screen.getByRole("button", { name: /^de taart, rij 4, kolom 3/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /^Cato, rij 3, kolom 4/ })).toBeTruthy();
     expect(useMurdokuStore.getState().play?.phase).toBe("solved");
     expect((screen.getByRole("button", { name: "Controleer" }) as HTMLButtonElement).disabled).toBe(
@@ -277,7 +283,7 @@ describe("Wie was het? controleren en de afloop", () => {
     // De viering kan weg om de omlijnde kamer rustig te bekijken.
     fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk de plattegrond" }));
     expect(screen.queryByRole("dialog")).toBeNull();
-    expect(screen.getByRole("region", { name: "De dader" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "De dief" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Nog een keer" })).toBeTruthy();
     expect(useMurdokuStore.getState().play?.phase).toBe("solved");
   });
@@ -291,7 +297,7 @@ describe("Wie was het? controleren en de afloop", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(useMurdokuStore.getState().play?.phase).toBe("playing");
     expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
-    expect(screen.queryByRole("region", { name: "De dader" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "De dief" })).toBeNull();
   });
 });
 
@@ -330,7 +336,7 @@ describe("Wie was het? hints en tikbare woorden", () => {
     expect(screen.queryByRole("button", { name: /^leeg, licht op, rij 1, kolom 1/ })).toBeNull();
   });
 
-  it("geeft een hint in trapjes: eerst wijzen, dan één persoon", async () => {
+  it("geeft een hint in trapjes: eerst de aanwijzing, dan de plek, dan de zet", async () => {
     renderApp("/mysterie");
 
     await screen.findByRole("heading", { name: "Wie is wie?" });
@@ -338,16 +344,25 @@ describe("Wie was het? hints en tikbare woorden", () => {
 
     fireEvent.click(hintButton);
 
-    // Eerst alleen wijzen: de keuken licht op en er verandert niets op het bord.
+    // Eerst de aanwijzing van Bram: geen kamer, wel de stoel waar hij naar verwijst.
     expect(screen.getByRole("status").textContent).toContain(
-      "Kijk eens naar de keuken, waar Bram nog kan staan.",
+      "Kijk eens naar de aanwijzing van Bram. Waar is nog een stoel?",
     );
-    expect(screen.getByRole("button", { name: /^leeg, licht op, rij 1, kolom 1/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /^leeg, licht op, rij 2, kolom 1/ })).toBeTruthy();
     expect(useMurdokuStore.getState().play?.placements.size).toBe(0);
 
     fireEvent.click(hintButton);
 
-    // Daarna één gedwongen zet, met een korte reden.
+    // Daarna de exacte cel met de reden.
+    expect(screen.getByRole("status").textContent).toContain(
+      "Bram stond op een stoel. Alleen de keuken blijft over, en dit is het enige vrije vakje daar.",
+    );
+    expect(screen.getByRole("button", { name: /^leeg, licht op, rij 2, kolom 1/ })).toBeTruthy();
+    expect(useMurdokuStore.getState().play?.placements.size).toBe(0);
+
+    fireEvent.click(hintButton);
+
+    // Pas de derde tik doet de gedwongen zet.
     expect(screen.getByRole("status").textContent).toContain(
       "Zet Bram op R2/K1, want hij stond op een stoel.",
     );
@@ -380,6 +395,7 @@ describe("Wie was het? hints en tikbare woorden", () => {
     fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 2, kolom 1/ }));
 
     const hintButton = screen.getByRole("button", { name: "Aanwijzing" });
+    fireEvent.click(hintButton);
     fireEvent.click(hintButton);
     fireEvent.click(hintButton);
 

@@ -43,29 +43,27 @@ function renderApp(path = "/") {
   return router;
 }
 
-/** De zes schermen in de volgorde van de uitleg. */
+/** De zeven schermen in de volgorde van de uitleg. */
 const STEP_TITLES = [
   "Het doel",
   "Eén per rij en kolom",
   "Wat mag je bezetten?",
   "Wat betekent naast?",
+  "Hoger en lager",
   "Plaatsen, kruisen en terug",
   "De onthulling",
 ];
 
 /** De woordenlijst met alle aanwijzingen van de eerste versie. */
 const GLOSSARY_TERMS = [
-  "alleen",
-  "alleen met",
-  "leeg",
+  "de buit",
+  "de dief",
   "naast",
   "hoek",
   "voor een raam",
   "rij en kolom",
   "links en rechts",
   "boven en onder",
-  "de enige op een stoel",
-  "twee personen naast een tafel",
   "ruimte",
 ];
 
@@ -77,7 +75,7 @@ describe("Wie was het? — de uitleg is bereikbaar", () => {
     fireEvent.click(screen.getByRole("button", { name: "Uitleg en woordenlijst" }));
 
     expect(await screen.findByRole("heading", { name: "Zo werkt het" })).toBeTruthy();
-    expect(screen.getByText("Stap 1 van 6")).toBeTruthy();
+    expect(screen.getByText("Stap 1 van 7")).toBeTruthy();
   });
 
   it("houdt de uitleg ook bij het eerste bezoek zichtbaar", async () => {
@@ -96,13 +94,13 @@ describe("Wie was het? — de uitleg is bereikbaar", () => {
   });
 });
 
-describe("Wie was het? — de zes schermen", () => {
+describe("Wie was het? — de zeven schermen", () => {
   it("bladert met één stap per scherm door de uitleg", async () => {
     renderApp("/mysterie/les");
     await screen.findByRole("heading", { name: "Zo werkt het" });
 
     for (const [index, title] of STEP_TITLES.entries()) {
-      expect(screen.getByText(`Stap ${index + 1} van 6`)).toBeTruthy();
+      expect(screen.getByText(`Stap ${index + 1} van 7`)).toBeTruthy();
       expect(screen.getByRole("heading", { name: title })).toBeTruthy();
       if (index < STEP_TITLES.length - 1) {
         fireEvent.click(screen.getByRole("button", { name: "Volgende stap" }));
@@ -121,11 +119,11 @@ describe("Wie was het? — de zes schermen", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Stap 4: Wat betekent naast?" }));
 
-    expect(screen.getByText("Stap 4 van 6")).toBeTruthy();
+    expect(screen.getByText("Stap 4 van 7")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Wat betekent naast?" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Vorige stap" }));
-    expect(screen.getByText("Stap 3 van 6")).toBeTruthy();
+    expect(screen.getByText("Stap 3 van 7")).toBeTruthy();
   });
 
   it("toont bij elke stap een diagram met een beschrijving", async () => {
@@ -168,7 +166,8 @@ describe("Wie was het? — de woordenlijst", () => {
     expect(
       within(glossary).getByText(/Aan de andere kant van de muur is niet naast/i),
     ).toBeTruthy();
-    expect(within(glossary).getByText(/Het slachtoffer telt gewoon mee/i)).toBeTruthy();
+    expect(within(glossary).getByText(/niet mee als persoon/i)).toBeTruthy();
+    expect(within(glossary).getByText(/Elke rij hoger of lager/i)).toBeTruthy();
   });
 });
 
