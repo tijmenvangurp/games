@@ -44,7 +44,8 @@ describe("murdoku bewaren en hervatten", () => {
     store().showHint();
 
     const saved = loadMurdokuState();
-    expect(saved.version).toBe(1);
+    expect(saved.version).toBe(2);
+    expect(saved.profileId).toBe("local");
     expect(saved.current?.levelId).toBe(intro.id);
     expect(saved.current?.placements).toEqual({ A: 1 });
     expect(saved.current?.crosses).toEqual([8]);

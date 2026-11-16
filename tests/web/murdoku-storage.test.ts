@@ -10,7 +10,8 @@ import {
   type MurdokuPlayState,
 } from "@features/murdoku-game";
 
-const STORAGE_KEY = "games.mysterie.v1";
+const STORAGE_KEY = "games.mysterie.v2";
+const LEGACY_STORAGE_KEY = "games.mysterie.v1";
 
 const hint: MurdokuHintState = {
   stage: "cross",
@@ -55,7 +56,8 @@ describe("murdoku opslag", () => {
     });
 
     expect(loadMurdokuState()).toEqual({
-      version: 1,
+      version: 2,
+      profileId: "local",
       current: {
         levelId: MURDOKU_INTRO_LEVEL.id,
         placements: { A: 1, B: 4 },
@@ -69,21 +71,26 @@ describe("murdoku opslag", () => {
       },
       solved: ["de-verdwenen-taart"],
       settings,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
   });
 
   it("begint leeg zonder opgeslagen staat", () => {
     expect(loadMurdokuState()).toEqual({
-      version: 1,
+      version: 2,
+      profileId: "local",
       current: null,
       solved: [],
       settings: DEFAULT_MURDOKU_SETTINGS,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
   });
 
   it("migreert de versieloze vorm uit de onderzoeksnotitie", () => {
     localStorage.setItem(
-      STORAGE_KEY,
+      LEGACY_STORAGE_KEY,
       JSON.stringify({
         solved: ["de-verdwenen-taart", "de-verdwenen-taart"],
         current: {
@@ -96,7 +103,8 @@ describe("murdoku opslag", () => {
     );
 
     expect(loadMurdokuState()).toEqual({
-      version: 1,
+      version: 2,
+      profileId: "local",
       current: {
         levelId: MURDOKU_INTRO_LEVEL.id,
         placements: { A: 1 },
@@ -110,12 +118,14 @@ describe("murdoku opslag", () => {
       },
       solved: ["de-verdwenen-taart"],
       settings: { autoCross: false, crossOnBlocked: false },
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
   });
 
   it("migreert versie 0 met dezelfde vorm", () => {
     localStorage.setItem(
-      STORAGE_KEY,
+      LEGACY_STORAGE_KEY,
       JSON.stringify({
         version: 0,
         current: { levelId: MURDOKU_INTRO_LEVEL.id, marks: [4] },
@@ -123,9 +133,30 @@ describe("murdoku opslag", () => {
     );
 
     const state = loadMurdokuState();
-    expect(state.version).toBe(1);
+    expect(state.version).toBe(2);
     expect(state.current?.crosses).toEqual([4]);
     expect(state.settings).toEqual(DEFAULT_MURDOKU_SETTINGS);
+    expect(state.adaptive).toEqual({ levelIndex: 0, streak: 0 });
+    expect(state.attempts).toEqual([]);
+  });
+
+  it("migreert de v1-opslag van #125 naar versie 2", () => {
+    localStorage.setItem(
+      LEGACY_STORAGE_KEY,
+      JSON.stringify({
+        version: 1,
+        current: { levelId: MURDOKU_INTRO_LEVEL.id, placements: { A: 1 } },
+        solved: ["de-verdwenen-taart"],
+        settings: { autoCross: false },
+      }),
+    );
+
+    const state = loadMurdokuState();
+    expect(state.version).toBe(2);
+    expect(state.current?.placements).toEqual({ A: 1 });
+    expect(state.solved).toEqual(["de-verdwenen-taart"]);
+    expect(state.adaptive.levelIndex).toBe(0);
+    expect(state.attempts).toEqual([]);
   });
 
   it("gooit een onbekende versie of kapotte JSON veilig weg", () => {
@@ -203,10 +234,13 @@ describe("murdoku opslag", () => {
     );
 
     expect(loadMurdokuState()).toEqual({
-      version: 1,
+      version: 2,
+      profileId: "local",
       current: null,
       solved: [],
       settings: DEFAULT_MURDOKU_SETTINGS,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
   });
 
@@ -237,6 +271,60 @@ describe("murdoku opslag", () => {
     expect(restored.hintsUsed).toBe(2);
     expect(restored.solvedCaseIds.has("de-verdwenen-taart")).toBe(true);
     expect(restored.settings).toEqual(settings);
+    expect(restored.adaptive).toEqual({ levelIndex: 0, streak: 0 });
+    expect(restored.attempts).toEqual([]);
+  });
+
+  it("bewaart en herstelt het niveau en het begrensde pogingenlog", () => {
+    const attempts = Array.from({ length: 205 }, (_, index) => ({
+      itemId: "de-verdwenen-taart",
+      ok: index % 2 === 0,
+      at: 1_700_000_000_000 + index,
+      durationMs: index * 1000,
+      hints: index % 4,
+    }));
+
+    saveMurdokuState({
+      play: null,
+      hint: null,
+      hintsUsed: 0,
+      solvedCaseIds: new Set(),
+      settings: DEFAULT_MURDOKU_SETTINGS,
+      adaptive: { levelIndex: 5, streak: 0 },
+      attempts,
+    });
+
+    const saved = loadMurdokuState();
+    expect(saved.profileId).toBe("local");
+    expect(saved.adaptive).toEqual({ levelIndex: 5, streak: 0 });
+    expect(saved.attempts).toHaveLength(200);
+    expect(saved.attempts[0]?.at).toBe(1_700_000_000_000 + 5);
+    expect(saved.attempts.at(-1)?.at).toBe(1_700_000_000_204);
+
+    const restored = restoreMurdokuState();
+    expect(restored.adaptive.levelIndex).toBe(5);
+    expect(restored.attempts).toHaveLength(200);
+  });
+
+  it("laat ongeldige pogingen en een niveau buiten de lijst vallen", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        version: 2,
+        adaptive: { levelIndex: 999, streak: -2 },
+        attempts: [
+          { itemId: "de-verdwenen-taart", ok: true, at: 1, durationMs: 2, hints: 0 },
+          { itemId: "", ok: true, at: 1, durationMs: 2, hints: 0 },
+          { itemId: "de-verdwenen-taart", ok: "ja", at: 1, durationMs: 2, hints: 0 },
+          { itemId: "de-verdwenen-taart", ok: false, at: 1, durationMs: -1, hints: 0 },
+          { itemId: "de-verdwenen-taart", ok: false, at: 1, durationMs: 2, hints: -1 },
+        ],
+      }),
+    );
+
+    const state = loadMurdokuState();
+    expect(state.adaptive).toEqual({ levelIndex: 11, streak: 0 });
+    expect(state.attempts).toHaveLength(1);
   });
 
   it("herstelt een opgeloste zaak met de dader en het slachtoffer", () => {
