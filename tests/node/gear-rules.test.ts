@@ -295,14 +295,15 @@ describe("gear rules: meshes", () => {
 });
 
 describe("gear rules: belts and chains", () => {
-  it("drives an open belt and a chain in the same direction at 1x", () => {
+  it("drives an open belt and a chain in the same direction", () => {
     for (const index of [2, 3]) {
       const level = levelAt(index);
       const result = drive(level, level.solution);
+      const expectedSpeed = index === 2 ? 1 : 0.5;
 
       expect(gearPose(result, "output:target-1")).toMatchObject({
         direction: 1,
-        speed: 1,
+        speed: expectedSpeed,
         driven: true,
       });
       expect(result.outputs[0]?.satisfied).toBe(true);

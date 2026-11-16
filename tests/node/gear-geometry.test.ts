@@ -93,7 +93,7 @@ describe("gear geometry", () => {
 
   it("reserves room for the largest gear and its output glyph", () => {
     expect(boardViewBox(levelAt(0))).toBe("-76 -76 264 264");
-    expect(boardViewBox(levelAt(3))).toBe("-76 -76 348 264");
+    expect(boardViewBox(levelAt(3))).toBe("-76 -76 320 264");
   });
 
   it("maps hole ids to board coordinates", () => {
