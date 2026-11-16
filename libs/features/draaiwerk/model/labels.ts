@@ -23,7 +23,7 @@ const NEW_LABELS: Record<string, string> = {
   "reverse-motor": "andere motorrichting",
   size: "groot en klein",
   "speed-gauge": "snelheidsmeter",
-  "belt-ratio": "riemvertraging",
+  "belt-ratio": "kettingvertraging",
   "two-ratios": "twee maten",
   generator: "lamp",
   lift: "lift",
