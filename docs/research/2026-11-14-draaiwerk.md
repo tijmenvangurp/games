@@ -586,7 +586,9 @@ samen verbindt. Daarvoor is de mechanica opnieuw bekeken:
   bord wordt geweigerd.
 - **Ribbels.** De as krijgt duidelijke diagonale schroefdraden, een metalen
   gradient, lagers en een contactpatch waar de tanden van beide wielen over de
-  as heen zichtbaar blijven.
+  as heen zichtbaar blijven. Een pijl om de as toont de draairichting; de
+  ribbels staan stil. Schuivende streepjes zijn vervangen door een statische
+  schroef met een richtingpijl, zoals in de referentietekening.
 - **Bronnen.** [Worm drive](https://en.wikipedia.org/wiki/Worm_drive),
   [RoyMech](https://www.roymech.co.uk/Useful_Tables/Drive/Worm_Gears.html) en
   een bestaande [dubbele-uitgang-wormkast](https://tramec.it/en/product/double-output-worm-gearboxes-series-vm)

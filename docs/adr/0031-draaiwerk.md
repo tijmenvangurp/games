@@ -186,10 +186,12 @@ vorige addendum.
   die al in elkaar grijpen, een as die van het bord loopt en een derde wiel
   onder de as. De speler tikt één wiel; de app kiest het tweede even grote
   wiel.
-- **Ribbels.** De as heeft een metalen gradient, duidelijke diagonale
-  schroefdraden, lagers en een contactpatch waarin de tanden van beide wielen
-  over de as heen zichtbaar blijven. Zo leest het als een schroef die in de
-  tanden grijpt, niet als een kale staaf.
+- **Ribbels en richting.** De as heeft een metalen gradient, duidelijke
+  diagonale schroefdraden, lagers en een contactpatch waarin de tanden van
+  beide wielen over de as heen zichtbaar blijven. Een pijl om de as toont de
+  draairichting; de ribbels zelf staan stil. Schuivende streepjes zijn daarmee
+  vervangen door een statische schroef met een duidelijke richtingpijl, zoals
+  in de referentietekening.
 - **Aangepaste levels.** Level 10: twee gelijke wielen, 0,5×. Level 11: twee
   gelijke wielen, 0,25×. Level 12 en 13: de ketting is 1× en lost; de wormas is
   0,5× en te langzaam. Level 14: lift met 0,25×. Level 16: ketting 1× voor de

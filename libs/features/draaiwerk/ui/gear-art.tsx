@@ -1,4 +1,4 @@
-import { memo, type CSSProperties, type KeyboardEvent } from "react";
+import { memo, type KeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
 import {
   gearPath,
@@ -532,7 +532,7 @@ export function WormBar({
     { pose: toPose, tone: toTone, contact: contacts[1] },
   ];
   const threadPitch = pitch;
-  const helix = Math.min(8, threadPitch * 0.62);
+  const helix = Math.min(9, threadPitch * 0.62);
 
   return (
     <g
@@ -560,6 +560,34 @@ export function WormBar({
           <clipPath id={clipId}>
             <rect height={16} rx={8} width={Math.max(0, length - 2)} x={-length / 2 + 1} y={-8} />
           </clipPath>
+          <linearGradient
+            id={`${clipId}-thread`}
+            x1="0"
+            x2="0"
+            y1="-8"
+            y2="8"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stopColor="#3f4852" stopOpacity={0.2} />
+            <stop offset="0.18" stopColor="#3f4852" stopOpacity={0.95} />
+            <stop offset="0.5" stopColor="#4a535d" stopOpacity={1} />
+            <stop offset="0.82" stopColor="#3f4852" stopOpacity={0.95} />
+            <stop offset="1" stopColor="#3f4852" stopOpacity={0.2} />
+          </linearGradient>
+          <linearGradient
+            id={`${clipId}-highlight`}
+            x1="0"
+            x2="0"
+            y1="-8"
+            y2="8"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stopColor="#e5eaee" stopOpacity={0.1} />
+            <stop offset="0.22" stopColor="#e5eaee" stopOpacity={0.75} />
+            <stop offset="0.5" stopColor="#f3f6f8" stopOpacity={0.9} />
+            <stop offset="0.78" stopColor="#e5eaee" stopOpacity={0.55} />
+            <stop offset="1" stopColor="#e5eaee" stopOpacity={0.1} />
+          </linearGradient>
         </defs>
         {/* Contact shadows sit under the body, so only their lower edge shows. */}
         {contacts.map((contact) => (
@@ -573,6 +601,30 @@ export function WormBar({
             ry={2.6}
           />
         ))}
+        {/* A static screw with a direction arrow reads better than sliding
+            stripes: the arrow shows the shaft turning, the ribs stay crisp. */}
+        <g
+          className="draaiwerk-worm-arrow"
+          data-direction={direction}
+          data-worm-spin={active ? "on" : "off"}
+        >
+          <ellipse
+            cx={0}
+            cy={0}
+            fill="none"
+            opacity={0.9}
+            rx={7}
+            ry={18}
+            stroke="#4c7f7b"
+            strokeWidth={2}
+          />
+          <path
+            d={
+              direction === 1 ? "M 0 -20 L 5 -14.5 L -5 -14.5 Z" : "M 0 -20 L -5 -14.5 L 5 -14.5 Z"
+            }
+            fill="#4c7f7b"
+          />
+        </g>
         {/* Axle stubs and bearing blocks run into the frame at both ends. */}
         <rect fill="#5d6671" height={3} rx={1.5} width={10} x={-length / 2 - 6} y={-1.5} />
         <rect fill="#5d6671" height={3} rx={1.5} width={10} x={length / 2 - 4} y={-1.5} />
@@ -615,30 +667,35 @@ export function WormBar({
           x={-length / 2 + 7}
           y={-6.2}
         />
-        <g
-          className="draaiwerk-worm-ribs"
-          clipPath={`url(#${clipId})`}
-          data-spin={active ? "on" : "off"}
-          style={{ "--worm-pitch": `${Math.round(threadPitch * 10) / 10}px` } as CSSProperties}
-        >
+        <g clipPath={`url(#${clipId})`}>
           {Array.from({ length: coils + 2 }, (_, index) => {
             const x = -length / 2 + threadPitch * 0.35 + index * threadPitch;
+            const curve = `M ${x - helix} -8 C ${x - helix * 0.3} -4 ${x + helix * 0.3} 4 ${x + helix} 8`;
             return (
               <g key={`coil-${index}`}>
                 <path
-                  d={`M ${x - helix} -8 C ${x - helix * 0.35} -3 ${x + helix * 0.35} 3 ${x + helix} 8`}
+                  d={curve}
                   fill="none"
-                  stroke="#3f4852"
+                  opacity={0.4}
+                  stroke="#2f373f"
                   strokeLinecap="round"
-                  strokeWidth={2.6}
+                  strokeWidth={6.4}
+                  transform="translate(1.2 1.2)"
                 />
                 <path
-                  d={`M ${x - helix + 1.8} -8 C ${x - helix * 0.35 + 1.8} -3 ${x + helix * 0.35 + 1.8} 3 ${x + helix + 1.8} 8`}
+                  d={curve}
                   fill="none"
-                  opacity={0.62}
-                  stroke="#e6ebee"
+                  stroke={`url(#${clipId}-thread)`}
                   strokeLinecap="round"
-                  strokeWidth={1.1}
+                  strokeWidth={4.6}
+                />
+                <path
+                  d={curve}
+                  fill="none"
+                  stroke={`url(#${clipId}-highlight)`}
+                  strokeLinecap="round"
+                  strokeWidth={1.4}
+                  transform="translate(-1.1 -1.1)"
                 />
               </g>
             );

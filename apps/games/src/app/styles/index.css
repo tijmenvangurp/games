@@ -690,18 +690,6 @@
     cursor: grabbing;
   }
 
-  .draaiwerk-worm-ribs {
-    animation: draaiwerk-worm-ribs 900ms linear infinite;
-  }
-
-  [data-direction="-1"] .draaiwerk-worm-ribs {
-    animation-direction: reverse;
-  }
-
-  .draaiwerk-worm-ribs[data-spin="off"] {
-    animation: none;
-  }
-
   .draaiwerk-direction {
     display: none;
   }
@@ -755,12 +743,6 @@
     }
   }
 
-  @keyframes draaiwerk-worm-ribs {
-    to {
-      transform: translateX(calc(-1 * var(--worm-pitch, 9px)));
-    }
-  }
-
   @keyframes draaiwerk-pulse {
     0%,
     100% {
@@ -785,10 +767,6 @@
 @layer motion {
   @media (prefers-reduced-motion: reduce) {
     .draaiwerk-rotor {
-      animation: none;
-    }
-
-    .draaiwerk-worm-ribs {
       animation: none;
     }
 
