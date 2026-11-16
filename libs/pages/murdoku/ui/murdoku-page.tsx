@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { createMurdokuPlay, everyonePlaced, useMurdokuStore } from "@features/murdoku-game";
 import { GameShell } from "@widgets/game-shell";
 import { useShallow } from "zustand/react/shallow";
-import { revealSentenceFor } from "./murdoku-copy";
+import { revealSentenceFor, progressSentenceFor } from "./murdoku-copy";
 import { MurdokuGameBody } from "./murdoku-game-body";
 import { useMurdokuSession } from "./use-murdoku-session";
 
@@ -30,12 +30,14 @@ export function MurdokuPage() {
     focusClue,
     setAutoCross,
     setCrossOnBlocked,
+    abandon,
     settings,
     storedPlay,
     historyLength,
     hint,
     clueFocus,
     clueFocusLabel,
+    lastRound,
   } = useMurdokuStore(
     useShallow((state) => ({
       start: state.start,
@@ -48,12 +50,14 @@ export function MurdokuPage() {
       focusClue: state.focusClue,
       setAutoCross: state.setAutoCross,
       setCrossOnBlocked: state.setCrossOnBlocked,
+      abandon: state.abandon,
       settings: state.settings,
       storedPlay: state.play,
       historyLength: state.history.length,
       hint: state.hint,
       clueFocus: state.clueFocus,
       clueFocusLabel: state.clueFocusLabel,
+      lastRound: state.lastRound,
     })),
   );
   const { activeCase, puzzle, text, solution, title } = useMurdokuSession(storedPlay);
@@ -68,6 +72,7 @@ export function MurdokuPage() {
   // juiste beeld en houdt de pagina zonder flikkering bruikbaar.
   const play = storedPlay?.levelId === puzzle.id ? storedPlay : createMurdokuPlay(puzzle.id);
   const revealSentence = revealSentenceFor(puzzle, text, play);
+  const progressMessage = progressSentenceFor(lastRound);
   const hintMessage = hint ? text.explanation(hint.explanation) : null;
   const clueMessage = clueFocusLabel
     ? text.explanation({ key: "board.wordOn", params: { word: clueFocusLabel } })
@@ -78,7 +83,10 @@ export function MurdokuPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
+      onBack={() => {
+        abandon();
+        navigate({ to: "/" });
+      }}
       showSpeech={false}
       subtitle={`${title} · ${puzzle.board.width} × ${puzzle.board.height}`}
       title="Wie was het?"
@@ -96,13 +104,21 @@ export function MurdokuPage() {
           onFocusWord: focusClue,
         }}
         play={play}
+        progressMessage={progressMessage}
         revealSentence={revealSentence}
         settingsView={{ settings, onAutoCross: setAutoCross, onCrossOnBlocked: setCrossOnBlocked }}
         actions={{
           cellTap: tapCell,
           check: () => check(solution),
+          chooseCase: () => {
+            abandon();
+            navigate({ to: "/mysterie/zaken" });
+          },
           help: () => navigate({ to: "/mysterie/les" }),
-          home: () => navigate({ to: "/" }),
+          home: () => {
+            abandon();
+            navigate({ to: "/" });
+          },
           restart: () => start(puzzle),
           selectPerson,
           toggleCross: () => setMode(play.mode === "cross" ? "place" : "cross"),

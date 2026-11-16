@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { DEFAULT_MURDOKU_SETTINGS, useMurdokuStore } from "@features/murdoku-game";
+import { GameIcon } from "@shared/ui";
 
 /**
  * jsdom tekent geen canvas. Het bord roept alleen tekenmethodes aan; de pixels
@@ -50,6 +51,14 @@ function renderApp(path = "/") {
 }
 
 describe("Wie was het? in de catalogus en de router", () => {
+  it("geeft het spel een eigen icoon, niet dat van Zoeken", () => {
+    const murdoku = render(<GameIcon name="murdoku" />).container.innerHTML;
+    const seek = render(<GameIcon name="seek" />).container.innerHTML;
+
+    expect(murdoku.length).toBeGreaterThan(0);
+    expect(murdoku).not.toBe(seek);
+  });
+
   it("opent de zaak vanuit het startscherm", async () => {
     renderApp("/");
 

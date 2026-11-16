@@ -17,6 +17,7 @@ export {
 } from "./model/murdoku";
 
 export { MURDOKU_CASES, MURDOKU_DEFAULT_CASE_ID, murdokuCaseById } from "./model/cases/cases";
+export { MURDOKU_LEVELS, murdokuClueCount } from "./model/cases/levels";
 export { validateMurdokuCases } from "./model/cases/validate";
 export type { MurdokuCase } from "./model/cases/types";
 
