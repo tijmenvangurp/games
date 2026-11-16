@@ -22,6 +22,8 @@ interface MurdokuGameActions {
   check: () => void;
   restart: () => void;
   selectPerson: (person: PersonId) => void;
+  /** Gaat naar de zaakkeuze en sluit de lopende ronde als die nog open is. */
+  chooseCase: () => void;
   /** Opent de uitleg met de zes schermen en de woordenlijst. */
   help: () => void;
   home: () => void;
@@ -35,6 +37,8 @@ interface MurdokuGameBodyProps {
   canCheck: boolean;
   historyLength: number;
   revealSentence: string | null;
+  /** De rustige uitleg over het niveau na een opgeloste zaak. */
+  progressMessage: string | null;
   hintView: MurdokuHintView;
   actions: MurdokuGameActions;
 }
@@ -119,6 +123,7 @@ export function MurdokuGameBody({
   canCheck,
   historyLength,
   revealSentence,
+  progressMessage,
   hintView,
   actions,
 }: MurdokuGameBodyProps) {
@@ -150,7 +155,9 @@ export function MurdokuGameBody({
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{intro}</p>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild className="min-h-11" variant="outline">
-            <Link to="/mysterie/zaken">Kies een andere zaak</Link>
+            <Link to="/mysterie/zaken" onClick={actions.chooseCase}>
+              Kies een andere zaak
+            </Link>
           </Button>
           <Button asChild className="min-h-11" variant="outline">
             <Link to="/mysterie/les">Zo werkt het</Link>
@@ -180,7 +187,12 @@ export function MurdokuGameBody({
           }}
         />
         {revealSentence ? (
-          <MurdokuReveal ref={revealRef} sentence={revealSentence} onRestart={restart} />
+          <MurdokuReveal
+            ref={revealRef}
+            progressMessage={progressMessage}
+            sentence={revealSentence}
+            onRestart={restart}
+          />
         ) : null}
         <MurdokuInfoSections
           caseView={caseView}

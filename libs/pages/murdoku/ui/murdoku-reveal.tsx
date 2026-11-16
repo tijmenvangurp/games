@@ -4,6 +4,8 @@ import { Button } from "@shared/ui";
 interface MurdokuRevealProps {
   /** De afloopzin met de dader en de kamer van het slachtoffer. */
   sentence: string;
+  /** Wat het niveau na deze zaak doet; `null` als het gelijk blijft. */
+  progressMessage?: string | null;
   /** De viering kan de focus hierheen verplaatsen als hij dichtgaat. */
   ref?: Ref<HTMLElement>;
   onRestart: () => void;
@@ -14,7 +16,12 @@ interface MurdokuRevealProps {
  * en een rustige manier om opnieuw te beginnen. Het bord erboven toont het
  * slachtoffer en omlijnt haar kamer.
  */
-export function MurdokuReveal({ sentence, ref, onRestart }: MurdokuRevealProps) {
+export function MurdokuReveal({
+  sentence,
+  progressMessage = null,
+  ref,
+  onRestart,
+}: MurdokuRevealProps) {
   return (
     <section
       ref={ref}
@@ -29,6 +36,11 @@ export function MurdokuReveal({ sentence, ref, onRestart }: MurdokuRevealProps) 
       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
         Het slachtoffer staat ook op de plattegrond; haar kamer is omlijnd.
       </p>
+      {progressMessage ? (
+        <p className="mt-2 rounded-lg bg-success/10 px-3 py-2 text-sm leading-relaxed text-success">
+          {progressMessage}
+        </p>
+      ) : null}
       <Button className="mt-3 min-h-11" variant="outline" onClick={onRestart}>
         Nog een keer
       </Button>
