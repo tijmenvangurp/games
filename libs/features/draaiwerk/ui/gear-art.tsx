@@ -509,7 +509,7 @@ export function TrayArt({ item }: { item: TrayItem }) {
   if (item.kind === "gear") {
     const radius = 9 + item.size * 2.6;
     return (
-      <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
+      <svg aria-hidden="true" className="h-12 w-20" viewBox="0 0 64 44">
         {miniGear(item.size, 32, 22, radius)}
       </svg>
     );
@@ -517,7 +517,7 @@ export function TrayArt({ item }: { item: TrayItem }) {
 
   if (item.kind === "belt" && item.crossed === true) {
     return (
-      <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
+      <svg aria-hidden="true" className="h-12 w-20" viewBox="0 0 64 44">
         <path
           d="M 18 12 L 46 32"
           stroke="#79828e"
@@ -556,7 +556,7 @@ export function TrayArt({ item }: { item: TrayItem }) {
 
   const loop = "M 20 13.5 L 44 13.5 A 8.5 8.5 0 0 1 44 30.5 L 20 30.5 A 8.5 8.5 0 0 1 20 13.5 Z";
   return (
-    <svg aria-hidden="true" className="h-10 w-16" viewBox="0 0 64 44">
+    <svg aria-hidden="true" className="h-12 w-20" viewBox="0 0 64 44">
       <path
         d={loop}
         fill="none"

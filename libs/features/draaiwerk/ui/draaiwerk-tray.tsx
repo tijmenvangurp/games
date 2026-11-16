@@ -60,15 +60,15 @@ function TrayPart({
         dndPointerDown?.(event);
       }}
     >
-      <span className="relative grid h-12 place-items-center">
+      <span className="relative grid h-14 place-items-center">
         {/* The part stands on the dot grid instead of in a card. */}
         <span
           aria-hidden="true"
-          className="absolute -bottom-1 h-1.5 w-10 rounded-full bg-foreground/10"
+          className="absolute -bottom-1 h-1.5 w-11 rounded-full bg-foreground/10"
         />
         <span
           className={cn(
-            "relative scale-110 rounded-full p-1 transition group-hover:bg-muted/60",
+            "relative rounded-full p-1 transition group-hover:bg-muted/60",
             selected && "bg-primary/10 ring-2 ring-primary/35 group-hover:bg-primary/15",
             used && "opacity-35 grayscale",
           )}
