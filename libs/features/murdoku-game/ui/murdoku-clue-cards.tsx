@@ -91,7 +91,7 @@ export function MurdokuClueCards({
                           aria-label={`Toon ${word.text} op het bord`}
                           aria-pressed={sameClueFocus(activeWord, word.focus)}
                           className={cn(
-                            "relative -my-1 inline touch-manipulation rounded-sm px-0.5 py-1 underline decoration-dotted decoration-2 underline-offset-2 transition-colors before:absolute before:-inset-x-1 before:-inset-y-3 before:content-[''] focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:outline-none",
+                            "relative -my-1 inline touch-manipulation rounded-sm px-0.5 py-1 underline decoration-dotted decoration-2 underline-offset-2 transition-colors before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-[''] focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:outline-none",
                             sameClueFocus(activeWord, word.focus)
                               ? "bg-warning/20 text-foreground"
                               : "decoration-primary/60 text-primary hover:bg-primary/10",
