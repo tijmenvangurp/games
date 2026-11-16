@@ -22,7 +22,7 @@ const NEW_LABELS: Record<string, string> = {
   "reverse-motor": "andere motorrichting",
   size: "groot en klein",
   "worm-as": "wormas",
-  "worm-as-strong": "groot wormwiel",
+  "worm-as-strong": "sterke wormas",
   "speed-gauge": "snelheidsmeter",
   generator: "lamp",
   lift: "lift",
@@ -47,7 +47,7 @@ export function trayShortLabel(item: TrayItem): string {
     case "gear":
       return shortSize(item.size).replace(/^./, (letter) => letter.toUpperCase());
     case "worm":
-      return "Wormas";
+      return item.ratio <= 0.25 ? "Wormas sterk" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruist" : "Ketting";
     case "chain":

@@ -246,13 +246,12 @@ describe("draaiwerk", () => {
     fireEvent.click(gearNode(gearKeyAt(level, solution.toHoleId)));
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
-    const placed = useDraaiwerkStore.getState().placements[0];
-    if (!placed || placed.kind !== "worm") {
-      throw new Error("Wormas was not placed");
-    }
-    expect([placed.fromHoleId, placed.toHoleId].sort()).toEqual(
-      [solution.fromHoleId, solution.toHoleId].sort(),
-    );
+    expect(useDraaiwerkStore.getState().placements[0]).toMatchObject({
+      kind: "worm",
+      fromHoleId: solution.fromHoleId,
+      toHoleId: solution.toHoleId,
+      ratio: solution.ratio,
+    });
   });
 
   it("explains blocked holes and overlapping gears", () => {
@@ -480,6 +479,7 @@ describe("draaiwerk: onderdelen verplaatsen", () => {
       kind: "worm",
       fromHoleId: "0,2",
       toHoleId: "4,2",
+      ratio: worm.ratio,
     };
 
     useDraaiwerkStore.setState({
@@ -992,10 +992,7 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("andere kant");
 
-    const meterLevel: Level = {
-      ...levelAt(11),
-      outputs: levelAt(11).outputs.map((output) => ({ ...output, size: 2 as const })),
-    };
+    const meterLevel = levelAt(11);
     expect(
       statusMessage(
         meterLevel,
@@ -1004,6 +1001,7 @@ describe("draaiwerk: statusmeldingen", () => {
             kind: "worm",
             fromHoleId: "0,2",
             toHoleId: "9,2",
+            ratio: 0.5,
           },
         ]),
         null,
@@ -1012,10 +1010,7 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("meter");
 
-    const generatorLevel: Level = {
-      ...levelAt(12),
-      outputs: levelAt(12).outputs.map((output) => ({ ...output, size: 2 as const })),
-    };
+    const generatorLevel = levelAt(12);
     expect(
       statusMessage(
         generatorLevel,
@@ -1024,6 +1019,7 @@ describe("draaiwerk: statusmeldingen", () => {
             kind: "worm",
             fromHoleId: "0,2",
             toHoleId: "9,2",
+            ratio: 0.5,
           },
         ]),
         null,
@@ -1032,10 +1028,7 @@ describe("draaiwerk: statusmeldingen", () => {
       ),
     ).toContain("lamp");
 
-    const liftLevel: Level = {
-      ...levelAt(13),
-      outputs: levelAt(13).outputs.map((output) => ({ ...output, maxSpeed: 0.4 })),
-    };
+    const liftLevel = levelAt(13);
     expect(
       statusMessage(
         liftLevel,

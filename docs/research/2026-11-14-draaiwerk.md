@@ -560,32 +560,42 @@ De deterministische graaf, de involute-tandwielen, de lokale opslag en de
 CSP blijven ongewijzigd. Zie het addendum in
 [ADR 0031](../adr/0031-draaiwerk.md).
 
-## Update 2026-11-15: wormas als verbinding tussen twee wielen
+## Update 2026-11-16: wormas ligt horizontaal op twee gelijke wielen
 
-Na het spelen van level 10 bleek de wormas nog steeds op één wiel te liggen. Het
-Het gewenste beeld is één schroefas die over twee even grote tandwielen ligt en ze
+Na het spelen van level 10 bleek de wormas nog steeds verkeerd te liggen. Het
+gewenste beeld is één schroefas die over twee even grote tandwielen ligt en ze
 samen verbindt. Daarvoor is de mechanica opnieuw bekeken:
 
 - **Assen.** Een worm en een wormwiel hebben assen die loodrecht op elkaar
   staan. In het bovenaanzicht van het spel staan de wielassen loodrecht op het
-  bord en ligt de wormas in het bordvlak. Een rechte wormas kan daarom meerdere
+  bord en ligt de wormas in het bordvlak. Een rechte wormas kan meerdere
   wielen langs zijn lengte raken.
-- **Verhouding.** De twee wielen op dezelfde worm draaien dezelfde kant op. Hun
-  snelheidsverhouding is de verhouding van hun tandenaantallen; de spoed van de
-  schroef valt weg. Een small wiel naast een groot wiel geeft dus 0,5×, twee
-  even grote wielen 1×.
-- **Plaatsing.** De as ligt op de gemeenschappelijke buitenraaklijn van de twee
-  steekcirkels. Bij even grote wielen is dat horizontaal boven beide; bij
-  ongelijke wielen schuin. De as mag niet over een derde tandwiel lopen en moet
-  met lagers binnen het bord passen.
+- **Ongelijke wielen.** Een rechte as raakt twee ongelijke wielen alleen op een
+  schuine gemeenschappelijke raaklijn. Op het bord leek de as daardoor boven het
+  kleine wiel te zweven en maar één wiel echt te raken. Dat is meetkundig
+  juist, maar visueel niet leesbaar voor een kind.
+- **Gelijke wielen.** Twee even grote wielen leggen de as horizontaal op beide
+  bovenkanten. Daarom is de wormas nu een **compacte wormkast met een vaste
+  vertraging** (0,5× of 0,25×) over twee gelijke wielen. De verhouding komt uit
+  het onderdeel, niet uit de wieldiameters. Dat is een bewuste abstractie: in
+  het echt bepalen het aantal schroefgangen en de tanden van het wormwiel de
+  ratio.
+- **Plaatsing.** De as ligt horizontaal op `straal + WORM_SHAFT_CLEARANCE` boven
+  beide steekcirkels. De speler tikt één wiel; de app kiest het tweede even
+  grote wiel. Een as over een derde wiel, over meshende wielen of buiten het
+  bord wordt geweigerd.
+- **Ribbels.** De as krijgt duidelijke diagonale schroefdraden, een metalen
+  gradient, lagers en een contactpatch waar de tanden van beide wielen over de
+  as heen zichtbaar blijven.
 - **Bronnen.** [Worm drive](https://en.wikipedia.org/wiki/Worm_drive),
   [RoyMech](https://www.roymech.co.uk/Useful_Tables/Drive/Worm_Gears.html) en
   een bestaande [dubbele-uitgang-wormkast](https://tramec.it/en/product/double-output-worm-gearboxes-series-vm)
   met één wormas en twee wormwielen.
 
-De vaste 0,5×/0,25×-ratio's en het eenrichtingsverkeer zijn daarmee vervallen.
-Level 10 verbindt twee even grote wielen; level 11 gebruikt een groot wormwiel
-voor de vertraging. Zie het addendum in [ADR 0031](../adr/0031-draaiwerk.md).
+De vaste 0,5×/0,25×-ratio's en het eenrichtingsverkeer zijn terug. Level 10 en
+11 gebruiken twee even grote wielen; level 12 en 13 houden de ketting als
+1×-oplossing en de wormas als te langzame instinker. Zie het addendum in
+[ADR 0031](../adr/0031-draaiwerk.md).
 
 ## Bronnen
 

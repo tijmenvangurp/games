@@ -1,24 +1,35 @@
-import { canPlace, drive, gearSlots, holeCenter, type Level, type Placement } from "@entities/gear";
+import {
+  canPlace,
+  drive,
+  gearSlots,
+  holeCenter,
+  type Level,
+  type Placement,
+  type TrayItem,
+} from "@entities/gear";
 
+type WormTrayItem = Extract<TrayItem, { kind: "worm" }>;
 type WormPlacement = Extract<Placement, { kind: "worm" }>;
 
-function wormBetween(fromHoleId: string, toHoleId: string): WormPlacement {
+function wormBetween(fromHoleId: string, toHoleId: string, item: WormTrayItem): WormPlacement {
   return {
     kind: "worm",
     fromHoleId,
     toHoleId,
+    ratio: item.ratio,
   };
 }
 
 /**
  * Picks the second gear the worm shaft should lie on. The player only taps one
- * gear; the shaft spans to the gear that best continues the machine. Both
- * orientations are tried because the shaft is a two-way connector.
+ * gear; the shaft spans to the equal gear that best continues the machine. The
+ * worm is one-way, so both orientations are tried.
  */
 export function autoWormPlacement(
   level: Level,
   placements: readonly Placement[],
   holeId: string,
+  item: WormTrayItem,
 ): WormPlacement | null {
   const slots = gearSlots(level, placements);
   if (!slots.some((slot) => slot.holeId === holeId)) {
@@ -33,8 +44,8 @@ export function autoWormPlacement(
     }
     for (const reversed of [false, true]) {
       const placement = reversed
-        ? wormBetween(partner.holeId, holeId)
-        : wormBetween(holeId, partner.holeId);
+        ? wormBetween(partner.holeId, holeId, item)
+        : wormBetween(holeId, partner.holeId, item);
       if (!canPlace(level, placements, placement)) {
         continue;
       }

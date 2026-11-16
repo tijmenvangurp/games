@@ -14,8 +14,8 @@ import {
 
 const level = levelAt(2);
 
-function worm(fromHoleId: string, toHoleId: string): Placement {
-  return { kind: "worm", fromHoleId, toHoleId };
+function worm(fromHoleId: string, toHoleId: string, ratio = 0.5): Placement {
+  return { kind: "worm", fromHoleId, toHoleId, ratio };
 }
 
 describe("draaiwerk placement", () => {
@@ -213,43 +213,6 @@ describe("draaiwerk placement", () => {
     expect(shaft.coils).toBeGreaterThanOrEqual(3);
   });
 
-  it("legt de as schuin over een klein en een groot wiel", () => {
-    const wormLevel = levelAt(10);
-    const placement = wormLevel.solution.find((part) => part.kind === "worm");
-    const wheel = wormLevel.outputs.find((output) => output.id === "target-1");
-    if (!placement || placement.kind !== "worm" || !wheel) {
-      throw new Error("Level 11 has no worm drive");
-    }
-
-    const motorRadius = gearRadius(wormLevel.motor.size);
-    const targetRadius = gearRadius(wheel.size);
-    const motor = holeCenter(wormLevel, placement.fromHoleId);
-    const target = holeCenter(wormLevel, placement.toHoleId);
-    const shaft = wormShaftGeometry(wormLevel, placement, motorRadius, targetRadius);
-    if (!shaft) {
-      throw new Error("Level 11 has no worm shaft");
-    }
-
-    // The common tangent is slanted because the wheels differ in size.
-    expect(Math.abs(shaft.angle)).toBeGreaterThan(0.1);
-    for (const [contact, center, radius] of [
-      [shaft.contacts[0], motor, motorRadius],
-      [shaft.contacts[1], target, targetRadius],
-    ] as const) {
-      expect(Math.hypot(contact.x - center.x, contact.y - center.y)).toBeCloseTo(radius, 6);
-    }
-
-    // Both wheel centres stay on the same side of the shaft, so both wheels
-    // turn the same way.
-    const axis = { x: Math.cos(shaft.angle), y: Math.sin(shaft.angle) };
-    const side = (center: { x: number; y: number }, contact: { x: number; y: number }) =>
-      axis.x * (center.y - contact.y) - axis.y * (center.x - contact.x);
-    expect(Math.sign(side(motor, shaft.contacts[0]))).toBe(
-      Math.sign(side(target, shaft.contacts[1])),
-    );
-    expect(shaft.fits).toBe(true);
-  });
-
   it("formats labels, speeds and outputs", () => {
     expect(formatSpeed(1)).toBe("1");
     expect(formatSpeed(1.5)).toBe("1,5");
@@ -260,7 +223,8 @@ describe("draaiwerk placement", () => {
     expect(trayShortLabel({ id: "g1", kind: "gear", size: 1 })).toBe("Klein");
     expect(trayShortLabel({ id: "g2", kind: "gear", size: 2 })).toBe("Middel");
     expect(trayShortLabel({ id: "g3", kind: "gear", size: 3 })).toBe("Groot");
-    expect(trayShortLabel({ id: "w1", kind: "worm" })).toBe("Wormas");
+    expect(trayShortLabel({ id: "w1", kind: "worm", ratio: 0.5 })).toBe("Wormas");
+    expect(trayShortLabel({ id: "w2", kind: "worm", ratio: 0.25 })).toBe("Wormas sterk");
     expect(trayShortLabel({ id: "b1", kind: "belt" })).toBe("Ketting");
     expect(trayShortLabel({ id: "b2", kind: "belt", crossed: true })).toBe("Gekruist");
     expect(trayShortLabel({ id: "c1", kind: "chain" })).toBe("Ketting");

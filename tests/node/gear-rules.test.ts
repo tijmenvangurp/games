@@ -66,11 +66,16 @@ function gearAt(col: number, row: number, size: GearSize): Placement {
   return { kind: "gear", holeId: `${col},${row}`, size };
 }
 
-function wormAt(from: readonly [number, number], to: readonly [number, number]): Placement {
+function wormAt(
+  from: readonly [number, number],
+  to: readonly [number, number],
+  ratio = 0.5,
+): Placement {
   return {
     kind: "worm",
     fromHoleId: `${from[0]},${from[1]}`,
     toHoleId: `${to[0]},${to[1]}`,
+    ratio,
   };
 }
 
@@ -366,7 +371,7 @@ describe("gear rules: belt runs and surface speed", () => {
     expect(connectionAt(chain).surfaceSpeed).toBeCloseTo(MOTOR_SURFACE_SPEED, 9);
   });
 
-  it("follows a worm-driven gear with a belt at the same speed", () => {
+  it("follows a worm-driven gear with a belt at half speed", () => {
     const level = makeLevel({
       cols: 10,
       rows: 5,
@@ -376,9 +381,9 @@ describe("gear rules: belt runs and surface speed", () => {
     });
     const result = drive(level, level.solution);
 
-    expect(gearPose(result, "gear:4,2").speed).toBeCloseTo(1);
+    expect(gearPose(result, "gear:4,2").speed).toBeCloseTo(0.5);
     const connection = connectionFrom(result, "gear:4,2");
-    expect(connection.surfaceSpeed).toBeCloseTo(MOTOR_SURFACE_SPEED, 9);
+    expect(connection.surfaceSpeed).toBeCloseTo(0.5 * MOTOR_SURFACE_SPEED, 9);
   });
 
   it("follows a pulley that runs at double speed", () => {
@@ -526,16 +531,16 @@ describe("gear rules: worm drive", () => {
     cols: 10,
     rows: 5,
     motor: motorAt(0, 2),
-    outputs: [targetAt(8, 2, { size: 2 })],
-    solution: [wormAt([0, 2], [8, 2])],
+    outputs: [targetAt(8, 2)],
+    solution: [wormAt([0, 2], [8, 2], 0.5)],
   });
 
   const strong = makeLevel({
     cols: 10,
     rows: 5,
     motor: motorAt(0, 2),
-    outputs: [targetAt(8, 2, { size: 3 })],
-    solution: [wormAt([0, 2], [8, 2])],
+    outputs: [targetAt(8, 2)],
+    solution: [wormAt([0, 2], [8, 2], 0.25)],
   });
 
   const backwards = makeLevel({
@@ -543,10 +548,10 @@ describe("gear rules: worm drive", () => {
     rows: 5,
     motor: motorAt(8, 2),
     outputs: [targetAt(0, 2)],
-    solution: [wormAt([0, 2], [8, 2])],
+    solution: [wormAt([0, 2], [8, 2], 0.5)],
   });
 
-  it("turns both wheels the same way at the wheel-size ratio", () => {
+  it("reduces two equal wheels in the same direction", () => {
     const result = drive(slow, slow.solution);
 
     expect(gearPose(result, "output:target-1").speed).toBeCloseTo(0.5);
@@ -554,19 +559,19 @@ describe("gear rules: worm drive", () => {
     expect(evaluate(slow, slow.solution)).toBe("solved");
   });
 
-  it("slows a bigger wheel further", () => {
+  it("uses a stronger reduction on the second worm", () => {
     const result = drive(strong, strong.solution);
 
-    expect(gearPose(result, "output:target-1").speed).toBeCloseTo(1 / 3);
+    expect(gearPose(result, "output:target-1").speed).toBeCloseTo(0.25);
     expect(evaluate(strong, strong.solution)).toBe("solved");
   });
 
-  it("connects from either side of the shaft", () => {
+  it("does not back-drive from the output to the input", () => {
     const result = drive(backwards, backwards.solution);
 
-    expect(gearPose(result, "output:target-1").driven).toBe(true);
-    expect(gearPose(result, "output:target-1").speed).toBeCloseTo(1);
-    expect(result.outputs[0]?.satisfied).toBe(true);
+    expect(gearPose(result, "output:target-1").driven).toBe(false);
+    expect(gearPose(result, "output:target-1").speed).toBe(0);
+    expect(result.outputs[0]?.satisfied).toBe(false);
   });
 
   it("requires both ends to lie on existing gears", () => {
@@ -590,6 +595,17 @@ describe("gear rules: worm drive", () => {
       solution: [],
     });
     expect(canPlace(meshing, [], wormAt([0, 2], [2, 2]))).toBe(false);
+  });
+
+  it("refuses two wheels of different sizes", () => {
+    const unequal = makeLevel({
+      cols: 10,
+      rows: 5,
+      motor: motorAt(0, 2),
+      outputs: [targetAt(8, 2, { size: 2 })],
+      solution: [],
+    });
+    expect(canPlace(unequal, [], wormAt([0, 2], [8, 2]))).toBe(false);
   });
 
   it("refuses a third wheel under the same shaft", () => {
@@ -659,11 +675,10 @@ describe("gear rules: outputs", () => {
         targetAt(8, 2, {
           id: "generator-1",
           kind: "generator",
-          size: 2,
           minSpeed: 0.4,
         }),
       ],
-      solution: [wormAt([0, 2], [8, 2])],
+      solution: [wormAt([0, 2], [8, 2], 0.5)],
     });
     const strongWorm = makeLevel({
       cols: 10,
@@ -673,11 +688,10 @@ describe("gear rules: outputs", () => {
         targetAt(8, 2, {
           id: "generator-1",
           kind: "generator",
-          size: 3,
           minSpeed: 0.4,
         }),
       ],
-      solution: [wormAt([0, 2], [8, 2])],
+      solution: [wormAt([0, 2], [8, 2], 0.25)],
     });
 
     expect(drive(belt, belt.solution).outputs[0]?.satisfied).toBe(false);
@@ -696,11 +710,10 @@ describe("gear rules: outputs", () => {
         targetAt(8, 2, {
           id: "lift-1",
           kind: "lift",
-          size: 2,
           maxSpeed: 0.75,
         }),
       ],
-      solution: [wormAt([0, 2], [8, 2])],
+      solution: [wormAt([0, 2], [8, 2], 0.5)],
     });
 
     expect(drive(quick, quick.solution).outputs[0]?.satisfied).toBe(false);
@@ -714,8 +727,8 @@ describe("gear rules: outputs", () => {
       cols: 10,
       rows: 5,
       motor: motorAt(0, 2),
-      outputs: [targetAt(8, 2, { size: 2, minSpeed: 0.9, maxSpeed: 1.1 })],
-      solution: [wormAt([0, 2], [8, 2])],
+      outputs: [targetAt(8, 2, { minSpeed: 0.9, maxSpeed: 1.1 })],
+      solution: [wormAt([0, 2], [8, 2], 0.5)],
     });
 
     expect(evaluate(belt, belt.solution)).toBe("solved");
@@ -787,7 +800,8 @@ describe("gear rules: levels", () => {
     expect(trayLabel(levelAt(0).tray[0] as TrayItem)).toBe("Klein tandwiel");
     expect(trayLabel(levelAt(2).tray[0] as TrayItem)).toBe("Ketting");
     expect(trayLabel(levelAt(3).tray[0] as TrayItem)).toBe("Ketting");
-    expect(trayLabel({ id: "worm", kind: "worm" })).toBe("Wormas");
+    expect(trayLabel({ id: "worm", kind: "worm", ratio: 0.5 })).toBe("Wormas");
+    expect(trayLabel({ id: "worm", kind: "worm", ratio: 0.25 })).toBe("Wormas, grote vertraging");
     expect(trayLabel({ id: "belt", kind: "belt", crossed: true })).toBe("Gekruiste ketting");
     expect(trayLabel({ id: "gear", kind: "gear", size: 3 })).toBe("Groot tandwiel");
   });
@@ -807,8 +821,8 @@ describe("gear rules: level validation", () => {
       rows: 5,
       motor: motorAt(0, 2),
       outputs: [targetAt(8, 2)],
-      tray: [{ id: "worm", kind: "worm" }],
-      solution: [wormAt([0, 2], [8, 2])],
+      tray: [{ id: "worm", kind: "worm", ratio: 0.5 }],
+      solution: [wormAt([0, 2], [8, 2], 0.5)],
     });
   }
 
@@ -888,7 +902,7 @@ describe("gear rules: level validation", () => {
       rows: 5,
       motor: motorAt(0, 2),
       outputs: [targetAt(9, 2, { direction: -1 })],
-      tray: [{ id: "worm", kind: "worm" }],
+      tray: [{ id: "worm", kind: "worm", ratio: 0.5 }],
       solution: [wormAt([3, 2], [4, 2])],
     });
     expectError(level, "must lie on two gears");

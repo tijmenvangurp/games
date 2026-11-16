@@ -21,11 +21,16 @@ function gear(col: number, row: number, size: GearSize): Placement {
   return { kind: "gear", holeId: hole(col, row), size };
 }
 
-function worm(from: readonly [number, number], to: readonly [number, number]): Placement {
+function worm(
+  from: readonly [number, number],
+  to: readonly [number, number],
+  ratio = 0.5,
+): Placement {
   return {
     kind: "worm",
     fromHoleId: hole(from[0], from[1]),
     toHoleId: hole(to[0], to[1]),
+    ratio,
   };
 }
 
@@ -88,7 +93,10 @@ const INTRODUCES = [
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
-const WORM_TO_TARGET = worm([0, 2], [4, 2]);
+const WORM_SLOW = worm([0, 2], [4, 2], 0.5);
+const WORM_STRONG = worm([0, 2], [4, 2], 0.25);
+const WORM_METER = worm([0, 2], [9, 2], 0.5);
+const WORM_LIFT = worm([0, 2], [4, 2], 0.25);
 
 describe("gear levels: catalogue", () => {
   it("holds sixteen levels in the brief's order", () => {
@@ -170,49 +178,65 @@ describe("gear levels: direction and speed", () => {
     expect(evaluate(level, [gear(2, 2, 1), gear(4, 2, 1)])).toBe("solved");
   });
 
-  it("connects two equal gears with the worm shaft (level 10)", () => {
+  it("reduces two equal gears through the worm shaft (level 10)", () => {
     const level = levelAt(9);
-    expect(level.solution).toEqual([WORM_TO_TARGET]);
+    expect(level.solution).toEqual([WORM_SLOW]);
     expect(level.motor.size).toBe(1);
     expect(level.outputs[0]?.size).toBe(1);
     expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
-    expect(outputAt(level).speed).toBeCloseTo(1, 6);
+    expect(outputAt(level).speed).toBeCloseTo(0.5, 6);
   });
 
-  it("slows a big worm wheel on level 11", () => {
+  it("uses a stronger worm reduction on level 11", () => {
     const level = levelAt(10);
-    expect(level.solution).toEqual([WORM_TO_TARGET]);
-    expect(level.outputs[0]?.size).toBe(2);
+    expect(level.solution).toEqual([WORM_STRONG]);
+    expect(level.outputs[0]?.size).toBe(1);
     expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
-    expect(outputAt(level).speed).toBeCloseTo(0.5, 6);
+    expect(outputAt(level).speed).toBeCloseTo(0.25, 6);
   });
 });
 
 describe("gear levels: speed bands", () => {
-  it("solves the meter level with the belt and no worm in the tray", () => {
+  it("lets level 12 be solved by the belt and not by the worm", () => {
     const level = levelAt(11);
 
     expect(level.solution).toEqual([BELT_TO_FAR_TARGET]);
-    expect(level.tray.map((item) => item.kind)).toEqual(["belt"]);
     expect(evaluate(level, level.solution)).toBe("solved");
+
+    for (const alternative of [WORM_METER]) {
+      expect(canPlace(level, [], alternative)).toBe(true);
+      expect(evaluate(level, [alternative])).toBe("playing");
+    }
+    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.5, 6);
   });
 
-  it("lights the lamp level with the belt and no worm in the tray", () => {
+  it("lights the level 13 lamp with the belt, not with the worm", () => {
     const level = levelAt(12);
 
     expect(level.solution).toEqual([BELT_TO_FAR_TARGET]);
-    expect(level.tray.map((item) => item.kind)).toEqual(["belt"]);
     expect(outputAt(level)).toMatchObject({ kind: "generator", satisfied: true, speed: 1 });
+
+    for (const alternative of [WORM_METER]) {
+      expect(canPlace(level, [], alternative)).toBe(true);
+      expect(evaluate(level, [alternative])).toBe("playing");
+    }
+    expect(drive(level, [WORM_METER]).outputs[0]?.speed).toBeCloseTo(0.5, 6);
   });
 
-  it("moves the level 14 lift with the worm shaft", () => {
+  it("moves the level 14 lift only with the slow worm", () => {
     const level = levelAt(13);
 
-    expect(level.solution).toEqual([WORM_TO_TARGET]);
-    expect(level.tray.map((item) => item.kind)).toEqual(["worm"]);
+    expect(level.solution).toEqual([WORM_LIFT]);
     expect(outputAt(level)).toMatchObject({ kind: "lift", satisfied: true });
-    expect(outputAt(level).speed).toBeCloseTo(0.5, 6);
-    expect(evaluate(level, [WORM_TO_TARGET])).toBe("solved");
+    expect(outputAt(level).speed).toBeCloseTo(0.25, 6);
+
+    expect(canPlace(level, [], { kind: "open-belt", fromHoleId: "0,2", toHoleId: "4,2" })).toBe(
+      true,
+    );
+    expect(evaluate(level, [{ kind: "open-belt", fromHoleId: "0,2", toHoleId: "4,2" }])).toBe(
+      "playing",
+    );
+    expect(evaluate(level, [WORM_LIFT])).toBe("solved");
   });
 });
 

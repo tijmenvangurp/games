@@ -497,6 +497,10 @@ export function WormBar({
   toRadius = gearRadius(1),
   active = true,
   direction = 1,
+  fromPose = null,
+  toPose = null,
+  fromTone = null,
+  toTone = null,
 }: {
   level: Level;
   placement: Extract<Placement, { kind: "worm" }>;
@@ -504,6 +508,10 @@ export function WormBar({
   toRadius?: number;
   active?: boolean;
   direction?: 1 | -1;
+  fromPose?: GearPose | null;
+  toPose?: GearPose | null;
+  fromTone?: GearTone | null;
+  toTone?: GearTone | null;
 }) {
   const shaft = wormShaftGeometry(level, placement, fromRadius, toRadius);
   if (!shaft) {
@@ -514,10 +522,17 @@ export function WormBar({
     /[^a-zA-Z0-9_-]/g,
     "-",
   );
+  const bodyId = `${clipId}-body`;
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);
   const localX = (point: { x: number; y: number }): number =>
     (point.x - centre.x) * cos + (point.y - centre.y) * sin;
+  const patches = [
+    { pose: fromPose, tone: fromTone, contact: contacts[0] },
+    { pose: toPose, tone: toTone, contact: contacts[1] },
+  ];
+  const threadPitch = pitch;
+  const helix = Math.min(8, threadPitch * 0.62);
 
   return (
     <g
@@ -526,13 +541,27 @@ export function WormBar({
       data-worm-span={Math.round(shaft.span * 10) / 10}
       data-worm-pitch={Math.round(pitch * 10) / 10}
     >
+      <defs>
+        <linearGradient id={bodyId} x1="0" x2="0" y1="-8" y2="8" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#d9dee2" />
+          <stop offset="0.38" stopColor="#a9b2ba" />
+          <stop offset="0.78" stopColor="#7d8791" />
+          <stop offset="1" stopColor="#5b646e" />
+        </linearGradient>
+        {patches.map((patch, index) => (
+          <clipPath id={`${clipId}-contact-${index}`} key={`contact-clip-${index}`}>
+            <circle cx={patch.contact.x} cy={patch.contact.y} r={8.5} />
+          </clipPath>
+        ))}
+      </defs>
+
       <g transform={`translate(${centre.x} ${centre.y}) rotate(${angle})`}>
         <defs>
           <clipPath id={clipId}>
             <rect height={16} rx={8} width={Math.max(0, length - 2)} x={-length / 2 + 1} y={-8} />
           </clipPath>
         </defs>
-        {/* Contact patches sit under the body, so only their lower edge shows. */}
+        {/* Contact shadows sit under the body, so only their lower edge shows. */}
         {contacts.map((contact) => (
           <ellipse
             cx={localX(contact)}
@@ -568,7 +597,7 @@ export function WormBar({
           y={-9.5}
         />
         <rect
-          fill="#8f98a2"
+          fill={`url(#${bodyId})`}
           height={16}
           rx={8}
           stroke="#4f5862"
@@ -578,38 +607,38 @@ export function WormBar({
           y={-8}
         />
         <rect
-          fill="#d9dee3"
-          height={3}
-          opacity={0.85}
-          rx={1.5}
+          fill="#eef2f4"
+          height={2.4}
+          opacity={0.72}
+          rx={1.2}
           width={Math.max(0, length - 14)}
           x={-length / 2 + 7}
-          y={-6}
+          y={-6.2}
         />
         <g
           className="draaiwerk-worm-ribs"
           clipPath={`url(#${clipId})`}
           data-spin={active ? "on" : "off"}
-          style={{ "--worm-pitch": `${Math.round(pitch * 10) / 10}px` } as CSSProperties}
+          style={{ "--worm-pitch": `${Math.round(threadPitch * 10) / 10}px` } as CSSProperties}
         >
-          {Array.from({ length: coils + 1 }, (_, index) => {
-            const x = -length / 2 + pitch * 0.6 + index * pitch;
+          {Array.from({ length: coils + 2 }, (_, index) => {
+            const x = -length / 2 + threadPitch * 0.35 + index * threadPitch;
             return (
               <g key={`coil-${index}`}>
                 <path
-                  d={`M ${x - 4} -8 C ${x} -3 ${x} 3 ${x - 4} 8`}
+                  d={`M ${x - helix} -8 C ${x - helix * 0.35} -3 ${x + helix * 0.35} 3 ${x + helix} 8`}
                   fill="none"
-                  stroke="#4b545e"
+                  stroke="#3f4852"
                   strokeLinecap="round"
-                  strokeWidth={2.4}
+                  strokeWidth={2.6}
                 />
                 <path
-                  d={`M ${x} -8 C ${x + 4} -3 ${x + 4} 3 ${x} 8`}
+                  d={`M ${x - helix + 1.8} -8 C ${x - helix * 0.35 + 1.8} -3 ${x + helix * 0.35 + 1.8} 3 ${x + helix + 1.8} 8`}
                   fill="none"
-                  opacity={0.75}
-                  stroke="#d4dade"
+                  opacity={0.62}
+                  stroke="#e6ebee"
                   strokeLinecap="round"
-                  strokeWidth={1.2}
+                  strokeWidth={1.1}
                 />
               </g>
             );
@@ -625,6 +654,29 @@ export function WormBar({
           strokeWidth={2.4}
         />
       </g>
+
+      {/* A clipped piece of each wheel is drawn over the shaft, so the teeth
+          visibly grip the threads instead of disappearing behind the body. */}
+      {patches.map((patch, index) => {
+        if (!patch.pose || !patch.tone) {
+          return null;
+        }
+        const phase = Math.round(((patch.pose.phase * 180) / Math.PI) * 100) / 100;
+        return (
+          <g clipPath={`url(#${clipId}-contact-${index})`} key={`contact-tooth-${index}`}>
+            <g
+              transform={`translate(${patch.pose.center.x} ${patch.pose.center.y}) rotate(${phase})`}
+            >
+              <path
+                d={gearPath(patch.pose.size)}
+                fill="none"
+                stroke={patch.tone.stroke}
+                strokeWidth={1.3}
+              />
+            </g>
+          </g>
+        );
+      })}
     </g>
   );
 }

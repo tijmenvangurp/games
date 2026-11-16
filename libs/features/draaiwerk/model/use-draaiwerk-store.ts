@@ -569,7 +569,7 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
   }
 
   if (item.kind === "worm") {
-    const placement = autoWormPlacement(state.level, state.placements, holeId);
+    const placement = autoWormPlacement(state.level, state.placements, holeId, item);
     if (!placement) {
       set({ feedback: "De wormas past daar niet.", feedbackTone: "warn" });
       playSound("almost");

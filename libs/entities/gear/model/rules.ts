@@ -177,21 +177,13 @@ function buildEdges(
       continue;
     }
     const { from, to } = ends;
-    // Both wheels sit on the same shaft, so they turn the same way. The shaft
-    // is a connector, not a fixed reduction: the wheel sizes set the ratio.
-    const ratio = gearRadius(from.size) / gearRadius(to.size);
+    // The worm shaft is a one-way reduction. The two equal wheels sit on the
+    // same shaft and turn the same way; the screw sets the reduction.
     addEdge(adjacency, {
       kind: "worm",
       from: from.key,
       to: to.key,
-      speedFactor: ratio,
-      phase: "free",
-    });
-    addEdge(adjacency, {
-      kind: "worm",
-      from: to.key,
-      to: from.key,
-      speedFactor: 1 / ratio,
+      speedFactor: placement.ratio,
       phase: "free",
     });
   }
@@ -513,11 +505,18 @@ function canPlaceWorm(
   if (next.fromHoleId === next.toHoleId) {
     return false;
   }
+  if (next.ratio <= 0 || next.ratio > 1) {
+    return false;
+  }
   const ends = placementSlots(holes, slots, next.fromHoleId, next.toHoleId);
   if (!ends) {
     return false;
   }
   const { from, to, fromSlot, toSlot } = ends;
+  // The shaft lies flat on both wheel tops, so both wheels must be equal.
+  if (fromSlot.size !== toSlot.size) {
+    return false;
+  }
 
   const fromCenter = holePoint(from);
   const toCenter = holePoint(to);
@@ -633,7 +632,7 @@ export function trayItemMatches(item: TrayItem, placement: Placement): boolean {
     case "gear":
       return item.kind === "gear" && item.size === placement.size;
     case "worm":
-      return item.kind === "worm";
+      return item.kind === "worm" && item.ratio === placement.ratio;
     case "loose-belt":
       return (
         (item.kind === "belt" && item.crossed !== true && placement.link === "open-belt") ||
@@ -832,6 +831,12 @@ function validateWormGeometry(
       errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} must lie on two gears`);
       continue;
     }
+    if (placement.ratio <= 0 || placement.ratio > 1) {
+      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} needs a ratio`);
+    }
+    if (fromSlot.size !== toSlot.size) {
+      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} needs two equal gears`);
+    }
     if (
       distanceBetween(holePoint(fromHole), holePoint(toHole)) <=
       gearRadius(fromSlot.size) + gearRadius(toSlot.size) + CONTACT_TOLERANCE
@@ -921,7 +926,7 @@ export function trayLabel(item: TrayItem): string {
       return `${label.charAt(0).toUpperCase()}${label.slice(1)} tandwiel`;
     }
     case "worm":
-      return "Wormas";
+      return item.ratio <= 0.25 ? "Wormas, grote vertraging" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruiste ketting" : "Ketting";
     case "chain":

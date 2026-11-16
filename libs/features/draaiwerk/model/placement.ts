@@ -127,10 +127,16 @@ function rejectWorm(
   if (next.fromHoleId === next.toHoleId) {
     return "Kies twee verschillende tandwielen.";
   }
+  if (next.ratio <= 0 || next.ratio > 1) {
+    return "Kies een wormas met een goede vertraging.";
+  }
   const from = slots.find((slot) => slot.holeId === next.fromHoleId);
   const to = slots.find((slot) => slot.holeId === next.toHoleId);
   if (!from || !to) {
     return "De wormas moet op twee tandwielen liggen.";
+  }
+  if (from.size !== to.size) {
+    return "De wormas ligt op twee even grote tandwielen.";
   }
   const fromCenter = holeCenter(level, next.fromHoleId);
   const toCenter = holeCenter(level, next.toHoleId);
@@ -216,8 +222,9 @@ function sameGear(first: GearPlacement, second: GearPlacement): boolean {
 
 function sameWorm(first: WormPlacement, second: WormPlacement): boolean {
   return (
-    [first.fromHoleId, first.toHoleId].sort().join("|") ===
-    [second.fromHoleId, second.toHoleId].sort().join("|")
+    first.ratio === second.ratio &&
+    first.fromHoleId === second.fromHoleId &&
+    first.toHoleId === second.toHoleId
   );
 }
 

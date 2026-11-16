@@ -33,6 +33,7 @@ import {
   StaticChain,
   TargetArc,
   WormBar,
+  type GearTone,
 } from "./gear-art";
 
 interface DraaiwerkBoardProps {
@@ -510,6 +511,15 @@ export function DraaiwerkBoard({
       }),
     );
   }, [outputById, result.gears, result.outputs]);
+  const toneFor = (pose: GearPose): GearTone => {
+    const meta = poseMeta.get(pose.key);
+    const output = meta?.output;
+    const config = meta?.config;
+    if (output && config) {
+      return fixedGearTone(pose, output);
+    }
+    return pose.key === "motor" ? fixedGearTone(pose, undefined) : playerGearTone(pose.size);
+  };
   const status = result.solved ? "solved" : result.jammed ? "jammed" : "playing";
   const linkMode =
     selectedItem?.kind === "belt" ||
@@ -649,21 +659,13 @@ export function DraaiwerkBoard({
         <g>
           {result.gears.map((pose) => {
             const meta = poseMeta.get(pose.key);
-            const output = meta?.output;
-            const config = meta?.config;
             return (
               <BoardGear
                 key={pose.key}
                 hint={hint.has(pose.holeId) || pendingGearKey === pose.key}
                 label={meta?.label}
                 pose={pose}
-                tone={
-                  output && config
-                    ? fixedGearTone(pose, output)
-                    : pose.key === "motor"
-                      ? fixedGearTone(pose, undefined)
-                      : playerGearTone(pose.size)
-                }
+                tone={toneFor(pose)}
               />
             );
           })}
@@ -686,11 +688,15 @@ export function DraaiwerkBoard({
               <WormBar
                 active={Boolean((from?.driven || to?.driven) && !result.jammed)}
                 direction={speed < 0 ? -1 : 1}
+                fromPose={from ?? null}
                 fromRadius={gearRadius(from?.size ?? 1)}
+                fromTone={from ? toneFor(from) : null}
                 key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
                 level={level}
                 placement={worm}
+                toPose={to ?? null}
                 toRadius={gearRadius(to?.size ?? 1)}
+                toTone={to ? toneFor(to) : null}
               />
             );
           })}
