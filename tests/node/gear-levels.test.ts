@@ -61,6 +61,7 @@ const LEVEL_IDS = [
   "twee-kettingen",
   "ketting-naar-tandwiel",
   "de-hijskraan",
+  "de-verdeelbox",
 ] as const;
 
 const INTRODUCES = [
@@ -83,20 +84,21 @@ const INTRODUCES = [
   "double-chain",
   "chain-mesh",
   "factory",
+  "mixed-split",
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
 
 describe("gear levels: catalogue", () => {
-  it("holds nineteen levels in the brief's order", () => {
+  it("holds twenty levels in the brief's order", () => {
     const levels = allLevels();
 
-    expect(LEVEL_COUNT).toBe(19);
-    expect(levels).toHaveLength(19);
+    expect(LEVEL_COUNT).toBe(20);
+    expect(levels).toHaveLength(20);
     expect(levels.map((level) => level.id)).toEqual([...LEVEL_IDS]);
     expect(levels.map((level) => level.introduces)).toEqual([...INTRODUCES]);
     expect(levels.map((level) => level.chapter)).toEqual([
-      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5,
+      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
     ]);
     levels.forEach((level, index) => {
       expect(levelAt(index)).toBe(level);
@@ -308,6 +310,18 @@ describe("gear levels: chapter 5", () => {
     expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
     expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
     expect(result.outputs[1]?.speed).toBeCloseTo(1 / 3, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("verdeelt level 20 met een tandwiel voor de lamp en een ketting voor de lift", () => {
+    const level = levelAt(19);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([gear(3, 3, 1), link("chain", [5, 3], [10, 3])]);
+    expect(level.outputs.map((output) => output.kind)).toEqual(["generator", "lift"]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
+    expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
+    expect(result.outputs[1]?.speed).toBeCloseTo(0.5, 6);
     expect(evaluate(level, level.solution)).toBe("solved");
   });
 });

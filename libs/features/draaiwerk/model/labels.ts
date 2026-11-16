@@ -32,6 +32,7 @@ const NEW_LABELS: Record<string, string> = {
   "double-chain": "twee kettingen",
   "chain-mesh": "ketting en tandwiel",
   factory: "hijskraan",
+  "mixed-split": "tandwiel en ketting",
 };
 
 export function introducesLabel(introduces: string): string {

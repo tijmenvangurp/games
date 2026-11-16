@@ -115,7 +115,29 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.locator('[data-gear-key="output:lift-1"]').click();
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
-    await expect(page.getByText("Level gehaald.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+  });
+
+  test("bouwt level 20 met een tandwiel en een ketting", async ({ page }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 20, current: 19 }, version: 1 }),
+      );
+    });
+    await page.reload();
+
+    await page.getByRole("button", { name: "Klein" }).click();
+    await page.locator('[data-hole-id="3,3"]').click();
+    await expect(page.locator('[data-placed-key="gear:3,3"]')).toBeVisible();
+
+    await page.getByRole("button", { name: "Ketting" }).click();
+    await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:lift-1"]').click();
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+    await expect(page.getByText("Alle levels gehaald!")).toBeVisible();
   });
 
   test("sleept een tandwiel van de la naar het bord", async ({ page }) => {

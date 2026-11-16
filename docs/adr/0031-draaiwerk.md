@@ -215,12 +215,13 @@ of een tandwiel is. Dit supersedeert alle wormas-addenda hierboven.
 - **De lift.** De lift hangt aan een ketting over een groot wiel (1/3×), zodat
   hij langzaam genoeg blijft. Level 16 splitst de motor in twee tandwieltreinen:
   twee kleine wielen naar de lamp (1×) en een groot liftwiel (1/3×).
-- **Nieuw hoofdstuk 5, "Machines".** Drie levels bouwen voort op alles ervoor:
+- **Nieuw hoofdstuk 5, "Machines".** Vier levels bouwen voort op alles ervoor:
   twee kettingen vanaf één motor (open en gekruist), een ketting naar een
-  tandwiel dat het doel aandrijft, en een hijskraan met een snelle lamp en een
-  trage lift aan twee kettingen.
+  tandwiel dat het doel aandrijft, een hijskraan met een snelle lamp en een
+  trage lift aan twee kettingen, en als slotstuk de verdeelbox met een tandwiel
+  voor de lamp (1×) en een ketting voor de lift (0,5×).
 - **Wat blijft.** Kettingen, tandwielen, snelheidsmeters, de lamp, de lift,
-  splitsen en de beperkte voorraad. De catalogus heeft nu 19 levels in vijf
+  splitsen en de beperkte voorraad. De catalogus heeft nu 20 levels in vijf
   hoofdstukken.
 
 ## Bronnen
