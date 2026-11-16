@@ -28,11 +28,14 @@ describe("Wie was het? in de spelcatalogus", () => {
       kind: "visual",
       reason: "De plattegrond, de portretten en de aanwijzingen zijn visueel.",
     });
+    expect(entry.name).not.toMatch(/murdoku/i);
+    expect(entry.to).not.toMatch(/murdoku/i);
+    expect(entry.thumbnail).not.toMatch(/murdoku/i);
   });
 
   it("gebruikt een lokale thumbnail van 800 × 500 met een contenthash", async () => {
     const entry = murdokuEntry();
-    const match = /^\/thumbnails\/murdoku-([0-9a-f]{8})\.jpg$/.exec(entry.thumbnail);
+    const match = /^\/thumbnails\/wie-was-het-([0-9a-f]{8})\.jpg$/.exec(entry.thumbnail);
     expect(match).not.toBeNull();
 
     const file = path.join(ROOT, "apps", "games", "public", entry.thumbnail);

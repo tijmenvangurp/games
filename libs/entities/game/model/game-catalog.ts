@@ -187,7 +187,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
       "Lees de aanwijzingen, vul de plattegrond in en vind wie als enige bij het slachtoffer was.",
     status: "available",
     to: "/mysterie",
-    thumbnail: "/thumbnails/murdoku-7b43d89b.jpg",
+    thumbnail: "/thumbnails/wie-was-het-7b43d89b.jpg",
     speech: {
       kind: "visual",
       reason: "De plattegrond, de portretten en de aanwijzingen zijn visueel.",
