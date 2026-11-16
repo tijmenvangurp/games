@@ -3,7 +3,7 @@ import {
   nextMurdokuHint,
   type Cell,
   type Explanation,
-  type MurdokuHint,
+  type MurdokuLine,
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
@@ -21,7 +21,7 @@ export interface MurdokuHintState {
   stage: MurdokuHintStage;
   explanation: Explanation;
   /** De rij of kolom die oplicht, als de stap daarover gaat. */
-  line: { axis: "row" | "col"; index: number } | null;
+  line: MurdokuLine | null;
   /** De kamer die oplicht, als de stap daarover gaat. */
   roomId: string | null;
   /** De vakjes die oplichten. */
@@ -40,7 +40,7 @@ export interface MurdokuHintPlan {
 }
 
 /** De vakjes van een rij of kolom. */
-function lineCells(puzzle: Puzzle, line: { axis: "row" | "col"; index: number }): Cell[] {
+function lineCells(puzzle: Puzzle, line: MurdokuLine): Cell[] {
   const cells =
     line.axis === "row" ? puzzle.board.cellsInRow(line.index) : puzzle.board.cellsInCol(line.index);
   return [...cells];
@@ -120,7 +120,7 @@ function focusPlan(
   puzzle: Puzzle,
   cell: Cell,
   personId: PersonId | null,
-  line: MurdokuHint["line"],
+  line: MurdokuLine | null,
 ): MurdokuHintPlan {
   const suffix = personId === null ? "" : "Name";
 

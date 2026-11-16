@@ -5,7 +5,7 @@ import {
   type Attempt,
   type RoundSummary,
 } from "@entities/adaptive";
-import { MURDOKU_LEVELS } from "@entities/murdoku";
+import { MURDOKU_LADDER } from "@entities/murdoku";
 
 /**
  * De adaptieve regelaar van Wie was het?.
@@ -16,11 +16,8 @@ import { MURDOKU_LEVELS } from "@entities/murdoku";
  * tien minuten niet door één ongelukkige tik.
  */
 export const MURDOKU_ADAPTIVE_CONFIG: AdaptiveConfig = {
-  levelCount: MURDOKU_LEVELS.length,
+  levelCount: MURDOKU_LADDER.length,
   startIndex: 0,
-  // De ronde is de eenheid; de reeks successen uit de memory-regelaar speelt
-  // hier geen rol. De waarde blijft staan zodat het config-type klopt.
-  successesToLevelUp: 1,
   maxStepsPerRound: 1,
 };
 
@@ -72,9 +69,9 @@ export function evaluateMurdokuRound(
   input: MurdokuRoundInput,
 ): MurdokuRoundOutcome {
   const hints = wholeCount(input.hints);
-  const start = clampLevelIndex(state.levelIndex, MURDOKU_LEVELS.length);
+  const start = clampLevelIndex(state.levelIndex, MURDOKU_LADDER.length);
   const wanted = roundDelta({ ...input, hints });
-  const levelIndex = clampLevelIndex(start + wanted, MURDOKU_LEVELS.length);
+  const levelIndex = clampLevelIndex(start + wanted, MURDOKU_LADDER.length);
   const delta = levelIndex - start;
 
   return {
@@ -96,5 +93,5 @@ export function evaluateMurdokuRound(
 
 /** De zaak die bij het huidige niveau hoort; buiten de lijst wordt hij geklemd. */
 export function murdokuCaseForLevel(levelIndex: number) {
-  return MURDOKU_LEVELS[clampLevelIndex(levelIndex, MURDOKU_LEVELS.length)];
+  return MURDOKU_LADDER[clampLevelIndex(levelIndex, MURDOKU_LADDER.length)];
 }

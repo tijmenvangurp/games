@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import { MURDOKU_CASES, MURDOKU_LEVELS, loadMurdokuLevel } from "@entities/murdoku";
+import { MURDOKU_CASES, MURDOKU_LADDER, loadMurdokuLevel } from "@entities/murdoku";
 import { useMurdokuStore } from "@features/murdoku-game";
 
 /** jsdom tekent geen canvas; de bordlaag is geen testseam. */
@@ -112,7 +112,7 @@ describe("de zaakkeuze van Wie was het?", () => {
 
   it("markeert de zaak die bij het adaptieve niveau past", async () => {
     useMurdokuStore.setState({ adaptive: { levelIndex: 5, streak: 0 } });
-    const entry = MURDOKU_LEVELS[5];
+    const entry = MURDOKU_LADDER[5];
 
     renderApp("/mysterie/zaken");
 

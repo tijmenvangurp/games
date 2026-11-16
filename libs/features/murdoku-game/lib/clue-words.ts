@@ -28,6 +28,7 @@ import {
   type Puzzle,
 } from "@entities/murdoku";
 import type { HelpMarks } from "./vendored/helpMarks";
+import { emptyHelpMarks } from "./reveal";
 import type { MurdokuText } from "./text";
 
 /** Wat een tik op een woord in een aanwijzing op het bord laat oplichten. */
@@ -264,17 +265,8 @@ export interface MurdokuFocusView {
 export function focusView(puzzle: Puzzle, focus: MurdokuClueFocus | null): MurdokuFocusView {
   const cells = new Set<Cell>();
   const rooms = new Set<string>();
-  const marks: HelpMarks = {
-    areas: [],
-    ring: new Set<Cell>(),
-    rooms,
-    windows: false,
-    doors: false,
-    redRing: new Set<Cell>(),
-    redRooms: new Set<string>(),
-    redWindows: false,
-    redDoors: false,
-  };
+  const marks = emptyHelpMarks();
+  marks.rooms = rooms;
 
   if (!focus) return { cells, rooms, marks };
 

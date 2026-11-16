@@ -8,6 +8,8 @@ import {
 } from "@features/murdoku-game";
 
 const [first, second] = MURDOKU_CASES;
+// Een grotere zaak heeft genoeg verdachten voor twee of drie hintstappen.
+const hintsCase = MURDOKU_CASES[4];
 
 function resetStore(): void {
   useMurdokuStore.setState({
@@ -39,7 +41,8 @@ function startCase(entry: (typeof MURDOKU_CASES)[number]): void {
 /** Vraagt hints via de gewone knop en speelt de zaak daarna uit. */
 function solveCase(entry: (typeof MURDOKU_CASES)[number], hints: number): void {
   startCase(entry);
-  for (let index = 0; index < hints; index++) {
+  // Eén hintstap is twee tikken: eerst wijzen, dan toepassen.
+  for (let press = 0; press < hints * 2 && store().hintsUsed < hints; press++) {
     store().showHint();
   }
   for (const [person, cell] of Object.entries(entry.solution)) {
@@ -65,7 +68,7 @@ describe("het adaptieve niveau in de murdokustore", () => {
   });
 
   it("blijft staan na een zaak met twee hints", () => {
-    solveCase(first, 2);
+    solveCase(hintsCase, 2);
 
     expect(store().adaptive.levelIndex).toBe(0);
     expect(store().lastRound?.delta).toBe(0);
@@ -73,7 +76,7 @@ describe("het adaptieve niveau in de murdokustore", () => {
 
   it("gaat omlaag na een zaak met drie hints", () => {
     useMurdokuStore.setState({ adaptive: { levelIndex: 2, streak: 0 } });
-    solveCase(first, 3);
+    solveCase(hintsCase, 3);
 
     expect(store().adaptive.levelIndex).toBe(1);
     expect(store().lastRound?.delta).toBe(-1);

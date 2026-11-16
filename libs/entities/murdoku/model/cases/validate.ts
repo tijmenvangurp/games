@@ -1,5 +1,6 @@
 import { VICTIM_ID } from "../engine/domain/types";
 import type { Cell, PersonId } from "../engine/domain/types";
+import { onePersonEachLine } from "../board-rules";
 import {
   checkMurdokuLevel,
   findMurdokuMurderer,
@@ -10,19 +11,6 @@ import type { MurdokuCase } from "./types";
 
 /** De maten die v1 ondersteunt: 4×4 tot en met 6×6, altijd vierkant. */
 const ALLOWED_SIZES = [4, 5, 6];
-
-function onePersonEachLine(solution: Readonly<Record<PersonId, Cell>>, width: number): boolean {
-  const rows = new Set<number>();
-  const cols = new Set<number>();
-  for (const cell of Object.values(solution)) {
-    const row = Math.floor(cell / width);
-    const col = cell % width;
-    if (rows.has(row) || cols.has(col)) return false;
-    rows.add(row);
-    cols.add(col);
-  }
-  return true;
-}
 
 function solutionProblems(
   entry: MurdokuCase,
@@ -51,7 +39,7 @@ function solutionProblems(
   if (outside.length > 0) {
     problems.push(`${entry.id}: de oplossing wijst vakjes buiten het bord aan`);
   }
-  if (problems.length === 0 && !onePersonEachLine(entry.solution, width)) {
+  if (problems.length === 0 && !onePersonEachLine(Object.values(entry.solution), width)) {
     problems.push(`${entry.id}: de oplossing zet twee personen in dezelfde rij of kolom`);
   }
   return problems;

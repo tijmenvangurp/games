@@ -1,7 +1,8 @@
 import type { Cell } from "@entities/murdoku";
 import type { HelpMarks } from "./vendored/helpMarks";
 
-function emptyMarks(): HelpMarks {
+/** Een lege set referentiemarkeringen; één bron voor reveal en clue-words. */
+export function emptyHelpMarks(): HelpMarks {
   return {
     areas: [],
     ring: new Set<Cell>(),
@@ -22,6 +23,6 @@ function emptyMarks(): HelpMarks {
  */
 export function withRoomOutline(marks: HelpMarks | null, roomId: string | null): HelpMarks | null {
   if (!roomId) return marks;
-  const base = marks ?? emptyMarks();
+  const base = marks ?? emptyHelpMarks();
   return { ...base, rooms: new Set([...base.rooms, roomId]) };
 }

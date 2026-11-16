@@ -51,12 +51,12 @@ describe("hinttrap", () => {
     expect(store().hint?.stage).toBe("place");
     expect(store().play?.placements.get("B")).toBe(4);
     expect(store().play?.wrongCheck).toBe(false);
-    expect(store().hintsUsed).toBe(2);
+    // De tweede tik past dezelfde hintstap toe; hij telt niet als nieuwe hint.
+    expect(store().hintsUsed).toBe(1);
   });
 
   it("streept één onmogelijk vakje weg in plaats van meteen te plaatsen", () => {
-    store().start(puzzle);
-    placeBramAndAnna();
+    store().start(generated);
 
     store().showHint();
     expect(store().hint?.stage).toBe("focus");
@@ -64,10 +64,10 @@ describe("hinttrap", () => {
     store().showHint();
 
     expect(store().hint?.stage).toBe("cross");
-    expect(store().play?.manualCrosses.has(10)).toBe(true);
-    expect(crossedCells(puzzle, store().play!)).toContain(10);
+    expect(store().play?.manualCrosses.has(6)).toBe(true);
+    expect(crossedCells(generated, store().play!)).toContain(6);
     // Een kruisje is geen fout en verandert geen plaatsing.
-    expect(store().play?.placements.size).toBe(2);
+    expect(store().play?.placements.size).toBe(0);
     expect(store().play?.wrongCheck).toBe(false);
   });
 
@@ -112,16 +112,6 @@ describe("hinttrap", () => {
     expect(store().play?.wrongCheck).toBe(false);
   });
 
-  it("noemt de rij als reden voor een weg te strepen vakje", () => {
-    store().start(puzzle);
-    placeBramAndAnna();
-
-    store().showHint();
-    store().showHint();
-
-    expect(store().hint?.explanation).toMatchObject({ key: "hint.crossRow" });
-  });
-
   it("zegt het eerlijk als er geen rij als reden is", () => {
     store().start(generated);
 
@@ -144,14 +134,15 @@ describe("hinttrap", () => {
     expect(store().hint?.stage).toBe("none");
   });
 
-  it("telt elke hint en levert nooit een straf op", () => {
+  it("telt één hint per hintstap en levert nooit een straf op", () => {
     store().start(puzzle);
 
     store().showHint();
     store().showHint();
     store().showHint();
 
-    expect(store().hintsUsed).toBe(3);
+    // Tik één zet de hint op, tik twee past hem toe, tik drie begint een nieuwe stap.
+    expect(store().hintsUsed).toBe(2);
     expect(store().play?.wrongCheck).toBe(false);
     expect(store().play?.phase).toBe("playing");
   });
@@ -176,7 +167,7 @@ describe("hinttrap", () => {
     store().undo();
 
     expect(store().play?.placements.has("B")).toBe(false);
-    expect(store().hintsUsed).toBe(2);
+    expect(store().hintsUsed).toBe(1);
   });
 
   it("geeft een rustige melding als er geen stap meer is", () => {

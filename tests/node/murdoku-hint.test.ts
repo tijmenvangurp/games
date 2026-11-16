@@ -36,11 +36,9 @@ describe("nextMurdokuHint", () => {
       crosses: autoCrosses(intro, [4, 1]),
     });
 
-    // Rij 4 heeft nog één vrij vakje; de kolom daarvan is daarmee bezet.
-    expect(hint).toMatchObject({ kind: "exclude", cells: [10], placeCell: null });
-    expect(hint?.personId).toBeNull();
-    // De engine noemt de rij waar de stap over gaat; de hint licht die op.
-    expect(hint?.line).toEqual({ axis: "row", index: 3 });
+    // De extra kolomaanwijzing van Cato maakt haar vakje nu direct zeker.
+    expect(hint).toMatchObject({ kind: "place", personId: "C", cells: [11], placeCell: 11 });
+    expect(hint?.line).toBeNull();
   });
 
   it("geeft geen hint meer als alle verdachten staan", () => {

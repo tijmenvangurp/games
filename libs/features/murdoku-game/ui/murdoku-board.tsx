@@ -1,4 +1,4 @@
-import { useMemo, type ReactNode, type RefObject } from "react";
+import { type ReactNode, type RefObject } from "react";
 import { VICTIM_ID, type Cell, type PersonId, type Puzzle } from "@entities/murdoku";
 import type { MurdokuMode } from "../model/play";
 import { MURDOKU_HINT_COLOR } from "../lib/palette";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { initialAdaptiveState, type AdaptiveState } from "@entities/adaptive";
-import { MURDOKU_DEFAULT_CASE_ID, MURDOKU_LEVELS, murdokuClueCount } from "@entities/murdoku";
+import { MURDOKU_DEFAULT_CASE_ID, MURDOKU_LADDER, murdokuClueCount } from "@entities/murdoku";
 import { MURDOKU_ADAPTIVE_CONFIG, evaluateMurdokuRound } from "@features/murdoku-game";
 
 function state(levelIndex: number): AdaptiveState {
@@ -31,11 +31,11 @@ function abandoned(levelIndex: number, hints = 0) {
 
 describe("de niveaus van Wie was het?", () => {
   it("ordent de zaken op bordgrootte en daarna op aanwijzingsdichtheid", () => {
-    expect(MURDOKU_LEVELS).toHaveLength(12);
+    expect(MURDOKU_LADDER).toHaveLength(12);
 
-    for (let index = 1; index < MURDOKU_LEVELS.length; index++) {
-      const previous = MURDOKU_LEVELS[index - 1];
-      const current = MURDOKU_LEVELS[index];
+    for (let index = 1; index < MURDOKU_LADDER.length; index++) {
+      const previous = MURDOKU_LADDER[index - 1];
+      const current = MURDOKU_LADDER[index];
       const previousSize = previous.level.size.width * previous.level.size.height;
       const currentSize = current.level.size.width * current.level.size.height;
 
@@ -49,10 +49,10 @@ describe("de niveaus van Wie was het?", () => {
   });
 
   it("begint bij een 4×4-zaak en heeft twaalf niveaus", () => {
-    expect(MURDOKU_ADAPTIVE_CONFIG.levelCount).toBe(MURDOKU_LEVELS.length);
+    expect(MURDOKU_ADAPTIVE_CONFIG.levelCount).toBe(MURDOKU_LADDER.length);
     expect(MURDOKU_ADAPTIVE_CONFIG.startIndex).toBe(0);
-    expect(MURDOKU_LEVELS[0].level.size.width).toBe(4);
-    expect(MURDOKU_LEVELS[0].id).toBe(MURDOKU_DEFAULT_CASE_ID);
+    expect(MURDOKU_LADDER[0].level.size.width).toBe(4);
+    expect(MURDOKU_LADDER[0].id).toBe(MURDOKU_DEFAULT_CASE_ID);
   });
 });
 
@@ -89,9 +89,9 @@ describe("het adaptieve niveau per zaak", () => {
   });
 
   it("blijft binnen de boven- en ondergrens", () => {
-    const top = solved(MURDOKU_LEVELS.length - 1, 0);
+    const top = solved(MURDOKU_LADDER.length - 1, 0);
     expect(top.summary.delta).toBe(0);
-    expect(top.summary.state.levelIndex).toBe(MURDOKU_LEVELS.length - 1);
+    expect(top.summary.state.levelIndex).toBe(MURDOKU_LADDER.length - 1);
 
     const bottom = abandoned(0);
     expect(bottom.summary.delta).toBe(0);

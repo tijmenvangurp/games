@@ -2,7 +2,9 @@ import { useMemo } from "react";
 import {
   loadMurdokuLevel,
   murdokuCaseById,
+  type Cell,
   type MurdokuCase,
+  type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
 import {
@@ -18,7 +20,7 @@ interface MurdokuSession {
   activeCase: MurdokuCase | null;
   puzzle: Puzzle;
   text: MurdokuText;
-  solution: ReadonlyMap<string, number>;
+  solution: ReadonlyMap<PersonId, Cell>;
   title: string;
 }
 
@@ -36,7 +38,7 @@ export function useMurdokuSession(storedPlay: MurdokuPlayState | null): MurdokuS
   const solution = useMemo(
     () =>
       activeCase
-        ? new Map<string, number>(Object.entries(activeCase.solution))
+        ? new Map<PersonId, Cell>(Object.entries(activeCase.solution))
         : MURDOKU_INTRO_SOLUTION,
     [activeCase],
   );

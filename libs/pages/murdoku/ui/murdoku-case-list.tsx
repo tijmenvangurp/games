@@ -1,12 +1,12 @@
 import { useNavigate } from "@tanstack/react-router";
-import { MURDOKU_LEVELS, loadMurdokuLevel, type MurdokuCase } from "@entities/murdoku";
+import { MURDOKU_LADDER, loadMurdokuLevel, type MurdokuCase } from "@entities/murdoku";
 import { murdokuCaseForLevel, useMurdokuStore } from "@features/murdoku-game";
 import { cn } from "@shared/lib";
-import { Check, Play, Sparkles } from "@shared/ui";
+import { Check, ChoiceCard, Play, Sparkles } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
 
 function statusLabel(solved: boolean): string {
-  return solved ? "opgelost" : "nog niet gespeeld";
+  return solved ? "Opgelost" : "Nog niet gespeeld";
 }
 
 /**
@@ -52,34 +52,22 @@ export function MurdokuCaseListPage() {
         </p>
 
         <ul aria-labelledby="murdoku-kies" className="grid gap-3 sm:grid-cols-2">
-          {MURDOKU_LEVELS.map((entry) => {
+          {MURDOKU_LADDER.map((entry) => {
             const isSolved = solved.has(entry.id);
             const isRecommended = entry.id === recommended.id;
             const { width, height } = entry.level.size;
             return (
               <li key={entry.id}>
-                <button
-                  aria-label={`${entry.title}, ${width} × ${height}, ${statusLabel(isSolved)}`}
-                  className={cn(
-                    "game-panel flex min-h-28 w-full flex-col gap-1 p-4 text-left transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
-                    isSolved ? "border-success/40" : "hover:bg-muted/50",
-                    isRecommended && "ring-2 ring-primary/40",
-                  )}
-                  type="button"
-                  onClick={() => choose(entry)}
-                >
-                  <span className="flex items-start justify-between gap-2">
-                    <span className="font-display text-lg leading-tight">{entry.title}</span>
-                    <span className="flex shrink-0 flex-wrap justify-end gap-1">
-                      {isRecommended ? (
-                        <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
-                          <Sparkles aria-hidden="true" className="size-3.5" />
-                          Past bij jou
-                        </span>
-                      ) : null}
+                <ChoiceCard
+                  ariaLabel={`${entry.title}, ${width} × ${height}, ${statusLabel(isSolved).toLowerCase()}`}
+                  className="min-h-28 w-full items-start gap-1 p-4 text-left"
+                  label={<span className="font-display text-lg leading-tight">{entry.title}</span>}
+                  selected={isRecommended}
+                  description={
+                    <span className="flex w-full flex-col gap-1">
                       <span
                         className={cn(
-                          "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold",
+                          "flex w-fit items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold",
                           isSolved
                             ? "bg-success/10 text-success"
                             : "bg-muted text-muted-foreground",
@@ -90,17 +78,24 @@ export function MurdokuCaseListPage() {
                         ) : (
                           <Play aria-hidden="true" className="size-3.5" />
                         )}
-                        {isSolved ? "Opgelost" : "Nog niet gespeeld"}
+                        {statusLabel(isSolved)}
+                      </span>
+                      {isRecommended ? (
+                        <span className="flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                          <Sparkles aria-hidden="true" className="size-3.5" />
+                          Past bij jou
+                        </span>
+                      ) : null}
+                      <span className="text-xs font-semibold text-muted-foreground">
+                        {width} × {height}
+                      </span>
+                      <span className="text-sm leading-relaxed text-muted-foreground">
+                        {entry.intro}
                       </span>
                     </span>
-                  </span>
-                  <span className="text-xs font-semibold text-muted-foreground">
-                    {width} × {height}
-                  </span>
-                  <span className="text-sm leading-relaxed text-muted-foreground">
-                    {entry.intro}
-                  </span>
-                </button>
+                  }
+                  onClick={() => choose(entry)}
+                />
               </li>
             );
           })}

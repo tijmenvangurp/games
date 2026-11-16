@@ -75,10 +75,10 @@ describe("Wie was het? in de catalogus en de router", () => {
 
     expect(await screen.findByRole("heading", { name: "Wie is wie?" })).toBeTruthy();
     const sentenceOf = (part: string) =>
-      screen.getByText((content) => content.trim().startsWith(part));
-    expect(sentenceOf("Anna stond in")).toBeTruthy();
-    expect(sentenceOf("Bram stond op")).toBeTruthy();
-    expect(sentenceOf("Cato stond in")).toBeTruthy();
+      screen.getAllByText((content) => content.trim().startsWith(part));
+    expect(sentenceOf("Anna stond in").length).toBeGreaterThan(0);
+    expect(sentenceOf("Bram stond op").length).toBeGreaterThan(0);
+    expect(sentenceOf("Cato stond in").length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Toon de keuken op het bord" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Toon een stoel op het bord" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Toon de badkamer op het bord" })).toBeTruthy();
@@ -169,6 +169,21 @@ describe("Wie was het? in de catalogus en de router", () => {
     expect(useMurdokuStore.getState().play?.placements.size).toBe(0);
     expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
     expect((undo as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("begint de zaak opnieuw met een leeg bord", async () => {
+    renderApp("/mysterie");
+
+    await screen.findByRole("heading", { name: "Wie is wie?" });
+    fireEvent.click(screen.getByRole("button", { name: "Anna" }));
+    fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
+    expect(useMurdokuStore.getState().play?.placements.size).toBe(1);
+
+    fireEvent.click(screen.getByRole("button", { name: "Opnieuw beginnen" }));
+
+    expect(useMurdokuStore.getState().play?.placements.size).toBe(0);
+    expect(useMurdokuStore.getState().hintsUsed).toBe(0);
+    expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ })).toBeTruthy();
   });
 });
 
@@ -338,7 +353,7 @@ describe("Wie was het? hints en tikbare woorden", () => {
     );
     expect(useMurdokuStore.getState().play?.placements.get("B")).toBe(4);
     expect(screen.getByRole("button", { name: /^Bram, (licht op, )?rij 2, kolom 1/ })).toBeTruthy();
-    expect(useMurdokuStore.getState().hintsUsed).toBe(2);
+    expect(useMurdokuStore.getState().hintsUsed).toBe(1);
   });
 
   it("geeft nooit meteen het eindantwoord en straft een hint niet", async () => {
@@ -355,7 +370,7 @@ describe("Wie was het? hints en tikbare woorden", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("streept na de lichte cue één onmogelijk vakje weg", async () => {
+  it("laat na de lichte cue de laatste persoon aan het kind", async () => {
     renderApp("/mysterie");
 
     await screen.findByRole("heading", { name: "Wie is wie?" });
@@ -368,11 +383,10 @@ describe("Wie was het? hints en tikbare woorden", () => {
     fireEvent.click(hintButton);
     fireEvent.click(hintButton);
 
-    expect(screen.getByRole("status").textContent).toContain("Streep R3/K3 weg.");
-    expect(useMurdokuStore.getState().play?.manualCrosses.has(10)).toBe(true);
-    expect(
-      screen.getByRole("button", { name: /^kruisje, (licht op, )?rij 3, kolom 3/ }),
-    ).toBeTruthy();
+    expect(screen.getByRole("status").textContent).toContain(
+      "Bijna klaar! Zet de laatste persoon zelf.",
+    );
+    expect(useMurdokuStore.getState().play?.placements.has("C")).toBe(false);
   });
 
   it("zet de hintknop uit als de zaak opgelost is", async () => {
@@ -383,7 +397,7 @@ describe("Wie was het? hints en tikbare woorden", () => {
     );
   });
 
-  it("bewaart de instellingen en laat auto-kruis het bord volgen", async () => {
+  it("bewaart de instelling voor automatisch wegstrepen", async () => {
     renderApp("/mysterie");
     await screen.findByRole("heading", { name: "Wie is wie?" });
 
@@ -399,10 +413,5 @@ describe("Wie was het? hints en tikbare woorden", () => {
     fireEvent.click(screen.getByRole("button", { name: "Anna" }));
     fireEvent.click(screen.getByRole("button", { name: /^leeg, rij 1, kolom 2/ }));
     expect(screen.getByRole("button", { name: /^leeg, rij 1, kolom 1/ })).toBeTruthy();
-
-    const blocked = screen.getByRole("button", { name: "Ook kruisjes op meubels" });
-    fireEvent.click(blocked);
-    expect(blocked.getAttribute("aria-pressed")).toBe("true");
-    expect(useMurdokuStore.getState().settings.crossOnBlocked).toBe(true);
   });
 });

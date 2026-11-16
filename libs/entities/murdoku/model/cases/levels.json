@@ -301,6 +301,10 @@
           "2": {
             "nameKey": "room.eetkamer",
             "color": "#cfe0d4"
+          },
+          "3": {
+            "nameKey": "room.studeerkamer",
+            "color": "#ecd3d3"
           }
         },
         "objects": {
@@ -308,40 +312,23 @@
             "type": "carpet",
             "occupiable": true
           },
-          "s": {
-            "type": "chair",
+          "b": {
+            "type": "bed",
             "occupiable": true
           },
           "g": {
             "type": "shelf",
             "occupiable": false
+          },
+          "p": {
+            "type": "plant",
+            "occupiable": false
           }
         },
-        "roomMap": ["1111", "1111", "1221", "1221"],
-        "groundMap": ["..rr", "....", "....", "...."],
-        "topMap": ["ssss", "....", "sg..", "..g."],
-        "windows": [
-          {
-            "r": 3,
-            "c": 2,
-            "side": "S"
-          },
-          {
-            "r": 0,
-            "c": 2,
-            "side": "N"
-          },
-          {
-            "r": 3,
-            "c": 0,
-            "side": "W"
-          },
-          {
-            "r": 2,
-            "c": 3,
-            "side": "E"
-          }
-        ],
+        "roomMap": ["1112", "1112", "1112", "3332"],
+        "groundMap": ["....", "....", "r...", "...."],
+        "topMap": ["p.p.", ".b..", ".b.g", ".bbg"],
+        "windows": [],
         "doors": [],
         "suspects": [
           {
@@ -349,6 +336,26 @@
             "name": "Iris",
             "attributes": {
               "gender": "f",
+              "glasses": true,
+              "beard": false,
+              "bald": false,
+              "hair": "black"
+            },
+            "clues": [
+              {
+                "type": "not",
+                "clue": {
+                  "type": "nearObject",
+                  "object": "shelf"
+                }
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "Mees",
+            "attributes": {
+              "gender": "m",
               "glasses": false,
               "beard": false,
               "bald": false,
@@ -362,42 +369,19 @@
             ]
           },
           {
-            "id": "B",
-            "name": "Juna",
+            "id": "C",
+            "name": "Noud",
             "attributes": {
-              "gender": "f",
+              "gender": "m",
               "glasses": true,
               "beard": false,
               "bald": false,
-              "hair": "black"
+              "hair": "brown"
             },
             "clues": [
               {
-                "type": "directionFromObject",
-                "object": "carpet",
-                "dir": "southwest",
-                "room": "other",
-                "all": true
-              }
-            ]
-          },
-          {
-            "id": "C",
-            "name": "Lotte",
-            "attributes": {
-              "gender": "f",
-              "glasses": false,
-              "beard": false,
-              "bald": false,
-              "hair": "black"
-            },
-            "clues": [
-              {
-                "type": "not",
-                "clue": {
-                  "type": "inRoom",
-                  "room": "2"
-                }
+                "type": "nearObject",
+                "object": "shelf"
               }
             ]
           }
@@ -407,18 +391,17 @@
           "attributes": {
             "gender": "m",
             "glasses": false,
-            "beard": true,
-            "bald": false,
-            "hair": "brown"
+            "beard": false,
+            "bald": true
           }
         },
         "title": "De lege koektrommel"
       },
       "solution": {
-        "A": 3,
-        "B": 13,
-        "C": 4,
-        "victim": 10
+        "A": 14,
+        "B": 8,
+        "C": 7,
+        "victim": 1
       }
     },
     {
@@ -840,7 +823,7 @@
       "level": {
         "schema": 1,
         "id": "de-opengebroken-kluis",
-        "difficulty": "medium",
+        "difficulty": "hard",
         "size": {
           "width": 5,
           "height": 5
@@ -868,16 +851,16 @@
             "type": "chair",
             "occupiable": true
           },
-          "b": {
-            "type": "bed",
-            "occupiable": true
-          },
           "t": {
             "type": "table",
             "occupiable": false
           },
-          "g": {
-            "type": "shelf",
+          "f": {
+            "type": "tv",
+            "occupiable": false
+          },
+          "x": {
+            "type": "box",
             "occupiable": false
           },
           "p": {
@@ -885,39 +868,29 @@
             "occupiable": false
           }
         },
-        "roomMap": ["11122", "11122", "11122", "13323", "11333"],
-        "groundMap": [".....", ".....", ".r..r", "....r", "....."],
-        "topMap": [".bbbb", ".....", "..gs.", "p.bt.", ".pb.g"],
+        "roomMap": ["11223", "11223", "13323", "33333", "33333"],
+        "groundMap": ["..r..", "r....", ".....", ".....", "....."],
+        "topMap": ["p..fp", "..stp", "fpp.p", ".pp..", "xppp."],
         "windows": [
+          {
+            "r": 4,
+            "c": 1,
+            "side": "S"
+          },
+          {
+            "r": 4,
+            "c": 4,
+            "side": "S"
+          },
           {
             "r": 2,
             "c": 0,
             "side": "W"
           },
           {
-            "r": 4,
-            "c": 3,
-            "side": "S"
-          },
-          {
-            "r": 3,
-            "c": 4,
-            "side": "E"
-          },
-          {
             "r": 0,
-            "c": 1,
-            "side": "N"
-          },
-          {
-            "r": 1,
             "c": 0,
             "side": "W"
-          },
-          {
-            "r": 0,
-            "c": 4,
-            "side": "E"
           }
         ],
         "doors": [],
@@ -929,52 +902,50 @@
               "gender": "m",
               "glasses": false,
               "beard": true,
-              "bald": false,
-              "hair": "grey"
-            },
-            "clues": [
-              {
-                "type": "nearObject",
-                "object": "plant"
-              }
-            ]
-          },
-          {
-            "id": "B",
-            "name": "Gijs",
-            "attributes": {
-              "gender": "m",
-              "glasses": true,
-              "beard": false,
-              "bald": false,
-              "hair": "red"
-            },
-            "clues": [
-              {
-                "type": "roomExists",
-                "attribute": "gender",
-                "value": "m",
-                "object": "carpet",
-                "relation": "near"
-              }
-            ]
-          },
-          {
-            "id": "C",
-            "name": "Hugo",
-            "attributes": {
-              "gender": "m",
-              "glasses": false,
-              "beard": true,
-              "bald": false,
-              "hair": "grey"
+              "bald": true
             },
             "clues": [
               {
                 "type": "directionFromObject",
                 "object": "chair",
                 "dir": "east",
-                "room": "other"
+                "room": "same"
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "Eva",
+            "attributes": {
+              "gender": "f",
+              "glasses": true,
+              "beard": false,
+              "bald": false,
+              "hair": "brown"
+            },
+            "clues": [
+              {
+                "type": "onObject",
+                "object": "chair"
+              }
+            ]
+          },
+          {
+            "id": "C",
+            "name": "Fien",
+            "attributes": {
+              "gender": "f",
+              "glasses": false,
+              "beard": false,
+              "bald": false,
+              "hair": "brown"
+            },
+            "clues": [
+              {
+                "type": "sameLineAsObject",
+                "object": "box",
+                "line": "row",
+                "room": "same"
               }
             ]
           },
@@ -986,13 +957,13 @@
               "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "brown"
+              "hair": "black"
             },
             "clues": [
               {
                 "type": "not",
                 "clue": {
-                  "type": "atWall"
+                  "type": "nearWindow"
                 }
               }
             ]
@@ -1002,20 +973,20 @@
           "name": "Vito",
           "attributes": {
             "gender": "m",
-            "glasses": false,
+            "glasses": true,
             "beard": true,
             "bald": false,
-            "hair": "black"
+            "hair": "grey"
           }
         },
         "title": "De opengebroken kluis"
       },
       "solution": {
-        "A": 10,
-        "B": 2,
-        "C": 19,
-        "D": 6,
-        "victim": 23
+        "A": 13,
+        "B": 7,
+        "C": 24,
+        "D": 1,
+        "victim": 15
       }
     },
     {
@@ -1036,10 +1007,6 @@
           "2": {
             "nameKey": "room.gang",
             "color": "#cfe0d4"
-          },
-          "3": {
-            "nameKey": "room.woonkamer",
-            "color": "#ecd3d3"
           }
         },
         "objects": {
@@ -1051,69 +1018,66 @@
             "type": "chair",
             "occupiable": true
           },
-          "b": {
-            "type": "bed",
-            "occupiable": true
-          },
           "t": {
             "type": "table",
-            "occupiable": false
-          },
-          "f": {
-            "type": "tv",
             "occupiable": false
           },
           "g": {
             "type": "shelf",
             "occupiable": false
-          },
-          "x": {
-            "type": "box",
-            "occupiable": false
           }
         },
-        "roomMap": ["12222", "11333", "11333", "11333", "11333"],
-        "groundMap": [".....", ".....", ".....", "..r..", "....."],
-        "topMap": ["g.stt", "g.bbg", "g....", "....g", "xxf.."],
-        "windows": [],
+        "roomMap": ["11111", "11111", "11111", "22221", "22221"],
+        "groundMap": [".....", ".....", ".....", "....r", "....r"],
+        "topMap": ["s..st", "gg..t", "....s", ".....", ".stss"],
+        "windows": [
+          {
+            "r": 3,
+            "c": 0,
+            "side": "W"
+          },
+          {
+            "r": 4,
+            "c": 2,
+            "side": "S"
+          }
+        ],
         "doors": [],
         "suspects": [
           {
             "id": "A",
-            "name": "Jens",
-            "attributes": {
-              "gender": "m",
-              "glasses": true,
-              "beard": false,
-              "bald": false,
-              "hair": "red"
-            },
-            "clues": [
-              {
-                "type": "directionFromAttr",
-                "attribute": "bald",
-                "value": true,
-                "dir": "northwest",
-                "quantifier": "all"
-              }
-            ]
-          },
-          {
-            "id": "B",
-            "name": "Iris",
+            "name": "Hanna",
             "attributes": {
               "gender": "f",
               "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "white"
+              "hair": "black"
             },
             "clues": [
               {
-                "type": "roomCompanion",
-                "count": 1,
-                "attribute": "glasses",
-                "value": true
+                "type": "direction",
+                "of": "D",
+                "dir": "north"
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "Lars",
+            "attributes": {
+              "gender": "m",
+              "glasses": true,
+              "beard": false,
+              "bald": false,
+              "hair": "black"
+            },
+            "clues": [
+              {
+                "type": "sameLineAsObject",
+                "object": "chair",
+                "line": "row",
+                "room": "other"
               }
             ]
           },
@@ -1124,12 +1088,14 @@
               "gender": "m",
               "glasses": true,
               "beard": true,
-              "bald": true
+              "bald": false,
+              "hair": "brown"
             },
             "clues": [
               {
-                "type": "inCol",
-                "col": 4
+                "type": "roomExists",
+                "object": "chair",
+                "relation": "near"
               }
             ]
           },
@@ -1139,43 +1105,45 @@
             "attributes": {
               "gender": "m",
               "glasses": false,
-              "beard": true,
-              "bald": false,
-              "hair": "brown"
+              "beard": false,
+              "bald": true
             },
             "clues": [
               {
-                "type": "nearObject",
-                "object": "box"
+                "type": "besideSameObject",
+                "object": "shelf",
+                "mate": {
+                  "kind": "any"
+                }
               }
             ]
           }
         ],
         "victim": {
-          "name": "Tess",
+          "name": "Viggo",
           "attributes": {
-            "gender": "f",
-            "glasses": true,
+            "gender": "m",
+            "glasses": false,
             "beard": false,
             "bald": false,
-            "hair": "blond"
+            "hair": "brown"
           }
         },
         "boardClues": [
           {
             "type": "countOnObject",
-            "object": "bed",
+            "object": "chair",
             "count": 1
           }
         ],
         "title": "De gestolen fiets"
       },
       "solution": {
-        "A": 2,
-        "B": 8,
-        "C": 24,
-        "D": 15,
-        "victim": 11
+        "A": 1,
+        "B": 20,
+        "C": 14,
+        "D": 7,
+        "victim": 18
       }
     },
     {
@@ -1183,7 +1151,7 @@
       "level": {
         "schema": 1,
         "id": "het-zoekgeraakte-dagboek",
-        "difficulty": "medium",
+        "difficulty": "hard",
         "size": {
           "width": 6,
           "height": 6
@@ -1215,6 +1183,10 @@
             "type": "chair",
             "occupiable": true
           },
+          "b": {
+            "type": "bed",
+            "occupiable": true
+          },
           "t": {
             "type": "table",
             "occupiable": false
@@ -1227,41 +1199,15 @@
             "type": "shelf",
             "occupiable": false
           },
-          "x": {
-            "type": "box",
+          "p": {
+            "type": "plant",
             "occupiable": false
           }
         },
-        "roomMap": ["111122", "111122", "111123", "111133", "111144", "111144"],
-        "groundMap": ["......", "......", "......", "r.....", ".r..r.", "......"],
-        "topMap": ["..s.g.", ".sts..", "..ttx.", "s.ssf.", "t....f", "tts.st"],
-        "windows": [
-          {
-            "r": 0,
-            "c": 5,
-            "side": "E"
-          },
-          {
-            "r": 2,
-            "c": 5,
-            "side": "E"
-          },
-          {
-            "r": 0,
-            "c": 0,
-            "side": "W"
-          },
-          {
-            "r": 4,
-            "c": 0,
-            "side": "W"
-          },
-          {
-            "r": 5,
-            "c": 1,
-            "side": "S"
-          }
-        ],
+        "roomMap": ["111122", "111122", "332222", "332222", "222444", "222444"],
+        "groundMap": ["......", ".r....", "......", "......", ".....r", "......"],
+        "topMap": ["p..fgg", "..st..", ".f.g..", "bbgg.g", "g..p..", "g.g..p"],
+        "windows": [],
         "doors": [],
         "suspects": [
           {
@@ -1270,33 +1216,33 @@
             "attributes": {
               "gender": "m",
               "glasses": false,
-              "beard": false,
-              "bald": false,
-              "hair": "black"
-            },
-            "clues": [
-              {
-                "type": "sameLineAsObject",
-                "object": "box",
-                "line": "row",
-                "room": "other"
-              }
-            ]
-          },
-          {
-            "id": "B",
-            "name": "Otis",
-            "attributes": {
-              "gender": "m",
-              "glasses": false,
-              "beard": false,
-              "bald": false,
-              "hair": "black"
+              "beard": true,
+              "bald": true
             },
             "clues": [
               {
                 "type": "onObject",
                 "object": "carpet"
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "Mila",
+            "attributes": {
+              "gender": "f",
+              "glasses": false,
+              "beard": false,
+              "bald": false,
+              "hair": "white"
+            },
+            "clues": [
+              {
+                "type": "not",
+                "clue": {
+                  "type": "nearObject",
+                  "object": "table"
+                }
               }
             ]
           },
@@ -1308,12 +1254,12 @@
               "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "white"
+              "hair": "black"
             },
             "clues": [
               {
-                "type": "nearObject",
-                "object": "box"
+                "type": "onObject",
+                "object": "chair"
               }
             ]
           },
@@ -1322,14 +1268,17 @@
             "name": "Sem",
             "attributes": {
               "gender": "m",
-              "glasses": true,
-              "beard": true,
-              "bald": true
+              "glasses": false,
+              "beard": false,
+              "bald": false,
+              "hair": "brown"
             },
             "clues": [
               {
-                "type": "onObject",
-                "object": "chair"
+                "type": "sameLineAsObject",
+                "object": "table",
+                "line": "col",
+                "room": "other"
               }
             ]
           },
@@ -1341,25 +1290,14 @@
               "glasses": true,
               "beard": false,
               "bald": false,
-              "hair": "black"
+              "hair": "red"
             },
             "clues": [
               {
-                "type": "and",
-                "clues": [
-                  {
-                    "type": "sameLineAsObject",
-                    "object": "carpet",
-                    "line": "row",
-                    "room": "other"
-                  },
-                  {
-                    "type": "roomCompanion",
-                    "count": 3,
-                    "attribute": "gender",
-                    "value": "m"
-                  }
-                ]
+                "type": "sameLineAsObject",
+                "object": "bed",
+                "line": "row",
+                "room": "other"
               }
             ]
           }
@@ -1368,21 +1306,22 @@
           "name": "Valentijn",
           "attributes": {
             "gender": "m",
-            "glasses": false,
+            "glasses": true,
             "beard": false,
             "bald": false,
             "hair": "grey"
           }
         },
+        "boardClues": [],
         "title": "Het zoekgeraakte dagboek"
       },
       "solution": {
-        "A": 13,
-        "B": 18,
-        "C": 10,
-        "D": 32,
-        "E": 27,
-        "victim": 5
+        "A": 29,
+        "B": 12,
+        "C": 8,
+        "D": 33,
+        "E": 22,
+        "victim": 1
       }
     },
     {
@@ -1422,10 +1361,6 @@
             "type": "chair",
             "occupiable": true
           },
-          "b": {
-            "type": "bed",
-            "occupiable": true
-          },
           "t": {
             "type": "table",
             "occupiable": false
@@ -1437,15 +1372,11 @@
           "x": {
             "type": "box",
             "occupiable": false
-          },
-          "p": {
-            "type": "plant",
-            "occupiable": false
           }
         },
-        "roomMap": ["112222", "111222", "111222", "311222", "344442", "334444"],
-        "groundMap": ["......", "r..r..", "...rr.", "......", ".r....", "......"],
-        "topMap": [".sgg.g", ".ts...", "sts...", "...gg.", ".sts.x", "bbs..p"],
+        "roomMap": ["112233", "111233", "111233", "114333", "144333", "444433"],
+        "groundMap": ["......", "..r...", "......", "....rr", ".....r", "......"],
+        "topMap": ["ttst.g", "ttss..", "s.....", "...ss.", "...tts", ".xxgs."],
         "windows": [],
         "doors": [],
         "suspects": [
@@ -1454,6 +1385,45 @@
             "name": "Sem",
             "attributes": {
               "gender": "m",
+              "glasses": true,
+              "beard": true,
+              "bald": false,
+              "hair": "black"
+            },
+            "clues": [
+              {
+                "type": "not",
+                "clue": {
+                  "type": "atWall"
+                }
+              }
+            ]
+          },
+          {
+            "id": "B",
+            "name": "Saar",
+            "attributes": {
+              "gender": "f",
+              "glasses": true,
+              "beard": false,
+              "bald": false,
+              "hair": "white"
+            },
+            "clues": [
+              {
+                "type": "not",
+                "clue": {
+                  "type": "nearObject",
+                  "object": "shelf"
+                }
+              }
+            ]
+          },
+          {
+            "id": "C",
+            "name": "Tess",
+            "attributes": {
+              "gender": "f",
               "glasses": false,
               "beard": false,
               "bald": false,
@@ -1462,64 +1432,41 @@
             "clues": [
               {
                 "type": "sameLineAsObject",
-                "object": "bed",
-                "line": "row",
+                "object": "shelf",
+                "line": "col",
                 "room": "other"
               }
             ]
           },
           {
-            "id": "B",
-            "name": "Teun",
-            "attributes": {
-              "gender": "m",
-              "glasses": false,
-              "beard": false,
-              "bald": true
-            },
-            "clues": [
-              {
-                "type": "nearObject",
-                "object": "carpet"
-              }
-            ]
-          },
-          {
-            "id": "C",
-            "name": "Tim",
+            "id": "D",
+            "name": "Wout",
             "attributes": {
               "gender": "m",
               "glasses": true,
-              "beard": true,
-              "bald": false,
-              "hair": "blond"
-            },
-            "clues": [
-              {
-                "type": "roomCompanion",
-                "count": 1,
-                "attribute": "bald",
-                "value": true
-              }
-            ]
-          },
-          {
-            "id": "D",
-            "name": "Yara",
-            "attributes": {
-              "gender": "f",
-              "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "grey"
+              "hair": "white"
             },
             "clues": [
               {
-                "type": "directionFromObject",
-                "object": "table",
-                "dir": "north",
-                "room": "other",
-                "all": true
+                "type": "and",
+                "clues": [
+                  {
+                    "type": "sameLineAsObject",
+                    "object": "carpet",
+                    "line": "col",
+                    "room": "other"
+                  },
+                  {
+                    "type": "roomExists",
+                    "object": "box",
+                    "relation": "near"
+                  },
+                  {
+                    "type": "corner"
+                  }
+                ]
               }
             ]
           },
@@ -1536,7 +1483,7 @@
             "clues": [
               {
                 "type": "nearObject",
-                "object": "box"
+                "object": "shelf"
               }
             ]
           }
@@ -1547,18 +1494,19 @@
             "gender": "m",
             "glasses": false,
             "beard": true,
-            "bald": true
+            "bald": false,
+            "hair": "blond"
           }
         },
         "title": "De verdwenen honkbal"
       },
       "solution": {
-        "A": 33,
-        "B": 12,
-        "C": 8,
-        "D": 4,
-        "E": 23,
-        "victim": 25
+        "A": 13,
+        "B": 30,
+        "C": 9,
+        "D": 20,
+        "E": 4,
+        "victim": 29
       }
     },
     {
@@ -1594,17 +1542,9 @@
             "type": "carpet",
             "occupiable": true
           },
-          "s": {
-            "type": "chair",
-            "occupiable": true
-          },
           "b": {
             "type": "bed",
             "occupiable": true
-          },
-          "t": {
-            "type": "table",
-            "occupiable": false
           },
           "f": {
             "type": "tv",
@@ -1619,10 +1559,21 @@
             "occupiable": false
           }
         },
-        "roomMap": ["111122", "331222", "333222", "333222", "442222", "444222"],
-        "groundMap": [".r....", "......", ".r....", "......", "r..r..", "...rr."],
-        "topMap": ["f.b.tp", ".gbsts", "....s.", "ss....", ".gf...", "pg...g"],
-        "windows": [],
+        "roomMap": ["111111", "111111", "111111", "223344", "223334", "223334"],
+        "groundMap": ["......", ".r....", ".r....", "......", "r..r..", "......"],
+        "topMap": ["gp.p..", "......", "..g.gp", "b..g.g", "b...fg", "f.g..g"],
+        "windows": [
+          {
+            "r": 4,
+            "c": 0,
+            "side": "W"
+          },
+          {
+            "r": 1,
+            "c": 0,
+            "side": "W"
+          }
+        ],
         "doors": [],
         "suspects": [
           {
@@ -1630,15 +1581,16 @@
             "name": "Yara",
             "attributes": {
               "gender": "f",
-              "glasses": true,
+              "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "black"
+              "hair": "white"
             },
             "clues": [
               {
-                "type": "nearObject",
-                "object": "plant"
+                "type": "roomExists",
+                "object": "carpet",
+                "relation": "near"
               }
             ]
           },
@@ -1647,53 +1599,52 @@
             "name": "Abel",
             "attributes": {
               "gender": "m",
-              "glasses": true,
-              "beard": false,
-              "bald": true
+              "glasses": false,
+              "beard": true,
+              "bald": false,
+              "hair": "blond"
             },
             "clues": [
               {
-                "type": "roomCompanion",
-                "count": 1,
-                "attribute": "hair",
-                "value": "grey"
+                "type": "sameLineAsObject",
+                "object": "tv",
+                "line": "row",
+                "room": "same"
               }
             ]
           },
           {
             "id": "C",
-            "name": "Bram",
-            "attributes": {
-              "gender": "m",
-              "glasses": false,
-              "beard": false,
-              "bald": true
-            },
-            "clues": [
-              {
-                "type": "roomAttribute",
-                "quantifier": "none",
-                "attribute": "gender",
-                "value": "m",
-                "excludeSelf": true
-              }
-            ]
-          },
-          {
-            "id": "D",
-            "name": "Britt",
+            "name": "Anna",
             "attributes": {
               "gender": "f",
               "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "grey"
+              "hair": "blond"
             },
             "clues": [
               {
                 "type": "roomExists",
-                "object": "carpet",
-                "relation": "on"
+                "relation": "corner"
+              }
+            ]
+          },
+          {
+            "id": "D",
+            "name": "Daan",
+            "attributes": {
+              "gender": "m",
+              "glasses": true,
+              "beard": true,
+              "bald": false,
+              "hair": "grey"
+            },
+            "clues": [
+              {
+                "type": "direction",
+                "of": "B",
+                "dir": "south"
               }
             ]
           },
@@ -1702,16 +1653,17 @@
             "name": "Finn",
             "attributes": {
               "gender": "m",
-              "glasses": true,
-              "beard": true,
+              "glasses": false,
+              "beard": false,
               "bald": false,
-              "hair": "white"
+              "hair": "black"
             },
             "clues": [
               {
-                "type": "direction",
-                "of": "A",
-                "dir": "south"
+                "type": "not",
+                "clue": {
+                  "type": "atWall"
+                }
               }
             ]
           }
@@ -1720,28 +1672,22 @@
           "name": "Viktor",
           "attributes": {
             "gender": "m",
-            "glasses": false,
-            "beard": true,
+            "glasses": true,
+            "beard": false,
             "bald": false,
-            "hair": "brown"
+            "hair": "red"
           }
         },
-        "boardClues": [
-          {
-            "type": "countOnObject",
-            "object": "chair",
-            "count": 3
-          }
-        ],
+        "boardClues": [],
         "title": "De gestolen telescoop"
       },
       "solution": {
-        "A": 11,
-        "B": 24,
-        "C": 3,
-        "D": 32,
-        "E": 19,
-        "victim": 16
+        "A": 5,
+        "B": 27,
+        "C": 12,
+        "D": 31,
+        "E": 10,
+        "victim": 20
       }
     },
     {
@@ -1766,10 +1712,6 @@
           "3": {
             "nameKey": "room.kelder",
             "color": "#ecd3d3"
-          },
-          "4": {
-            "nameKey": "room.washok",
-            "color": "#dcd7e8"
           }
         },
         "objects": {
@@ -1797,14 +1739,14 @@
             "type": "shelf",
             "occupiable": false
           },
-          "x": {
-            "type": "box",
+          "p": {
+            "type": "plant",
             "occupiable": false
           }
         },
-        "roomMap": ["122222", "122222", "133444", "113334", "113333", "113333"],
-        "groundMap": ["......", "..r...", "......", "...r..", "......", ".r...."],
-        "topMap": ["fx..t.", "...sts", ".ft..g", "b.s..g", "b.b..x", "x.b..x"],
+        "roomMap": ["112222", "112222", "111222", "111332", "111333", "111333"],
+        "groundMap": ["......", "......", ".r...r", "..rr..", "......", "......"],
+        "topMap": [".gts..", "st.sts", "g.f...", "...bbp", "bb....", "..gf.p"],
         "windows": [],
         "doors": [],
         "suspects": [
@@ -1816,14 +1758,13 @@
               "glasses": false,
               "beard": true,
               "bald": false,
-              "hair": "black"
+              "hair": "white"
             },
             "clues": [
               {
-                "type": "roomCompanion",
-                "count": 1,
-                "attribute": "gender",
-                "value": "f"
+                "type": "roomExists",
+                "object": "carpet",
+                "relation": "on"
               }
             ]
           },
@@ -1832,27 +1773,16 @@
             "name": "Cato",
             "attributes": {
               "gender": "f",
-              "glasses": true,
+              "glasses": false,
               "beard": false,
               "bald": false,
-              "hair": "brown"
+              "hair": "blond"
             },
             "clues": [
               {
-                "type": "and",
-                "clues": [
-                  {
-                    "type": "directionFromObject",
-                    "object": "chair",
-                    "dir": "south",
-                    "room": "other",
-                    "all": true
-                  },
-                  {
-                    "type": "onObject",
-                    "object": "bed"
-                  }
-                ]
+                "type": "direction",
+                "of": "A",
+                "dir": "north"
               }
             ]
           },
@@ -1861,21 +1791,52 @@
             "name": "Gijs",
             "attributes": {
               "gender": "m",
-              "glasses": false,
+              "glasses": true,
               "beard": true,
-              "bald": true
+              "bald": false,
+              "hair": "red"
             },
             "clues": [
               {
-                "type": "direction",
-                "of": "B",
-                "dir": "north"
+                "type": "and",
+                "clues": [
+                  {
+                    "type": "not",
+                    "clue": {
+                      "type": "atWall"
+                    }
+                  },
+                  {
+                    "type": "nearObject",
+                    "object": "carpet"
+                  }
+                ]
               }
             ]
           },
           {
             "id": "D",
-            "name": "Fien",
+            "name": "Hugo",
+            "attributes": {
+              "gender": "m",
+              "glasses": true,
+              "beard": true,
+              "bald": false,
+              "hair": "red"
+            },
+            "clues": [
+              {
+                "type": "not",
+                "clue": {
+                  "type": "nearObject",
+                  "object": "plant"
+                }
+              }
+            ]
+          },
+          {
+            "id": "E",
+            "name": "Hanna",
             "attributes": {
               "gender": "f",
               "glasses": true,
@@ -1885,52 +1846,20 @@
             },
             "clues": [
               {
-                "type": "and",
-                "clues": [
-                  {
-                    "type": "nearObject",
-                    "object": "chair"
-                  },
-                  {
-                    "type": "besideSameObject",
-                    "object": "table",
-                    "mate": {
-                      "kind": "any"
-                    },
-                    "dir": "east"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "id": "E",
-            "name": "Jens",
-            "attributes": {
-              "gender": "m",
-              "glasses": false,
-              "beard": false,
-              "bald": false,
-              "hair": "white"
-            },
-            "clues": [
-              {
-                "type": "roomAttribute",
-                "quantifier": "none",
-                "attribute": "gender",
-                "value": "f",
-                "excludeSelf": true
+                "type": "roomExists",
+                "relation": "corner"
               }
             ]
           }
         ],
         "victim": {
-          "name": "Victor",
+          "name": "Sofie",
           "attributes": {
-            "gender": "m",
-            "glasses": true,
+            "gender": "f",
+            "glasses": false,
             "beard": false,
-            "bald": true
+            "bald": false,
+            "hair": "red"
           }
         },
         "boardClues": [
@@ -1943,12 +1872,12 @@
         "title": "Het lege aquarium"
       },
       "solution": {
-        "A": 11,
-        "B": 24,
-        "C": 16,
-        "D": 3,
-        "E": 32,
-        "victim": 19
+        "A": 8,
+        "B": 3,
+        "C": 19,
+        "D": 28,
+        "E": 17,
+        "victim": 30
       }
     }
   ]

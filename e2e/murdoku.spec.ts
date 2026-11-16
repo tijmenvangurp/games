@@ -97,6 +97,11 @@ async function playIntroCase(page: Page, keyboardFirst: boolean): Promise<void> 
   await page.getByRole("button", { name: ONGEDAAN }).click();
   await expect(page.getByRole("button", { name: /^Bram, rij 2, kolom 1/ })).toHaveCount(0);
 
+  // Reset maakt het bord leeg en begint dezelfde zaak opnieuw.
+  await page.getByRole("button", { name: "Opnieuw beginnen" }).click();
+  await expect(page.getByRole("button", { name: /^Anna, rij 1, kolom 2/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Bram, rij 2, kolom 1/ })).toHaveCount(0);
+
   await placeOnBoard(page, /^Anna$/, /^leeg, rij 1, kolom 2/);
   await placeOnBoard(page, /^Bram$/, /^leeg, rij 2, kolom 1/);
   await placeOnBoard(page, /^Cato$/, /^leeg, rij 3, kolom 4/);
