@@ -13,5 +13,6 @@ export {
   occupiedHoleIds,
   rejectionFor,
 } from "./model/placement";
+export { trayOrder } from "./model/tray-order";
 export { DraaiwerkLevelSelect } from "./ui/draaiwerk-level-select";
 export { DraaiwerkPlay } from "./ui/draaiwerk-play";

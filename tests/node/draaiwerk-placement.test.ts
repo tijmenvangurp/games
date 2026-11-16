@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drive, levelAt, type Placement } from "@entities/gear";
+import { allLevels, drive, levelAt, type Placement } from "@entities/gear";
 import {
   formatSpeed,
   holesForPlacement,
@@ -7,6 +7,7 @@ import {
   occupiedHoleIds,
   outputName,
   rejectionFor,
+  trayOrder,
   trayShortLabel,
 } from "@features/draaiwerk";
 
@@ -151,6 +152,22 @@ describe("draaiwerk placement", () => {
         toHoleId: "1,2",
       }),
     ).toBe("De ketting past niet tussen deze wielen.");
+  });
+
+  it("zet de onderdelen in een vaste, geschudde volgorde", () => {
+    for (const level of allLevels()) {
+      const order = trayOrder(level).map((item) => item.id);
+      const authored = level.tray.map((item) => item.id);
+
+      expect(order.slice().sort(), level.id).toEqual(authored.slice().sort());
+      expect(
+        trayOrder(level).map((item) => item.id),
+        level.id,
+      ).toEqual(order);
+      if (level.tray.length > 1) {
+        expect(order, level.id).not.toEqual(authored);
+      }
+    }
   });
 
   it("formats labels, speeds and outputs", () => {

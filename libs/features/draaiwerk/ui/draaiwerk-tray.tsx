@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Check } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { trayLabel, type TrayItem } from "@entities/gear";
 import { trayShortLabel } from "../model/labels";
+import { trayOrder } from "../model/tray-order";
 import { useDraaiwerkStore } from "../model/use-draaiwerk-store";
 import { TrayArt } from "./gear-art";
 
@@ -100,6 +101,7 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
   const selectedTrayId = useDraaiwerkStore((state) => state.selectedTrayId);
   const status = useDraaiwerkStore((state) => state.status);
   const solving = status === "solved";
+  const items = useMemo(() => trayOrder(level), [level]);
   const { isOver, setNodeRef } = useDroppable({
     id: "tray-remove",
     disabled: !removing,
@@ -136,11 +138,11 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
           !removing && "content-start",
         )}
       >
-        {level.tray.length === 0 ? (
+        {items.length === 0 ? (
           <p className="col-span-2 py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
         ) : null}
 
-        {level.tray.map((item) => (
+        {items.map((item) => (
           <TrayPart
             key={item.id}
             item={item}
