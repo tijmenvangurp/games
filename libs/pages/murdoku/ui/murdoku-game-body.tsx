@@ -131,7 +131,7 @@ export function MurdokuGameBody({
   const [boardFocusToken, setBoardFocusToken] = useState(0);
   const revealRef = useRef<HTMLElement>(null);
   const { puzzle, text, title, intro } = caseView;
-  const { settings, onAutoCross, onCrossOnBlocked } = settingsView;
+  const { settings, onAutoCross } = settingsView;
   const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
   const restart = () => {
     setShowCelebration(true);
@@ -180,6 +180,7 @@ export function MurdokuGameBody({
           actions={{
             cellTap: actions.cellTap,
             undo: actions.undo,
+            reset: actions.restart,
             toggleCross: actions.toggleCross,
             check: actions.check,
             hint: onHint,
@@ -201,11 +202,7 @@ export function MurdokuGameBody({
           onFocusWord={onFocusWord}
           onSelectPerson={selectPerson}
         />
-        <MurdokuSettingsSection
-          settings={settings}
-          onAutoCross={onAutoCross}
-          onCrossOnBlocked={onCrossOnBlocked}
-        />
+        <MurdokuSettingsSection settings={settings} onAutoCross={onAutoCross} />
       </div>
 
       {revealSentence && showCelebration ? (

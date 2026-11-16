@@ -1,4 +1,5 @@
 export { Button } from "./button";
+export { ChoiceCard } from "./choice-card";
 export { CelebrationDialog } from "./celebration-dialog";
 export { ChessBoard } from "./chess-board";
 export { Confetti } from "./confetti";

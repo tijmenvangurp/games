@@ -31,9 +31,8 @@ export interface MurdokuHintView {
   onFocusWord: (focus: MurdokuClueFocus, label: string) => void;
 }
 
-/** De instellingen van het kind en de twee schakelaars. */
+/** De instelling van het kind en de schakelaar. */
 export interface MurdokuSettingsView {
   settings: MurdokuSettings;
   onAutoCross: (enabled: boolean) => void;
-  onCrossOnBlocked: (enabled: boolean) => void;
 }

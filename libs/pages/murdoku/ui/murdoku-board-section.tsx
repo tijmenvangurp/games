@@ -11,12 +11,13 @@ import {
   type MurdokuHintState,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
-import { Button, Check, CircleQuestionMark, Lightbulb, Undo2, X } from "@shared/ui";
+import { Button, Check, CircleQuestionMark, Lightbulb, RotateCcw, Undo2, X } from "@shared/ui";
 
 /** De knoppen en tikacties van het bord, gebundeld zodat de sectie leesbaar blijft. */
 interface MurdokuBoardActions {
   cellTap: (cell: Cell) => void;
   undo: () => void;
+  reset: () => void;
   toggleCross: () => void;
   check: () => void;
   hint: () => void;
@@ -84,6 +85,7 @@ interface MurdokuControlsProps {
   canCheck: boolean;
   onToggleCross: () => void;
   onUndo: () => void;
+  onReset: () => void;
   onCheck: () => void;
   onHint: () => void;
   onHelp?: () => void;
@@ -97,6 +99,7 @@ function MurdokuControls({
   canCheck,
   onToggleCross,
   onUndo,
+  onReset,
   onCheck,
   onHint,
   onHelp,
@@ -116,6 +119,10 @@ function MurdokuControls({
       <Button className="min-h-11" disabled={!canUndo || solved} variant="outline" onClick={onUndo}>
         <Undo2 aria-hidden="true" className="size-5" />
         Ongedaan maken
+      </Button>
+      <Button className="min-h-11" disabled={solved} variant="outline" onClick={onReset}>
+        <RotateCcw aria-hidden="true" className="size-5" />
+        Opnieuw beginnen
       </Button>
       <Button className="min-h-11" disabled={solved} variant="outline" onClick={onHint}>
         <Lightbulb aria-hidden="true" className="size-5" />
@@ -313,6 +320,7 @@ export function MurdokuBoardSection({
         onCheck={actions.check}
         onHelp={actions.help}
         onHint={actions.hint}
+        onReset={actions.reset}
         onToggleCross={actions.toggleCross}
         onUndo={actions.undo}
       />

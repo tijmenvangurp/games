@@ -29,7 +29,6 @@ export function MurdokuPage() {
     showHint,
     focusClue,
     setAutoCross,
-    setCrossOnBlocked,
     abandon,
     settings,
     storedPlay,
@@ -49,7 +48,6 @@ export function MurdokuPage() {
       showHint: state.showHint,
       focusClue: state.focusClue,
       setAutoCross: state.setAutoCross,
-      setCrossOnBlocked: state.setCrossOnBlocked,
       abandon: state.abandon,
       settings: state.settings,
       storedPlay: state.play,
@@ -79,7 +77,7 @@ export function MurdokuPage() {
     : null;
   const intro =
     activeCase?.intro ??
-    "Er is iets gestolen. Lees de aanwijzingen, plaats iedereen en zoek wie als enige bij Vera was.";
+    `Er is iets gestolen. Lees de aanwijzingen, plaats iedereen en zoek wie als enige bij ${puzzle.victim.name} was.`;
 
   return (
     <GameShell
@@ -106,7 +104,7 @@ export function MurdokuPage() {
         play={play}
         progressMessage={progressMessage}
         revealSentence={revealSentence}
-        settingsView={{ settings, onAutoCross: setAutoCross, onCrossOnBlocked: setCrossOnBlocked }}
+        settingsView={{ settings, onAutoCross: setAutoCross }}
         actions={{
           cellTap: tapCell,
           check: () => check(solution),
