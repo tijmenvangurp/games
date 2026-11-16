@@ -40,11 +40,17 @@ export const MURDOKU_LEVELS_FILE = "libs/entities/murdoku/model/cases/levels.jso
  * De aanwijzingstypes die v1 toestaat.
  *
  * De lijst dekt de v1-woordenschat uit de spec: plaats, object, raam, hoek,
- * kamer, rij, kolom, alleen, de enige op een object, links/rechts/boven/onder
- * en "niet". Aanwijzingen op geslacht, baard, bril of ander uiterlijk staan er
- * bewust niet in; die zijn voor v1 te moeilijk en te persoonsgebonden. De
- * samengestelde vormen `and`, `or` en `not` combineren alleen toegestane
- * aanwijzingen.
+ * kamer, rij, kolom, links/rechts/boven/onder en "niet". Aanwijzingen op
+ * geslacht, baard, bril of ander uiterlijk staan er bewust niet in; die zijn
+ * voor v1 te moeilijk en te persoonsgebonden.
+ *
+ * De aanwijzingen die de buit als persoon tellen, staan er ook niet in:
+ * `alone`, `notAlone`, `aloneWith`, de `unique*`-reeks, `roomExists`,
+ * `roomCompanion`, `roomAttribute`, `directionFromAttr` en de bordbrede
+ * `countOnObject`/`emptyRooms`/`everyRoomCount`. De buit is een voorwerp, geen
+ * medespeler; alleen de interne rij/kolom-bijectie en de daderregel gebruiken
+ * hem nog als persoon. De samengestelde vormen `and`, `or` en `not` combineren
+ * alleen toegestane aanwijzingen.
  */
 const V1_CLUE_TYPES: ReadonlySet<string> = new Set([
   "onObject",
@@ -59,24 +65,12 @@ const V1_CLUE_TYPES: ReadonlySet<string> = new Set([
   "inCol",
   "corner",
   "atWall",
-  "uniqueOnObject",
-  "uniqueNearObject",
-  "uniqueNearWindow",
-  "uniqueNearDoor",
-  "uniqueInside",
-  "uniqueOutside",
-  "alone",
-  "notAlone",
   "direction",
   "sameRoom",
   "sameLineAsObject",
   "directionFromObject",
   "sameRoomAsObject",
   "besideSameObject",
-  "roomExists",
-  "countOnObject",
-  "emptyRooms",
-  "everyRoomCount",
   "and",
   "or",
   "not",
@@ -106,6 +100,7 @@ function clueProblems(value: unknown): string[] {
     ...allowedTypeProblems(type),
     ...attributeProblems(type, value),
     ...directionProblems(type, value),
+    ...occupancyProblems(type, value),
   ];
 }
 
@@ -132,6 +127,21 @@ function directionProblems(type: string, value: Record<string, unknown>): string
 }
 
 /**
+ * Aanwijzingen die de buit als een persoon meetellen, zijn niet toegestaan.
+ * `inRoom` met `occupancy` en `sameRoom`/`sameRoomAsObject` met `alone` kijken
+ * wie er nog meer in de kamer staat; de buit is echter een voorwerp.
+ */
+function occupancyProblems(type: string, value: Record<string, unknown>): string[] {
+  if (type === "inRoom" && value.occupancy != null) {
+    return ["inRoom met een bezetting staat niet in de v1-allowlist"];
+  }
+  if ((type === "sameRoom" || type === "sameRoomAsObject") && value.alone === true) {
+    return [`${type} met alone staat niet in de v1-allowlist`];
+  }
+  return [];
+}
+
+/**
  * Controleert alle aanwijzingen van een zaak tegen de v1-allowlist. Retourneert
  * leesbare problemen; een lege lijst betekent: toegestaan.
  */
@@ -141,9 +151,11 @@ export function murdokuV1ClueProblems(
   const clues = [
     ...level.suspects.flatMap((suspect) => suspect.clues ?? []),
     ...(level.globalClues ?? []),
-    ...(level.boardClues ?? []),
   ];
-  return clues.flatMap(clueProblems);
+  const boardProblems = (level.boardClues ?? []).map(
+    (clue) => `de bordbrede aanwijzing ${clue.type} staat niet in de v1-allowlist`,
+  );
+  return [...clues.flatMap(clueProblems), ...boardProblems];
 }
 
 /** Vaste kamertinten; dezelfde waarden als de bordpalette van de feature. */
@@ -269,8 +281,9 @@ function localizePeople(level: LevelJson, spec: MurdokuCaseSpec, caseIndex: numb
     suspect.name = nextName(pool, start, used, `${suspect.id}${index}`);
   });
 
-  const victimGender = genderOf(level.victim.attributes);
-  level.victim.name = victimGender === "m" ? spec.victimName.male : spec.victimName.female;
+  // De engine houdt intern een victim-persoon bij voor de rij/kolom-bijectie en
+  // de daderregel. Voor de speler is dat de buit: een voorwerp, geen persoon.
+  level.victim.name = spec.loot.name;
 }
 
 function pruneObjects(level: LevelJson): void {
@@ -345,6 +358,7 @@ function toMurdokuCases(data: GeneratedMurdokuLevels): MurdokuCase[] {
         id: spec.id,
         title: spec.title,
         intro: spec.intro,
+        loot: spec.loot,
         level: generated.level,
         solution: generated.solution,
       },

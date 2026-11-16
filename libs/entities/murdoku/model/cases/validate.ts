@@ -23,7 +23,7 @@ function solutionProblems(
   const extra = ids.filter((id) => !expectedIds.includes(id));
 
   if (missing.includes(VICTIM_ID)) {
-    problems.push(`${entry.id}: het slachtoffer ontbreekt in de oplossing`);
+    problems.push(`${entry.id}: de buit ontbreekt in de oplossing`);
   }
   const missingPeople = missing.filter((id) => id !== VICTIM_ID);
   if (missingPeople.length > 0) {
@@ -54,6 +54,15 @@ function levelProblems(entry: MurdokuCase): string[] {
   }
   if (level.id !== entry.id) {
     problems.push(`${entry.id}: de level-id "${level.id}" hoort niet bij de zaak`);
+  }
+  if (entry.loot.name.trim() === "") {
+    problems.push(`${entry.id}: de buit heeft geen naam`);
+  }
+  if (!/^[a-z0-9-]+$/.test(entry.loot.icon)) {
+    problems.push(`${entry.id}: het buit-icoon "${entry.loot.icon}" is geen elementnaam`);
+  }
+  if (level.victim.name !== entry.loot.name) {
+    problems.push(`${entry.id}: de levelnaam van de buit hoort "${entry.loot.name}" te zijn`);
   }
   if (/^gen-/.test(entry.id)) {
     problems.push(`${entry.id}: gebruik een eigen id, niet de generator-id`);
@@ -110,12 +119,10 @@ function placementProblems(entry: MurdokuCase): string[] {
 
   const murderer = findMurdokuMurderer(puzzle, entry.solution);
   if (!murderer.suspectId) {
-    return [`${entry.id}: de oplossing heeft geen unieke dader`];
+    return [`${entry.id}: de oplossing heeft geen unieke dief`];
   }
   if (murderer.suspectsInRoom.length !== 1) {
-    return [
-      `${entry.id}: er staan ${murderer.suspectsInRoom.length} verdachten bij het slachtoffer`,
-    ];
+    return [`${entry.id}: er staan ${murderer.suspectsInRoom.length} verdachten bij de buit`];
   }
   return [];
 }

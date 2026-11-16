@@ -184,10 +184,10 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "murdoku",
     name: "Wie was het?",
     description:
-      "Lees de aanwijzingen, vul de plattegrond in en vind wie als enige bij het slachtoffer was.",
+      "Lees de aanwijzingen, vul de plattegrond in en vind de dief die als enige bij de buit was.",
     status: "available",
     to: "/mysterie",
-    thumbnail: "/thumbnails/wie-was-het-7b43d89b.jpg",
+    thumbnail: "/thumbnails/wie-was-het-a87a3622.jpg",
     speech: {
       kind: "visual",
       reason: "De plattegrond, de portretten en de aanwijzingen zijn visueel.",
