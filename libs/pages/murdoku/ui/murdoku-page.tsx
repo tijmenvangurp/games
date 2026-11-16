@@ -98,14 +98,16 @@ export function MurdokuPage() {
         play={play}
         revealSentence={revealSentence}
         settingsView={{ settings, onAutoCross: setAutoCross, onCrossOnBlocked: setCrossOnBlocked }}
-        onCellTap={tapCell}
-        onCheck={() => check(solution)}
-        onHelp={() => navigate({ to: "/mysterie/les" })}
-        onHome={() => navigate({ to: "/" })}
-        onRestart={() => start(puzzle)}
-        onSelectPerson={selectPerson}
-        onToggleCross={() => setMode(play.mode === "cross" ? "place" : "cross")}
-        onUndo={undo}
+        actions={{
+          cellTap: tapCell,
+          check: () => check(solution),
+          help: () => navigate({ to: "/mysterie/les" }),
+          home: () => navigate({ to: "/" }),
+          restart: () => start(puzzle),
+          selectPerson,
+          toggleCross: () => setMode(play.mode === "cross" ? "place" : "cross"),
+          undo,
+        }}
       />
     </GameShell>
   );
