@@ -43,7 +43,10 @@ export const BOARD = {
   window: "#7fb6cc", // gedempt raamblauw
   press: APP_TOKENS.warning,
   pressScrim: "rgba(176, 122, 54, 0.20)",
-  victim: APP_TOKENS.danger,
+  loot: "#e9dcc2", // neutrale, warme schijf voor de buit
+  lootRing: "rgba(47, 58, 51, 0.28)",
+  murderer: APP_TOKENS.warning, // de ring om de dief; geen rood als "dood"
+  hoverBlocked: APP_TOKENS.warning,
   grass: "#a9c08a", // grasoever rond een waterkamer
 } as const;
 

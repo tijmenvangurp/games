@@ -148,7 +148,7 @@ function LegendAndTips() {
 }
 
 /**
- * De uitleg van Wie was het?: zes schermen en een woordenlijst.
+ * De uitleg van Wie was het?: zeven schermen en een woordenlijst.
  *
  * De opbouw volgt de schaaktutorial: per scherm één onderwerp, een korte zin en
  * een diagram. De woordenlijst staat eronder en is altijd te bereiken, ook als

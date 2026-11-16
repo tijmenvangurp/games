@@ -511,6 +511,18 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
     southwest: "linksonder",
   },
 
+  /** Richting met het juiste voorzetsel en de halfvlak-betekenis van de engine. */
+  dirPhrase: {
+    north: "in een hogere rij dan",
+    south: "in een lagere rij dan",
+    east: "rechts van",
+    west: "links van",
+    northeast: "in een hogere rij en rechts van",
+    northwest: "in een hogere rij en links van",
+    southeast: "in een lagere rij en rechts van",
+    southwest: "in een lagere rij en links van",
+  },
+
   side: { inside: "binnen", outside: "buiten" },
   line: { col: "kolom", row: "rij", either: "kolom of rij" },
   linePlural: { col: "kolommen", row: "rijen" },
@@ -538,7 +550,7 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
   },
 
   rule: {
-    aloneWithVictim: "Het slachtoffer is alleen in een kamer met precies één verdachte.",
+    aloneWithVictim: "De buit is in een kamer met precies één verdachte. Die verdachte is de dief.",
     oneEachLine: "Iedereen staat in een eigen rij en kolom.",
   },
 
@@ -546,6 +558,16 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
   // wegstrepen, dan één persoon plaatsen. Alle zinnen staan hier zodat de
   // woordenlijst dezelfde tekst kan gebruiken.
   hint: {
+    clueNudge: "Kijk eens naar de aanwijzing van {{name}}. Waar kan die persoon nog staan?",
+    clueNudgeObject: "Kijk eens naar de aanwijzing van {{name}}. Waar is nog {{object}}?",
+    focusCell: "Kijk naar {{cell}}.",
+    focusCellReason: "{{child}}. Dit is het enige vrije vakje.",
+    focusCellReasonRoom:
+      "{{child}}. Alleen {{room}} blijft over, en dit is het enige vrije vakje daar.",
+    focusCells: "Kijk naar deze vakjes: hier kan niemand staan.",
+    focusCellsReason: "{{child}}. Deze vakjes kunnen in ieder geval niet.",
+    focusCellsReasonRoom:
+      "{{child}}. Alleen {{room}} blijft over, maar welke plek daar precies volgt, is nog niet zeker. Deze vakjes kunnen in ieder geval niet.",
     focusRow: "Kijk eens naar rij {{num}}.",
     focusRowName: "Kijk eens naar rij {{num}}, waar {{name}} nog kan staan.",
     focusCol: "Kijk eens naar kolom {{num}}.",
@@ -634,7 +656,7 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
       all: "Iedereen in {{poss}} kamer was {{who}}",
     },
 
-    direction: "{{subject}} stond {{neg}}{{direction}} van {{target}}",
+    direction: "{{subject}} stond {{neg}}{{directionPhrase}} {{target}}",
     offsetWest: "{{subject}} stond {{neg}}precies {{n}} kolommen links van {{target}}",
     offsetWest_one: "{{subject}} stond {{neg}}precies {{n}} kolom links van {{target}}",
     offsetEast: "{{subject}} stond {{neg}}precies {{n}} kolommen rechts van {{target}}",
@@ -665,19 +687,20 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
     aloneSameRoomAsObject: "{{subject}} was {{neg}}alleen in een kamer met {{object}}",
     sameLineAsObject: "{{subject}} stond {{neg}}in dezelfde {{line}} als {{object}}{{roomRel}}",
     directionFromObject:
-      "{{subject}} stond {{neg}}{{direction}} van {{object}}{{atCell}}{{roomRel}}",
-    directionFromObjectAll: "{{subject}} stond {{neg}}{{direction}} van {{objectEvery}}{{roomRel}}",
-    directionFromAttrGenderSome: "{{subject}} stond {{neg}}{{direction}} van minstens {{who}}",
-    directionFromAttrGenderAll: "{{subject}} stond {{neg}}{{direction}} van {{who}}",
+      "{{subject}} stond {{neg}}{{directionPhrase}} {{object}}{{atCell}}{{roomRel}}",
+    directionFromObjectAll:
+      "{{subject}} stond {{neg}}{{directionPhrase}} {{objectEvery}}{{roomRel}}",
+    directionFromAttrGenderSome: "{{subject}} stond {{neg}}{{directionPhrase}} minstens {{who}}",
+    directionFromAttrGenderAll: "{{subject}} stond {{neg}}{{directionPhrase}} {{who}}",
     directionFromAttrTraitSome:
-      "{{subject}} stond {{neg}}{{direction}} van minstens één verdachte met {{attribute}}",
+      "{{subject}} stond {{neg}}{{directionPhrase}} minstens één verdachte met {{attribute}}",
     directionFromAttrTraitAll:
-      "{{subject}} stond {{neg}}{{direction}} van elke verdachte met {{attribute}}",
+      "{{subject}} stond {{neg}}{{directionPhrase}} elke verdachte met {{attribute}}",
 
     besideSameObject: "{{subject}} stond naast {{object}}. {{mate}} stond naast {{objectSame}}.",
     besideSameObjectNeg: "{{subject}} en {{mateLc}} stonden niet allebei naast {{objectSame}}.",
     besideSameObjectDir:
-      "{{subject}} stond naast {{object}}. {{mate}} stond {{direction}} van {{subjectObj}}, naast {{objectSame}}.",
+      "{{subject}} stond naast {{object}}. {{mate}} stond {{directionPhrase}} {{subjectObj}}, naast {{objectSame}}.",
     besideSameObjectDirNeg:
       "{{subject}} en {{mateLc}} ({{direction}}) stonden niet allebei naast {{objectSame}}.",
 
@@ -691,7 +714,7 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
     aloneWithPeople:
       "{{subject}} stond {{neg}}alleen met {{target}} en nog {{count}} anderen ({{attribute}})",
     aloneWithDir:
-      "{{subject}} stond {{neg}}alleen met {{target}} en nog {{count}} anderen ({{attribute}}, één {{direction}})",
+      "{{subject}} stond {{neg}}alleen met {{target}} en nog {{count}} anderen ({{attribute}}, één {{directionPhrase}} {{subjectObj}})",
 
     connAnd: "en",
     connOr: "of",

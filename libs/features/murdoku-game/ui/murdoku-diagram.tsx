@@ -22,8 +22,7 @@ function toneClass(cell: MurdokuDiagramCell): string {
 
 /** Een persoon als gekleurde pion met zijn letter. */
 function PersonDot({ letter }: { letter: string }) {
-  const victim = letter === "V";
-  const color = victim ? "var(--foreground)" : suspectColor(letter.charCodeAt(0) - 65);
+  const color = suspectColor(letter.charCodeAt(0) - 65);
 
   return (
     <span
@@ -33,6 +32,18 @@ function PersonDot({ letter }: { letter: string }) {
     >
       {letter}
     </span>
+  );
+}
+
+/** De buit als lokaal elementicoon, zonder externe afbeelding. */
+function LootBadge({ icon }: { icon: string }) {
+  return (
+    <img
+      alt=""
+      aria-hidden="true"
+      className="size-8 shrink-0 drop-shadow-sm"
+      src={`/elements/${icon}.svg`}
+    />
   );
 }
 
@@ -103,6 +114,7 @@ export function MurdokuDiagram({
               <span className="absolute inset-x-1 top-1 h-1 rounded-full bg-pawn-blue" />
             ) : null}
             {cell.person ? <PersonDot letter={cell.person} /> : null}
+            {cell.loot ? <LootBadge icon={cell.loot} /> : null}
             {cell.object ? <ObjectBadge name={objectName(cell.object)} type={cell.object} /> : null}
             {cell.mark === "check" ? (
               <Check aria-hidden="true" className="absolute right-1 top-1 size-3.5 text-success" />
