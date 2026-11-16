@@ -7,7 +7,7 @@ import { trayShortLabel } from "../model/labels";
 import { useDraaiwerkStore } from "../model/use-draaiwerk-store";
 import { TrayArt } from "./gear-art";
 
-function TrayCard({
+function TrayPart({
   item,
   used,
   selected,
@@ -40,11 +40,7 @@ function TrayCard({
       aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
       aria-pressed={selected}
       className={cn(
-        "relative flex min-h-16 min-w-28 shrink-0 cursor-grab touch-none flex-col items-stretch rounded-xl border p-1.5 text-left transition active:scale-[0.99] active:cursor-grabbing md:landscape:min-w-0 md:landscape:shrink",
-        used
-          ? "border-dashed border-border bg-muted/30 opacity-50"
-          : "border-border bg-card hover:bg-muted/40",
-        selected && "border-primary bg-primary/5 ring-2 ring-primary/25",
+        "group relative flex min-h-16 min-w-0 cursor-grab touch-none flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 transition active:scale-[0.97] active:cursor-grabbing",
         isDragging && "opacity-30",
       )}
       data-selected={selected ? "true" : "false"}
@@ -64,17 +60,36 @@ function TrayCard({
         dndPointerDown?.(event);
       }}
     >
-      <span className="grid flex-1 place-items-center rounded-lg bg-muted/50 py-1">
-        <TrayArt item={item} />
+      <span className="relative grid h-12 place-items-center">
+        {/* The part stands on the dot grid instead of in a card. */}
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-1 h-1.5 w-10 rounded-full bg-foreground/10"
+        />
+        <span
+          className={cn(
+            "relative scale-110 rounded-full p-1 transition group-hover:bg-muted/60",
+            selected && "bg-primary/10 ring-2 ring-primary/35 group-hover:bg-primary/15",
+            used && "opacity-35 grayscale",
+          )}
+        >
+          <TrayArt item={item} />
+        </span>
+        {used ? (
+          <span className="absolute -right-0.5 -top-0.5 grid size-4 place-items-center rounded-full bg-success text-white">
+            <Check aria-hidden="true" className="size-2.5" />
+          </span>
+        ) : null}
       </span>
-      <span className="mt-1 block px-0.5 text-[10px] font-bold leading-tight">
+      <span
+        className={cn(
+          "relative text-[10px] font-bold leading-tight",
+          selected ? "text-primary" : "text-foreground/70",
+          used && "opacity-60",
+        )}
+      >
         {trayShortLabel(item)}
       </span>
-      {used ? (
-        <span className="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-success text-white">
-          <Check aria-hidden="true" className="size-2.5" />
-        </span>
-      ) : null}
     </button>
   );
 }
@@ -117,18 +132,16 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
 
       <div
         className={cn(
-          "game-scrollbar grid min-h-0 min-w-0 gap-2 overflow-y-auto pb-1 md:landscape:flex-1",
-          level.tray.length <= 2
-            ? "grid-cols-1 md:landscape:content-center"
-            : "grid-cols-2 content-start",
+          "draaiwerk-tray-field game-scrollbar grid min-h-0 min-w-0 grid-cols-2 justify-items-center gap-1 overflow-y-auto rounded-lg p-1.5 md:landscape:flex-1 md:landscape:content-center",
+          !removing && "content-start",
         )}
       >
         {level.tray.length === 0 ? (
-          <p className="py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
+          <p className="col-span-2 py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
         ) : null}
 
         {level.tray.map((item) => (
-          <TrayCard
+          <TrayPart
             key={item.id}
             item={item}
             selected={selectedTrayId === item.id}

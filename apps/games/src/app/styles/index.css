@@ -717,6 +717,20 @@
   }
 
   /*
+   * De onderdelenbank is hetzelfde puntengrid als het bord: geen kaartjes per
+   * onderdeel, maar losse onderdelen die op de stippen klaarstaan.
+   */
+  .draaiwerk-tray-field {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1.3px
+    );
+    background-position: 5px 5px;
+    background-size: 14px 14px;
+  }
+
+  /*
    * Een riem is twee rechte banden. De groef is een dash van 5 + 11 = 16
    * board-eenheden; de keyframe reist precies die periodelengte, anders
    * springt het loopvlak bij elke herhaling.
