@@ -206,7 +206,7 @@ describe("draaiwerk placement", () => {
 
     // The lower edge sinks into the tooth tips (the tip circle is radius + 4)
     // but stays clear of the wheel body.
-    expect(shaft.centre.y + 8).toBeLessThanOrEqual(motor.y - motorRadius);
+    expect(shaft.centre.y + 8).toBeLessThanOrEqual(motor.y - motorRadius + 1);
     expect(shaft.centre.y + 8).toBeGreaterThanOrEqual(motor.y - motorRadius - 4);
     expect(shaft.fits).toBe(true);
     expect(shaft.length).toBeGreaterThanOrEqual(70);

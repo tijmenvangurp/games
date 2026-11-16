@@ -544,13 +544,13 @@ export function WormBar({
       <defs>
         <linearGradient id={bodyId} x1="0" x2="0" y1="-8" y2="8" gradientUnits="userSpaceOnUse">
           <stop offset="0" stopColor="#c7d0d6" />
-          <stop offset="0.38" stopColor="#9aa4ad" />
-          <stop offset="0.78" stopColor="#78828c" />
-          <stop offset="1" stopColor="#59626c" />
+          <stop offset="0.38" stopColor="#aab3bb" />
+          <stop offset="0.78" stopColor="#8b959e" />
+          <stop offset="1" stopColor="#6d7781" />
         </linearGradient>
         {patches.map((patch, index) => (
           <clipPath id={`${clipId}-contact-${index}`} key={`contact-clip-${index}`}>
-            <circle cx={patch.contact.x} cy={patch.contact.y} r={8.5} />
+            <circle cx={patch.contact.x} cy={patch.contact.y} r={6.5} />
           </clipPath>
         ))}
       </defs>
@@ -674,10 +674,10 @@ export function WormBar({
                 <path
                   d={curve}
                   fill="none"
-                  opacity={0.55}
-                  stroke="#303841"
+                  opacity={0.82}
+                  stroke="#2b3239"
                   strokeLinecap="round"
-                  strokeWidth={6}
+                  strokeWidth={5.8}
                   transform="translate(1.2 1.2)"
                 />
                 <path
@@ -685,14 +685,14 @@ export function WormBar({
                   fill="none"
                   stroke={`url(#${clipId}-thread)`}
                   strokeLinecap="round"
-                  strokeWidth={3.8}
+                  strokeWidth={4.2}
                 />
                 <path
                   d={curve}
                   fill="none"
                   stroke={`url(#${clipId}-highlight)`}
                   strokeLinecap="round"
-                  strokeWidth={1.2}
+                  strokeWidth={1.3}
                   transform="translate(-1 -1)"
                 />
               </g>
@@ -724,9 +724,10 @@ export function WormBar({
             >
               <path
                 d={gearPath(patch.pose.size)}
-                fill="none"
+                fill={patch.tone.fill}
+                fillOpacity={0.95}
                 stroke={patch.tone.stroke}
-                strokeWidth={1.3}
+                strokeWidth={1.2}
               />
             </g>
           </g>

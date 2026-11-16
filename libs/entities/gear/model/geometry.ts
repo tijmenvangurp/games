@@ -228,7 +228,7 @@ export function boardViewBox(level: Level): string {
 }
 
 /** Distance from the wheel's pitch circle to the worm shaft's centreline. */
-export const WORM_SHAFT_CLEARANCE = 9;
+export const WORM_SHAFT_CLEARANCE = 7;
 /** Half the shaft body's thickness. */
 export const WORM_SHAFT_RADIUS = 8;
 /** Room for the shaft, its bearings and the board edge. */
@@ -364,7 +364,7 @@ export function wormShaft(
         corners.push(addPoint(end, tangent.normal, across));
       }
     }
-    const coils = Math.max(3, Math.round(length / 24));
+    const coils = Math.max(3, Math.round(length / 22));
     const shaft: WormShaft = {
       centre,
       angle: Math.atan2(tangent.direction.y, tangent.direction.x),
