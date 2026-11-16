@@ -20,11 +20,6 @@ export function trayGear(id: string, size: GearSize): TrayItem {
   return { id, kind: "gear", size };
 }
 
-/** Level-data helper for the worm drive in chapters 3-4. */
-export function trayWorm(id: string, ratio = 0.5): TrayItem {
-  return { id, kind: "worm", ratio };
-}
-
 export function trayBelt(id: string, crossed = false): TrayItem {
   return crossed ? { id, kind: "belt", crossed: true } : { id, kind: "belt" };
 }
@@ -35,20 +30,6 @@ export function trayChain(id: string): TrayItem {
 
 export function gearAt(col: number, row: number, size: GearSize): Placement {
   return { kind: "gear", holeId: holeId(col, row), size };
-}
-
-/** Level-data helper for the worm drive in chapters 3-4. */
-export function wormAt(
-  from: readonly [number, number],
-  to: readonly [number, number],
-  ratio = 0.5,
-): Placement {
-  return {
-    kind: "worm",
-    fromHoleId: holeId(from[0], from[1]),
-    toHoleId: holeId(to[0], to[1]),
-    ratio,
-  };
 }
 
 export function beltAt(

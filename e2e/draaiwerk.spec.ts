@@ -81,37 +81,41 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "playing");
   });
 
-  test("toont een wormas met schroef en wiel", async ({ page }) => {
+  test("toont level 17 met twee kettingen", async ({ page }) => {
     await page.goto("/draaiwerk");
     await page.evaluate(() => {
       localStorage.setItem(
         "games.draaiwerk.v1",
-        JSON.stringify({ state: { unlocked: 10, current: 9 }, version: 1 }),
+        JSON.stringify({ state: { unlocked: 17, current: 16 }, version: 1 }),
       );
     });
     await page.reload();
 
-    await expect(page.getByRole("heading", { name: /De wormas/ })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Wormas/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Twee kettingen/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Ketting" })).toHaveCount(2);
   });
 
-  test("plaats een wormas met één tik", async ({ page }) => {
+  test("bouwt level 19 met twee kettingen", async ({ page }) => {
     await page.goto("/draaiwerk");
     await page.evaluate(() => {
       localStorage.setItem(
         "games.draaiwerk.v1",
-        JSON.stringify({ state: { unlocked: 10, current: 9 }, version: 1 }),
+        JSON.stringify({ state: { unlocked: 19, current: 18 }, version: 1 }),
       );
     });
     await page.reload();
 
-    await page.getByRole("button", { name: /Wormas/ }).click();
+    await page.locator('[data-tray-id]:not([data-used="true"])').first().click();
     await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:generator-1"]').click();
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "playing");
 
-    await expect(page.locator("[data-worm]")).toBeVisible();
-    await expect(page.locator("[data-worm]")).toHaveAttribute("data-worm-span", "112");
+    await page.locator('[data-tray-id]:not([data-used="true"])').first().click();
+    await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:lift-1"]').click();
+
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
-    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+    await expect(page.getByText("Level gehaald.")).toBeVisible();
   });
 
   test("sleept een tandwiel van de la naar het bord", async ({ page }) => {
@@ -175,14 +179,14 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.evaluate(() => {
       localStorage.setItem(
         "games.draaiwerk.v1",
-        JSON.stringify({ state: { unlocked: 16, current: 15 }, version: 1 }),
+        JSON.stringify({ state: { unlocked: 12, current: 11 }, version: 1 }),
       );
     });
     await page.reload();
 
     await page.locator("[data-tray-id]").first().click();
     await page.locator('[data-gear-key="motor"]').click();
-    await page.locator('[data-gear-key="output:lift-1"]').click();
+    await page.locator('[data-gear-key="output:target-1"]').click();
     await expect(page.locator('[data-placed-key^="belt:"]')).toBeVisible();
 
     await dragOnto(page, '[data-placed-key^="belt:"]', "[data-tray-drop]");

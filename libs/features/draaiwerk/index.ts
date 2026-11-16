@@ -12,8 +12,6 @@ export {
   looseBeltTarget,
   occupiedHoleIds,
   rejectionFor,
-  WORM_SHAFT_CLEARANCE,
-  wormShaftGeometry,
 } from "./model/placement";
 export { DraaiwerkLevelSelect } from "./ui/draaiwerk-level-select";
 export { DraaiwerkPlay } from "./ui/draaiwerk-play";

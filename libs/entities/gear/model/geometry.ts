@@ -65,11 +65,6 @@ export function gearRadius(size: GearSize): number {
   return size * HOLE_SPACING;
 }
 
-/** Radius at the tooth tips; the involute teeth stick out past the pitch circle. */
-export function gearTipRadius(size: GearSize): number {
-  return gearRadius(size) + ADDENDUM * MODULE;
-}
-
 export function gearTeeth(size: GearSize): number {
   return size * 14;
 }
@@ -176,7 +171,7 @@ export function holeCenter(level: Level, holeId: string): Point {
   return holePoint(hole);
 }
 
-export interface BoardRect {
+interface BoardRect {
   minX: number;
   minY: number;
   maxX: number;
@@ -185,8 +180,8 @@ export interface BoardRect {
   height: number;
 }
 
-/** The visible board, including room for the largest gear and a worm shaft. */
-export function boardRect(level: Level): BoardRect {
+/** The visible board, including room for the largest gear. */
+function boardRect(level: Level): BoardRect {
   let maxSize: GearSize = level.motor.size;
   for (const output of level.outputs) {
     maxSize = Math.max(maxSize, output.size) as GearSize;
@@ -202,14 +197,7 @@ export function boardRect(level: Level): BoardRect {
     }
   }
 
-  const hasWorm =
-    level.tray.some((item) => item.kind === "worm") ||
-    level.solution.some((placement) => placement.kind === "worm");
-  const margin = Math.max(
-    MIN_MARGIN,
-    gearRadius(maxSize) + 16,
-    hasWorm ? gearRadius(maxSize) + WORM_BOARD_MARGIN : 0,
-  );
+  const margin = Math.max(MIN_MARGIN, gearRadius(maxSize) + 16);
   const width = (level.cols - 1) * HOLE_SPACING + margin * 2;
   const height = (level.rows - 1) * HOLE_SPACING + margin * 2;
   return {
@@ -225,171 +213,6 @@ export function boardRect(level: Level): BoardRect {
 export function boardViewBox(level: Level): string {
   const rect = boardRect(level);
   return `${rect.minX} ${rect.minY} ${rect.width} ${rect.height}`;
-}
-
-/** Distance from the wheel's pitch circle to the worm shaft's centreline. */
-export const WORM_SHAFT_CLEARANCE = 7;
-/** Half the shaft body's thickness. */
-export const WORM_SHAFT_RADIUS = 8;
-/** Room for the shaft, its bearings and the board edge. */
-const WORM_BOARD_MARGIN = 30;
-/** Threaded length beyond the two contact points. */
-const WORM_OVERHANG = 18;
-/** Bearing stubs stick out past the threaded body. */
-const WORM_BEARING_OVERHANG = 6;
-const WORM_MIN_LENGTH = 70;
-
-interface WormTangent {
-  /** Contact point on the first wheel's pitch circle. */
-  from: Point;
-  /** Contact point on the second wheel's pitch circle. */
-  to: Point;
-  /** Unit vector from `from` to `to`. */
-  direction: Point;
-  /** Unit normal pointing from the wheels toward the shaft. */
-  normal: Point;
-  /** Distance between the two contact points. */
-  span: number;
-}
-
-/**
- * The two common external tangents between two pitch circles. A worm shaft
- * can only touch both wheels on the same side, so internal tangents are not
- * offered. Returns null when the circles overlap or one sits inside the other.
- */
-function wormTangents(
-  from: Point,
-  fromRadius: number,
-  to: Point,
-  toRadius: number,
-): readonly [WormTangent, WormTangent] | null {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const distance = Math.hypot(dx, dy);
-  const difference = fromRadius - toRadius;
-  if (distance <= Math.abs(difference) + 1e-6) {
-    return null;
-  }
-
-  const ex = dx / distance;
-  const ey = dy / distance;
-  const along = difference / distance;
-  const across = Math.sqrt(Math.max(0, 1 - along * along));
-
-  const build = (normal: Point): WormTangent => {
-    const start = {
-      x: from.x + fromRadius * normal.x,
-      y: from.y + fromRadius * normal.y,
-    };
-    const end = {
-      x: to.x + toRadius * normal.x,
-      y: to.y + toRadius * normal.y,
-    };
-    const span = Math.hypot(end.x - start.x, end.y - start.y);
-    return {
-      from: start,
-      to: end,
-      normal,
-      direction:
-        span > 1e-9 ? { x: (end.x - start.x) / span, y: (end.y - start.y) / span } : { x: 1, y: 0 },
-      span,
-    };
-  };
-
-  return [
-    build({ x: along * ex - across * ey, y: along * ey + across * ex }),
-    build({ x: along * ex + across * ey, y: along * ey - across * ex }),
-  ];
-}
-
-export interface WormShaft {
-  /** Centre of the threaded shaft body. */
-  centre: Point;
-  /** Rotation of the shaft, along the common tangent. */
-  angle: number;
-  length: number;
-  coils: number;
-  pitch: number;
-  /** Distance between the two contact points. */
-  span: number;
-  /** The two points where the threads meet the pitch circles. */
-  contacts: readonly [Point, Point];
-  fromRadius: number;
-  toRadius: number;
-  /** True when the whole shaft, including its bearings, is on the board. */
-  fits: boolean;
-}
-
-function addPoint(point: Point, offset: Point, scale = 1): Point {
-  return { x: point.x + offset.x * scale, y: point.y + offset.y * scale };
-}
-
-function insideRect(rect: BoardRect, point: Point): boolean {
-  return (
-    point.x >= rect.minX && point.x <= rect.maxX && point.y >= rect.minY && point.y <= rect.maxY
-  );
-}
-
-/**
- * Places one worm shaft on the common tangent of two wheels. Both wheels stay
- * on the same side of the shaft, so they turn the same way. The shaft body is
- * lifted off the pitch line by `WORM_SHAFT_CLEARANCE`, which lets its lower
- * edge sink into the tooth tips without touching the wheel body.
- */
-export function wormShaft(
-  from: Point,
-  fromRadius: number,
-  to: Point,
-  toRadius: number,
-  bounds: BoardRect,
-): WormShaft | null {
-  const tangents = wormTangents(from, fromRadius, to, toRadius);
-  if (!tangents) {
-    return null;
-  }
-
-  const candidates = tangents.map((tangent) => {
-    const axisFrom = addPoint(tangent.from, tangent.normal, WORM_SHAFT_CLEARANCE);
-    const axisTo = addPoint(tangent.to, tangent.normal, WORM_SHAFT_CLEARANCE);
-    const length = Math.max(WORM_MIN_LENGTH, tangent.span + WORM_OVERHANG * 2);
-    const centre = {
-      x: (axisFrom.x + axisTo.x) / 2,
-      y: (axisFrom.y + axisTo.y) / 2,
-    };
-    const half = length / 2 + WORM_BEARING_OVERHANG;
-    const corners: Point[] = [];
-    for (const along of [-half, half]) {
-      const end = addPoint(centre, tangent.direction, along);
-      for (const across of [-WORM_SHAFT_RADIUS, WORM_SHAFT_RADIUS]) {
-        corners.push(addPoint(end, tangent.normal, across));
-      }
-    }
-    const coils = Math.max(3, Math.round(length / 22));
-    const shaft: WormShaft = {
-      centre,
-      angle: Math.atan2(tangent.direction.y, tangent.direction.x),
-      length,
-      coils,
-      pitch: length / coils,
-      span: tangent.span,
-      contacts: [tangent.from, tangent.to],
-      fromRadius,
-      toRadius,
-      fits: corners.every((corner) => insideRect(bounds, corner)),
-    };
-    // Prefer the shaft above the wheels; for a vertical pair, on the left.
-    const score = -tangent.normal.y * 2 - tangent.normal.x;
-    return { shaft, score };
-  });
-
-  candidates.sort((first, second) => {
-    if (first.shaft.fits !== second.shaft.fits) {
-      return first.shaft.fits ? -1 : 1;
-    }
-    return second.score - first.score;
-  });
-
-  return candidates[0]?.shaft ?? null;
 }
 
 function straightPath(from: Point, to: Point): string {

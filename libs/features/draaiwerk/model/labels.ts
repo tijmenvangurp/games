@@ -5,6 +5,7 @@ const CHAPTER_NAMES: Record<number, string> = {
   2: "Overbrengen",
   3: "Snelheid",
   4: "Kracht",
+  5: "Machines",
 };
 
 export function chapterName(chapter: number): string {
@@ -21,13 +22,16 @@ const NEW_LABELS: Record<string, string> = {
   "limited-tray": "beperkte voorraad",
   "reverse-motor": "andere motorrichting",
   size: "groot en klein",
-  "worm-as": "wormas",
-  "worm-as-strong": "sterke wormas",
   "speed-gauge": "snelheidsmeter",
+  "belt-ratio": "riemvertraging",
+  "two-ratios": "twee maten",
   generator: "lamp",
   lift: "lift",
   split: "splitsing",
   "two-speeds": "twee snelheden",
+  "double-chain": "twee kettingen",
+  "chain-mesh": "ketting en tandwiel",
+  factory: "hijskraan",
 };
 
 export function introducesLabel(introduces: string): string {
@@ -46,8 +50,6 @@ export function trayShortLabel(item: TrayItem): string {
   switch (item.kind) {
     case "gear":
       return shortSize(item.size).replace(/^./, (letter) => letter.toUpperCase());
-    case "worm":
-      return item.ratio <= 0.25 ? "Wormas sterk" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruist" : "Ketting";
     case "chain":

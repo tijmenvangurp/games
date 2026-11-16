@@ -32,7 +32,6 @@ import {
   playerGearTone,
   StaticChain,
   TargetArc,
-  WormBar,
   type GearTone,
 } from "./gear-art";
 
@@ -100,14 +99,8 @@ export function boardPointFromClient(
   };
 }
 
-type WormPlacement = Extract<Placement, { kind: "worm" }>;
-
 function hintHoles(placement: Placement | null): Set<string> {
   return placement ? holesForPlacement(placement) : new Set();
-}
-
-function isWorm(placement: Placement): placement is WormPlacement {
-  return placement.kind === "worm";
 }
 
 interface DraaiwerkHoleProps {
@@ -489,7 +482,6 @@ export function DraaiwerkBoard({
   const occupied = useMemo(() => occupiedHoleIds(level, placements), [level, placements]);
   const blocked = useMemo(() => new Set(level.blockedHoleIds), [level]);
   const hint = hintHoles(hintPlacement);
-  const worms = placements.filter(isWorm);
   const looseBelts = placements.filter(
     (placement): placement is Extract<Placement, { kind: "loose-belt" }> =>
       placement.kind === "loose-belt",
@@ -522,10 +514,7 @@ export function DraaiwerkBoard({
   };
   const status = result.solved ? "solved" : result.jammed ? "jammed" : "playing";
   const linkMode =
-    selectedItem?.kind === "belt" ||
-    selectedItem?.kind === "chain" ||
-    selectedItem?.kind === "worm" ||
-    Boolean(pendingGearKey);
+    selectedItem?.kind === "belt" || selectedItem?.kind === "chain" || Boolean(pendingGearKey);
 
   const handleBackgroundTap = (event: MouseEvent<SVGSVGElement>) => {
     const target = event.target as Element;
@@ -676,30 +665,6 @@ export function DraaiwerkBoard({
           {result.connections.map((connection) => (
             <ConnectionBand connection={connection} key={connection.key} />
           ))}
-        </g>
-
-        {/* The worm shaft lies across two gears, so it is drawn over them. */}
-        <g data-worm-layer="true">
-          {worms.map((worm) => {
-            const from = result.gears.find((pose) => pose.holeId === worm.fromHoleId);
-            const to = result.gears.find((pose) => pose.holeId === worm.toHoleId);
-            const speed = from?.speed ?? to?.speed ?? 1;
-            return (
-              <WormBar
-                active={Boolean((from?.driven || to?.driven) && !result.jammed)}
-                direction={speed < 0 ? -1 : 1}
-                fromPose={from ?? null}
-                fromRadius={gearRadius(from?.size ?? 1)}
-                fromTone={from ? toneFor(from) : null}
-                key={`worm-bar:${worm.fromHoleId}:${worm.toHoleId}`}
-                level={level}
-                placement={worm}
-                toPose={to ?? null}
-                toRadius={gearRadius(to?.size ?? 1)}
-                toTone={to ? toneFor(to) : null}
-              />
-            );
-          })}
         </g>
 
         {ghostArt ? (

@@ -1,19 +1,14 @@
 import {
-  boardRect,
   canPlace,
   gearRadius,
   gearSlots,
   holeCenter,
   trayItemMatches,
-  wormShaft,
   type GearPose,
   type Level,
   type Placement,
   type TrayItem,
-  type WormShaft,
 } from "@entities/gear";
-
-export { WORM_SHAFT_CLEARANCE } from "@entities/gear";
 
 export type LinkTrayItem = Extract<TrayItem, { kind: "belt" | "chain" }>;
 
@@ -45,10 +40,6 @@ export function occupiedHoleIds(level: Level, placements: readonly Placement[]):
     if (placement.kind === "gear") {
       ids.add(placement.holeId);
     }
-    if (placement.kind === "worm") {
-      ids.add(placement.fromHoleId);
-      ids.add(placement.toHoleId);
-    }
   }
 
   return ids;
@@ -79,9 +70,6 @@ export function holesForPlacement(placement: Placement): Set<string> {
   if (placement.kind === "gear") {
     return new Set([placement.holeId]);
   }
-  if (placement.kind === "worm") {
-    return new Set([placement.fromHoleId, placement.toHoleId]);
-  }
   if (placement.kind === "loose-belt") {
     return new Set([placement.holeId]);
   }
@@ -89,7 +77,6 @@ export function holesForPlacement(placement: Placement): Set<string> {
 }
 
 type GearPlacement = Extract<Placement, { kind: "gear" }>;
-type WormPlacement = Extract<Placement, { kind: "worm" }>;
 type LooseBeltPlacement = Extract<Placement, { kind: "loose-belt" }>;
 
 function rejectGear(
@@ -116,46 +103,6 @@ function rejectGear(
     (slot) => distance(center, holeCenter(level, slot.holeId)) < radius + gearRadius(slot.size) - 1,
   );
   return clash ? "Dit tandwiel botst met een ander." : "Dat past hier niet.";
-}
-
-function rejectWorm(
-  level: Level,
-  placements: readonly Placement[],
-  next: WormPlacement,
-  slots: ReturnType<typeof gearSlots>,
-): string {
-  if (next.fromHoleId === next.toHoleId) {
-    return "Kies twee verschillende tandwielen.";
-  }
-  if (next.ratio <= 0 || next.ratio > 1) {
-    return "Kies een wormas met een goede vertraging.";
-  }
-  const from = slots.find((slot) => slot.holeId === next.fromHoleId);
-  const to = slots.find((slot) => slot.holeId === next.toHoleId);
-  if (!from || !to) {
-    return "De wormas moet op twee tandwielen liggen.";
-  }
-  if (from.size !== to.size) {
-    return "De wormas ligt op twee even grote tandwielen.";
-  }
-  const fromCenter = holeCenter(level, next.fromHoleId);
-  const toCenter = holeCenter(level, next.toHoleId);
-  if (distance(fromCenter, toCenter) <= gearRadius(from.size) + gearRadius(to.size) + 1) {
-    return "Deze twee wielen raken elkaar al.";
-  }
-
-  const shaft = wormShaftGeometry(level, next, gearRadius(from.size), gearRadius(to.size));
-  if (!shaft || !shaft.fits) {
-    return "De wormas past niet op het bord.";
-  }
-
-  const pair = [next.fromHoleId, next.toHoleId].sort().join("|");
-  const duplicate = placements.some(
-    (placement) =>
-      placement.kind === "worm" &&
-      [placement.fromHoleId, placement.toHoleId].sort().join("|") === pair,
-  );
-  return duplicate ? "Hier ligt al een wormas." : "Dat past hier niet.";
 }
 
 function rejectLooseBelt(next: LooseBeltPlacement, slots: ReturnType<typeof gearSlots>): string {
@@ -207,8 +154,6 @@ export function rejectionFor(
   switch (next.kind) {
     case "gear":
       return rejectGear(level, next, blocked, occupied, slots);
-    case "worm":
-      return rejectWorm(level, placements, next, slots);
     case "loose-belt":
       return rejectLooseBelt(next, slots);
     default:
@@ -218,14 +163,6 @@ export function rejectionFor(
 
 function sameGear(first: GearPlacement, second: GearPlacement): boolean {
   return first.holeId === second.holeId && first.size === second.size;
-}
-
-function sameWorm(first: WormPlacement, second: WormPlacement): boolean {
-  return (
-    first.ratio === second.ratio &&
-    first.fromHoleId === second.fromHoleId &&
-    first.toHoleId === second.toHoleId
-  );
 }
 
 function sameLooseBelt(first: LooseBeltPlacement, second: LooseBeltPlacement): boolean {
@@ -245,9 +182,6 @@ function samePlacement(first: Placement, second: Placement): boolean {
   if (first.kind === "gear") {
     return sameGear(first, second as GearPlacement);
   }
-  if (first.kind === "worm") {
-    return sameWorm(first, second as WormPlacement);
-  }
   if (first.kind === "loose-belt") {
     return sameLooseBelt(first, second as LooseBeltPlacement);
   }
@@ -266,26 +200,6 @@ export function nextSolutionPlacement(
   );
 }
 
-/**
- * The worm shaft lies on the common tangent of both wheels. Its body is lifted
- * off the pitch circles by `WORM_SHAFT_CLEARANCE`, so the lower edge grips the
- * teeth while the wheel hubs stay clear.
- */
-export function wormShaftGeometry(
-  level: Level,
-  placement: Extract<Placement, { kind: "worm" }>,
-  fromRadius: number,
-  toRadius: number,
-): WormShaft | null {
-  return wormShaft(
-    holeCenter(level, placement.fromHoleId),
-    fromRadius,
-    holeCenter(level, placement.toHoleId),
-    toRadius,
-    boardRect(level),
-  );
-}
-
 /** The hole behind a drive pose key, without trusting that the pose exists. */
 export function holeForGearKey(level: Level, key: string): string | null {
   if (key === "motor") {
@@ -295,8 +209,8 @@ export function holeForGearKey(level: Level, key: string): string | null {
     const id = key.slice("output:".length);
     return level.outputs.find((output) => output.id === id)?.holeId ?? null;
   }
-  if (key.startsWith("gear:") || key.startsWith("worm:")) {
-    return key.slice(key.indexOf(":") + 1);
+  if (key.startsWith("gear:")) {
+    return key.slice("gear:".length);
   }
   return null;
 }

@@ -1,6 +1,5 @@
 export {
   beltTangentRuns,
-  boardRect,
   boardViewBox,
   connectionLength,
   connectionPath,
@@ -8,10 +7,7 @@ export {
   gearRadius,
   gearTeeth,
   holeCenter,
-  WORM_SHAFT_CLEARANCE,
-  wormShaft,
 } from "./model/geometry";
-export type { WormShaft } from "./model/geometry";
 export { LEVEL_COUNT, allLevels, levelAt } from "./model/levels";
 export {
   canPlace,

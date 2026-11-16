@@ -1,14 +1,10 @@
 import {
   beltTangentRuns,
-  boardRect,
   connectionLength,
   connectionPath,
   gearRadius,
   gearTeeth,
-  gearTipRadius,
   holePoint,
-  WORM_SHAFT_RADIUS,
-  wormShaft,
   type ConnectionKind,
   type Point,
 } from "./geometry";
@@ -41,7 +37,7 @@ interface GearNode {
 }
 
 interface GearEdge {
-  kind: "mesh" | "rigid" | "worm" | ConnectionKind;
+  kind: "mesh" | "rigid" | ConnectionKind;
   from: string;
   to: string;
   /** Signed speed factor from `from` to `to`. */
@@ -167,26 +163,6 @@ function buildEdges(
   }
 
   const byHole = new Map(nodes.map((node) => [node.holeId, node]));
-
-  for (const placement of placements) {
-    if (placement.kind !== "worm") {
-      continue;
-    }
-    const ends = placementNodes(byHole, placement.fromHoleId, placement.toHoleId);
-    if (!ends) {
-      continue;
-    }
-    const { from, to } = ends;
-    // The worm shaft is a one-way reduction. The two equal wheels sit on the
-    // same shaft and turn the same way; the screw sets the reduction.
-    addEdge(adjacency, {
-      kind: "worm",
-      from: from.key,
-      to: to.key,
-      speedFactor: placement.ratio,
-      phase: "free",
-    });
-  }
 
   for (const placement of placements) {
     if (
@@ -481,89 +457,6 @@ function canPlaceGear(
   return true;
 }
 
-function distanceToSegment(point: Point, start: Point, end: Point): number {
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const lengthSquared = dx * dx + dy * dy;
-  if (lengthSquared === 0) {
-    return distanceBetween(point, start);
-  }
-  const t = Math.min(
-    1,
-    Math.max(0, ((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared),
-  );
-  return distanceBetween(point, { x: start.x + t * dx, y: start.y + t * dy });
-}
-
-function canPlaceWorm(
-  level: Level,
-  holes: ReadonlyMap<string, Hole>,
-  slots: readonly GearSlot[],
-  placements: readonly Placement[],
-  next: Extract<Placement, { kind: "worm" }>,
-): boolean {
-  if (next.fromHoleId === next.toHoleId) {
-    return false;
-  }
-  if (next.ratio <= 0 || next.ratio > 1) {
-    return false;
-  }
-  const ends = placementSlots(holes, slots, next.fromHoleId, next.toHoleId);
-  if (!ends) {
-    return false;
-  }
-  const { from, to, fromSlot, toSlot } = ends;
-  // The shaft lies flat on both wheel tops, so both wheels must be equal.
-  if (fromSlot.size !== toSlot.size) {
-    return false;
-  }
-
-  const fromCenter = holePoint(from);
-  const toCenter = holePoint(to);
-  const fromRadius = gearRadius(fromSlot.size);
-  const toRadius = gearRadius(toSlot.size);
-  // Two wheels that already mesh cannot also hang on one worm shaft.
-  if (distanceBetween(fromCenter, toCenter) <= fromRadius + toRadius + CONTACT_TOLERANCE) {
-    return false;
-  }
-
-  const shaft = wormShaft(fromCenter, fromRadius, toCenter, toRadius, boardRect(level));
-  if (!shaft || !shaft.fits) {
-    return false;
-  }
-
-  // The shaft may only touch the two wheels it connects. A third wheel under
-  // the same shaft would be driven too, so it is not a two-wheel part.
-  const axisX = Math.cos(shaft.angle);
-  const axisY = Math.sin(shaft.angle);
-  const half = shaft.length / 2;
-  const start = { x: shaft.centre.x - axisX * half, y: shaft.centre.y - axisY * half };
-  const end = { x: shaft.centre.x + axisX * half, y: shaft.centre.y + axisY * half };
-  for (const slot of slots) {
-    if (slot.holeId === next.fromHoleId || slot.holeId === next.toHoleId) {
-      continue;
-    }
-    const hole = holes.get(slot.holeId);
-    if (!hole) {
-      continue;
-    }
-    if (
-      distanceToSegment(holePoint(hole), start, end) <
-      gearTipRadius(slot.size) + WORM_SHAFT_RADIUS - CONTACT_TOLERANCE
-    ) {
-      return false;
-    }
-  }
-
-  const pair = linkPair(next.fromHoleId, next.toHoleId);
-  for (const placement of placements) {
-    if (placement.kind === "worm" && linkPair(placement.fromHoleId, placement.toHoleId) === pair) {
-      return false;
-    }
-  }
-  return true;
-}
-
 function canPlaceLooseBelt(
   slots: readonly GearSlot[],
   placements: readonly Placement[],
@@ -618,9 +511,6 @@ export function canPlace(level: Level, placements: readonly Placement[], next: P
   if (next.kind === "gear") {
     return canPlaceGear(holes, blocked, occupied, slots, next);
   }
-  if (next.kind === "worm") {
-    return canPlaceWorm(level, holes, slots, placements, next);
-  }
   if (next.kind === "loose-belt") {
     return canPlaceLooseBelt(slots, placements, next);
   }
@@ -631,8 +521,6 @@ export function trayItemMatches(item: TrayItem, placement: Placement): boolean {
   switch (placement.kind) {
     case "gear":
       return item.kind === "gear" && item.size === placement.size;
-    case "worm":
-      return item.kind === "worm" && item.ratio === placement.ratio;
     case "loose-belt":
       return (
         (item.kind === "belt" && item.crossed !== true && placement.link === "open-belt") ||
@@ -681,8 +569,6 @@ function describePlacement(placement: Placement): string {
   switch (placement.kind) {
     case "gear":
       return `gear at ${placement.holeId}`;
-    case "worm":
-      return `worm ${placement.fromHoleId} -> ${placement.toHoleId}`;
     case "loose-belt":
       return `loose-belt at ${placement.holeId}`;
     case "open-belt":
@@ -809,45 +695,6 @@ function validateTrayCover(level: Level, errors: string[]): void {
   }
 }
 
-function validateWormGeometry(
-  level: Level,
-  holes: ReadonlyMap<string, Hole>,
-  errors: string[],
-): void {
-  const finalSlots = slotsByHole(gearSlots(level, level.solution));
-  for (const placement of level.solution) {
-    if (placement.kind !== "worm") {
-      continue;
-    }
-    const fromHole = holes.get(placement.fromHoleId);
-    const toHole = holes.get(placement.toHoleId);
-    if (!fromHole || !toHole) {
-      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} leaves the board`);
-      continue;
-    }
-    const fromSlot = finalSlots.get(placement.fromHoleId);
-    const toSlot = finalSlots.get(placement.toHoleId);
-    if (!fromSlot || !toSlot) {
-      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} must lie on two gears`);
-      continue;
-    }
-    if (placement.ratio <= 0 || placement.ratio > 1) {
-      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} needs a ratio`);
-    }
-    if (fromSlot.size !== toSlot.size) {
-      errors.push(`Wormas ${placement.fromHoleId} -> ${placement.toHoleId} needs two equal gears`);
-    }
-    if (
-      distanceBetween(holePoint(fromHole), holePoint(toHole)) <=
-      gearRadius(fromSlot.size) + gearRadius(toSlot.size) + CONTACT_TOLERANCE
-    ) {
-      errors.push(
-        `Wormas ${placement.fromHoleId} -> ${placement.toHoleId} touches two meshing gears`,
-      );
-    }
-  }
-}
-
 function validateConnections(
   level: Level,
   holes: ReadonlyMap<string, Hole>,
@@ -905,7 +752,6 @@ export function validateLevel(level: Level): string[] {
   validateFixedParts(level, holes, errors);
   validateOverlaps(level, holes, errors);
   validateTrayCover(level, errors);
-  validateWormGeometry(level, holes, errors);
   validateConnections(level, holes, errors);
   validatePlaceableSolution(level, errors);
   validateSolved(level, errors);
@@ -925,8 +771,6 @@ export function trayLabel(item: TrayItem): string {
       const label = SIZE_LABELS[item.size];
       return `${label.charAt(0).toUpperCase()}${label.slice(1)} tandwiel`;
     }
-    case "worm":
-      return item.ratio <= 0.25 ? "Wormas, grote vertraging" : "Wormas";
     case "belt":
       return item.crossed === true ? "Gekruiste ketting" : "Ketting";
     case "chain":

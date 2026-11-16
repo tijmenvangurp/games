@@ -82,7 +82,6 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
   const liftDragToken =
     activeItem?.kind === "belt" ||
     activeItem?.kind === "chain" ||
-    activeItem?.kind === "worm" ||
     Boolean(activePlacedKey?.startsWith("loose:")) ||
     Boolean(activePlacedKey?.startsWith("belt:"));
 
@@ -107,11 +106,7 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
           }
           return id.startsWith("hole:") || id === "tray-remove";
         }
-        if (
-          activeItem?.kind === "belt" ||
-          activeItem?.kind === "chain" ||
-          activeItem?.kind === "worm"
-        ) {
+        if (activeItem?.kind === "belt" || activeItem?.kind === "chain") {
           return id.startsWith("gear:");
         }
         return id.startsWith("hole:");
@@ -356,19 +351,7 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
       }
       return null;
     }
-    const holeId = activePlacedKey.slice("worm:".length);
-    const placement = placements.find(
-      (candidate) =>
-        candidate.kind === "worm" &&
-        (candidate.fromHoleId === holeId || candidate.toHoleId === holeId),
-    );
-    return placement && placement.kind === "worm"
-      ? {
-          id: "drag",
-          kind: "worm",
-          ratio: placement.ratio,
-        }
-      : null;
+    return null;
   }, [activePlacedKey, placements, result.gears]);
 
   // A loose belt drags as a real band on the board, not as a token from the tray.

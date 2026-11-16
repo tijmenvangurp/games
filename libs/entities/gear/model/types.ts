@@ -28,33 +28,18 @@ export type LinkKind = "open-belt" | "crossed-belt" | "chain";
 
 export type TrayItem =
   | { id: string; kind: "gear"; size: GearSize }
-  | {
-      id: string;
-      kind: "worm";
-      /** Wheel speed per shaft turn. Always a reduction, so 0 < ratio <= 1. */
-      ratio: number;
-    }
   | { id: string; kind: "belt"; crossed?: boolean }
   | { id: string; kind: "chain" };
 
 export type Placement =
   | { kind: "gear"; holeId: string; size: GearSize }
-  | {
-      kind: "worm";
-      /** One wheel on the worm shaft. */
-      fromHoleId: string;
-      /** The other wheel on the same worm shaft. */
-      toHoleId: string;
-      /** Wheel speed per shaft turn. Always a reduction, so 0 < ratio <= 1. */
-      ratio: number;
-    }
   | { kind: "loose-belt"; holeId: string; link: LinkKind }
   | { kind: LinkKind; fromHoleId: string; toHoleId: string };
 
 export interface Level {
   id: string;
   name: string;
-  chapter: 1 | 2 | 3 | 4;
+  chapter: 1 | 2 | 3 | 4 | 5;
   introduces: string;
   intro: string;
   cols: number;

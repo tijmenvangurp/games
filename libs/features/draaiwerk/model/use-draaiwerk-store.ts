@@ -29,7 +29,6 @@ import {
   DRAAIWERK_STORAGE_VERSION,
   normalizeDraaiwerkProgress,
 } from "./storage";
-import { autoWormPlacement } from "./worm-placement";
 
 type DraaiwerkStatus = "playing" | "solved";
 type DraaiwerkFeedbackTone = "info" | "warn" | "success";
@@ -334,7 +333,6 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
 
 interface FoundPlacement {
   placement: Placement;
-  end?: "from" | "to";
 }
 
 function findPlaced(placements: readonly Placement[], key: string): FoundPlacement | null {
@@ -344,18 +342,6 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
       (candidate) => candidate.kind === "gear" && candidate.holeId === holeId,
     );
     return placement ? { placement } : null;
-  }
-  if (key.startsWith("worm:")) {
-    const holeId = key.slice("worm:".length);
-    const placement = placements.find(
-      (candidate) =>
-        candidate.kind === "worm" &&
-        (candidate.fromHoleId === holeId || candidate.toHoleId === holeId),
-    );
-    if (!placement || placement.kind !== "worm") {
-      return null;
-    }
-    return { placement, end: placement.fromHoleId === holeId ? "from" : "to" };
   }
   if (key.startsWith("loose:")) {
     const holeId = key.slice("loose:".length);
@@ -372,10 +358,6 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
     return placement ? { placement } : null;
   }
   return null;
-}
-
-function holeAt(level: Level, col: number, row: number) {
-  return level.holes.find((hole) => hole.col === col && hole.row === row) ?? null;
 }
 
 function attachedPlacements(state: DraaiwerkStore, removed: Placement): Placement[] {
@@ -457,33 +439,6 @@ function movePlacedAction(
       return;
     }
     next = { ...found.placement, holeId: targetHoleId };
-  } else if (found.placement.kind === "worm" && found.end) {
-    const draggedHoleId =
-      found.end === "from" ? found.placement.fromHoleId : found.placement.toHoleId;
-    const anchorHoleId =
-      found.end === "from" ? found.placement.toHoleId : found.placement.fromHoleId;
-    const draggedHole = state.level.holes.find((hole) => hole.id === draggedHoleId);
-    const anchorHole = state.level.holes.find((hole) => hole.id === anchorHoleId);
-    if (!draggedHole || !anchorHole || draggedHoleId === targetHoleId) {
-      return;
-    }
-
-    const nextAnchor = holeAt(
-      state.level,
-      anchorHole.col + target.col - draggedHole.col,
-      anchorHole.row + target.row - draggedHole.row,
-    );
-    if (!nextAnchor) {
-      set({ feedback: "De wormas past daar niet.", feedbackTone: "warn" });
-      playSound("almost");
-      playHaptic("almost");
-      return;
-    }
-
-    next =
-      found.end === "from"
-        ? { ...found.placement, fromHoleId: targetHoleId, toHoleId: nextAnchor.id }
-        : { ...found.placement, fromHoleId: nextAnchor.id, toHoleId: targetHoleId };
   } else {
     return;
   }
@@ -562,21 +517,6 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
 
   if (item.kind === "gear") {
     const placed = attemptPlacement(set, get, { kind: "gear", holeId, size: item.size }, item.id);
-    if (placed) {
-      set({ selectedTrayId: null, pendingGearKey: null });
-    }
-    return;
-  }
-
-  if (item.kind === "worm") {
-    const placement = autoWormPlacement(state.level, state.placements, holeId, item);
-    if (!placement) {
-      set({ feedback: "De wormas past daar niet.", feedbackTone: "warn" });
-      playSound("almost");
-      playHaptic("almost");
-      return;
-    }
-    const placed = attemptPlacement(set, get, placement, item.id);
     if (placed) {
       set({ selectedTrayId: null, pendingGearKey: null });
     }

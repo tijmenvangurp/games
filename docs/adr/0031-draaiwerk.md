@@ -200,6 +200,29 @@ vorige addendum.
   gelijke raakpunten. Dat is het beeld dat een kind van een wormas moet
   onthouden; de vaste vertraging houdt de levels leerbaar en deterministisch.
 
+## Addendum 2026-11-16: wormas vervangen door kettingen en tandwielen
+
+De wormas is uit het spel gehaald. De illustratie bleef onduidelijk en de
+mechanic paste niet bij de rest van het bord, waar elke verbinding een ketting
+of een tandwiel is. Dit supersedeert alle wormas-addenda hierboven.
+
+- **Geen wormas meer.** Het model kent geen `worm`-trayitem, geen
+  `worm`-placement, geen `worm`-edge en geen `wormShaft`-geometrie meer. De
+  levels 10 en 11 (de twee wormaslessen) zijn vervallen.
+- **Snelheid via kettingen.** Hoofdstuk 3 leert snelheid nu met de motor, een
+  meter, een ketting over een groot wiel (0,5×) en één motor met twee
+  verschillende eindsnelheden (1× en 0,5×).
+- **De lift.** De lift hangt aan een ketting over een groot wiel (1/3×), zodat
+  hij langzaam genoeg blijft. Level 16 splitst de motor in twee tandwieltreinen:
+  twee kleine wielen naar de lamp (1×) en een groot liftwiel (1/3×).
+- **Nieuw hoofdstuk 5, "Machines".** Drie levels bouwen voort op alles ervoor:
+  twee kettingen vanaf één motor (open en gekruist), een ketting naar een
+  tandwiel dat het doel aandrijft, en een hijskraan met een snelle lamp en een
+  trage lift aan twee kettingen.
+- **Wat blijft.** Kettingen, tandwielen, snelheidsmeters, de lamp, de lift,
+  splitsen en de beperkte voorraad. De catalogus heeft nu 19 levels in vijf
+  hoofdstukken.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)

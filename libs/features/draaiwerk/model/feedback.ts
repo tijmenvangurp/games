@@ -5,7 +5,7 @@ export const JAMMED =
 
 const METER_OFF = "De meter staat nog niet in het groen.";
 const NEEDS_SPEED = "De lamp heeft meer snelheid nodig.";
-const NEEDS_SLOW = "De lift heeft een langzamer as nodig.";
+const NEEDS_SLOW = "De lift gaat te snel. Maak de overbrenging langzamer.";
 const WRONG_DIRECTION = "Het doel draait de andere kant op. Probeer een andere route.";
 const ALL_USED = "Alle onderdelen zijn gebruikt. Haal er één weg en probeer opnieuw.";
 

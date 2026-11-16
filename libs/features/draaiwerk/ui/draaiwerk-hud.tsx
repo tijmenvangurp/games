@@ -27,9 +27,6 @@ function instructionFor(item: TrayItem | null, pendingGearKey: string | null): s
   if (item.kind === "gear") {
     return "Tik op een leeg gat voor het tandwiel.";
   }
-  if (item.kind === "worm") {
-    return "Tik op een leeg gat; de wormas zoekt zelf de tweede plek.";
-  }
   return "Tik op een tandwiel om de ketting eromheen te hangen.";
 }
 

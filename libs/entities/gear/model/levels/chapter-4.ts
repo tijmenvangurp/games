@@ -1,14 +1,5 @@
 import type { Level } from "../types";
-import {
-  beltAt,
-  createHoles,
-  gearAt,
-  holeId,
-  trayBelt,
-  trayGear,
-  trayWorm,
-  wormAt,
-} from "./helpers";
+import { beltAt, createHoles, gearAt, holeId, trayBelt, trayGear } from "./helpers";
 
 export const CHAPTER_4_LEVELS: readonly Level[] = [
   {
@@ -31,7 +22,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
         minSpeed: 0.9,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.5)],
+    tray: [trayBelt("riem-1"), trayGear("tandwiel-1", 1)],
     solution: [beltAt("open-belt", [0, 2], [9, 2])],
   },
   {
@@ -39,7 +30,7 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
     name: "De lift",
     chapter: 4,
     introduces: "lift",
-    intro: "De lift heeft een langzame, sterke wormas nodig.",
+    intro: "Een ketting over een groot wiel hijst de lift langzaam.",
     cols: 7,
     rows: 5,
     holes: createHoles(7, 5),
@@ -49,13 +40,13 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
       {
         id: "lift-1",
         kind: "lift",
-        holeId: holeId(4, 2),
-        size: 1,
+        holeId: holeId(6, 2),
+        size: 3,
         maxSpeed: 0.4,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.25)],
-    solution: [wormAt([0, 2], [4, 2], 0.25)],
+    tray: [trayBelt("riem-1"), trayGear("tandwiel-1", 1)],
+    solution: [beltAt("open-belt", [0, 2], [6, 2])],
   },
   {
     id: "twee-kanten-op",
@@ -92,29 +83,29 @@ export const CHAPTER_4_LEVELS: readonly Level[] = [
     name: "Snel en langzaam",
     chapter: 4,
     introduces: "two-speeds",
-    intro: "Een snelle lamp en een langzame lift tegelijk.",
-    cols: 12,
+    intro: "De lamp draait snel, de lift langzaam. Splits de motor.",
+    cols: 13,
     rows: 7,
-    holes: createHoles(12, 7),
+    holes: createHoles(13, 7),
     blockedHoleIds: [],
-    motor: { holeId: holeId(0, 4), size: 1, direction: 1 },
+    motor: { holeId: holeId(5, 3), size: 1, direction: 1 },
     outputs: [
       {
         id: "generator-1",
         kind: "generator",
-        holeId: holeId(11, 2),
+        holeId: holeId(1, 3),
         size: 1,
         minSpeed: 0.9,
       },
       {
         id: "lift-1",
         kind: "lift",
-        holeId: holeId(4, 4),
-        size: 1,
-        maxSpeed: 0.75,
+        holeId: holeId(11, 3),
+        size: 3,
+        maxSpeed: 0.4,
       },
     ],
-    tray: [trayBelt("riem-1"), trayWorm("worm-1", 0.5)],
-    solution: [beltAt("open-belt", [0, 4], [11, 2]), wormAt([0, 4], [4, 4], 0.5)],
+    tray: [trayGear("tandwiel-1", 1), trayGear("tandwiel-2", 1)],
+    solution: [gearAt(3, 3, 1), gearAt(7, 3, 1)],
   },
 ];
