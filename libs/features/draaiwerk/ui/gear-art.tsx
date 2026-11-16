@@ -543,10 +543,10 @@ export function WormBar({
     >
       <defs>
         <linearGradient id={bodyId} x1="0" x2="0" y1="-8" y2="8" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#d9dee2" />
-          <stop offset="0.38" stopColor="#a9b2ba" />
-          <stop offset="0.78" stopColor="#7d8791" />
-          <stop offset="1" stopColor="#5b646e" />
+          <stop offset="0" stopColor="#c7d0d6" />
+          <stop offset="0.38" stopColor="#9aa4ad" />
+          <stop offset="0.78" stopColor="#78828c" />
+          <stop offset="1" stopColor="#59626c" />
         </linearGradient>
         {patches.map((patch, index) => (
           <clipPath id={`${clipId}-contact-${index}`} key={`contact-clip-${index}`}>
@@ -568,11 +568,11 @@ export function WormBar({
             y2="8"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0" stopColor="#3f4852" stopOpacity={0.2} />
-            <stop offset="0.18" stopColor="#3f4852" stopOpacity={0.95} />
-            <stop offset="0.5" stopColor="#4a535d" stopOpacity={1} />
-            <stop offset="0.82" stopColor="#3f4852" stopOpacity={0.95} />
-            <stop offset="1" stopColor="#3f4852" stopOpacity={0.2} />
+            <stop offset="0" stopColor="#f4f7f9" stopOpacity={0.15} />
+            <stop offset="0.18" stopColor="#e8edf0" stopOpacity={0.95} />
+            <stop offset="0.5" stopColor="#c9d2d9" stopOpacity={1} />
+            <stop offset="0.82" stopColor="#e8edf0" stopOpacity={0.95} />
+            <stop offset="1" stopColor="#f4f7f9" stopOpacity={0.15} />
           </linearGradient>
           <linearGradient
             id={`${clipId}-highlight`}
@@ -582,11 +582,11 @@ export function WormBar({
             y2="8"
             gradientUnits="userSpaceOnUse"
           >
-            <stop offset="0" stopColor="#e5eaee" stopOpacity={0.1} />
-            <stop offset="0.22" stopColor="#e5eaee" stopOpacity={0.75} />
-            <stop offset="0.5" stopColor="#f3f6f8" stopOpacity={0.9} />
-            <stop offset="0.78" stopColor="#e5eaee" stopOpacity={0.55} />
-            <stop offset="1" stopColor="#e5eaee" stopOpacity={0.1} />
+            <stop offset="0" stopColor="#ffffff" stopOpacity={0.1} />
+            <stop offset="0.22" stopColor="#ffffff" stopOpacity={0.7} />
+            <stop offset="0.5" stopColor="#ffffff" stopOpacity={0.95} />
+            <stop offset="0.78" stopColor="#ffffff" stopOpacity={0.55} />
+            <stop offset="1" stopColor="#ffffff" stopOpacity={0.1} />
           </linearGradient>
         </defs>
         {/* Contact shadows sit under the body, so only their lower edge shows. */}
@@ -612,16 +612,14 @@ export function WormBar({
             cx={0}
             cy={0}
             fill="none"
-            opacity={0.9}
-            rx={7}
-            ry={18}
+            opacity={0.92}
+            rx={8}
+            ry={20}
             stroke="#4c7f7b"
-            strokeWidth={2}
+            strokeWidth={2.2}
           />
           <path
-            d={
-              direction === 1 ? "M 0 -20 L 5 -14.5 L -5 -14.5 Z" : "M 0 -20 L -5 -14.5 L 5 -14.5 Z"
-            }
+            d={direction === 1 ? "M 0 -22 L 6 -16 L -6 -16 Z" : "M 0 -22 L -6 -16 L 6 -16 Z"}
             fill="#4c7f7b"
           />
         </g>
@@ -676,10 +674,10 @@ export function WormBar({
                 <path
                   d={curve}
                   fill="none"
-                  opacity={0.4}
-                  stroke="#2f373f"
+                  opacity={0.55}
+                  stroke="#303841"
                   strokeLinecap="round"
-                  strokeWidth={6.4}
+                  strokeWidth={6}
                   transform="translate(1.2 1.2)"
                 />
                 <path
@@ -687,15 +685,15 @@ export function WormBar({
                   fill="none"
                   stroke={`url(#${clipId}-thread)`}
                   strokeLinecap="round"
-                  strokeWidth={4.6}
+                  strokeWidth={3.8}
                 />
                 <path
                   d={curve}
                   fill="none"
                   stroke={`url(#${clipId}-highlight)`}
                   strokeLinecap="round"
-                  strokeWidth={1.4}
-                  transform="translate(-1.1 -1.1)"
+                  strokeWidth={1.2}
+                  transform="translate(-1 -1)"
                 />
               </g>
             );

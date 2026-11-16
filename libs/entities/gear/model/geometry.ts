@@ -364,7 +364,7 @@ export function wormShaft(
         corners.push(addPoint(end, tangent.normal, across));
       }
     }
-    const coils = Math.max(3, Math.round(length / 14));
+    const coils = Math.max(3, Math.round(length / 24));
     const shaft: WormShaft = {
       centre,
       angle: Math.atan2(tangent.direction.y, tangent.direction.x),
