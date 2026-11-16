@@ -1,12 +1,13 @@
 import { clampLevelIndex, type AdaptiveState, type Attempt } from "@entities/adaptive";
 import {
   MURDOKU_CASES,
-  MURDOKU_LEVELS,
+  MURDOKU_LADDER,
   VICTIM_ID,
   loadMurdokuLevel,
   murdokuCaseById,
   type Cell,
   type Explanation,
+  type MurdokuLine,
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
@@ -91,8 +92,8 @@ export interface MurdokuSaveInput {
   hintsUsed: number;
   solvedCaseIds: ReadonlySet<string>;
   settings: MurdokuSettings;
-  adaptive?: AdaptiveState;
-  attempts?: readonly Attempt[];
+  adaptive: AdaptiveState;
+  attempts: readonly Attempt[];
 }
 
 /** De staat zoals de store hem na het laden nodig heeft. */
@@ -108,7 +109,7 @@ export interface MurdokuRestoredState {
 }
 
 /** De beginstand van de adaptieve ladder: de kleinste zaak. */
-export const DEFAULT_MURDOKU_ADAPTIVE: AdaptiveState = {
+const DEFAULT_MURDOKU_ADAPTIVE: AdaptiveState = {
   levelIndex: 0,
   streak: 0,
 };
@@ -140,7 +141,6 @@ function readSettings(value: unknown): MurdokuSettings {
   }
   return {
     autoCross: value.autoCross !== false,
-    crossOnBlocked: value.crossOnBlocked === true,
   };
 }
 
@@ -162,7 +162,7 @@ function readAdaptive(value: unknown): AdaptiveState {
     return DEFAULT_MURDOKU_ADAPTIVE;
   }
   const levelIndex = isNonNegativeInteger(value.levelIndex)
-    ? clampLevelIndex(value.levelIndex, MURDOKU_LEVELS.length)
+    ? clampLevelIndex(value.levelIndex, MURDOKU_LADDER.length)
     : DEFAULT_MURDOKU_ADAPTIVE.levelIndex;
   const streak = isNonNegativeInteger(value.streak) ? value.streak : 0;
   return { levelIndex, streak };
@@ -296,7 +296,7 @@ function readExplanation(value: unknown, depth: number): Explanation | null {
   };
 }
 
-function readHintLine(value: unknown, puzzle: Puzzle): MurdokuHintState["line"] {
+function readHintLine(value: unknown, puzzle: Puzzle): MurdokuLine | null {
   if (!isRecord(value) || (value.axis !== "row" && value.axis !== "col")) {
     return null;
   }
@@ -534,8 +534,8 @@ export function saveMurdokuState(input: MurdokuSaveInput): void {
         .filter((id) => CASE_IDS.has(id))
         .slice(0, MURDOKU_CASES.length),
       settings: input.settings,
-      adaptive: readAdaptive(input.adaptive ?? DEFAULT_MURDOKU_ADAPTIVE),
-      attempts: readAttempts(input.attempts ?? []),
+      adaptive: readAdaptive(input.adaptive),
+      attempts: readAttempts(input.attempts),
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {

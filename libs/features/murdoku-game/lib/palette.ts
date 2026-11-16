@@ -8,6 +8,8 @@
  * Alleen de bordrenderer gebruikt dit bestand; de UI leest de CSS-tokens.
  */
 
+import { murdokuRoomTint } from "@entities/murdoku";
+
 /** App-tokens als hex, zodat bord en UI dezelfde kleuren delen. */
 const APP_TOKENS = {
   background: "#f7f1e5", // --background (ivoor papier)
@@ -21,21 +23,9 @@ const APP_TOKENS = {
   danger: "#bf4a3a", // --danger
 } as const;
 
-/** Gedempte kamertinten; kleur is nooit de enige drager (naam en muur doen mee). */
-const ROOM_TINTS = [
-  "#e9dcc2", // zand
-  "#cfe0d4", // mint
-  "#ecd3d3", // pink
-  "#dcd7e8", // lavendel
-  "#cfdbe6", // blauwgrijs
-  "#d9e2cb", // salie
-  "#f0dcc4", // abrikoos
-  "#e3d5e6", // lila
-] as const;
-
 /** De rustige kamertint voor een kamerindex (onze eigen levels). */
 export function roomTint(index: number): string {
-  return ROOM_TINTS[index % ROOM_TINTS.length];
+  return murdokuRoomTint(index);
 }
 
 export const BOARD = {

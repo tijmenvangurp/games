@@ -39,7 +39,7 @@ function runningPlay(): MurdokuPlayState {
   };
 }
 
-const settings = { autoCross: false, crossOnBlocked: true };
+const settings = { autoCross: false };
 
 beforeEach(() => {
   localStorage.clear();
@@ -53,6 +53,8 @@ describe("murdoku opslag", () => {
       hintsUsed: 2,
       solvedCaseIds: new Set(["de-verdwenen-taart"]),
       settings,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
 
     expect(loadMurdokuState()).toEqual({
@@ -117,7 +119,7 @@ describe("murdoku opslag", () => {
         hint: null,
       },
       solved: ["de-verdwenen-taart"],
-      settings: { autoCross: false, crossOnBlocked: false },
+      settings: { autoCross: false },
       adaptive: { levelIndex: 0, streak: 0 },
       attempts: [],
     });
@@ -251,6 +253,8 @@ describe("murdoku opslag", () => {
       hintsUsed: 2,
       solvedCaseIds: new Set(["de-verdwenen-taart"]),
       settings,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
 
     const restored = restoreMurdokuState();
@@ -346,6 +350,8 @@ describe("murdoku opslag", () => {
       hintsUsed: 1,
       solvedCaseIds: new Set(["de-verdwenen-taart"]),
       settings: DEFAULT_MURDOKU_SETTINGS,
+      adaptive: { levelIndex: 0, streak: 0 },
+      attempts: [],
     });
 
     const restored = restoreMurdokuState();

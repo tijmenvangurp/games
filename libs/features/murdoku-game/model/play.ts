@@ -1,6 +1,7 @@
 import {
   VICTIM_ID,
   findMurdokuMurderer,
+  onePersonEachLine,
   validateMurdokuPlacement,
   type Cell,
   type PersonId,
@@ -10,12 +11,10 @@ import {
 /** De twee tikstanden van het bord: iemand plaatsen of een vakje wegstrepen. */
 export type MurdokuMode = "place" | "cross";
 
-/** Opties waarmee de store de twee instellingen aan de pure regels doorgeeft. */
+/** Opties waarmee de store de instelling aan de pure regels doorgeeft. */
 export interface MurdokuTapOptions {
   /** Automatische kruisjes in de rij en kolom van een geplaatst persoon. */
   autoCross?: boolean;
-  /** Sta een kruisje toe op een vakje waar niemand kan staan. */
-  crossOnBlocked?: boolean;
 }
 
 /** Opties voor het tonen van de kruisjes op het bord. */
@@ -43,6 +42,10 @@ export interface MurdokuResolution {
  * verplaatst of verwijderd persoon nooit een spookkruisje achterlaat.
  */
 export interface MurdokuPlayState {
+  /**
+   * De id van de zaak. De naam `levelId` is de bestaande opslagsleutel; een
+   * hernoeming naar `caseId` zou een opslagmigratie vragen en volgt later.
+   */
   levelId: string;
   placements: ReadonlyMap<PersonId, Cell>;
   manualCrosses: ReadonlySet<Cell>;
@@ -191,9 +194,8 @@ function tapPlacementCell(puzzle: Puzzle, play: MurdokuPlayState, cell: Cell): M
 /**
  * Eén tik in de kruisjesstand. Een kruisje kan alleen op een bezetbaar vakje
  * zonder persoon; een automatisch kruisje is niet met de hand weg te halen
- * zolang die persoon er staat. Twee instellingen verzachten die regel: op een
- * meubelstuk mag een kruisje als het kind dat wil, en zonder auto-kruis mag het
- * kind die vakjes zelf markeren.
+ * zolang die persoon er staat. Zonder auto-kruis mag het kind die vakjes zelf
+ * markeren.
  */
 function tapCrossCell(
   puzzle: Puzzle,
@@ -201,8 +203,7 @@ function tapCrossCell(
   cell: Cell,
   options: MurdokuTapOptions,
 ): MurdokuPlayState {
-  const blocked = !puzzle.board.isOccupiable(cell);
-  if (blocked && options.crossOnBlocked !== true) {
+  if (!puzzle.board.isOccupiable(cell)) {
     return play;
   }
   if (personAt(play, cell)) {
@@ -238,23 +239,6 @@ export function tapMurdokuCell(
 }
 
 /**
- * Of een volledige plaatsing de bordregel volgt: één persoon per rij en per
- * kolom. De engine bewaakt die regel in de solver, maar niet in de losse
- * aanwijzingen, dus de controle toetst hem hier zelf.
- */
-function onePersonEachLine(puzzle: Puzzle, placement: ReadonlyMap<PersonId, Cell>): boolean {
-  const rows = new Set<number>();
-  const cols = new Set<number>();
-  for (const cell of placement.values()) {
-    const { row, col } = puzzle.board.rc(cell);
-    if (rows.has(row) || cols.has(col)) return false;
-    rows.add(row);
-    cols.add(col);
-  }
-  return true;
-}
-
-/**
  * Controleert de zaak. Pas als alle verdachten staan, anders gebeurt er niets.
  *
  * Het slachtoffer heeft een vast vakje in de zaak; de controle plaatst het
@@ -279,7 +263,7 @@ export function checkMurdokuPlay(
 
   if (
     validateMurdokuPlacement(puzzle, placements).length > 0 ||
-    !onePersonEachLine(puzzle, placements) ||
+    !onePersonEachLine(placements.values(), puzzle.board.width) ||
     !murderer.suspectId
   ) {
     return { ...play, wrongCheck: true };

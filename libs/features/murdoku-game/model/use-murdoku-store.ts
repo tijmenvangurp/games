@@ -14,12 +14,7 @@ import {
   type MurdokuPlayState,
 } from "./play";
 import type { MurdokuSettings } from "./settings";
-import {
-  DEFAULT_MURDOKU_ADAPTIVE,
-  MAX_STORED_ATTEMPTS,
-  restoreMurdokuState,
-  saveMurdokuState,
-} from "./storage";
+import { MAX_STORED_ATTEMPTS, restoreMurdokuState, saveMurdokuState } from "./storage";
 
 const MAX_HISTORY = 200;
 
@@ -73,8 +68,6 @@ interface MurdokuStore {
   focusClue: (focus: MurdokuClueFocus, label: string) => void;
   /** De rij en kolom van een geplaatst persoon automatisch wegstrepen. */
   setAutoCross: (enabled: boolean) => void;
-  /** Ook een kruisje mogen zetten op een vakje waar niemand kan staan. */
-  setCrossOnBlocked: (enabled: boolean) => void;
 }
 
 function withHistory(history: MurdokuPlayState[], play: MurdokuPlayState): MurdokuPlayState[] {
@@ -104,10 +97,10 @@ function finishRound(
   state: { adaptive: AdaptiveState; attempts: readonly Attempt[] },
   input: MurdokuRoundInput,
 ): FinishedRound {
-  const outcome = evaluateMurdokuRound(state.adaptive ?? DEFAULT_MURDOKU_ADAPTIVE, input);
+  const outcome = evaluateMurdokuRound(state.adaptive, input);
   return {
     adaptive: outcome.summary.state,
-    attempts: appendAttempt(state.attempts ?? [], outcome.attempt),
+    attempts: appendAttempt(state.attempts, outcome.attempt),
     lastRound: outcome.summary,
   };
 }
@@ -141,8 +134,8 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
   clueFocus: null,
   clueFocusLabel: null,
   settings: restored.settings,
-  adaptive: restored.adaptive ?? DEFAULT_MURDOKU_ADAPTIVE,
-  attempts: restored.attempts ?? [],
+  adaptive: restored.adaptive,
+  attempts: restored.attempts,
   lastRound: null,
   roundStartedAt: restored.play?.phase === "playing" ? Date.now() : null,
   roundOpen: restored.play?.phase === "playing",
@@ -189,7 +182,6 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
     if (!puzzle || !play) return;
     const next = tapMurdokuCell(puzzle, play, cell, {
       autoCross: settings.autoCross,
-      crossOnBlocked: settings.crossOnBlocked,
     });
     if (next === play) return;
     set({ play: next, history: withHistory(get().history, play), ...CLEARED_HINT });
@@ -262,11 +254,15 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
 
     const plan = planMurdokuHint(puzzle, play, hint);
     const nextPlay = plan.apply ? applyMurdokuHint(puzzle, play, plan.apply) : play;
+    // Eén hintstap kost twee tikken: de eerste zet de hint op, de tweede past
+    // hem toe. Alleen de eerste tik telt, zodat de niveauteller hints telt en
+    // niet tikken.
+    const startsStep = plan.state.stage === "focus";
     set({
       play: nextPlay,
       history: nextPlay === play ? history : withHistory(history, play),
       hint: plan.state,
-      hintsUsed: hintsUsed + 1,
+      hintsUsed: hintsUsed + (startsStep ? 1 : 0),
       // Een hint vervangt de markering van een woord; het bord toont één uitleg.
       clueFocus: null,
       clueFocusLabel: null,
@@ -284,9 +280,6 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
     }),
 
   setAutoCross: (autoCross) => set((state) => ({ settings: { ...state.settings, autoCross } })),
-
-  setCrossOnBlocked: (crossOnBlocked) =>
-    set((state) => ({ settings: { ...state.settings, crossOnBlocked } })),
 }));
 
 useMurdokuStore.subscribe((state) => {

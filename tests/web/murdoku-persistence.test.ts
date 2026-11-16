@@ -82,27 +82,14 @@ describe("murdoku bewaren en hervatten", () => {
 
   it("bewaart de instellingen en laat ze een nieuwe zaak overleven", () => {
     store().setAutoCross(false);
-    store().setCrossOnBlocked(true);
 
-    expect(loadMurdokuState().settings).toEqual({ autoCross: false, crossOnBlocked: true });
-    expect(restoreMurdokuState().settings).toEqual({ autoCross: false, crossOnBlocked: true });
+    expect(loadMurdokuState().settings).toEqual({ autoCross: false });
+    expect(restoreMurdokuState().settings).toEqual({ autoCross: false });
 
     store().start(intro);
 
-    expect(store().settings).toEqual({ autoCross: false, crossOnBlocked: true });
-    expect(restoreMurdokuState().settings).toEqual({ autoCross: false, crossOnBlocked: true });
-  });
-
-  it("zet met de instelling een kruisje op een meubelstuk", () => {
-    store().start(intro);
-    store().setMode("cross");
-
-    store().tapCell(2);
-    expect(crossedCells(intro, store().play!)).not.toContain(2);
-
-    store().setCrossOnBlocked(true);
-    store().tapCell(2);
-    expect(crossedCells(intro, store().play!)).toContain(2);
+    expect(store().settings).toEqual({ autoCross: false });
+    expect(restoreMurdokuState().settings).toEqual({ autoCross: false });
   });
 
   it("toont zonder auto-kruis alleen de kruisjes die het kind zelf zet", () => {

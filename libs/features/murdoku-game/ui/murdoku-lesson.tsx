@@ -62,8 +62,8 @@ function StepPicker({ index, onSelect }: { index: number; onSelect: (index: numb
   );
 }
 
-/** Eén scherm: titel, korte uitleg en een diagram. */
-function LessonStep() {
+/** De stappenblokken: één scherm per stap, met een keuze boven en pijlen onder. */
+function LessonStepper() {
   const [index, setIndex] = useState(0);
   const step = MURDOKU_LESSON_STEPS[index];
 
@@ -158,7 +158,7 @@ function LegendAndTips() {
 export function MurdokuLesson() {
   return (
     <div className="flex flex-col gap-8 pb-2">
-      <LessonStep />
+      <LessonStepper />
       <Glossary />
       <LegendAndTips />
     </div>

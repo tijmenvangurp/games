@@ -59,7 +59,10 @@ export const MURDOKU_INTRO_LEVEL: LevelJson = {
       id: "C",
       name: "Cato",
       attributes: { gender: "f", hair: "black", hairstyle: "braids" },
-      clues: [{ type: "inRoom", room: "4" }],
+      clues: [
+        { type: "inRoom", room: "4" },
+        { type: "inCol", col: 3 },
+      ],
     },
   ],
   victim: {

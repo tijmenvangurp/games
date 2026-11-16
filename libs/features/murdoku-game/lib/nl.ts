@@ -3,8 +3,8 @@
  * richtingen en bordregels van Wie was het?
  *
  * De engine levert alleen keys en parameters; alle zinnen staan hier. Dezelfde
- * tabel is later de bron voor de woordenlijst en voor spraak, zodat een kind op
- * het scherm en in de audio precies dezelfde zin hoort.
+ * tabel is de bron voor de aanwijzingen en de woordenlijst, zodat een kind op
+ * het scherm en in de uitleg precies dezelfde zin leest.
  *
  * Opbouw volgt de MIT-Renderer (`./renderer.ts`): `{{param}}` wordt ingevuld,
  * `[[woord:tip]]` is een tikbaar sleutelwoord en `_one` is het enkelvoud.
@@ -544,7 +544,7 @@ export const MURDOKU_NL_TEXTS: MurdokuTextDictionary = {
 
   // De hinttrap: eerst wijzen (rij, kolom of kamer), dan één onmogelijk vakje
   // wegstrepen, dan één persoon plaatsen. Alle zinnen staan hier zodat de
-  // woordenlijst en spraak later dezelfde tekst kunnen gebruiken.
+  // woordenlijst dezelfde tekst kan gebruiken.
   hint: {
     focusRow: "Kijk eens naar rij {{num}}.",
     focusRowName: "Kijk eens naar rij {{num}}, waar {{name}} nog kan staan.",
