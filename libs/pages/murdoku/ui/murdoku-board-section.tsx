@@ -29,6 +29,8 @@ interface MurdokuBoardSectionProps {
   puzzle: Puzzle;
   /** Werktitel van de zaak, voor het toegankelijke bordlabel. */
   title: string;
+  /** Elementnaam van de buit, bijvoorbeeld "cake"; het bord laadt die lokaal. */
+  lootIcon: string;
   play: MurdokuPlayState;
   /** Of de rij en kolom van een geplaatst persoon automatisch een kruisje krijgen. */
   autoCross?: boolean;
@@ -196,6 +198,7 @@ function focusFor(
 interface MurdokuBoardPanelProps {
   puzzle: Puzzle;
   title: string;
+  lootIcon: string;
   play: MurdokuPlayState;
   autoCross: boolean;
   focus: MurdokuBoardHighlight | null;
@@ -208,6 +211,7 @@ interface MurdokuBoardPanelProps {
 function MurdokuBoardPanel({
   puzzle,
   title,
+  lootIcon,
   play,
   autoCross,
   focus,
@@ -233,13 +237,14 @@ function MurdokuBoardPanel({
 
   return (
     <div className="game-panel p-3 sm:p-5">
-      <div className="mx-auto w-full max-w-lg">
+      <div className="mx-auto w-full max-w-lg lg:landscape:max-w-none">
         <MurdokuBoard
           crosses={crosses}
           focus={focus}
           focusToken={focusToken}
           helpMarks={helpMarks}
           highlight={highlight}
+          lootIcon={lootIcon}
           mode={play.mode}
           outlineRoomId={resolution?.roomId ?? null}
           placements={play.placements}
@@ -254,19 +259,32 @@ function MurdokuBoardPanel({
   );
 }
 
+/** De rustige ringen bij een clue-nudge; een tik op een woord werkt hetzelfde. */
+function hintMarks(
+  hint: MurdokuHintState | null,
+  hintView: ReturnType<typeof focusView> | null,
+  clueFocus: MurdokuClueFocus | null,
+  wordView: ReturnType<typeof focusView>,
+): ReturnType<typeof focusView>["marks"] | null {
+  if (hint?.stage === "clue") return hintView?.marks ?? null;
+  return clueFocus ? wordView.marks : null;
+}
+
 /**
  * Het bord met de rij- en kolomlabels, de bedieningsknoppen en de hulpregel.
  * De pagina hoeft alleen de zaak en de store-acties door te geven. Na een goede
- * controle omlijnt het bord de kamer van het slachtoffer en krijgt de dader een
- * ring; het bord staat dan vast.
+ * controle omlijnt het bord de kamer van de buit en krijgt de dief een ring; het
+ * bord staat dan vast.
  *
- * Een hint licht eerst de rij, kolom of kamer op en past daarna één stap toe;
- * een tik op een woord in een aanwijzing licht het genoemde ding op. Beide
- * gebruiken dezelfde rustige markering en laten de gewone bordkleuren staan.
+ * Een hint licht eerst de aanwijzing van een persoon op, daarna de exacte plek
+ * met de reden en pas dan de gedwongen zet. Een tik op een woord in een
+ * aanwijzing licht het genoemde ding op. Beide gebruiken dezelfde rustige
+ * markering en laten de gewone bordkleuren staan.
  */
 export function MurdokuBoardSection({
   puzzle,
   title,
+  lootIcon,
   play,
   autoCross = true,
   canUndo,
@@ -281,7 +299,14 @@ export function MurdokuBoardSection({
 }: MurdokuBoardSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const previousHint = useRef(hint);
-  const wordView = useMemo(() => focusView(puzzle, clueFocus), [puzzle, clueFocus]);
+  const wordView = useMemo(
+    () => focusView(puzzle, clueFocus, play.placements),
+    [puzzle, clueFocus, play.placements],
+  );
+  const hintView = useMemo(
+    () => (hint?.focus ? focusView(puzzle, hint.focus, play.placements) : null),
+    [puzzle, hint, play.placements],
+  );
   const solved = play.phase === "solved";
   const status = boardStatus(puzzle, play, feedback, hintMessage, clueMessage);
 
@@ -306,7 +331,8 @@ export function MurdokuBoardSection({
         autoCross={autoCross}
         focus={focusFor(hint, clueFocus, wordView.cells)}
         focusToken={focusToken}
-        helpMarks={clueFocus ? wordView.marks : null}
+        helpMarks={hintMarks(hint, hintView, clueFocus, wordView)}
+        lootIcon={lootIcon}
         play={play}
         puzzle={puzzle}
         title={title}

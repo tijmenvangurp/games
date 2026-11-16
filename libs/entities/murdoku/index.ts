@@ -21,13 +21,13 @@ export { MURDOKU_LADDER, murdokuClueCount } from "./model/cases/levels";
 export { MURDOKU_ROOM_TINTS, murdokuRoomTint } from "./model/cases/room-tints";
 export { validateMurdokuCases } from "./model/cases/validate";
 export { onePersonEachLine } from "./model/board-rules";
-export type { MurdokuCase } from "./model/cases/types";
+export type { MurdokuCase, MurdokuLoot } from "./model/cases/types";
 
 export { nextMurdokuHint } from "./model/hints";
 export type { MurdokuLine } from "./model/hints";
 
-export { VICTIM_ID } from "./model/engine/domain/types";
-export type { Cell, PersonId } from "./model/engine/domain/types";
+export { VICTIM_ID, inDirection8 } from "./model/engine/domain/types";
+export type { Cell, Direction8, PersonId } from "./model/engine/domain/types";
 export type { LevelJson } from "./model/engine/io/index";
 
 /**
@@ -43,6 +43,8 @@ export {
   AtWallClue,
   BesideSameObjectClue,
   CornerClue,
+  DirectionClue,
+  DirectionFromAttrClue,
   DirectionFromObjectClue,
   InColClue,
   InRoomClue,
@@ -55,6 +57,7 @@ export {
   OnObjectClue,
   OrClue,
   OutsideClue,
+  RoomExistsClue,
   SameLineAsObjectClue,
   SameRoomAsObjectClue,
   UniqueNearDoorClue,

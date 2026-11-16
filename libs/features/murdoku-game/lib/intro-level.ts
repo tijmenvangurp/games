@@ -1,5 +1,16 @@
 import type { Cell, LevelJson, PersonId } from "@entities/murdoku";
+import type { MurdokuLoot } from "@entities/murdoku";
 import { roomTint } from "./palette";
+
+/**
+ * De buit van de instapzaak. De engine noemt hem intern `victim`, maar op het
+ * bord en in de tekst is het de gestolen taart: een voorwerp, geen persoon.
+ */
+export const MURDOKU_INTRO_LOOT: MurdokuLoot = { name: "de taart", icon: "cake" };
+
+/** De intro die bij de instapzaak op de pagina staat. */
+export const MURDOKU_INTRO_INTRO =
+  "Op de verjaardag is de taart ineens weg. Lees de aanwijzingen en vind de dief die als enige bij de buit was.";
 
 /**
  * De eigen 4×4-instapzaak van Wie was het?. Geen boekzaak: plattegrond, meubels
@@ -15,10 +26,10 @@ import { roomTint } from "./palette";
  *
  * Bezetbaar: (0,1) tapijt, (1,0) stoel, (2,0)+(2,1) bed, (2,3) tapijt,
  * (3,2) tapijt. De oplossing hieronder gebruikt rij en kolom één keer en zet
- * Cato als enige bij Vera in kamer 4.
+ * Cato als enige bij de taart in kamer 4.
  *
  * Deze zaak is het instaplevel van Wie was het?. Het bord start leeg; het kind
- * plaatst de drie verdachten zelf. Het slachtoffer volgt in #123.
+ * plaatst de drie verdachten zelf. De buit volgt bij de afloop.
  */
 export const MURDOKU_INTRO_LEVEL: LevelJson = {
   schema: 1,
@@ -66,14 +77,15 @@ export const MURDOKU_INTRO_LEVEL: LevelJson = {
     },
   ],
   victim: {
-    name: "Vera",
+    name: MURDOKU_INTRO_LOOT.name,
     attributes: { gender: "f", hair: "red", hairstyle: "ponytailLeft" },
   },
 };
 
 /**
  * De oplossing van {@link MURDOKU_INTRO_LEVEL}. Het bord start leeg; deze kaart
- * is de fixture voor de regels, de latere controle en de tests.
+ * is de fixture voor de regels, de latere controle en de tests. `victim` is de
+ * interne id van de buit.
  */
 export const MURDOKU_INTRO_SOLUTION: ReadonlyMap<PersonId, Cell> = new Map([
   ["A", 1],

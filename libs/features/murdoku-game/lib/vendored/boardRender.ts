@@ -84,6 +84,8 @@ export interface BoardView {
   reveal: RevealInfo | null;
   /** Committed-suspect head avatars, keyed by id (drawn when loaded). */
   avatars?: Map<PersonId, HTMLImageElement>;
+  /** The loot icon drawn on the neutral victim disk (loaded by the board). */
+  victimIcon?: HTMLImageElement | null;
   /** Cell under the cursor/finger → outlined yellow (occupiable) or red (blocked). */
   hover?: Cell | null;
   /** Suspect whose pencil notes are SKIPPED here — the overlay canvas draws them
@@ -945,14 +947,15 @@ export function drawBoard(ctx: CanvasRenderingContext2D, view: BoardView): void 
     }
   }
 
-  // --- committed tokens (suspect avatar head, or victim skull) ----------
+  // --- committed tokens (suspect avatar head, or the loot disk) ----------
   for (const [id, c] of view.placements) {
     const { x, y } = xy(c);
     if (id === VICTIM_ID) {
       // Sprite-cached: the disk's shadowBlur is expensive to redo per frame.
       const vp = S * 0.15; // margin for the drop shadow
-      const img = sprite(`victim|${S}|${dpr}`, S + 2 * vp, S + 2 * vp, dpr, (c2) =>
-        drawVictim(c2, { x: vp, y: vp }, S),
+      const iconKey = view.victimIcon?.currentSrc ?? view.victimIcon?.src ?? "none";
+      const img = sprite(`loot|${S}|${dpr}|${iconKey}`, S + 2 * vp, S + 2 * vp, dpr, (c2) =>
+        drawVictim(c2, { x: vp, y: vp }, S, view.victimIcon),
       );
       ctx.drawImage(img, x - vp, y - vp, S + 2 * vp, S + 2 * vp);
       continue;
@@ -960,7 +963,7 @@ export function drawBoard(ctx: CanvasRenderingContext2D, view: BoardView): void 
     if (view.reveal?.murdererId === id) {
       ctx.beginPath();
       ctx.arc(x + S / 2, y + S / 2, S * 0.47, 0, Math.PI * 2);
-      ctx.strokeStyle = BOARD.victim;
+      ctx.strokeStyle = BOARD.murderer;
       ctx.lineWidth = S * 0.06;
       ctx.stroke();
     }
@@ -1027,7 +1030,7 @@ export function drawBoard(ctx: CanvasRenderingContext2D, view: BoardView): void 
     const occ = board.isOccupiable(view.hover);
     const pad = S * 0.06;
     ctx.fillStyle = occ ? "rgba(255, 216, 77, 0.16)" : "rgba(207, 70, 60, 0.16)";
-    ctx.strokeStyle = occ ? "#ffd84d" : BOARD.victim;
+    ctx.strokeStyle = occ ? "#ffd84d" : BOARD.hoverBlocked;
     ctx.lineWidth = Math.max(2, S * 0.06);
     ctx.beginPath();
     ctx.roundRect(x + pad, y + pad, S - 2 * pad, S - 2 * pad, S * 0.12);
@@ -1370,24 +1373,47 @@ export function drawDoor(
   ctx.fill();
 }
 
-/** The victim token: a crimson disc with a skull. */
-function drawVictim(ctx: CanvasRenderingContext2D, pos: { x: number; y: number }, S: number): void {
+/** The loot token: a neutral disc with the case's stolen-item icon (never a skull). */
+function drawVictim(
+  ctx: CanvasRenderingContext2D,
+  pos: { x: number; y: number },
+  S: number,
+  icon?: HTMLImageElement | null,
+): void {
   const cx = pos.x + S / 2;
   const cy = pos.y + S / 2;
+  const r = S * 0.37;
   ctx.beginPath();
-  ctx.arc(cx, cy, S * 0.37, 0, Math.PI * 2);
-  ctx.fillStyle = BOARD.victim;
-  ctx.shadowColor = "rgba(0,0,0,0.45)";
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fillStyle = BOARD.loot;
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
   ctx.shadowBlur = S * 0.16;
   ctx.shadowOffsetY = S * 0.03;
   ctx.fill();
   ctx.shadowBlur = 0;
   ctx.shadowOffsetY = 0;
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.font = `${S * 0.44}px 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif`;
-  ctx.fillText("💀", cx, cy + S * 0.02);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.86, 0, Math.PI * 2);
+  ctx.strokeStyle = BOARD.lootRing;
+  ctx.lineWidth = Math.max(1, S * 0.025);
+  ctx.stroke();
+
+  if (icon && icon.complete && icon.naturalWidth > 0) {
+    const size = S * 0.62;
+    ctx.drawImage(icon, cx - size / 2, cy - size / 2, size, size);
+    return;
+  }
+
+  // Fallback while the local icon loads (or when a case has no icon): a small
+  // neutral diamond, so the disk never reads as a person or a skull.
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r * 0.42);
+  ctx.lineTo(cx + r * 0.34, cy);
+  ctx.lineTo(cx, cy + r * 0.42);
+  ctx.lineTo(cx - r * 0.34, cy);
+  ctx.closePath();
+  ctx.fillStyle = BOARD.lootRing;
+  ctx.fill();
 }
 
 function drawToken(

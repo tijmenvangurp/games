@@ -6,12 +6,14 @@ import {
   loadMurdokuLevel,
   murdokuCaseById,
   type Cell,
+  type Direction8,
   type Explanation,
   type MurdokuLine,
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
 import { isFiniteNumber, isNonNegativeInteger, isRecord } from "@shared/lib";
+import type { MurdokuClueFocus } from "../lib/clue-words";
 import { MURDOKU_INTRO_LEVEL } from "../lib/intro-level";
 import type { MurdokuHintStage, MurdokuHintState } from "./hints";
 import type { MurdokuPlayState } from "./play";
@@ -46,11 +48,23 @@ const MAX_HINT_PARAMS = 24;
 const MAX_ITEM_ID_CHARS = 64;
 
 const HINT_STAGES: ReadonlySet<string> = new Set<MurdokuHintStage>([
+  "clue",
   "focus",
   "cross",
   "place",
   "check",
   "none",
+]);
+
+const DIRECTIONS: ReadonlySet<string> = new Set<Direction8>([
+  "north",
+  "south",
+  "east",
+  "west",
+  "northeast",
+  "northwest",
+  "southeast",
+  "southwest",
 ]);
 
 const CASE_IDS: ReadonlySet<string> = new Set(MURDOKU_CASES.map((entry) => entry.id));
@@ -320,6 +334,78 @@ function readHintPerson(value: unknown, puzzle: Puzzle): PersonId | null {
   return puzzle.suspects.some((suspect) => suspect.id === value) ? value : null;
 }
 
+function readDirection(value: unknown): Direction8 | null {
+  return typeof value === "string" && DIRECTIONS.has(value) ? (value as Direction8) : null;
+}
+
+function readHintRoomFocus(
+  value: Record<string, unknown>,
+  puzzle: Puzzle,
+): MurdokuClueFocus | null {
+  return typeof value.roomId === "string" && puzzle.board.rooms.has(value.roomId)
+    ? { kind: "room", roomId: value.roomId }
+    : null;
+}
+
+function readHintPersonFocus(
+  value: Record<string, unknown>,
+  puzzle: Puzzle,
+): MurdokuClueFocus | null {
+  const personId = readHintPerson(value.personId, puzzle);
+  return personId === null ? null : { kind: "person", personId };
+}
+
+function readHintHalfPlaneFocus(
+  value: Record<string, unknown>,
+  puzzle: Puzzle,
+): MurdokuClueFocus | null {
+  const of = readHintPerson(value.of, puzzle);
+  const direction = readDirection(value.direction);
+  return of === null || direction === null ? null : { kind: "halfPlane", of, direction };
+}
+
+function readHintObjectHalfPlaneFocus(value: Record<string, unknown>): MurdokuClueFocus | null {
+  const direction = readDirection(value.direction);
+  return typeof value.object !== "string" || direction === null
+    ? null
+    : {
+        kind: "objectHalfPlane",
+        object: value.object,
+        direction,
+        all: value.all === true,
+      };
+}
+
+function readHintAreaFocus(
+  value: Record<string, unknown>,
+  kind: "ring" | "area",
+  puzzle: Puzzle,
+): MurdokuClueFocus | null {
+  const cells = readCells(value.cells, puzzle.board.width * puzzle.board.height);
+  return cells.length > 0 ? { kind, cells } : null;
+}
+
+function readHintFocus(value: unknown, puzzle: Puzzle): MurdokuClueFocus | null {
+  if (!isRecord(value) || typeof value.kind !== "string") {
+    return null;
+  }
+  switch (value.kind) {
+    case "room":
+      return readHintRoomFocus(value, puzzle);
+    case "person":
+      return readHintPersonFocus(value, puzzle);
+    case "halfPlane":
+      return readHintHalfPlaneFocus(value, puzzle);
+    case "objectHalfPlane":
+      return readHintObjectHalfPlaneFocus(value);
+    case "ring":
+    case "area":
+      return readHintAreaFocus(value, value.kind, puzzle);
+    default:
+      return null;
+  }
+}
+
 function readHint(value: unknown, puzzle: Puzzle): MurdokuHintState | null {
   if (!isRecord(value) || typeof value.stage !== "string" || !HINT_STAGES.has(value.stage)) {
     return null;
@@ -336,6 +422,7 @@ function readHint(value: unknown, puzzle: Puzzle): MurdokuHintState | null {
     roomId: readHintRoom(value.roomId, puzzle),
     cells: readCells(value.cells, puzzle.board.width * puzzle.board.height),
     personId: readHintPerson(value.personId, puzzle),
+    focus: readHintFocus(value.focus, puzzle),
   };
 }
 
@@ -423,14 +510,25 @@ function migratedCurrent(value: Record<string, unknown>): unknown {
     : value.current;
 }
 
+function isSupportedVersion(version: unknown): boolean {
+  return version === STORAGE_VERSION || version === 0 || version === undefined || version === 1;
+}
+
+function adaptiveFor(version: unknown, value: unknown): StoredMurdokuState["adaptive"] {
+  return version === STORAGE_VERSION ? readAdaptive(value) : DEFAULT_MURDOKU_ADAPTIVE;
+}
+
+function attemptsFor(version: unknown, value: unknown): StoredMurdokuState["attempts"] {
+  return version === STORAGE_VERSION ? readAttempts(value) : [];
+}
+
 function normalize(value: unknown): Normalized {
   if (!isRecord(value)) {
     return { state: emptyMurdokuState(), puzzle: null };
   }
 
   const version = value.version;
-  const legacy = version === 0 || version === undefined || version === 1;
-  if (version !== STORAGE_VERSION && !legacy) {
+  if (!isSupportedVersion(version)) {
     return { state: emptyMurdokuState(), puzzle: null };
   }
 
@@ -445,9 +543,8 @@ function normalize(value: unknown): Normalized {
       // Een oudere vorm kent nog geen niveau, log of instellingen voor het
       // adaptieve deel; die beginnen dan bij de kleinste zaak.
       settings: readSettings(value.settings),
-      adaptive:
-        version === STORAGE_VERSION ? readAdaptive(value.adaptive) : DEFAULT_MURDOKU_ADAPTIVE,
-      attempts: version === STORAGE_VERSION ? readAttempts(value.attempts) : [],
+      adaptive: adaptiveFor(version, value.adaptive),
+      attempts: attemptsFor(version, value.attempts),
     },
     puzzle: read?.puzzle ?? null,
   };

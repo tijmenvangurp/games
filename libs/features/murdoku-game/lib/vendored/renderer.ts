@@ -211,6 +211,10 @@ export class Renderer {
       }
       case "direction":
         return this.lookup(`dir.${value}`) ?? String(value);
+      // Direction with its preposition and the engine's half-plane reading
+      // ("in een hogere rij dan" / "links van"). Dutch needs both forms.
+      case "directionPhrase":
+        return this.lookup(`dirPhrase.${value}`) ?? this.lookup(`dir.${value}`) ?? String(value);
       case "line":
         return this.lookup(`line.${value}`) ?? String(value);
       case "linePlural":
@@ -338,14 +342,20 @@ export class Renderer {
         const subj = exp.params?.name;
         const childExtra =
           subj !== undefined ? { ...extra, name: subj, subject: subj, poss: subj } : extra;
-        const childText = exp.children.map((child) => this.render(child, childExtra)).join(" ");
+        const childText = exp.children
+          .map((child) => this.render(child, childExtra, nameSubject || exp.params?.named === 1))
+          .join(" ");
         const params = { ...extra, ...exp.params };
         return wrapper
           .replace(/\{\{child\}\}/g, childText)
           .replace(/\[\[([^\]]+?):[^\]]+?\]\]/g, "$1")
-          .replace(/\{\{(\w+)\}\}/g, (_match, key: string) =>
-            this.resolveParam(key, params[key] ?? "", nameSubject, params.subject),
-          );
+          .replace(/\{\{(\w+)\}\}/g, (_match, key: string) => {
+            const value =
+              key === "directionPhrase"
+                ? (params.direction ?? params[key] ?? "")
+                : (params[key] ?? "");
+            return this.resolveParam(key, value, nameSubject, params.subject);
+          });
       }
       const parts = exp.children.map((child) => this.render(child, extra, nameSubject));
       if (exp.key === "clue.and") return parts.join(` ${this.lookup("clue.connAnd") ?? "und"} `);
@@ -359,8 +369,13 @@ export class Renderer {
       /\[\[([^\]]+?):[^\]]+?\]\]/g,
       "$1",
     );
-    return template.replace(/\{\{(\w+)\}\}/g, (_match, key: string) =>
-      this.resolveParam(key, params[key] ?? "", nameSubject, params.subject),
-    );
+    return template.replace(/\{\{(\w+)\}\}/g, (_match, key: string) => {
+      // De engine levert één `direction`-param; de Nederlandse laag gebruikt
+      // zowel de losse richting (`{{direction}}`) als de richting met voorzetsel
+      // (`{{directionPhrase}}`).
+      const value =
+        key === "directionPhrase" ? (params.direction ?? params[key] ?? "") : (params[key] ?? "");
+      return this.resolveParam(key, value, nameSubject, params.subject);
+    });
   }
 }

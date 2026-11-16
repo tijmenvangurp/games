@@ -76,6 +76,17 @@ Het bewust niet meteen weggeven van het antwoord: eerst een visuele of
 woordelijke hint, daarna pas de oplossing.
 _Avoid_: cheat, answer
 
+**Buit**:
+Het gestolen voorwerp van een zaak in Wie was het?. De engine noemt hem intern
+`victim`, maar op het bord is het een voorwerp met een eigen icoon en telt hij
+niet mee als persoon.
+_Avoid_: slachtoffer, victim (in de UI)
+
+**Dief**:
+De enige verdachte die in dezelfde kamer als de buit stond. De engine noemt hem
+intern `murderer`.
+_Avoid_: dader, moordenaar (in de UI)
+
 **Puzzel**:
 Een schaakpuzzel met een stelling en een gevraagde zet. Niet te verwarren met
 de kaartpuzzel van Vlaggenreis.

@@ -6,7 +6,7 @@ import { GameShell } from "@widgets/game-shell";
 /**
  * De uitleg van Wie was het? op een eigen route.
  *
- * Zes schermen en een woordenlijst leggen de regels en de aanwijzingen uit. De
+ * Zeven schermen en een woordenlijst leggen de regels en de aanwijzingen uit. De
  * speelpagina opent deze pagina met de ?-knop; teruggaan brengt het kind naar de
  * zaak waar het mee bezig was. De uitleg raakt de speltoestand niet aan.
  */
@@ -17,7 +17,7 @@ export function MurdokuLessonPage() {
     <GameShell
       backLabel="Terug naar de zaak"
       showSpeech={false}
-      subtitle="Zes stappen en een woordenlijst"
+      subtitle="Zeven stappen en een woordenlijst"
       title="Zo werkt het"
       onBack={() => navigate({ to: "/mysterie" })}
     >

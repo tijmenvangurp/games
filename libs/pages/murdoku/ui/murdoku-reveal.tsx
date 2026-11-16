@@ -2,7 +2,7 @@ import type { Ref } from "react";
 import { Button } from "@shared/ui";
 
 interface MurdokuRevealProps {
-  /** De afloopzin met de dader en de kamer van het slachtoffer. */
+  /** De afloopzin met de dief en de kamer van de buit. */
   sentence: string;
   /** Wat het niveau na deze zaak doet; `null` als het gelijk blijft. */
   progressMessage?: string | null;
@@ -12,9 +12,9 @@ interface MurdokuRevealProps {
 }
 
 /**
- * De onthulling na een goede controle: de dader, de kamer van het slachtoffer
- * en een rustige manier om opnieuw te beginnen. Het bord erboven toont het
- * slachtoffer en omlijnt haar kamer.
+ * De onthulling na een goede controle: de dief, de kamer van de buit en een
+ * rustige manier om opnieuw te beginnen. Het bord erboven toont de buit en
+ * omlijnt de kamer waar hij lag.
  */
 export function MurdokuReveal({
   sentence,
@@ -30,11 +30,11 @@ export function MurdokuReveal({
       tabIndex={-1}
     >
       <h2 className="font-display text-xl" id="murdoku-afloop">
-        De dader
+        De dief
       </h2>
       <p className="mt-1 text-base leading-relaxed">{sentence}</p>
       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-        Het slachtoffer staat ook op de plattegrond; haar kamer is omlijnd.
+        De buit staat ook op de plattegrond; de kamer van de buit is omlijnd.
       </p>
       {progressMessage ? (
         <p className="mt-2 rounded-lg bg-success/10 px-3 py-2 text-sm leading-relaxed text-success">

@@ -61,8 +61,10 @@ De kopie is inhoudelijk gelijk aan upstream. Alle afwijkingen zijn hieronder opg
 3. **Nederlands in `renderer.ts`.** De `objectEvery`-tak leest eerst een expliciete `objectEvery.*`-sleutel uit `nl.ts` en zet anders het lidwoord om (`een tafel` → `elke tafel`). Upstream laat die twee stappen sinds een latere refactor weg; wij hebben ze nodig voor de Nederlandse zinnen.
 4. **Opmaak.** Alle vendored bestanden zijn met `oxfmt` geformatteerd, net als de rest van de repo (zie ADR 0031). Upstream gebruikt geen puntkomma's en enkele quotes; de diff daarvan is mechanisch.
 5. **Lint.** Zeventien `oxlint`-meldingen zijn verholpen zonder gedrag te wijzigen: acht keer `unicorn(no-useless-spread)` (een `Set` direct in `for…of` in plaats van `[...set]`; verwijderen tijdens iteratie is veilig en de volgorde blijft gelijk), vijf keer `unicorn(no-new-array)` (`Array.from({ length: n }, …)` in plaats van `new Array(n).fill(…)`), en vier keer `unicorn(no-useless-fallback-in-spread)` (`...(x ?? {})` → `...x`, want een lege spread voegt niets toe).
+6. **Buit in plaats van schedel (`boardRender.ts`).** `drawVictim` tekent geen doodshoofd meer, maar een neutrale schijf met het lokale elementicoon van de buit. `BoardView` kreeg een optionele `victimIcon`; de sprite-cache sleutelt op dat icoon. De daderring gebruikt `BOARD.murderer` (amber) in plaats van het oude foutrood.
+7. **Nederlandse richting en naam in de hint (`renderer.ts`).** De renderer kent `directionPhrase` (`dirPhrase.*`), zodat de engine-param `direction` zowel "boven" als "in een hogere rij dan" kan worden. Een wrapper met `params.named === 1` rendert zijn `{{child}}` met de persoonsnaam in plaats van een voornaamwoord; de hint gebruikt dat voor de reden bij de exacte cel.
 
-De engine is verder byte-identiek aan upstream op commit `efc3c3b`; van de acht renderbestanden zijn zeven identiek op de importpaden na.
+De engine is verder byte-identiek aan upstream op commit `efc3c3b`; de overige renderbestanden zijn identiek op de importpaden na. `boardRender.ts` en `renderer.ts` dragen de patches hierboven.
 
 ## Onderhoud
 

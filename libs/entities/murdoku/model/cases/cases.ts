@@ -34,6 +34,7 @@ export const MURDOKU_CASES: readonly MurdokuCase[] = MURDOKU_CASE_SPECS.map((spe
     id: spec.id,
     title: spec.title,
     intro: spec.intro,
+    loot: spec.loot,
     level: stored.level,
     solution: stored.solution,
   };

@@ -21,6 +21,8 @@ interface MurdokuCanvasOptions {
   outlineRoomId: string | null;
   /** De onthulling na een goede controle; `null` zolang de zaak loopt. */
   reveal: RevealInfo | null;
+  /** Het geladen icoon van de buit; `null` zolang het nog niet klaar is. */
+  lootIcon: HTMLImageElement | null;
 }
 
 /**
@@ -39,6 +41,7 @@ export function useMurdokuCanvas({
   helpMarks,
   outlineRoomId,
   reveal,
+  lootIcon,
 }: MurdokuCanvasOptions) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const avatarsRef = useRef<Map<PersonId, HTMLImageElement>>(new Map());
@@ -79,6 +82,7 @@ export function useMurdokuCanvas({
         helpMarks: marks,
         reveal,
         avatars: avatarsRef.current,
+        victimIcon: lootIcon,
       });
     };
 
@@ -98,6 +102,7 @@ export function useMurdokuCanvas({
     helpMarks,
     outlineRoomId,
     reveal,
+    lootIcon,
     text,
   ]);
 

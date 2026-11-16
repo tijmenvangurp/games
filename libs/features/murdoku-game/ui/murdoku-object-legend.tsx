@@ -8,6 +8,8 @@ import { MurdokuObjectIcon } from "./murdoku-object-icon";
 interface MurdokuObjectLegendProps {
   /** De zaak waarvan de legenda uit het bord komt. Weglaten bij de uitleg. */
   puzzle?: Puzzle;
+  /** De buit van de zaak; toont dezelfde uitleg als op de speelpagina. */
+  lootName?: string;
   className?: string;
 }
 
@@ -16,9 +18,10 @@ interface MurdokuObjectLegendProps {
  * blokkeren een vakje? Zonder zaak toont hij de vaste legenda van de eerste
  * versie, zodat de uitleg dezelfde objecten laat zien als elke zaak.
  *
- * Een raam is geen vakje en staat daarom apart.
+ * Een raam is geen vakje en staat daarom apart. De buit heeft een eigen icoon
+ * en is geen meubel; hij staat daarom in een eigen regel.
  */
-export function MurdokuObjectLegend({ puzzle, className }: MurdokuObjectLegendProps) {
+export function MurdokuObjectLegend({ puzzle, lootName, className }: MurdokuObjectLegendProps) {
   const legend = useMemo(() => (puzzle ? murdokuLegend(puzzle) : MURDOKU_V1_LEGEND), [puzzle]);
   const groups = [
     { occupiable: true, label: "Hier mag je staan" },
@@ -57,6 +60,7 @@ export function MurdokuObjectLegend({ puzzle, className }: MurdokuObjectLegendPr
       ))}
       <p className="text-xs leading-relaxed text-muted-foreground sm:col-span-2">
         Een raam is geen vakje: het zit op de muur.
+        {lootName ? <> De buit ({lootName}) heeft een eigen icoon en is geen meubel.</> : null}
       </p>
     </div>
   );

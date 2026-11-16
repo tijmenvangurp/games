@@ -74,13 +74,13 @@ describe("Wie was het? toegankelijke overlay", () => {
     await renderGame();
 
     const summary = screen.getByRole("list", { name: "Waar staat wie?" });
-    expect(within(summary).getByText("Anna staat nog niet op het bord.")).toBeTruthy();
+    expect(within(summary).getByText("Anna is nog niet op het bord.")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Anna" }));
     fireEvent.click(cell(/^leeg, rij 1, kolom 2/));
 
-    expect(within(summary).getByText("Anna staat op rij 1, kolom 2.")).toBeTruthy();
-    expect(within(summary).getByText("Bram staat nog niet op het bord.")).toBeTruthy();
+    expect(within(summary).getByText("Anna is op rij 1, kolom 2.")).toBeTruthy();
+    expect(within(summary).getByText("Bram is nog niet op het bord.")).toBeTruthy();
   });
 });
 
@@ -123,7 +123,11 @@ describe("Wie was het? focus en toetsenbord", () => {
 
     fireEvent.click(hint);
 
-    expect(document.activeElement).toBe(cell(/^leeg, licht op, rij 1, kolom 1/));
+    expect(document.activeElement).toBe(cell(/^leeg, licht op, rij 2, kolom 1/));
+
+    fireEvent.click(hint);
+
+    expect(document.activeElement).toBe(cell(/^leeg, licht op, rij 2, kolom 1/));
 
     fireEvent.click(hint);
 
@@ -140,7 +144,7 @@ describe("Wie was het? focus en toetsenbord", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Bekijk de plattegrond" }));
 
     await waitFor(() => {
-      expect(document.activeElement).toBe(screen.getByRole("region", { name: "De dader" }));
+      expect(document.activeElement).toBe(screen.getByRole("region", { name: "De dief" }));
     });
   });
 });

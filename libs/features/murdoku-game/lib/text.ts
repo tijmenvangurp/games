@@ -27,6 +27,8 @@ export interface MurdokuText {
   objectPhrase(type: string, form?: "nom" | "every" | "same"): string;
   /** Een richting in gewone taal ("links", "boven"). */
   direction(direction: string): string;
+  /** Een richting met voorzetsel en halfvlak-betekenis ("links van", "in een hogere rij dan"). */
+  directionPhrase(direction: string): string;
   /** Een los woord uit de woordenlijst, bijvoorbeeld "in een hoek". */
   word(name: string): string;
   /** Een vaste bordregel, bijvoorbeeld de regel over het slachtoffer. */
@@ -60,6 +62,7 @@ export function createMurdokuText(puzzle: Puzzle): MurdokuText {
         type,
       ),
     direction: (direction) => renderer.resolveParam("direction", direction),
+    directionPhrase: (direction) => renderer.resolveParam("directionPhrase", direction),
     word: (name) => renderer.lookup(`word.${name}`) ?? name,
     rule: (name) => renderer.lookup(`rule.${name}`) ?? name,
   };

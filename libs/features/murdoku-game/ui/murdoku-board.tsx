@@ -1,4 +1,4 @@
-import { type ReactNode, type RefObject } from "react";
+import { type ReactNode, type RefObject, useEffect, useState } from "react";
 import { VICTIM_ID, type Cell, type PersonId, type Puzzle } from "@entities/murdoku";
 import type { MurdokuMode } from "../model/play";
 import { MURDOKU_HINT_COLOR } from "../lib/palette";
@@ -25,6 +25,8 @@ interface MurdokuBoardProps {
   puzzle: Puzzle;
   /** Werktitel van de zaak; gebruikt voor het toegankelijke label. */
   title: string;
+  /** Elementnaam van de buit; het bord laadt het lokale icoon zelf. */
+  lootIcon?: string;
   /** Geplaatste personen. Zonder plaatsingen toont het bord alleen de plattegrond. */
   placements?: ReadonlyMap<PersonId, Cell>;
   /** Kandidaatvakjes van de gekozen persoon (primaire hintwash). */
@@ -156,9 +158,9 @@ function placementSummary(puzzle: Puzzle, placements: ReadonlyMap<PersonId, Cell
   return people.map((person) => {
     const name = puzzle.nameOf(person);
     const cell = placements.get(person);
-    if (cell === undefined) return `${name} staat nog niet op het bord.`;
+    if (cell === undefined) return `${name} is nog niet op het bord.`;
     const { row, col } = puzzle.board.rc(cell);
-    return `${name} staat op rij ${row + 1}, kolom ${col + 1}.`;
+    return `${name} is op rij ${row + 1}, kolom ${col + 1}.`;
   });
 }
 
@@ -247,15 +249,47 @@ function BoardFrame({ wrapRef, width, height, cell, children }: BoardFrameProps)
 }
 
 /**
+ * Laadt het lokale elementicoon van de buit. Geen netwerk buiten de app: het
+ * bestand komt uit `apps/games/public/elements/` en wordt door Vite geserveerd.
+ * Zolang het laadt, tekent het bord een neutrale schijf zonder schedel.
+ */
+function useLootImage(lootIcon: string | undefined): HTMLImageElement | null {
+  const [image, setImage] = useState<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    if (!lootIcon) {
+      setImage(null);
+      return;
+    }
+    const next = new Image();
+    let active = true;
+    next.onload = () => {
+      if (active) setImage(next);
+    };
+    next.src = `/elements/${lootIcon}.svg`;
+    return () => {
+      active = false;
+      next.onload = null;
+    };
+  }, [lootIcon]);
+
+  return image;
+}
+
+/**
  * Eén canvas met de plattegrond van een zaak: kamers, vloeren, meubels, ramen,
  * kamernamen en de geplaatste portretten. Boven en links staan de kolom- en
  * rijlabels; over het canvas ligt een transparant knoppenrooster met per vakje
  * een Nederlandse toegankelijke naam. Zo blijven de pixels snel en is de
  * bediening echt met rollen en namen te testen.
  */
+// Een React-scherm met veel props, default-waarden en vier hooks; de
+// conditionele bedrading is lineair en wordt door de bord- en e2e-tests gedekt.
+// fallow-ignore-next-line complexity
 export function MurdokuBoard({
   puzzle,
   title,
+  lootIcon,
   placements,
   highlight = null,
   focus = null,
@@ -270,8 +304,11 @@ export function MurdokuBoard({
 }: MurdokuBoardProps) {
   const width = puzzle.board.width;
   const height = puzzle.board.height;
-  const { wrapRef, cell } = useBoardCellSize(width, MAX_BOARD_CELL);
+  const { wrapRef, cell } = useBoardCellSize(width, height, MAX_BOARD_CELL, {
+    fitLandscapeHeight: true,
+  });
   const text = useMurdokuText(puzzle);
+  const lootImage = useLootImage(lootIcon);
   const placed = placements ?? NO_PLACEMENTS;
   const labels = boardLabels(
     puzzle,
@@ -295,6 +332,7 @@ export function MurdokuBoard({
     helpMarks,
     outlineRoomId,
     reveal,
+    lootIcon: lootImage,
   });
 
   return (

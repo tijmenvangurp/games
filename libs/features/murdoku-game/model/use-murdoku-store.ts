@@ -254,10 +254,10 @@ export const useMurdokuStore = create<MurdokuStore>((set, get) => ({
 
     const plan = planMurdokuHint(puzzle, play, hint);
     const nextPlay = plan.apply ? applyMurdokuHint(puzzle, play, plan.apply) : play;
-    // Eén hintstap kost twee tikken: de eerste zet de hint op, de tweede past
-    // hem toe. Alleen de eerste tik telt, zodat de niveauteller hints telt en
-    // niet tikken.
-    const startsStep = plan.state.stage === "focus";
+    // Eén hintstap telt bij de eerste tik (de clue-nudge). De tweede tik geeft
+    // de exacte plek met de reden, de derde past de zet toe; alleen de eerste
+    // tik telt, zodat de niveauteller hints telt en niet tikken.
+    const startsStep = hint === null || (hint.stage !== "clue" && hint.stage !== "focus");
     set({
       play: nextPlay,
       history: nextPlay === play ? history : withHistory(history, play),

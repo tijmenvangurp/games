@@ -3,6 +3,8 @@ import {
   AtWallClue,
   BesideSameObjectClue,
   CornerClue,
+  DirectionClue,
+  DirectionFromAttrClue,
   DirectionFromObjectClue,
   InColClue,
   InRoomClue,
@@ -15,6 +17,7 @@ import {
   OnObjectClue,
   OrClue,
   OutsideClue,
+  RoomExistsClue,
   SameLineAsObjectClue,
   SameRoomAsObjectClue,
   UniqueNearDoorClue,
@@ -22,8 +25,10 @@ import {
   UniqueNearWindowClue,
   UniqueOnObjectClue,
   UniqueOutsideClue,
+  inDirection8,
   type Cell,
   type Clue,
+  type Direction8,
   type PersonId,
   type Puzzle,
 } from "@entities/murdoku";
@@ -40,7 +45,11 @@ export type MurdokuClueFocus =
   /** Een kamer: de omtrek van die kamer. */
   | { kind: "room"; roomId: string }
   /** Een persoon: zijn vakje, of anders de vakjes waar hij nog kan staan. */
-  | { kind: "person"; personId: PersonId };
+  | { kind: "person"; personId: PersonId }
+  /** Een halfvlak vanaf een persoon: elke hogere/lagere rij, of links/rechts. */
+  | { kind: "halfPlane"; of: PersonId; direction: Direction8 }
+  /** Een halfvlak vanaf elk (of het gezochte) object van dit type. */
+  | { kind: "objectHalfPlane"; object: string; direction: Direction8; all: boolean };
 
 /** Eén stuk van een aanwijzing: gewone tekst, of een tikbaar woord met een doel. */
 export interface MurdokuClueWord {
@@ -139,6 +148,63 @@ function fixtureReferences(clue: Clue, puzzle: Puzzle, text: MurdokuText, out: S
   return false;
 }
 
+/** "In zijn kamer stond iemand op een tapijt": het object of de plek licht op. */
+function roomExistsReferences(clue: Clue, puzzle: Puzzle, text: MurdokuText, out: Sink): boolean {
+  if (!(clue instanceof RoomExistsClue)) return false;
+  if (clue.relation === "on" || clue.relation === "near") {
+    pushRing(puzzle, clue.object, text.objectPhrase(clue.object), out);
+    return true;
+  }
+  if (clue.relation === "window") {
+    pushRing(puzzle, "window", text.objectPhrase("window"), out);
+    return true;
+  }
+  if (clue.relation === "door") {
+    pushRing(puzzle, "door", text.objectPhrase("door"), out);
+    return true;
+  }
+  const cells =
+    clue.relation === "corner" ? [...puzzle.board.cornerCells()] : [...puzzle.board.cellsAtWall()];
+  out.push({
+    label: text.word(clue.relation === "corner" ? "corner" : "wall"),
+    focus: { kind: "area", cells },
+  });
+  return true;
+}
+
+/** Een richting wijst een halfvlak aan, niet één cel: alle hogere of lagere rijen. */
+function directionReferences(clue: Clue, puzzle: Puzzle, text: MurdokuText, out: Sink): boolean {
+  if (clue instanceof DirectionClue) {
+    out.push({
+      label: text.directionPhrase(clue.direction),
+      focus: { kind: "halfPlane", of: clue.target, direction: clue.direction },
+    });
+    out.push({
+      label: puzzle.nameOf(clue.target),
+      focus: { kind: "person", personId: clue.target },
+    });
+    return true;
+  }
+  if (clue instanceof DirectionFromObjectClue) {
+    out.push({
+      label: text.directionPhrase(clue.direction),
+      focus: {
+        kind: "objectHalfPlane",
+        object: clue.object,
+        direction: clue.direction,
+        all: clue.all,
+      },
+    });
+    out.push({
+      label: text.objectPhrase(clue.object, clue.all ? "every" : undefined),
+      focus: objectFocus(puzzle, clue.object),
+    });
+    return true;
+  }
+  // directionFromAttr is geen v1-aanwijzing; de zin blijft leesbaar zonder focus.
+  return clue instanceof DirectionFromAttrClue;
+}
+
 /** Hoeken, muren en binnen/buiten: een gebied zonder object of kamer. */
 function areaReferences(clue: Clue, puzzle: Puzzle, text: MurdokuText, out: Sink): boolean {
   if (clue instanceof CornerClue) {
@@ -194,8 +260,10 @@ function references(
   }
   if (lineReferences(clue, puzzle, text, out)) return;
   if (roomReferences(clue, text, out)) return;
+  if (directionReferences(clue, puzzle, text, out)) return;
   if (objectReferences(clue, puzzle, text, out)) return;
   if (fixtureReferences(clue, puzzle, text, out)) return;
+  if (roomExistsReferences(clue, puzzle, text, out)) return;
   if (areaReferences(clue, puzzle, text, out)) return;
   personReferences(clue, puzzle, subjectId, text, out);
 }
@@ -239,6 +307,18 @@ export function clueWords(
   return words;
 }
 
+/** De verwijzingen van een aanwijzing als losse focusdoelen (voor de clue-nudge). */
+export function clueFocusTargets(
+  puzzle: Puzzle,
+  clue: Clue,
+  subjectId: PersonId,
+  text: MurdokuText,
+): MurdokuClueFocus[] {
+  const refs: Reference[] = [];
+  references(puzzle, clue, subjectId, text, refs);
+  return refs.map((reference) => reference.focus);
+}
+
 /** De vakjes waar een persoon nu kan staan, puur als verwijzing (geen deductie). */
 function personCells(puzzle: Puzzle, personId: PersonId): Cell[] {
   const suspect = puzzle.suspects.find((person) => person.id === personId);
@@ -258,11 +338,61 @@ export interface MurdokuFocusView {
   marks: HelpMarks;
 }
 
+/** Alle bezetbare vakjes in een halfvlak vanaf `anchor`. */
+function halfPlaneCells(puzzle: Puzzle, anchor: Cell, direction: Direction8): Cell[] {
+  const origin = puzzle.board.rc(anchor);
+  return [...puzzle.board.occupiableCells()].filter((cell) =>
+    inDirection8(direction, puzzle.board.rc(cell), origin),
+  );
+}
+
+/** Het halfvlak vanaf elk object, of de doorsnede als de aanwijzing "elke" zegt. */
+function objectHalfPlaneCells(
+  puzzle: Puzzle,
+  object: string,
+  direction: Direction8,
+  all: boolean,
+): Cell[] {
+  const objects = [...puzzle.board.objectCells(object)];
+  if (objects.length === 0) return [];
+  const sets = objects.map((cell) => new Set(halfPlaneCells(puzzle, cell, direction)));
+  if (!all) return [...new Set(sets.flatMap((set) => [...set]))];
+  const first = sets[0];
+  return [...first].filter((cell) => sets.every((set) => set.has(cell)));
+}
+
+/**
+ * De vakjes van een niet-kamer-verwijzing. Een richting wordt pas een halfvlak
+ * als de ankerpersoon op het bord staat; anders blijven het zijn kandidaten.
+ */
+function focusCells(
+  puzzle: Puzzle,
+  focus: Exclude<MurdokuClueFocus, { kind: "room" }>,
+  placements?: ReadonlyMap<PersonId, Cell>,
+): Cell[] {
+  if (focus.kind === "halfPlane") {
+    const anchor = placements?.get(focus.of);
+    return anchor === undefined
+      ? personCells(puzzle, focus.of)
+      : halfPlaneCells(puzzle, anchor, focus.direction);
+  }
+  if (focus.kind === "objectHalfPlane") {
+    return objectHalfPlaneCells(puzzle, focus.object, focus.direction, focus.all);
+  }
+  return focus.kind === "person" ? personCells(puzzle, focus.personId) : [...focus.cells];
+}
+
 /**
  * Vertaalt een tikbare verwijzing naar wat het bord moet tekenen. De markeringen
- * zijn dezelfde rustige contouren als de verwijzingen van de aanwijzingen.
+ * zijn dezelfde rustige contouren als de verwijzingen van de aanwijzingen. Met
+ * de plaatsingen erbij wordt een richting het hele halfvlak; zonder een
+ * geplaatste persoon blijft het bij de vakjes waar die persoon nog kan staan.
  */
-export function focusView(puzzle: Puzzle, focus: MurdokuClueFocus | null): MurdokuFocusView {
+export function focusView(
+  puzzle: Puzzle,
+  focus: MurdokuClueFocus | null,
+  placements?: ReadonlyMap<PersonId, Cell>,
+): MurdokuFocusView {
   const cells = new Set<Cell>();
   const rooms = new Set<string>();
   const marks = emptyHelpMarks();
@@ -276,7 +406,7 @@ export function focusView(puzzle: Puzzle, focus: MurdokuClueFocus | null): Murdo
     return { cells, rooms, marks };
   }
 
-  const focused = focus.kind === "person" ? personCells(puzzle, focus.personId) : [...focus.cells];
+  const focused = focusCells(puzzle, focus, placements);
   for (const cell of focused) cells.add(cell);
 
   if (focus.kind === "ring") marks.ring = new Set(focused);
@@ -290,6 +420,12 @@ export function sameClueFocus(a: MurdokuClueFocus | null, b: MurdokuClueFocus | 
   if (!a || !b || a.kind !== b.kind) return false;
   if (a.kind === "room" && b.kind === "room") return a.roomId === b.roomId;
   if (a.kind === "person" && b.kind === "person") return a.personId === b.personId;
+  if (a.kind === "halfPlane" && b.kind === "halfPlane") {
+    return a.of === b.of && a.direction === b.direction;
+  }
+  if (a.kind === "objectHalfPlane" && b.kind === "objectHalfPlane") {
+    return a.object === b.object && a.direction === b.direction && a.all === b.all;
+  }
   const left = "cells" in a ? a.cells : [];
   const right = "cells" in b ? b.cells : [];
   return left.length === right.length && left.every((cell, index) => cell === right[index]);
