@@ -18,6 +18,7 @@ import { LettersPage } from "@pages/letter";
 import { TypepretPage } from "@pages/typepret";
 import { MathPage } from "@pages/math";
 import { MemoryPage } from "@pages/memory";
+import { MurdokuCaseListPage, MurdokuLessonPage, MurdokuPage } from "@pages/murdoku";
 import { PokemonQuizPage } from "@pages/pokemon-quiz";
 import { PuzzlesPage } from "@pages/puzzles";
 import { SeekPage } from "@pages/seek";
@@ -56,6 +57,9 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/ganzenbord", GanzenbordPage),
     gameRoute("/ganzenbord/bord", BoardEditorPage),
     gameRoute("/mengelmoes", AlchemyPage),
+    gameRoute("/mysterie", MurdokuPage),
+    gameRoute("/mysterie/les", MurdokuLessonPage),
+    gameRoute("/mysterie/zaken", MurdokuCaseListPage),
     gameRoute("/frans", FrenchPage),
     gameRoute("/frans/herhalen", FrenchReviewPage),
     gameRoute("/frans/sorteren", FrenchSortPage),

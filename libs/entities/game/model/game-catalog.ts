@@ -29,7 +29,8 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/vlaggen"
           | "/vier-op-een-rij"
           | "/ganzenbord"
-          | "/typepret";
+          | "/typepret"
+          | "/mysterie";
         thumbnail: string;
         /** Elke game kiest expliciet hoe het met spraak omgaat. */
         speech: GameSpeech;
@@ -177,6 +178,19 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     speech: {
       kind: "visual",
       reason: "Het toetsenbord en de doeltekens zijn visueel.",
+    },
+  },
+  {
+    id: "murdoku",
+    name: "Wie was het?",
+    description:
+      "Lees de aanwijzingen, vul de plattegrond in en vind wie als enige bij het slachtoffer was.",
+    status: "available",
+    to: "/mysterie",
+    thumbnail: "/thumbnails/wie-was-het-7b43d89b.jpg",
+    speech: {
+      kind: "visual",
+      reason: "De plattegrond, de portretten en de aanwijzingen zijn visueel.",
     },
   },
 ];

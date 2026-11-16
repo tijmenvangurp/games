@@ -50,6 +50,23 @@ De code bevatte ook feedback die tegen de leerkuil in werkt: `playSound("wrong")
 | Frans           | Nee, vaste les; SRS is de as            | Bestaande Leitner houden; geen niveauladder                    |
 | Schaakles       | Nee, lineaire instructie                | Geen ladder; alleen hinttiming en copy                         |
 | Pijlen          | Bestaande levelpad                      | Geen nieuwe ladder; wel de foutvriendelijke pass (geen harten) |
+| Wie was het?    | Ja: bordgrootte en aanwijzingsdichtheid | Adaptieve ladder; één zaak is één ronde                        |
+
+### De ronde-regelaar van Wie was het?
+
+Eén zaak is één ronde. De zaken zijn geordend op bordgrootte en daarna op
+aanwijzingsdichtheid. Aan het einde van een ronde geldt:
+
+- **0 of 1 hint:** één stap omhoog.
+- **2 hints:** blijven staan.
+- **3 of meer hints, of halverwege stoppen:** één stap omlaag.
+- **Een foutplaatsing:** geen demotie. Alleen het einde van de ronde beweegt het
+  niveau, zodat een puzzel van tien minuten niet door één ongelukkige tik zakt.
+
+Een hintstap kost twee tikken (eerst wijzen, dan toepassen) en telt als één
+hint. Het niveau beweegt hooguit één stap per ronde en blijft binnen de twaalf
+zaken. De poging gaat met zaak, goed/fout, tijd, hints en tijdstip naar het
+begrensde lokale log.
 
 ## Gevolgen
 
