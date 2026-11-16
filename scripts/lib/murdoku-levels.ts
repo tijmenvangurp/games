@@ -5,14 +5,15 @@ import type { MurdokuCaseSpec } from "../../libs/entities/murdoku/model/cases/sp
 import {
   checkMurdokuLevel,
   generateMurdokuLevel,
+  MURDOKU_ROOM_TINTS,
   placementOf,
   validateMurdokuCases,
+  VICTIM_ID,
   type Cell,
   type LevelJson,
   type MurdokuCase,
   type PersonId,
 } from "../../libs/entities/murdoku/index";
-
 /**
  * Bouwt de twaalf eigen zaken van Wie was het? en controleert ze.
  *
@@ -35,17 +36,117 @@ export interface GeneratedMurdokuLevels {
 
 export const MURDOKU_LEVELS_FILE = "libs/entities/murdoku/model/cases/levels.json";
 
+/**
+ * De aanwijzingstypes die v1 toestaat.
+ *
+ * De lijst dekt de v1-woordenschat uit de spec: plaats, object, raam, hoek,
+ * kamer, rij, kolom, alleen, de enige op een object, links/rechts/boven/onder
+ * en "niet". Aanwijzingen op geslacht, baard, bril of ander uiterlijk staan er
+ * bewust niet in; die zijn voor v1 te moeilijk en te persoonsgebonden. De
+ * samengestelde vormen `and`, `or` en `not` combineren alleen toegestane
+ * aanwijzingen.
+ */
+const V1_CLUE_TYPES: ReadonlySet<string> = new Set([
+  "onObject",
+  "nearObject",
+  "nearObjectAny",
+  "nearWindow",
+  "nearDoor",
+  "inside",
+  "outside",
+  "inRoom",
+  "inRow",
+  "inCol",
+  "corner",
+  "atWall",
+  "uniqueOnObject",
+  "uniqueNearObject",
+  "uniqueNearWindow",
+  "uniqueNearDoor",
+  "uniqueInside",
+  "uniqueOutside",
+  "alone",
+  "notAlone",
+  "direction",
+  "sameRoom",
+  "sameLineAsObject",
+  "directionFromObject",
+  "sameRoomAsObject",
+  "besideSameObject",
+  "roomExists",
+  "countOnObject",
+  "emptyRooms",
+  "everyRoomCount",
+  "and",
+  "or",
+  "not",
+]);
+
+/** Alleen de vier kompasrichtingen; diagonalen zijn in v1 te lastig. */
+const V1_DIRECTIONS: ReadonlySet<string> = new Set(["north", "south", "east", "west"]);
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Eén aanwijzing tegen de v1-allowlist; leeg betekent: toegestaan. */
+function clueProblems(value: unknown): string[] {
+  if (!isRecord(value) || typeof value.type !== "string") {
+    return ["een aanwijzing zonder type"];
+  }
+  const type = value.type;
+  if (type === "and" || type === "or") {
+    const children = Array.isArray(value.clues) ? value.clues : [];
+    return children.flatMap(clueProblems);
+  }
+  if (type === "not") {
+    return clueProblems(value.clue);
+  }
+  return [
+    ...allowedTypeProblems(type),
+    ...attributeProblems(type, value),
+    ...directionProblems(type, value),
+  ];
+}
+
+/** Het type zelf moet in de allowlist staan. */
+function allowedTypeProblems(type: string): string[] {
+  return V1_CLUE_TYPES.has(type) ? [] : [`${type} staat niet in de v1-allowlist`];
+}
+
+/** Aanwijzingen op een persoonskenmerk zijn in v1 te moeilijk. */
+function attributeProblems(type: string, value: Record<string, unknown>): string[] {
+  if (type === "roomExists" && (value.attribute != null || value.person != null)) {
+    return ["roomExists met een persoonskenmerk staat niet in de v1-allowlist"];
+  }
+  if (type === "besideSameObject" && isRecord(value.mate) && value.mate.kind === "attr") {
+    return ["besideSameObject met een persoonskenmerk staat niet in de v1-allowlist"];
+  }
+  return [];
+}
+
+/** Alleen de vier kompasrichtingen; diagonalen zijn in v1 te lastig. */
+function directionProblems(type: string, value: Record<string, unknown>): string[] {
+  if (typeof value.dir !== "string" || V1_DIRECTIONS.has(value.dir)) return [];
+  return [`${type} gebruikt de diagonaal ${value.dir}`];
+}
+
+/**
+ * Controleert alle aanwijzingen van een zaak tegen de v1-allowlist. Retourneert
+ * leesbare problemen; een lege lijst betekent: toegestaan.
+ */
+export function murdokuV1ClueProblems(
+  level: Pick<LevelJson, "suspects" | "globalClues" | "boardClues">,
+): string[] {
+  const clues = [
+    ...level.suspects.flatMap((suspect) => suspect.clues ?? []),
+    ...(level.globalClues ?? []),
+    ...(level.boardClues ?? []),
+  ];
+  return clues.flatMap(clueProblems);
+}
+
 /** Vaste kamertinten; dezelfde waarden als de bordpalette van de feature. */
-const ROOM_TINTS = [
-  "#e9dcc2",
-  "#cfe0d4",
-  "#ecd3d3",
-  "#dcd7e8",
-  "#cfdbe6",
-  "#d9e2cb",
-  "#f0dcc4",
-  "#e3d5e6",
-] as const;
 
 const INDOOR_ROOMS = [
   "room.keuken",
@@ -149,7 +250,7 @@ function localizeRooms(level: LevelJson, caseIndex: number): void {
     const pool = room.outside ? OUTDOOR_ROOMS : INDOOR_ROOMS;
     const offset = room.outside ? outsideStart + outside : insideStart + inside;
     room.nameKey = pool[offset % pool.length];
-    room.color = ROOM_TINTS[index % ROOM_TINTS.length];
+    room.color = MURDOKU_ROOM_TINTS[index % MURDOKU_ROOM_TINTS.length];
     if (room.outside) {
       outside += 1;
     } else {
@@ -206,6 +307,13 @@ function buildCase(spec: MurdokuCaseSpec, caseIndex: number): GeneratedMurdokuCa
   localizePeople(level, spec, caseIndex);
   pruneObjects(level);
 
+  const clueProblems = murdokuV1ClueProblems(level);
+  if (clueProblems.length > 0) {
+    throw new Error(
+      `${spec.id} gebruikt aanwijzingen die v1 niet toestaat:\n  ${clueProblems.join("\n  ")}`,
+    );
+  }
+
   const check = checkMurdokuLevel(level, { forwardOnly: true });
   if (!check.unique || !check.solvable || !check.solution) {
     throw new Error(
@@ -220,7 +328,7 @@ function buildCase(spec: MurdokuCaseSpec, caseIndex: number): GeneratedMurdokuCa
     if (cell === undefined) throw new Error(`${spec.id} mist een oplossing voor ${suspect.id}`);
     solution[suspect.id] = cell;
   }
-  const victimCell = actual.get("victim");
+  const victimCell = actual.get(VICTIM_ID);
   if (victimCell === undefined) throw new Error(`${spec.id} mist het vakje van het slachtoffer`);
   solution.victim = victimCell;
 
@@ -329,6 +437,11 @@ export async function checkMurdokuLevelsFile(file = MURDOKU_LEVELS_FILE): Promis
       `de zaken zijn niet te laden: ${error instanceof Error ? error.message : String(error)}`,
     ];
   }
+
+  const clueProblems = actual.cases.flatMap((entry) =>
+    murdokuV1ClueProblems(entry.level).map((problem) => `${entry.id}: ${problem}`),
+  );
+  if (clueProblems.length > 0) return clueProblems;
 
   return compareCases(expected, actual);
 }

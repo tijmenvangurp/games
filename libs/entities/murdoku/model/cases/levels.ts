@@ -23,7 +23,7 @@ function murdokuClueDensity(entry: MurdokuCase): number {
  * bordgrootte, daarna de aanwijzingsdichtheid. Bij een gelijke dichtheid houdt
  * de zaak zijn plaats in de vaste lijst, zodat de volgorde deterministisch is.
  */
-export const MURDOKU_LEVELS: readonly MurdokuCase[] = [...MURDOKU_CASES]
+export const MURDOKU_LADDER: readonly MurdokuCase[] = [...MURDOKU_CASES]
   .map((entry, index) => ({ entry, index }))
   .sort((left, right) => {
     const leftCells = left.entry.level.size.width * left.entry.level.size.height;

@@ -10,7 +10,12 @@ import {
   validateMurdokuCases,
   type MurdokuCase,
 } from "@entities/murdoku";
-import { MURDOKU_LEVELS_FILE, checkMurdokuLevelsFile } from "../../scripts/lib/murdoku-levels";
+import {
+  MURDOKU_LEVELS_FILE,
+  checkMurdokuLevelsFile,
+  murdokuV1ClueProblems,
+} from "../../scripts/lib/murdoku-levels";
+import { MURDOKU_INTRO_LEVEL, MURDOKU_INTRO_SOLUTION } from "@features/murdoku-game";
 import { MURDOKU_FIXTURE, MURDOKU_SOLUTION } from "./murdoku-fixtures";
 
 function goodCase(overrides: Partial<MurdokuCase> = {}): MurdokuCase {
@@ -74,6 +79,20 @@ describe("murdoku zaken", () => {
   });
 });
 
+describe("de instapzaak van Wie was het?", () => {
+  it("is uniek, vooruit oplosbaar en heeft één dader", () => {
+    const intro: MurdokuCase = {
+      id: MURDOKU_INTRO_LEVEL.id,
+      title: MURDOKU_INTRO_LEVEL.title ?? "",
+      intro: "De taart is weg. Zoek uit wie er als enige bij Vera was.",
+      level: MURDOKU_INTRO_LEVEL,
+      solution: Object.fromEntries(MURDOKU_INTRO_SOLUTION),
+    };
+
+    expect(validateMurdokuCases([intro])).toEqual([]);
+  });
+});
+
 describe("de twaalf eigen zaken van Wie was het?", () => {
   it("bevat twaalf unieke zaken van 4×4, 5×5 en 6×6", () => {
     expect(MURDOKU_CASES).toHaveLength(12);
@@ -103,6 +122,40 @@ describe("de twaalf eigen zaken van Wie was het?", () => {
         expect(room.nameKey).toMatch(/^room\.[a-z]+$/);
       }
     }
+  });
+});
+
+describe("de v1-allowlist van de aanwijzingen", () => {
+  it("keurt de aanwijzingen van het gecommitte zakenbestand goed", async () => {
+    const raw = JSON.parse(await readFile(MURDOKU_LEVELS_FILE, "utf8")) as {
+      cases: { id: string; level: Parameters<typeof murdokuV1ClueProblems>[0] }[];
+    };
+
+    for (const entry of raw.cases) {
+      expect(murdokuV1ClueProblems(entry.level), entry.id).toEqual([]);
+    }
+  });
+
+  it("wijst geslachts-, baard- en brilaanwijzingen en diagonalen af", () => {
+    const level = {
+      suspects: [
+        {
+          id: "A",
+          name: "Anna",
+          clues: [
+            { type: "roomAttribute", quantifier: "none", attribute: "gender", value: "m" },
+            { type: "directionFromAttr", attribute: "bald", value: true, dir: "northwest" },
+            { type: "direction", of: "B", dir: "southeast" },
+          ],
+        },
+      ],
+    } as Parameters<typeof murdokuV1ClueProblems>[0];
+
+    const problems = murdokuV1ClueProblems(level);
+
+    expect(problems.join("\n")).toMatch(/roomAttribute/);
+    expect(problems.join("\n")).toMatch(/directionFromAttr/);
+    expect(problems.join("\n")).toMatch(/diagonaal southeast/);
   });
 });
 

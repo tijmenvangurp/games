@@ -29,19 +29,19 @@ export interface MurdokuHint {
   placeCell: Cell | null;
   technique: Technique;
   /** De rij of kolom die de engine bij deze stap noemt, voor het oplichten. */
-  line: MurdokuHintLine | null;
+  line: MurdokuLine | null;
   /** De kamer die de engine bij deze stap noemt, voor het oplichten. */
   roomId: string | null;
 }
 
 /** Een rij of kolom op het bord, 0-geïndexeerd. */
-interface MurdokuHintLine {
+export interface MurdokuLine {
   axis: "row" | "col";
   index: number;
 }
 
 /** Leest de rij, kolom en kamer uit de parameters van een engine-stap. */
-function lineOf(step: DeductionStep): MurdokuHintLine | null {
+function lineOf(step: DeductionStep): MurdokuLine | null {
   const params = step.explanation.params ?? {};
   const key = step.explanation.key;
   const rowNum = params.rowNum ?? (key.endsWith("forcedCellRow") ? params.line : undefined);
