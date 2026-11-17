@@ -62,6 +62,11 @@ const LEVEL_IDS = [
   "ketting-naar-tandwiel",
   "de-hijskraan",
   "de-verdeelbox",
+  "tegenrichting",
+  "de-keerkoppeling",
+  "de-wenteltrap",
+  "de-drievoudige",
+  "de-productielijn",
 ] as const;
 
 const INTRODUCES = [
@@ -85,20 +90,25 @@ const INTRODUCES = [
   "chain-mesh",
   "factory",
   "mixed-split",
+  "opposite-directions",
+  "mesh-and-chain",
+  "diagonal-train",
+  "three-outputs",
+  "finale",
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
 
 describe("gear levels: catalogue", () => {
-  it("holds twenty levels in the brief's order", () => {
+  it("holds twenty-five levels in the brief's order", () => {
     const levels = allLevels();
 
-    expect(LEVEL_COUNT).toBe(20);
-    expect(levels).toHaveLength(20);
+    expect(LEVEL_COUNT).toBe(25);
+    expect(levels).toHaveLength(25);
     expect(levels.map((level) => level.id)).toEqual([...LEVEL_IDS]);
     expect(levels.map((level) => level.introduces)).toEqual([...INTRODUCES]);
     expect(levels.map((level) => level.chapter)).toEqual([
-      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5,
+      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6,
     ]);
     levels.forEach((level, index) => {
       expect(levelAt(index)).toBe(level);
@@ -322,6 +332,71 @@ describe("gear levels: chapter 5", () => {
     expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
     expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
     expect(result.outputs[1]?.speed).toBeCloseTo(0.5, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+});
+
+describe("gear levels: chapter 6", () => {
+  it("draait level 21 twee grote doelen tegen elkaar in", () => {
+    const level = levelAt(20);
+    const result = drive(level, level.solution);
+
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
+    expect(result.outputs.map((output) => output.direction)).toEqual([1, -1]);
+    for (const output of result.outputs) {
+      expect(Math.abs(output.speed)).toBeCloseTo(0.5, 6);
+    }
+    expect(evaluate(level, level.solution)).toBe("solved");
+    // Een open ketting naar rechts geeft de verkeerde richting.
+    expect(
+      evaluate(level, [link("open-belt", [4, 2], [9, 2]), link("open-belt", [4, 2], [0, 2])]),
+    ).toBe("playing");
+  });
+
+  it("keert en vertraagt level 22 met een tandwiel en een ketting", () => {
+    const level = levelAt(21);
+
+    expect(level.solution).toEqual([gear(2, 2, 1), link("chain", [2, 2], [6, 2])]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: -1 });
+    expect(outputAt(level).speed).toBeCloseTo(-0.5, 6);
+    // Zonder keerwiel geeft de ketting de verkeerde richting.
+    expect(evaluate(level, [link("chain", [0, 2], [6, 2])])).toBe("playing");
+  });
+
+  it("vindt de diagonale tandwielroute in level 23", () => {
+    const level = levelAt(22);
+
+    expect(level.solution).toEqual([gear(3, 0, 2), gear(7, 3, 3)]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: -1 });
+    expect(outputAt(level).speed).toBeCloseTo(-0.5, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("bedient level 24 met drie kettingen", () => {
+    const level = levelAt(23);
+    const result = drive(level, level.solution);
+
+    expect(level.outputs.map((output) => output.kind)).toEqual(["generator", "lift", "target"]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true, true]);
+    expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
+    expect(result.outputs[1]?.speed).toBeCloseTo(0.5, 6);
+    expect(result.outputs[2]?.direction).toBe(-1);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("bouwt level 25 met een ketting, een gekruiste ketting en een tandwiel", () => {
+    const level = levelAt(24);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([
+      link("chain", [4, 5], [0, 5]),
+      link("crossed-belt", [4, 5], [1, 0]),
+      gear(6, 5, 1),
+    ]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true, true]);
+    expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
+    expect(result.outputs[1]?.direction).toBe(-1);
+    expect(result.outputs[2]?.speed).toBeCloseTo(1 / 3, 6);
     expect(evaluate(level, level.solution)).toBe("solved");
   });
 });

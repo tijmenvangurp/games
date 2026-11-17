@@ -224,6 +224,26 @@ of een tandwiel is. Dit supersedeert alle wormas-addenda hierboven.
   splitsen en de beperkte voorraad. De catalogus heeft nu 20 levels in vijf
   hoofdstukken.
 
+## Addendum 2026-11-17: vijf extra levels in hoofdstuk 6
+
+De catalogus groeit naar 25 levels in zes hoofdstukken. Hoofdstuk 6,
+"De fabriek", bundelt de moeilijkste combinaties:
+
+- **21 Tegenrichting.** Twee grote doelen, één open en één gekruiste ketting,
+  allebei op 0,5× maar tegen elkaar in.
+- **22 De keerkoppeling.** Eerst een tandwiel om de richting te keren, dan een
+  ketting om te vertragen; een rechte ketting geeft de verkeerde richting.
+- **23 De wenteltrap.** Een diagonale tandwielroute met een middelgroot en een
+  groot tandwiel; de rechte rij is niet de oplossing.
+- **24 De drievoudige.** Drie uitgangen aan drie kettingen vanaf één motor;
+  één doel moet de andere kant op.
+- **25 De productielijn.** Een snelle lamp, een trage lift en een doel dat
+  andersom draait, met een tandwiel en twee kettingen.
+
+De banden zijn smaller (0,45–0,55) en elk level heeft meer dan één stap nodig.
+De vaste instinkers uit eerdere hoofdstukken blijven: ze passen, maar draaien
+de verkeerde kant op of halen de band niet.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)

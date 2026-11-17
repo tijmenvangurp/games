@@ -6,6 +6,7 @@ const CHAPTER_NAMES: Record<number, string> = {
   3: "Snelheid",
   4: "Kracht",
   5: "Machines",
+  6: "De fabriek",
 };
 
 export function chapterName(chapter: number): string {

@@ -137,6 +137,33 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.locator('[data-gear-key="output:lift-1"]').click();
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+  });
+
+  test("bouwt level 25 met een ketting, een gekruiste ketting en een tandwiel", async ({
+    page,
+  }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 25, current: 24 }, version: 1 }),
+      );
+    });
+    await page.reload();
+
+    await page.locator('[data-tray-id="ketting-1"]').click();
+    await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:generator-1"]').click();
+
+    await page.locator('[data-tray-id="riem-1"]').click();
+    await page.locator('[data-gear-key="motor"]').click();
+    await page.locator('[data-gear-key="output:target-1"]').click();
+
+    await page.locator('[data-tray-id="tandwiel-1"]').click();
+    await page.locator('[data-hole-id="6,5"]').click();
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByText("Alle levels gehaald!")).toBeVisible();
   });
 
