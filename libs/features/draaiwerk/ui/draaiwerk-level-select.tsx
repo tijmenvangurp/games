@@ -45,7 +45,7 @@ export function DraaiwerkLevelSelect({
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
       <p className="px-1 text-xs leading-snug text-muted-foreground sm:text-sm">
-        Elk level voegt één onderdeel toe. Kies een level en bouw de beweging van de motor naar het
+        Elk level voegt iets nieuws toe. Kies een level en bouw de beweging van de motor naar het
         doel.
       </p>
 
