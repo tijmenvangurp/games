@@ -1,4 +1,4 @@
-# ADR 0031: Draaiwerk als deterministische tandwielpuzzel
+# ADR 0032: Draaiwerk als deterministische tandwielpuzzel
 
 - **Status:** Accepted
 - **Datum:** 2026-11-14

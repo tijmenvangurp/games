@@ -1,0 +1,23 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "pages-murdoku",
+  "projectType": "library",
+  "sourceRoot": "libs/pages/murdoku",
+  "tags": ["layer:pages", "scope:murdoku", "type:page"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/pages/murdoku"
+      }
+    }
+  },
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-murdoku-game",
+    "entities-murdoku",
+    "shared-ui"
+  ]
+}

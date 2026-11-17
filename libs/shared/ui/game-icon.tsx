@@ -9,6 +9,7 @@ import {
   GearSix,
   CirclesFour,
   Flag,
+  Fingerprint,
   Flask,
   Keyboard,
   MagnifyingGlass,
@@ -40,6 +41,7 @@ const GAME_ICONS = {
   "four-in-a-row": CirclesFour,
   ganzenbord: Bird,
   typepret: Keyboard,
+  murdoku: Fingerprint,
 } satisfies Record<string, Icon>;
 
 type GameIconName = keyof typeof GAME_ICONS;

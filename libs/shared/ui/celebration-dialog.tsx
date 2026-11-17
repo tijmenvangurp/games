@@ -71,11 +71,11 @@ export function CelebrationDialog({
             <Sparkles aria-hidden="true" className="size-5" />
             {againLabel}
           </Button>
-          <Button className="w-full" variant="outline" onClick={onChoose}>
+          <Button className="min-h-11 w-full" variant="outline" onClick={onChoose}>
             <LayoutGrid aria-hidden="true" className="size-4" />
             {chooseLabel}
           </Button>
-          <Button className="w-full" variant="ghost" onClick={onHome}>
+          <Button className="min-h-11 w-full" variant="ghost" onClick={onHome}>
             {homeLabel}
           </Button>
         </div>

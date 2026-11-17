@@ -1,4 +1,5 @@
 export { Button } from "./button";
+export { ChoiceCard } from "./choice-card";
 export { CelebrationDialog } from "./celebration-dialog";
 export { ChessBoard } from "./chess-board";
 export { Confetti } from "./confetti";
@@ -12,22 +13,31 @@ export { SpeechButton } from "./speech-button";
 export { SpeechToggle } from "./speech-toggle";
 export { SpokenText } from "./spoken-text";
 export {
+  AppWindow,
+  Armchair,
   ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
+  BedDouble,
   BookOpen,
   Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleQuestionMark,
   Copy,
+  DoorOpen,
   Ear,
   Eraser,
   Eye,
   Flame,
   Flag,
+  Grid2x2,
   Home,
   LayoutGrid,
   Lightbulb,
   Lock,
+  Package,
   Play,
   Plus,
   Puzzle,
@@ -35,9 +45,13 @@ export {
   Save,
   Search,
   Sparkles,
+  Square,
+  Sprout,
   Star,
+  Table2,
   TrainFront,
   Trophy,
+  Tv,
   Undo2,
   Volume2,
   X,

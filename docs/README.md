@@ -8,6 +8,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `../CONTRIBUTING.md` — setup, branch/PR-flow, commit-scopes en definition of done.
 - `../AGENTS.md` — de harde regels en werkwijze voor mens en agent.
 - `../GLOSSARY.md` — de domeintaal van Spellen.
+- `../VENDORED.md` — de 1:1 overgenomen MIT-code: bron, commit, licentie, lokale patches en updateprocedure.
 - `tooling.md` — Nx-daemon, cache, Fallow, TTS, Varlock en de bijbehorende permission-regels.
 - `design-system.md` — de visuele basis, gedeelde componenten en spraak.
 - `agents/issue-tracker.md` — GitHub Issues via `gh`.
@@ -16,7 +17,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 
 ## Beslissingen
 
-- `adr/README.md` — de volledige, genummerde ADR-index (0001–0030).
+- `adr/README.md` — de volledige, genummerde ADR-index (0001–0031).
 - `adr/template.md` — het template voor een nieuwe ADR.
 - `adr/0001-publieke-statische-spellen-app.md` — waarom een aparte publieke, statische repository.
 - `adr/0002-kwaliteitsgate.md` — dezelfde kwaliteitscontroles als `homelab-control`, inclusief de afwijking rond pnpm `minimumReleaseAge`.
@@ -48,7 +49,8 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0028-ganzenbord.md` — de klassieke regels, de pure beurtengine, de hergebruikte publiek-domeinkaart en de keuze voor 2,5D in plaats van Three.js.
 - `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
 - `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
-- `adr/0031-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, zestien levels met een nieuw ingrediënt en de landscape-tabletlayout.
+- `adr/0031-vendored-murdoku-engine.md` — de 1:1 MIT-overname, het formatter- en lintbeleid, de coverage- en Fallow-grens en de onderhoudsafspraak.
+- `adr/0032-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, 25 levels in zes hoofdstukken en de landscape-tabletlayout.
 
 ## Onderzoek
 

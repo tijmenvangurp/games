@@ -4,7 +4,7 @@
 - **Status:** Voorstel. De huidige implementatie op `feat/draaiwerk` is gelezen; er is nog niets aan de app veranderd.
 - **Aanleiding:** Op het bord leest de "open riem" als een kapsule met een streeplijn erin. De wielen draaien, maar de band lijkt daar los van te staan. Bij het slepen verplaatst een icoontje uit de bak zich, niet de band zelf. De vraag: welke libraries of SVG-animaties maken hier een echte riem of ketting van?
 - **Vraag:** Hoe laten we de band en de ketting fysisch kloppend bewegen, en hoe voelt het plaatsen als het opspannen van een echte band in plaats van het neerzetten van een token?
-- **Kader:** [AGENTS.md](../../AGENTS.md) (bibliotheken eerst, geen backend, geen externe requests), de [CSP](../../apps/games/public/_headers), het [design system](../design-system.md), [ADR 0031](../adr/0031-draaiwerk.md) en de [researchnotitie van 2026-11-14](2026-11-14-draaiwerk.md).
+- **Kader:** [AGENTS.md](../../AGENTS.md) (bibliotheken eerst, geen backend, geen externe requests), de [CSP](../../apps/games/public/_headers), het [design system](../design-system.md), [ADR 0032](../adr/0032-draaiwerk.md) en de [researchnotitie van 2026-11-14](2026-11-14-draaiwerk.md).
 
 ## Kort advies
 
@@ -47,7 +47,7 @@ De ketting deelt het tekenpad met de riem. Er is geen onderscheid in vorm, laag,
 
 ### De interactie
 
-De route is: kies "Open riem" in de bak, tik op wiel A, de band hangt als cirkel om A, tik op wiel B, de verbinding verschijnt. Dat is bewust twee stappen (ADR 0031, addendum). Maar tussen stap 2 en 3 gebeurt visueel niets:
+De route is: kies "Open riem" in de bak, tik op wiel A, de band hangt als cirkel om A, tik op wiel B, de verbinding verschijnt. Dat is bewust twee stappen (ADR 0032, addendum). Maar tussen stap 2 en 3 gebeurt visueel niets:
 
 - De drag-overlay is een klein icoon uit de bak, geen band in bordcoördinaten.
 - De losse band is een cirkel plus een kwart-commandostreep; er is geen zwaartekracht, geen doorhang, geen beweging als de vinger verschuift.
@@ -414,5 +414,5 @@ De riem is uit het spel verdwenen. Open en gekruiste verbindingen worden nu als 
 - [npm: gsap](https://www.npmjs.com/package/gsap) — 3.15.1, "no charge"-licentie.
 - [Crazy Gears](https://apps.apple.com/us/app/crazy-gears/id967327312) — commerciële referentie voor kettingen en katrollen.
 - [Sprocketry op gameeduhub](https://gameeduhub.com/sprocketry.html) — commerciële referentie voor het pegboard; de webversie heeft alleen tandwielen.
-- [ADR 0031: Draaiwerk](../adr/0031-draaiwerk.md)
+- [ADR 0032: Draaiwerk](../adr/0032-draaiwerk.md)
 - [Research: Draaiwerk, 2026-11-14](2026-11-14-draaiwerk.md)

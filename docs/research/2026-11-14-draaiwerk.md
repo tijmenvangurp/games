@@ -26,7 +26,7 @@ De motor van de puzzel is één graaf met zeven verbindingstypes:
 
 De tandwielvorm komt uit een MIT-referentie met echte involute tanden ([`mechanism-lab`](https://github.com/jacobplee/mechanism-lab)); we porten daar ongeveer 120 regels van naar TypeScript. De rest van de onderdelen is eenvoudige SVG of een Phosphor-icoon. Er is **geen nieuwe runtime-dependency nodig**.
 
-Voeg bij implementatie een ADR toe, bijvoorbeeld `0031-draaiwerk.md`, omdat het deterministische model, de as-varianten, de riem/ketting-verbindingen en de snelheidsdoelen architectuurkeuzes zijn.
+Voeg bij implementatie een ADR toe, bijvoorbeeld `0032-draaiwerk.md`, omdat het deterministische model, de as-varianten, de riem/ketting-verbindingen en de snelheidsdoelen architectuurkeuzes zijn.
 
 ## Spelconcept
 
@@ -558,7 +558,7 @@ een bewuste wijziging ten opzichte van de oorspronkelijke scope hierboven:
 
 De deterministische graaf, de involute-tandwielen, de lokale opslag en de
 CSP blijven ongewijzigd. Zie het addendum in
-[ADR 0031](../adr/0031-draaiwerk.md).
+[ADR 0032](../adr/0032-draaiwerk.md).
 
 ## Update 2026-11-16: wormas ligt horizontaal op twee gelijke wielen
 
@@ -597,7 +597,7 @@ samen verbindt. Daarvoor is de mechanica opnieuw bekeken:
 De vaste 0,5×/0,25×-ratio's en het eenrichtingsverkeer zijn terug. Level 10 en
 11 gebruiken twee even grote wielen; level 12 en 13 houden de ketting als
 1×-oplossing en de wormas als te langzame instinker. Zie het addendum in
-[ADR 0031](../adr/0031-draaiwerk.md).
+[ADR 0032](../adr/0032-draaiwerk.md).
 
 ## Bronnen
 
