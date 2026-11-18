@@ -30,6 +30,9 @@
   "duplicates": {
     "ignore": [
       "scripts/generate-sounds.ts",
+      "libs/entities/gear/model/levels/**",
+      "libs/features/draaiwerk/model/storage.ts",
+      "libs/features/arrow-game/model/storage.ts",
       "libs/entities/murdoku/model/engine/**",
       "libs/features/murdoku-game/lib/vendored/**"
     ]
@@ -70,6 +73,30 @@
         "maxCognitive": 26,
         "maxCrap": 120,
         "reason": "Dev-only audiogeneratoren en de catalogusscanner; de uitvoer wordt bewaakt door pnpm run audio:check en tests/node/speech-audio.test.ts."
+      },
+      {
+        "files": ["libs/entities/gear/**"],
+        "maxCyclomatic": 50,
+        "maxCognitive": 67,
+        "maxCrap": 80,
+        "maxUnitSize": 170,
+        "reason": "Pure Draaiwerk-puzzelregels: validateLevel controleert de volledige leveldata in één functie en drive/buildEdges bouwen de graaf. Gedekt door tests/node/gear-*.test.ts (95% coverage)."
+      },
+      {
+        "files": ["libs/features/draaiwerk/**", "libs/pages/draaiwerk/**"],
+        "maxCyclomatic": 20,
+        "maxCognitive": 45,
+        "maxCrap": 400,
+        "maxUnitSize": 350,
+        "reason": "React/SVG-schermen en het interactiemodel van Draaiwerk; de CRAP-schatting telt JSX- en event-takken mee. Gedekt door tests/web/draaiwerk.test.tsx en e2e/draaiwerk.spec.ts."
+      },
+      {
+        "files": ["tests/web/draaiwerk.test.tsx", "tests/node/gear-rules.test.ts"],
+        "maxCyclomatic": 20,
+        "maxCognitive": 25,
+        "maxCrap": 400,
+        "maxUnitSize": 260,
+        "reason": "Beschrijvende Draaiwerk-testsuites; de tests zijn lineair en lezen als een scenario."
       },
       {
         "files": ["libs/entities/murdoku/model/engine/**"],

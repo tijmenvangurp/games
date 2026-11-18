@@ -50,6 +50,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
 - `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
 - `adr/0031-vendored-murdoku-engine.md` — de 1:1 MIT-overname, het formatter- en lintbeleid, de coverage- en Fallow-grens en de onderhoudsafspraak.
+- `adr/0032-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, 25 levels in zes hoofdstukken en de landscape-tabletlayout.
 
 ## Onderzoek
 
@@ -67,6 +68,8 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `research/2026-10-21-mengelmoes-audio-en-sfeer.md` — audio, sfeer en feedback voor Mengelmoes.
 - `research/2026-11-05-ganzenbord-libraries.md` — bibliotheken en bronnen voor Ganzenbord: dobbelsteen-componenten, spellogica, bordopbouw, iconen, historische borden en de regelvarianten.
 - `research/2026-11-07-typepret-libraries.md` — welke library Typepret kan gebruiken: react-simple-keyboard voor het toetsenbord, en waarom er voor de typelogica geen bruikbare library is.
+- `research/2026-11-14-draaiwerk.md` — Draaiwerk: onderzoek naar 24 levels met elk een nieuw ingrediënt, liggende en compacte as, riem, ketting, rupsband, tandheugel, generator en lift, met echte involute tandwielen uit een MIT-generator. De eerste release bouwt de eerste 16 levels.
+- `research/2026-11-15-draaiwerk-riem-en-ketting.md` — waarom de riem en ketting in Draaiwerk nog niet als materiaal lezen, wat Beltz en mechanism-lab daar al aan oplossen, en welke SVG-animatie of library daarna nodig is.
 - `research/2026-11-15-murdoku.md` — regels, aanwijzingensemantiek, een MIT-engine en procedurele art, spritebronnen en een afgebakende eerste versie voor een Murdoku-achtig logicamysterie.
 - `research/verrijkingsmaterialen/README.md` — de SLO-leermiddelenlijst (hoog)begaafden uit 2011, per leerjaar geëxtraheerd, met aanknopingspunten voor de spellen.
 - `research/verrijkingsmaterialen/bronnen.md` — herkomst van de SLO-PDF en een index van de 70 unieke bron-URL's.

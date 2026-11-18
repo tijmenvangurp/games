@@ -621,3 +621,181 @@
     font-size: 1.4rem;
   }
 }
+
+@layer games {
+  /*
+   * Draaiwerk: rustige pegboard-kaart. De rotor draait om zijn eigen midden;
+   * de buitenste groep houdt de tandstand vast, zodat de tanden blijven passen.
+   */
+  .draaiwerk-rotor {
+    animation: draaiwerk-spin 6s linear infinite;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .draaiwerk-rotor[data-direction="-1"] {
+    animation-direction: reverse;
+  }
+
+  .draaiwerk-rotor[data-spin="off"] {
+    animation: none;
+  }
+
+  .draaiwerk-gear {
+    pointer-events: none;
+  }
+
+  .draaiwerk-gear-hit {
+    cursor: pointer;
+  }
+
+  .draaiwerk-gear-hit:focus-visible {
+    outline: none;
+    stroke: var(--primary);
+    stroke-width: 2;
+  }
+
+  .draaiwerk-gear-shadow {
+    filter: drop-shadow(0 1.5px 1px rgb(43 37 28 / 0.16));
+  }
+
+  .draaiwerk-drag-token {
+    filter: drop-shadow(0 12px 16px rgb(43 37 28 / 0.28));
+    pointer-events: none;
+    transform: scale(1.5);
+    transform-origin: center;
+  }
+
+  .draaiwerk-drag-token[data-lift="true"] {
+    transform: translateY(-56px) scale(1.5);
+  }
+
+  .draaiwerk-placed-handle {
+    cursor: grab;
+  }
+
+  .draaiwerk-placed-handle:active {
+    cursor: grabbing;
+  }
+
+  .draaiwerk-loose-handle {
+    cursor: grab;
+  }
+
+  .draaiwerk-loose-handle:active {
+    cursor: grabbing;
+  }
+
+  .draaiwerk-direction {
+    display: none;
+  }
+
+  .draaiwerk-hole {
+    cursor: pointer;
+  }
+
+  .draaiwerk-hole:focus,
+  .draaiwerk-gear-hit:focus {
+    outline: none;
+  }
+
+  .draaiwerk-hole:focus-visible {
+    outline: none;
+  }
+
+  .draaiwerk-hole:focus-visible .draaiwerk-focus-ring {
+    opacity: 1;
+  }
+
+  .draaiwerk-focus-ring {
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  .draaiwerk-hint {
+    animation: draaiwerk-pulse 1600ms ease-in-out infinite;
+  }
+
+  /*
+   * De onderdelenbank is hetzelfde puntengrid als het bord: geen kaartjes per
+   * onderdeel, maar losse onderdelen die op de stippen klaarstaan.
+   */
+  .draaiwerk-tray-field {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklab, var(--border) 60%, transparent) 1px,
+      transparent 1.3px
+    );
+    background-position: 5px 5px;
+    background-size: 14px 14px;
+  }
+
+  /*
+   * Een riem is twee rechte banden. De groef is een dash van 5 + 11 = 16
+   * board-eenheden; de keyframe reist precies die periodelengte, anders
+   * springt het loopvlak bij elke herhaling.
+   */
+  .draaiwerk-chain {
+    pointer-events: none;
+  }
+
+  .draaiwerk-lamp-glow {
+    animation: draaiwerk-glow 2200ms ease-in-out infinite;
+  }
+
+  .draaiwerk-lift-platform {
+    transition: transform 500ms ease;
+  }
+
+  @keyframes draaiwerk-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes draaiwerk-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes draaiwerk-glow {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+@layer motion {
+  @media (prefers-reduced-motion: reduce) {
+    .draaiwerk-rotor {
+      animation: none;
+    }
+
+    .draaiwerk-hint {
+      animation: none;
+      opacity: 1;
+    }
+
+    .draaiwerk-lamp-glow {
+      animation: none;
+      opacity: 1;
+    }
+
+    .draaiwerk-lift-platform {
+      transition: none;
+    }
+
+    .draaiwerk-direction {
+      display: inline;
+    }
+  }
+}
