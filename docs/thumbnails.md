@@ -150,6 +150,17 @@ De veldkleuren komen overeen met `chessBoardOptions` in `libs/shared/lib/chess-b
 > finger-zones (coral, apricot, sage, sky, lavender), and two keys (F and J) subtly highlighted in
 > craftsman indigo with tiny glowing sparks rising above them. No UI chrome.
 
+### Geheime Code (`geheime-code`)
+
+> A charming cut-paper secret-code game on a warm ivory tabletop: a slightly tilted cream paper code
+> card with a neat 2×5 grid of rounded paper tiles. Each tile holds one simple cut-paper pictogram —
+> star, heart, key, boat, gift, book, carrot, bag, bell, moon — with a single plain standard Latin
+> lowercase letter beneath it in deep warm ink. Below the card, a paper strip with four larger
+> pictogram tiles (key, star, bell, moon) and four empty cream letter squares. A small indigo paper
+> magnifying glass, a terracotta pencil, and a loop of indigo string rest beside the card, with a few
+> tiny ochre paper stars. Only single letters as part of the code: no words, no sentences, no title,
+> no UI chrome, no frame.
+
 ### Wie was het? (`wie-was-het`)
 
 > A cozy top-down architectural floorplan of four pastel-tinted dollhouse rooms (sand kitchen, mint

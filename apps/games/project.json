@@ -79,6 +79,7 @@
     "pages-letter",
     "pages-alchemy",
     "pages-draaiwerk",
+    "pages-geheime-code",
     "widgets-game-menu",
     "widgets-game-shell",
     "features-sudoku-game",
@@ -97,6 +98,7 @@
     "features-letter-game",
     "features-alchemy-lab",
     "features-draaiwerk",
+    "features-geheime-code",
     "entities-chess",
     "entities-game",
     "entities-french",
@@ -111,6 +113,7 @@
     "entities-letter",
     "entities-alchemy",
     "entities-gear",
+    "entities-geheime-code",
     "shared-lib",
     "shared-ui"
   ]

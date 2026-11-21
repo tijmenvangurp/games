@@ -817,3 +817,49 @@
     }
   }
 }
+
+@layer games {
+  /* De codekaart en de symbolen van Geheime Code. De tint per symbool komt
+     uit de bestaande accent- en pionkleuren; het inline `--code-tint` houdt
+     dezelfde ster in de codekaart en de woordrij dezelfde kleur. */
+  .code-card {
+    border-top: 2px solid color-mix(in oklab, var(--primary) 38%, var(--border));
+  }
+
+  .code-token {
+    border: 1px solid color-mix(in oklab, var(--code-tint, var(--primary)) 16%, var(--border));
+    background: color-mix(in oklab, var(--code-tint, var(--primary)) 10%, var(--card));
+  }
+
+  .code-token.is-hidden {
+    border-style: dashed;
+  }
+
+  .code-token.is-wrong {
+    border-color: var(--warning);
+    background: color-mix(in oklab, var(--warning) 10%, var(--card));
+  }
+
+  .code-shake {
+    animation: code-shake 280ms ease-out;
+  }
+
+  @keyframes code-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-3px);
+    }
+    75% {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-shake {
+      animation: none;
+    }
+  }
+}
