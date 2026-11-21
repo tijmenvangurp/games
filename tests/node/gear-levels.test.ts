@@ -6,6 +6,7 @@ import {
   evaluate,
   LEVEL_COUNT,
   levelAt,
+  trayItemMatches,
   validateLevel,
   type GearSize,
   type Level,
@@ -33,12 +34,181 @@ function link(
   };
 }
 
+type GearPlacement = Extract<Placement, { kind: "gear" }>;
+type LinkPlacement = Extract<Placement, { kind: "open-belt" | "crossed-belt" | "chain" }>;
+
 function outputAt(level: Level, index = 0): OutputPose {
   const output = drive(level, level.solution).outputs[index];
   if (!output) {
     throw new Error(`Level ${level.id} has no output at index ${index}`);
   }
   return output;
+}
+
+function coversTray(level: Level, placements: readonly Placement[]): boolean {
+  const remaining = [...level.tray];
+  for (const placement of placements) {
+    const index = remaining.findIndex((item) => trayItemMatches(item, placement));
+    if (index < 0) {
+      return false;
+    }
+    remaining.splice(index, 1);
+  }
+  return true;
+}
+
+function linkKinds(level: Level): LinkPlacement["kind"][] {
+  const kinds = new Set<LinkPlacement["kind"]>();
+  for (const item of level.tray) {
+    if (item.kind === "chain") {
+      kinds.add("chain");
+    } else if (item.kind === "belt") {
+      kinds.add(item.crossed === true ? "crossed-belt" : "open-belt");
+    }
+  }
+  return [...kinds];
+}
+
+function gearCandidates(level: Level): GearPlacement[] {
+  const sizes = new Set<GearSize>();
+  for (const item of level.tray) {
+    if (item.kind === "gear") {
+      sizes.add(item.size);
+    }
+  }
+  const candidates: GearPlacement[] = [];
+  for (const size of sizes) {
+    for (const hole of level.holes) {
+      candidates.push({ kind: "gear", holeId: hole.id, size });
+    }
+  }
+  return candidates;
+}
+
+function solvedBy(level: Level, placements: Placement[]): boolean {
+  return coversTray(level, placements) && evaluate(level, placements) === "solved";
+}
+
+function linkBetween(kind: LinkPlacement["kind"], from: string, to: string): LinkPlacement {
+  return { kind, fromHoleId: from, toHoleId: to };
+}
+
+function fixedHoles(level: Level): string[] {
+  return [level.motor.holeId, ...level.outputs.map((output) => output.holeId)];
+}
+
+function singlePlacementSolves(
+  level: Level,
+  gears: readonly GearPlacement[],
+  kinds: readonly LinkPlacement["kind"][],
+): boolean {
+  for (const gear of gears) {
+    if (canPlace(level, [], gear) && solvedBy(level, [gear])) {
+      return true;
+    }
+  }
+  const holes = fixedHoles(level);
+  for (const kind of kinds) {
+    for (let first = 0; first < holes.length; first += 1) {
+      for (let second = first + 1; second < holes.length; second += 1) {
+        const link = linkBetween(kind, holes[first] as string, holes[second] as string);
+        if (canPlace(level, [], link) && solvedBy(level, [link])) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function twoGearsSolve(level: Level, gears: readonly GearPlacement[]): boolean {
+  for (let first = 0; first < gears.length; first += 1) {
+    const a = gears[first] as GearPlacement;
+    for (let second = first + 1; second < gears.length; second += 1) {
+      const b = gears[second] as GearPlacement;
+      if (coversTray(level, [a, b]) && canPlace(level, [a], b) && solvedBy(level, [a, b])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function gearPlusLinkSolves(
+  level: Level,
+  gears: readonly GearPlacement[],
+  kinds: readonly LinkPlacement["kind"][],
+): boolean {
+  for (const gear of gears) {
+    if (!canPlace(level, [], gear)) {
+      continue;
+    }
+    const ends: [string, string][] = [
+      [level.motor.holeId, gear.holeId],
+      ...level.outputs.map((output): [string, string] => [gear.holeId, output.holeId]),
+    ];
+    for (const kind of kinds) {
+      for (const [from, to] of ends) {
+        const link = linkBetween(kind, from, to);
+        if (
+          coversTray(level, [gear, link]) &&
+          canPlace(level, [gear], link) &&
+          solvedBy(level, [gear, link])
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function twoLinksSolve(level: Level, kinds: readonly LinkPlacement["kind"][]): boolean {
+  const holes = fixedHoles(level);
+  const links: LinkPlacement[] = [];
+  for (const kind of kinds) {
+    for (let first = 0; first < holes.length; first += 1) {
+      for (let second = first + 1; second < holes.length; second += 1) {
+        links.push(linkBetween(kind, holes[first] as string, holes[second] as string));
+      }
+    }
+  }
+  for (let first = 0; first < links.length; first += 1) {
+    const a = links[first] as LinkPlacement;
+    for (let second = first + 1; second < links.length; second += 1) {
+      const b = links[second] as LinkPlacement;
+      if (coversTray(level, [a, b]) && canPlace(level, [a], b) && solvedBy(level, [a, b])) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Proves that a level cannot be solved with one or two placements: every
+ * topology with at most two parts is tried, from the tray that the level
+ * offers. Three outputs already need three edges, and a gear plus one link can
+ * only attach to the motor, an output or the gear itself.
+ */
+function hasSolutionWithin(level: Level, limit: 1 | 2): boolean {
+  if (evaluate(level, []) === "solved") {
+    return true;
+  }
+
+  const gears = gearCandidates(level);
+  const kinds = linkKinds(level);
+  if (singlePlacementSolves(level, gears, kinds)) {
+    return true;
+  }
+  if (limit === 1) {
+    return false;
+  }
+  return (
+    twoGearsSolve(level, gears) ||
+    gearPlusLinkSolves(level, gears, kinds) ||
+    twoLinksSolve(level, kinds)
+  );
 }
 
 const LEVEL_IDS = [
@@ -67,6 +237,10 @@ const LEVEL_IDS = [
   "de-wenteltrap",
   "de-drievoudige",
   "de-productielijn",
+  "de-lange-trap",
+  "de-boog",
+  "drie-machines",
+  "de-dubbele-trap",
 ] as const;
 
 const INTRODUCES = [
@@ -95,20 +269,24 @@ const INTRODUCES = [
   "diagonal-train",
   "three-outputs",
   "finale",
+  "three-gear-train",
+  "gear-arch",
+  "chain-and-gear-split",
+  "four-gear-split",
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
 
 describe("gear levels: catalogue", () => {
-  it("holds twenty-five levels in the brief's order", () => {
+  it("holds twenty-nine levels in the brief's order", () => {
     const levels = allLevels();
 
-    expect(LEVEL_COUNT).toBe(25);
-    expect(levels).toHaveLength(25);
+    expect(LEVEL_COUNT).toBe(29);
+    expect(levels).toHaveLength(29);
     expect(levels.map((level) => level.id)).toEqual([...LEVEL_IDS]);
     expect(levels.map((level) => level.introduces)).toEqual([...INTRODUCES]);
     expect(levels.map((level) => level.chapter)).toEqual([
-      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6,
+      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7,
     ]);
     levels.forEach((level, index) => {
       expect(levelAt(index)).toBe(level);
@@ -398,5 +576,62 @@ describe("gear levels: chapter 6", () => {
     expect(result.outputs[1]?.direction).toBe(-1);
     expect(result.outputs[2]?.speed).toBeCloseTo(1 / 3, 6);
     expect(evaluate(level, level.solution)).toBe("solved");
+  });
+});
+
+describe("gear levels: chapter 7", () => {
+  it("klimt level 26 met drie tandwielen schuin omhoog", () => {
+    const level = levelAt(25);
+
+    expect(level.solution).toEqual([gear(3, 0, 2), gear(6, 4, 3), gear(9, 8, 2)]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
+    expect(outputAt(level).speed).toBeCloseTo(1, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("laat level 27 in een boog over het geblokkeerde gat gaan", () => {
+    const level = levelAt(26);
+
+    expect(level.solution).toEqual([gear(0, 1, 2), gear(4, 1, 2), gear(8, 1, 2)]);
+    expect(level.blockedHoleIds).toEqual([hole(4, 4)]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
+    expect(outputAt(level).speed).toBeCloseTo(1, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("bouwt level 28 met twee kettingen en een tandwiel", () => {
+    const level = levelAt(27);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([
+      link("chain", [4, 4], [0, 4]),
+      link("chain", [4, 4], [8, 4]),
+      gear(4, 2, 1),
+    ]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true, true]);
+    expect(result.outputs.map((output) => output.direction)).toEqual([1, 1, 1]);
+    expect(result.outputs[2]?.speed).toBeCloseTo(1, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("bouwt level 29 met twee tandwieltreinen", () => {
+    const level = levelAt(28);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([gear(2, 0, 1), gear(5, 0, 2), gear(0, 2, 1), gear(0, 5, 2)]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
+    expect(result.outputs.map((output) => output.direction)).toEqual([-1, -1]);
+    for (const output of result.outputs) {
+      expect(output.speed).toBeCloseTo(-1, 6);
+    }
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("eist voor ieder nieuw level minstens drie plaatsingen", () => {
+    for (const level of allLevels().filter((candidate) => candidate.chapter === 7)) {
+      expect(level.solution.length, level.id).toBeGreaterThanOrEqual(3);
+      expect(evaluate(level, level.solution), level.id).toBe("solved");
+      expect(hasSolutionWithin(level, 2), level.id).toBe(false);
+    }
   });
 });

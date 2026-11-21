@@ -7,6 +7,7 @@ const CHAPTER_NAMES: Record<number, string> = {
   4: "Kracht",
   5: "Machines",
   6: "De fabriek",
+  7: "De tandwielkamer",
 };
 
 export function chapterName(chapter: number): string {
@@ -39,6 +40,10 @@ const NEW_LABELS: Record<string, string> = {
   "diagonal-train": "diagonale route",
   "three-outputs": "drie uitgangen",
   finale: "productielijn",
+  "three-gear-train": "drie tandwielen",
+  "gear-arch": "tandwielboog",
+  "chain-and-gear-split": "kettingen en tandwiel",
+  "four-gear-split": "dubbele tandwieltrein",
 };
 
 export function introducesLabel(introduces: string): string {

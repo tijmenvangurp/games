@@ -164,6 +164,31 @@ test.describe("draaiwerk op een landschapstablet", () => {
     await page.locator('[data-hole-id="6,5"]').click();
 
     await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
+    await expect(page.getByRole("button", { name: "Volgende level" })).toBeVisible();
+  });
+
+  test("bouwt level 29 met vier tandwielen en haalt alle levels", async ({ page }) => {
+    await page.goto("/draaiwerk");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "games.draaiwerk.v1",
+        JSON.stringify({ state: { unlocked: 29, current: 28 }, version: 1 }),
+      );
+    });
+    await page.reload();
+
+    await expect(page.getByRole("heading", { name: /De dubbele trap/ })).toBeVisible();
+
+    await page.locator('[data-tray-id="tandwiel-1"]').click();
+    await page.locator('[data-hole-id="2,0"]').click();
+    await page.locator('[data-tray-id="tandwiel-2"]').click();
+    await page.locator('[data-hole-id="5,0"]').click();
+    await page.locator('[data-tray-id="tandwiel-3"]').click();
+    await page.locator('[data-hole-id="0,2"]').click();
+    await page.locator('[data-tray-id="tandwiel-4"]').click();
+    await page.locator('[data-hole-id="0,5"]').click();
+
+    await expect(page.locator("[data-draaiwerk-board]")).toHaveAttribute("data-status", "solved");
     await expect(page.getByText("Alle levels gehaald!")).toBeVisible();
   });
 

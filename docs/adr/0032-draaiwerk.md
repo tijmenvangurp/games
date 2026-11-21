@@ -244,6 +244,28 @@ De banden zijn smaller (0,45–0,55) en elk level heeft meer dan één stap nodi
 De vaste instinkers uit eerdere hoofdstukken blijven: ze passen, maar draaien
 de verkeerde kant op of halen de band niet.
 
+## Addendum 2026-11-21: vier extra levels in hoofdstuk 7
+
+De catalogus groeit naar 29 levels in zeven hoofdstukken. Hoofdstuk 7,
+"De tandwielkamer", verdiept de tandwieltreinen: elk level heeft minstens
+drie plaatsingen nodig. Drie levels zijn tandwiel-only; level 28 combineert
+twee kettingen met één tandwiel.
+
+- **26 De lange trap.** Drie tandwielen (2, 3 en 2) klimmen diagonaal van de
+  motor naar het doel. Twee wielen halen de afstand niet.
+- **27 De boog.** Het rechte gat in het midden is geblokkeerd; drie middelgrote
+  wielen gaan over de bovenrand. De directe rij is geen oplossing.
+- **28 Drie machines.** Twee kettingen en één tandwiel bedienen drie doelen.
+  Met twee onderdelen blijven er altijd doelen onbediend.
+- **29 De dubbele trap.** Twee doelen, elk met een eigen trein van een klein en
+  een middelgroot tandwiel. Vier plaatsingen, en drie is niet genoeg.
+
+De levels zijn zo ontworpen dat de oplossing niet in één of twee stappen kan:
+de afstand tussen motor en doel is groter dan twee tandwielen kunnen
+overbruggen, of er zijn drie uitgangen die elk een eigen verbinding vragen.
+Een test controleert met een uitputtende zoektocht over één en twee
+plaatsingen dat geen van de nieuwe levels een kortere oplossing heeft.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)

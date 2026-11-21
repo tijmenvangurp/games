@@ -39,7 +39,7 @@ export type Placement =
 export interface Level {
   id: string;
   name: string;
-  chapter: 1 | 2 | 3 | 4 | 5 | 6;
+  chapter: 1 | 2 | 3 | 4 | 5 | 6 | 7;
   introduces: string;
   intro: string;
   cols: number;
