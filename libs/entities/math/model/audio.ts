@@ -27,10 +27,25 @@ const OPERATORS: Record<MathMode, SpeechLine> = {
   deel: line("math-deel", OPERATOR_WORDS.deel),
 };
 
+/**
+ * Bemoedigingen voor een goede som. De reeks schuift per ronde op, zodat een
+ * kind binnen één ronde alle varianten hoort en dezelfde som dezelfde regel
+ * houdt.
+ */
+const PRAISE_LINES: readonly SpeechLine[] = [
+  line("math-correct", "Goed gerekend!"),
+  line("math-praise-knap", "Knap gedaan!"),
+  line("math-praise-top", "Top gedaan!"),
+  line("math-praise-helemaal", "Helemaal goed!"),
+  line("math-praise-slim", "Slim gerekend!"),
+  line("math-praise-goedzo", "Goedzo!"),
+];
+
+export const MATH_PRAISE_LINES = PRAISE_LINES;
+
 export const MATH_LINES = {
   whatIs: line("math-what-is", "Wat is"),
   answerPrefix: line("math-answer-prefix", "Het juiste antwoord is"),
-  correct: line("math-correct", "Goed gerekend!"),
   almost: line("math-almost", "Bijna! Probeer nog één keer."),
   choose: line("math-choose", "Kies het juiste antwoord."),
 } as const;
@@ -47,6 +62,14 @@ export function operatorSpeech(mode: MathMode): SpeechLine {
   return OPERATORS[mode];
 }
 
+/**
+ * De bemoediging voor deze som. De seed en het vraagnummer maken de keuze
+ * stabiel: bij elke render van dezelfde som klinkt en staat dezelfde regel.
+ */
+export function praiseSpeech(seed: number, question: MathQuestion): SpeechLine {
+  return PRAISE_LINES[(seed + question.id) % PRAISE_LINES.length];
+}
+
 /** De gesproken som: “Wat is tien plus vijf?”. */
 export function mathQuestionSpeech(question: MathQuestion): readonly SpeechLine[] {
   return [
@@ -57,13 +80,14 @@ export function mathQuestionSpeech(question: MathQuestion): readonly SpeechLine[
   ];
 }
 
-/** “Goed gerekend!” of “Het juiste antwoord is vijftien.”. */
+/** Een bemoediging, of “Het juiste antwoord is vijftien.”. */
 export function mathFeedbackSpeech(
   question: MathQuestion,
   correct: boolean,
+  seed: number,
 ): readonly SpeechLine[] {
   if (correct) {
-    return [MATH_LINES.correct];
+    return [praiseSpeech(seed, question)];
   }
   return [MATH_LINES.answerPrefix, numberSpeech(question.answer)];
 }
@@ -71,6 +95,11 @@ export function mathFeedbackSpeech(
 export const speechGroups = [
   {
     folder: FOLDER,
-    lines: [...NUMBERS.values(), ...Object.values(OPERATORS), ...Object.values(MATH_LINES)],
+    lines: [
+      ...NUMBERS.values(),
+      ...Object.values(OPERATORS),
+      ...Object.values(MATH_LINES),
+      ...PRAISE_LINES,
+    ],
   },
 ] satisfies readonly SpeechGroup[];

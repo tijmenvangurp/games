@@ -5,7 +5,7 @@ import {
   type FlagQuestion,
   type FlagScope,
 } from "@entities/geography";
-import { cn } from "@shared/lib";
+import { cn, praiseFor } from "@shared/lib";
 import { Button, Check, X } from "@shared/ui";
 import { useFlagStore } from "../model/use-flags-store";
 import { PlaceMap } from "./place-map";
@@ -157,10 +157,12 @@ function FlagFeedback({
   question,
   answered,
   correct,
+  praise,
 }: {
   question: FlagQuestion;
   answered: boolean;
   correct: boolean;
+  praise: string;
 }) {
   if (!answered) {
     return (
@@ -171,7 +173,7 @@ function FlagFeedback({
   }
 
   const message = correct
-    ? "Goed zo!"
+    ? praise
     : question.direction === "vlag-naar-land"
       ? `Het juiste antwoord is ${question.subject.name}.`
       : `De juiste vlag is de vlag van ${question.subject.name}.`;
@@ -198,10 +200,12 @@ function FlagFeedback({
 function QuestionCard({
   question,
   isLast,
+  praise,
   scope,
 }: {
   question: FlagQuestion;
   isLast: boolean;
+  praise: string;
   scope: FlagScope;
 }) {
   const wrongChoices = useFlagStore((state) => state.wrongChoices);
@@ -233,7 +237,7 @@ function QuestionCard({
         </div>
 
         <div className="mt-4 lg:mt-0">
-          <FlagFeedback answered={answered} correct={correct} question={question} />
+          <FlagFeedback answered={answered} correct={correct} praise={praise} question={question} />
 
           {answered ? (
             <Button
@@ -275,6 +279,7 @@ export function FlagsPlay() {
       </header>
       <QuestionCard
         isLast={questionIndex + 1 >= round.questions.length}
+        praise={praiseFor(round.seed, questionIndex)}
         question={question}
         scope={round.scope}
       />

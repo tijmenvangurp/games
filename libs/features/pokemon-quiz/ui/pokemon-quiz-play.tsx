@@ -1,5 +1,5 @@
 import { getPokemon, type Pokemon } from "@entities/pokedex";
-import { playHaptic, playSound } from "@shared/lib";
+import { playHaptic, playSound, praiseFor } from "@shared/lib";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
@@ -82,7 +82,12 @@ export function PokemonQuizPlay() {
         </div>
 
         {answered ? (
-          <QuizFeedback correct={correct} targetName={target.name} onNext={handleNext} />
+          <QuizFeedback
+            correct={correct}
+            praise={praiseFor(question.seed)}
+            targetName={target.name}
+            onNext={handleNext}
+          />
         ) : (
           <p aria-live="polite" className="text-center text-xs text-muted-foreground">
             Kies een naam.

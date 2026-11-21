@@ -5,6 +5,7 @@ import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { getPokemon } from "@entities/pokedex";
 import { DEFAULT_POKEMON_QUIZ_SETTINGS, usePokemonQuizStore } from "@features/pokemon-quiz";
+import { praiseFor } from "@shared/lib";
 
 const STORAGE_KEY = "games.pokemon-quiz.v1";
 
@@ -101,7 +102,7 @@ describe("wie is deze pokémon", () => {
     expect(usePokemonQuizStore.getState().answered).toBe(true);
     expect(usePokemonQuizStore.getState().correctCount).toBe(1);
     expect(usePokemonQuizStore.getState().rounds).toBe(1);
-    expect(screen.getByText("Je vond het!")).toBeTruthy();
+    expect(screen.getByText(praiseFor(currentQuestion().seed))).toBeTruthy();
     expect(screen.getByText(`Het is ${name}.`)).toBeTruthy();
     expect(screen.getByRole("img", { name })).toBeTruthy();
     expect(screen.getByRole("button", { name }).getAttribute("data-answer-state")).toBe("correct");

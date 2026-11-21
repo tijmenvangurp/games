@@ -134,14 +134,15 @@ export function SentenceWordBank({ available, answered, onChoose }: WordBankProp
 interface FeedbackProps {
   item: FrenchItem;
   correct: boolean;
+  praise: string;
   onNext: () => void;
 }
 
-export function SentenceFeedback({ item, correct, onNext }: FeedbackProps) {
+export function SentenceFeedback({ item, correct, praise, onNext }: FeedbackProps) {
   return (
     <div aria-live="polite" className="game-panel space-y-2 p-4">
       <p className={correct ? "font-black text-success" : "font-black text-warning"}>
-        {correct ? "Je vond het!" : "Nog niet."}
+        {correct ? praise : "Nog niet."}
       </p>
       <p className="text-sm text-muted-foreground">
         De zin is: <strong>{item.fr}</strong>

@@ -1,4 +1,5 @@
 import type { FrenchLesson } from "@entities/french";
+import { praiseFor } from "@shared/lib";
 import { useSentenceBuilder } from "../model/use-sentence-builder";
 import {
   SentenceAnswer,
@@ -38,7 +39,12 @@ export function FrenchSentenceBuilder({ lesson }: FrenchSentenceBuilderProps) {
         onChoose={state.choose}
       />
       {state.answered ? (
-        <SentenceFeedback correct={state.correct} item={state.item} onNext={state.next} />
+        <SentenceFeedback
+          correct={state.correct}
+          item={state.item}
+          praise={praiseFor(state.index)}
+          onNext={state.next}
+        />
       ) : (
         <SentenceControls
           disabled={state.selected.length === 0}
