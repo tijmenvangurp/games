@@ -37,6 +37,7 @@ export {
   ChevronRight,
   CircleQuestionMark,
   Copy,
+  Dices,
   DoorOpen,
   Ear,
   Eraser,

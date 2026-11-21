@@ -376,5 +376,8 @@ describe("games app", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Alles" }));
     expect(screen.getByRole("link", { name: /Sudoku/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Verras me!" }));
+    expect(await screen.findByRole("button", { name: "Terug naar het menu" })).toBeTruthy();
   });
 });
