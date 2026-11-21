@@ -1,10 +1,12 @@
 export { levelHint, MATH_LEVEL_INFO, MATH_MODE_INFO } from "./model/config";
 export {
   MATH_LINES,
+  MATH_PRAISE_LINES,
   mathFeedbackSpeech,
   mathQuestionSpeech,
   numberSpeech,
   operatorSpeech,
+  praiseSpeech,
   speechGroups as MATH_SPEECH_GROUPS,
 } from "./model/audio";
 export { createRound, explanationFor, groupingFor } from "./model/generator";

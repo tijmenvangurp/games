@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { frenchAudioSrc, frenchExampleAudioSrc } from "@entities/french";
-import { playSound } from "@shared/lib";
+import { playSound, praiseFor } from "@shared/lib";
 import { useFrenchProgressStore } from "../model/use-french-progress-store";
 import { useFrenchQuizStore } from "../model/use-french-quiz-store";
 import { FrenchAudioPanel } from "./french-audio-panel";
@@ -99,6 +99,7 @@ export function FrenchQuiz() {
         <FrenchFeedback
           correct={correct}
           item={question.item}
+          praise={praiseFor(question.seed, index)}
           onNext={handleNext}
           onPlayExample={() => play(frenchExampleAudioSrc(question.item))}
         />
