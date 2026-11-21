@@ -6,7 +6,7 @@ import {
   type FlagScope,
 } from "@entities/geography";
 import { cn, praiseFor } from "@shared/lib";
-import { AnswerOption, Button, Panel, ScoreHeader, type AnswerState } from "@shared/ui";
+import { AnswerOption, Button, Flag, Panel, ScoreHeader, type AnswerState } from "@shared/ui";
 import { useFlagStore } from "../model/use-flags-store";
 import { PlaceMap } from "./place-map";
 
@@ -87,7 +87,9 @@ function FlagChoices({
     question.direction === "vlag-naar-land"
       ? compact
         ? "grid-cols-2 sm:grid-cols-3"
-        : "grid-cols-1 sm:grid-cols-2"
+        : count === 3
+          ? "grid-cols-1 sm:grid-cols-3"
+          : "grid-cols-1 sm:grid-cols-2"
       : compact
         ? "grid-cols-4 sm:grid-cols-6"
         : count === 3
@@ -135,9 +137,21 @@ function FlagFeedback({
 }) {
   if (!answered) {
     return (
-      <p aria-live="polite" className="text-center text-sm font-semibold text-muted-foreground">
-        Kies het juiste antwoord.
-      </p>
+      <Panel
+        className="flex flex-col items-center justify-center gap-2 text-center lg:min-h-64"
+        padding="lg"
+        surface="subtle"
+      >
+        <span
+          aria-hidden="true"
+          className="grid size-11 place-items-center rounded-full bg-card text-primary shadow-xs"
+        >
+          <Flag className="size-5" />
+        </span>
+        <p aria-live="polite" className="text-sm font-semibold text-muted-foreground">
+          Kies het juiste antwoord.
+        </p>
+      </Panel>
     );
   }
 

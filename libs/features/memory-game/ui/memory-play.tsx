@@ -50,20 +50,32 @@ function ActionButtons({
     <div className="grid grid-cols-3 gap-2">
       <Button
         aria-label="Hint"
-        className={cn("min-h-12", suggestHint && "border-warning ring-2 ring-warning/35")}
+        className={cn(
+          "min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm",
+          suggestHint && "border-warning ring-2 ring-warning/35",
+        )}
         disabled={disabled}
         variant="outline"
         onClick={onHint}
       >
-        <Lightbulb aria-hidden="true" className="size-4 text-warning" />
+        <Lightbulb aria-hidden="true" className="size-4 shrink-0 text-warning" />
         Hint
       </Button>
-      <Button className="min-h-12" disabled={atTopLevel} variant="outline" onClick={onChallenge}>
-        <Sparkles aria-hidden="true" className="size-4 text-warning" />
+      <Button
+        className="min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm"
+        disabled={atTopLevel}
+        variant="outline"
+        onClick={onChallenge}
+      >
+        <Sparkles aria-hidden="true" className="size-4 shrink-0 text-warning" />
         Uitdaging
       </Button>
-      <Button className="min-h-12" variant="outline" onClick={onAgain}>
-        <RotateCcw aria-hidden="true" className="size-4" />
+      <Button
+        className="min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm"
+        variant="outline"
+        onClick={onAgain}
+      >
+        <RotateCcw aria-hidden="true" className="size-4 shrink-0" />
         Opnieuw
       </Button>
     </div>

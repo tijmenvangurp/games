@@ -32,7 +32,7 @@ export function PageHeader({
       <div className="min-w-0 flex-1">
         <h1
           className={cn(
-            "truncate font-display text-2xl font-normal leading-tight tracking-tight",
+            "truncate font-display text-xl font-normal leading-tight tracking-tight sm:text-2xl",
             titleClassName,
           )}
         >

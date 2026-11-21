@@ -47,7 +47,9 @@ export function PlayerCard({ player, color, active, thinking, captured }: Player
       </span>
       <div className="min-w-0">
         <p className="truncate text-sm font-bold leading-tight">{name}</p>
-        <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+        {name.toLowerCase() !== label.toLowerCase() ? (
+          <p className="text-xs font-semibold text-muted-foreground">{label}</p>
+        ) : null}
         {captured.length > 0 ? (
           <p aria-hidden="true" className="truncate text-sm leading-none text-muted-foreground">
             {captured.map((piece) => PIECE_GLYPHS[piece]).join("")}
