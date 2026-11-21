@@ -108,6 +108,51 @@
 }
 
 @layer games {
+  /*
+   * Kaarten van Vlaggenreis. De continent- en puzzelkaart delen één palet:
+   * warmer water, lichte landvlakken met een zichtbare rand en indigo voor de
+   * plek die telt. Zo blijft elk land leesbaar op papier én op een tablet.
+   */
+  .flag-map {
+    border: 1px solid var(--border);
+    border-radius: var(--ds-radius-md);
+    background-color: var(--map-water);
+  }
+
+  .flag-map-land {
+    fill: var(--map-land);
+    stroke: var(--map-land-stroke);
+  }
+
+  .flag-map-highlight {
+    fill: var(--primary);
+    stroke: var(--primary-hover);
+  }
+
+  .flag-map-marker {
+    fill: var(--warning);
+    stroke: var(--foreground);
+  }
+
+  .flag-map-country {
+    fill: var(--map-land);
+    stroke: var(--map-land-stroke);
+  }
+
+  .flag-map-slot {
+    fill: color-mix(in oklab, var(--primary) 16%, var(--map-land));
+    stroke: var(--primary);
+  }
+
+  .flag-map-placed {
+    fill: var(--success);
+    stroke: var(--success-ink);
+  }
+
+  .flag-map-hint {
+    fill: var(--primary);
+  }
+
   .ganzenbord-board {
     border-radius: var(--ds-radius-md);
     box-shadow: 0 12px 30px -22px oklch(0.25 0.024 148 / 0.45);

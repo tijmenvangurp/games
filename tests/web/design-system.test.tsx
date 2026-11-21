@@ -126,6 +126,26 @@ describe("design system primitives", () => {
     expect((screen.getByRole("button", { name: "Uit" }) as HTMLButtonElement).disabled).toBe(true);
   });
 
+  it("renders the indicator as an overlay on answers without a letter badge", () => {
+    render(
+      <div>
+        <AnswerOption aria-label="Goed" state="correct">
+          <img alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" />
+        </AnswerOption>
+        <AnswerOption aria-label="Bijna" state="warn" wrongIcon="retry">
+          Bijna
+        </AnswerOption>
+        <AnswerOption aria-label="Uit" state="muted">
+          Uit
+        </AnswerOption>
+      </div>,
+    );
+
+    expect(screen.getByRole("button", { name: "Goed" }).querySelector("span svg")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Bijna" }).querySelector("span svg")).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Uit" }).querySelector("span svg")).toBeNull();
+  });
+
   it("renders StatusBanner with tones, icon and action", () => {
     render(
       <StatusBanner
