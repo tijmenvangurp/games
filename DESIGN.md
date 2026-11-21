@@ -202,7 +202,7 @@ A quiet warm-paper neutral foundation anchored by a single craftsman indigo acce
 
 **The Serif-For-Titles Rule.** Screen headings, setup headings, card titles, and dialog titles use the display serif (`font-display`) at weight 400 with tight tracking (`-0.02em`), never heavy all-caps sans.
 
-**The Tabular Counter Rule.** Every star count, streak, round counter, move number, and progress ratio (`4 / 242`, `1/10`) uses `tabular-nums` so digits never jitter during play.
+**The Tabular Counter Rule.** Every star count, streak, round counter, move number, and progress ratio (such as 4 of 242 or 1 of 10) uses `tabular-nums` so digits never jitter during play.
 
 ## Layout
 
@@ -313,6 +313,6 @@ Full-width top bar with ghost back button (`44 × 44px`), truncated serif `h1` a
 
 - **Don't** use raw Tailwind color palettes (`bg-slate-*`, `bg-emerald-*`, `bg-rose-*`, `bg-amber-*`, `bg-sky-*`) or hex literals in UI chrome.
 - **Don't** use `!important` anywhere in CSS; rely on the `@layer theme, base, components, utilities, games, motion` cascade.
-- **Don't** put emojis in UI chrome (buttons, headers, tabs, status counters); use Lucide or Phosphor icons via `@shared/ui`. Emojis are only for learning content or player avatars.
+- **Don't** put emojis in UI chrome (buttons, headers, tabs, status counters); use Lucide or Phosphor icons via `libs/shared/ui/`. Emojis are only for learning content or player avatars.
 - **Don't** add rainbow gradients, eyebrow kickers above headings, hard zero-blur drop shadows, or external fonts/images/requests.
 - **Don't** mix unrelated corner radii (`rounded-3xl` panels next to `rounded-lg` cards) within the same screen.

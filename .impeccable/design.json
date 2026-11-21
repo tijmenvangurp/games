@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-21T07:50:00Z",
+  "generatedAt": "2026-11-21T07:50:37.366Z",
   "title": "Design System: Spellen",
   "extensions": {
     "colorMeta": {
@@ -191,10 +191,22 @@
       }
     ],
     "breakpoints": [
-      { "name": "mobile", "value": "390px" },
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" }
+      {
+        "name": "mobile",
+        "value": "390px"
+      },
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
     ]
   },
   "components": [
@@ -291,7 +303,7 @@
       },
       {
         "name": "The Tabular Counter Rule",
-        "body": "Every star count, streak, round counter, move number, and progress ratio (`4 / 242`, `1/10`) uses `tabular-nums` so digits never jitter during play.",
+        "body": "Every star count, streak, round counter, move number, and progress ratio (such as 4 of 242 or 1 of 10) uses `tabular-nums` so digits never jitter during play.",
         "section": "typography"
       },
       {
@@ -310,7 +322,7 @@
     "donts": [
       "Don't use raw Tailwind color palettes (`bg-slate-*`, `bg-emerald-*`, `bg-rose-*`, `bg-amber-*`, `bg-sky-*`) or hex literals in UI chrome.",
       "Don't use `!important` anywhere in CSS; rely on the `@layer theme, base, components, utilities, games, motion` cascade.",
-      "Don't put emojis in UI chrome (buttons, headers, tabs, status counters); use Lucide or Phosphor icons via `@shared/ui`. Emojis are only for learning content or player avatars.",
+      "Don't put emojis in UI chrome (buttons, headers, tabs, status counters); use Lucide or Phosphor icons via `libs/shared/ui/`. Emojis are only for learning content or player avatars.",
       "Don't add rainbow gradients, eyebrow kickers above headings, hard zero-blur drop shadows, or external fonts/images/requests.",
       "Don't mix unrelated corner radii (`rounded-3xl` panels next to `rounded-lg` cards) within the same screen."
     ]
