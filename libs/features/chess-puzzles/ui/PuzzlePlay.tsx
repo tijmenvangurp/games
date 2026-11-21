@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef } from "react";
 import type { ChessboardOptions } from "react-chessboard";
-import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
+import { chessBoardOptions, chessSquareStyles, useAutoSpeech } from "@shared/lib";
 import {
   Button,
   Check,
@@ -10,6 +10,8 @@ import {
   Play,
   RotateCcw,
   SpeechButton,
+  StatusBanner,
+  type StatusTone,
 } from "@shared/ui";
 import { puzzlePromptSpeech, puzzleStatusSpeech, puzzleTitleSpeech } from "../model/audio";
 import { useChessPuzzle } from "../model/useChessPuzzle";
@@ -38,10 +40,10 @@ interface PuzzleHeaderProps {
 function PuzzleHeader({ index, prompt, title, titleId, total }: PuzzleHeaderProps) {
   return (
     <header className="space-y-1 text-center">
-      <p className="text-xs font-black uppercase tracking-widest text-primary">
+      <p className="text-xs font-semibold tabular-nums text-muted-foreground">
         Puzzel {index + 1} van {total}
       </p>
-      <h2 id={titleId} className="text-2xl font-black text-foreground sm:text-3xl">
+      <h2 id={titleId} className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">
         {title.text}
       </h2>
       <div className="flex items-center justify-center gap-1">
@@ -64,33 +66,24 @@ function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
 interface PuzzleStatusProps {
   readonly speech: ReturnType<typeof puzzleStatusSpeech>;
   readonly solved: boolean;
-  readonly tone: "success" | "danger" | "primary" | "muted";
+  readonly tone: StatusTone;
 }
-
-const TONE_CLASSES: Record<PuzzleStatusProps["tone"], string> = {
-  success: "bg-success/10 text-success",
-  danger: "bg-danger/10 text-danger",
-  primary: "bg-primary/10 text-primary",
-  muted: "bg-muted text-muted-foreground",
-};
 
 function PuzzleStatusBanner({ speech, solved, tone }: PuzzleStatusProps) {
   return (
-    <div
-      aria-live="polite"
-      className={cn(
-        "flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 py-2 text-center text-sm font-bold",
-        TONE_CLASSES[tone],
-      )}
+    <StatusBanner
+      action={<SpeechButton label="Beluister de feedback" line={speech} />}
+      align="center"
+      className="text-sm"
+      icon={solved ? <Check className="size-5" /> : undefined}
+      tone={tone}
     >
-      {solved ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      <span className="min-w-0">{speech.text}</span>
-      <SpeechButton className="shrink-0" label="Beluister de feedback" line={speech} />
-    </div>
+      {speech.text}
+    </StatusBanner>
   );
 }
 
-function statusTone(status: PuzzleStatus, feedback: PuzzleFeedback): PuzzleStatusProps["tone"] {
+function statusTone(status: PuzzleStatus, feedback: PuzzleFeedback): StatusTone {
   if (status === "solved") {
     return "success";
   }
@@ -100,7 +93,7 @@ function statusTone(status: PuzzleStatus, feedback: PuzzleFeedback): PuzzleStatu
   if (feedback === "correct") {
     return "primary";
   }
-  return "muted";
+  return "neutral";
 }
 
 interface PuzzleActionsProps {

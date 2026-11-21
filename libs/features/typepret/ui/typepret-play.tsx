@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { currentTarget, fingerForKey, needsHint } from "@entities/typepret";
 import { cn } from "@shared/lib";
+import { Panel, StatusBanner } from "@shared/ui";
 import { useNeedsKeyboard } from "../model/use-keyboard-hint";
 import { FINGER_COLORS } from "../model/finger-colors";
 import { useTypepretStore } from "../model/use-typepret-store";
@@ -59,14 +60,15 @@ export function TypepretPlay() {
   return (
     <section className="mx-auto flex w-full max-w-2xl flex-col gap-4">
       {needsKeyboard ? (
-        <p className="game-panel p-3 text-center text-sm font-semibold" role="status">
+        <StatusBanner align="center" className="text-sm" role="status" tone="warning">
           Sluit een toetsenbord aan om te oefenen. Blind leren typen kan niet op een aanraakscherm.
-        </p>
+        </StatusBanner>
       ) : null}
 
-      <div
+      <Panel
         aria-label="Typ deze letters"
-        className="game-panel flex flex-wrap justify-center gap-x-5 gap-y-3 p-4 sm:p-6"
+        className="flex flex-wrap justify-center gap-x-5 gap-y-3"
+        padding="lg"
         role="group"
       >
         {round.round.groups.map((group, groupIndex) => {
@@ -86,10 +88,10 @@ export function TypepretPlay() {
                     key={position}
                     aria-current={active ? "step" : undefined}
                     className={cn(
-                      "flex size-11 items-center justify-center rounded-lg border-2 border-transparent",
-                      done && "text-muted-foreground/60",
-                      active && "border-foreground bg-primary/15",
-                      active && wrong && "border-dashed bg-amber-100",
+                      "flex size-11 items-center justify-center rounded-xl border-2 border-transparent transition-colors",
+                      done && "text-muted-foreground/55",
+                      active && "border-foreground bg-primary-soft",
+                      active && wrong && "border-dashed border-warning bg-warning-soft",
                     )}
                   >
                     {letter === ";" ? ";" : letter.toUpperCase()}
@@ -99,14 +101,15 @@ export function TypepretPlay() {
             </span>
           );
         })}
-      </div>
+      </Panel>
 
-      <div
+      <Panel
         aria-live="polite"
         className={cn(
-          "game-panel flex items-center justify-center gap-3 p-3 text-center",
+          "flex items-center justify-center gap-3 text-center",
           hint ? "text-xl font-black" : "text-base font-bold",
         )}
+        padding="sm"
       >
         {finger ? (
           <>
@@ -121,7 +124,7 @@ export function TypepretPlay() {
             </span>
           </>
         ) : null}
-      </div>
+      </Panel>
 
       <Keyboard emphasize={hint} target={target} />
 

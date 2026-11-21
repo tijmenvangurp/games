@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { cn } from "../lib";
+import { cn } from "@shared/lib";
+import { choiceCardRecipe, type ChoiceCardVariants } from "./choice-card.css";
 
 interface ChoiceCardProps {
   selected: boolean;
@@ -7,6 +8,8 @@ interface ChoiceCardProps {
   /** Korte toelichting onder het label; bijvoorbeeld een maat of uitleg. */
   description?: ReactNode;
   leading?: ReactNode;
+  /** Compacte hoogte voor eenvoudige teksten zonder symbool. */
+  size?: ChoiceCardVariants["size"];
   /** Toegankelijke naam als het label alleen visueel klopt. */
   ariaLabel?: string;
   /** Extra klassen voor de kaart zelf, bijvoorbeeld uitlijning of breedte. */
@@ -19,6 +22,7 @@ export function ChoiceCard({
   label,
   description,
   leading,
+  size = "default",
   ariaLabel,
   className,
   onClick,
@@ -28,21 +32,15 @@ export function ChoiceCard({
       type="button"
       aria-label={ariaLabel}
       aria-pressed={selected}
-      className={cn(
-        "flex min-h-24 flex-col items-center justify-center gap-1 rounded-lg border p-3 transition active:scale-[0.99]",
-        selected
-          ? "border-primary bg-primary/5 ring-1 ring-primary/20"
-          : "border-border bg-card hover:bg-muted/60",
-        className,
-      )}
+      className={cn(choiceCardRecipe({ selected, size }), className)}
       onClick={onClick}
     >
       {leading ? (
-        <span aria-hidden="true" className="text-primary">
+        <span aria-hidden="true" className={selected ? "text-primary" : "text-muted-foreground"}>
           {leading}
         </span>
       ) : null}
-      <span className="text-sm font-bold">{label}</span>
+      <span className="text-sm font-bold leading-snug">{label}</span>
       {description ? (
         <span className="text-xs leading-relaxed text-muted-foreground">{description}</span>
       ) : null}

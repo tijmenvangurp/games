@@ -6,7 +6,7 @@ import {
   type ChessMode,
 } from "@entities/chess";
 import { cn } from "@shared/lib";
-import { Button, OptionPicker, Play } from "@shared/ui";
+import { Bot, Button, OptionPicker, Panel, Play, Users } from "@shared/ui";
 import { SIDE_LABEL } from "../model/presentation";
 import { MAX_NAME_LENGTH } from "../model/settings";
 import { useChessGameStore } from "../model/use-chess-game-store";
@@ -15,24 +15,35 @@ const MODE_OPTIONS = [
   {
     value: "friend" as ChessMode,
     label: "Samen spelen",
-    symbol: "👫",
+    leading: <Users className="size-6" />,
   },
   {
     value: "computer" as ChessMode,
     label: "Computer",
-    symbol: "🤖",
+    leading: <Bot className="size-6" />,
   },
 ] as const;
 
 const LEVEL_OPTIONS = COMPUTER_LEVELS.map((level) => ({
   value: level,
   label: COMPUTER_LEVEL_INFO[level].label,
-  symbol: COMPUTER_LEVEL_INFO[level].emoji,
 }));
 
 const SIDE_OPTIONS = [
-  { value: "w" as Color, label: "Wit", symbol: "⚪" },
-  { value: "b" as Color, label: "Zwart", symbol: "⚫" },
+  {
+    value: "w" as Color,
+    label: "Wit",
+    leading: (
+      <span className="inline-block size-6 rounded-full border-2 border-foreground/40 bg-card shadow-xs" />
+    ),
+  },
+  {
+    value: "b" as Color,
+    label: "Zwart",
+    leading: (
+      <span className="inline-block size-6 rounded-full border-2 border-foreground/20 bg-foreground shadow-xs" />
+    ),
+  },
 ] as const;
 
 function PlayerSetup({ color }: { readonly color: Color }) {
@@ -45,24 +56,24 @@ function PlayerSetup({ color }: { readonly color: Color }) {
   const label = SIDE_LABEL[color];
 
   return (
-    <fieldset className="rounded-2xl border border-slate-200 bg-white/80 p-3">
-      <legend className="px-1 text-sm font-black text-slate-700">
+    <Panel as="fieldset" padding="sm" surface="subtle">
+      <legend className="px-1.5 text-sm font-bold text-foreground">
         {label}
         {isComputer ? " · computer" : ""}
       </legend>
       <div className="flex flex-wrap items-center gap-2">
         <span
           aria-hidden="true"
-          className="grid size-12 shrink-0 place-items-center rounded-full bg-muted text-2xl"
+          className="grid size-12 shrink-0 place-items-center rounded-full border border-border bg-card text-2xl"
         >
           {player.avatar}
         </span>
         {isComputer ? (
-          <p className="min-h-11 flex flex-1 items-center font-black text-slate-800">Computer</p>
+          <p className="flex min-h-11 flex-1 items-center font-bold text-foreground">Computer</p>
         ) : (
           <input
             aria-label={`Naam voor ${label.toLowerCase()}`}
-            className="min-h-11 w-32 flex-1 rounded-xl border-2 border-border bg-card px-3 text-base font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30"
+            className="min-h-11 w-32 flex-1 rounded-xl border border-border bg-card px-3 text-base font-semibold text-foreground transition focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
             maxLength={MAX_NAME_LENGTH}
             placeholder={label}
             type="text"
@@ -73,7 +84,7 @@ function PlayerSetup({ color }: { readonly color: Color }) {
       </div>
       <div
         aria-label={`Kies een avatar voor ${label.toLowerCase()}`}
-        className="mt-2 flex flex-wrap gap-1.5"
+        className="mt-2.5 flex flex-wrap gap-1.5"
         role="group"
       >
         {CHESS_AVATARS.map((avatar) => (
@@ -82,10 +93,10 @@ function PlayerSetup({ color }: { readonly color: Color }) {
             aria-label={`Avatar ${avatar}`}
             aria-pressed={player.avatar === avatar}
             className={cn(
-              "grid size-11 place-items-center rounded-xl border-2 text-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+              "grid size-11 place-items-center rounded-xl border text-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
               player.avatar === avatar
-                ? "border-primary bg-primary/10"
-                : "border-border bg-card hover:bg-muted",
+                ? "border-primary bg-primary-soft ring-1 ring-primary/20"
+                : "border-border bg-card hover:border-border-strong hover:bg-muted",
             )}
             type="button"
             onClick={() => setPlayerAvatar(color, avatar)}
@@ -94,7 +105,7 @@ function PlayerSetup({ color }: { readonly color: Color }) {
           </button>
         ))}
       </div>
-    </fieldset>
+    </Panel>
   );
 }
 
@@ -111,18 +122,22 @@ export function ChessGameSetup() {
   const moveCount = useChessGameStore((state) => state.history.length);
 
   return (
-    <section className="mx-auto flex w-full max-w-xl flex-col gap-4">
+    <Panel
+      as="section"
+      className="animate-rise mx-auto flex w-full max-w-xl flex-col gap-5"
+      padding="lg"
+    >
       <div className="space-y-1">
-        <h2 className="text-2xl font-black">Nieuwe partij</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="font-display text-2xl tracking-tight">Nieuwe partij</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">
           Kies je tegenstander, een avatar en een naam. Daarna zie je meteen wie aan zet is.
         </p>
       </div>
 
       {canResume ? (
-        <section className="flex flex-wrap items-center gap-3 rounded-2xl border-2 border-primary/30 bg-primary/5 p-3">
+        <section className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary-soft p-3.5">
           <div className="min-w-0 flex-1">
-            <p className="font-black">Je partij is bewaard</p>
+            <p className="font-bold text-foreground">Je partij is bewaard</p>
             <p className="text-sm text-muted-foreground">
               {moveCount === 1
                 ? "Er staat 1 zet op het bord."
@@ -150,6 +165,7 @@ export function ChessGameSetup() {
             legend="Hoe sterk is de computer?"
             options={LEVEL_OPTIONS}
             selected={level}
+            size="compact"
             onSelect={setLevel}
           />
           <OptionPicker
@@ -162,7 +178,7 @@ export function ChessGameSetup() {
         </>
       ) : null}
 
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         <PlayerSetup color="w" />
         <PlayerSetup color="b" />
       </div>
@@ -171,6 +187,6 @@ export function ChessGameSetup() {
         <Play aria-hidden="true" className="size-5" />
         {canResume ? "Nieuwe partij" : "Spelen"}
       </Button>
-    </section>
+    </Panel>
   );
 }

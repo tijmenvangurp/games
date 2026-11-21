@@ -1,6 +1,5 @@
 import type { FlagLevel, FlagScope } from "@entities/geography";
-import { cn } from "@shared/lib";
-import { OptionPicker, SetupActions } from "@shared/ui";
+import { OptionPicker, Panel, SetupActions } from "@shared/ui";
 import {
   flagLevelOptions,
   FLAG_MODE_OPTIONS,
@@ -9,39 +8,6 @@ import {
   type FlagMode,
   type FlagSettings,
 } from "../model/settings";
-
-interface ScopePickerProps {
-  selected: FlagScope;
-  onSelect: (scope: FlagScope) => void;
-}
-
-function ScopePicker({ selected, onSelect }: ScopePickerProps) {
-  return (
-    <fieldset className="space-y-2">
-      <legend className="mb-2 text-sm font-semibold">Waar wil je spelen?</legend>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {FLAG_SCOPE_OPTIONS.map((option) => {
-          return (
-            <button
-              key={option.value}
-              type="button"
-              aria-pressed={selected === option.value}
-              className={cn(
-                "flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border-2 px-2 text-sm font-bold transition active:scale-95",
-                selected === option.value
-                  ? "border-primary bg-primary/5 text-primary ring-2 ring-primary/20"
-                  : "border-border bg-card hover:bg-muted",
-              )}
-              onClick={() => onSelect(option.value)}
-            >
-              <span className="truncate">{option.label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
-  );
-}
 
 interface FlagsSetupProps {
   settings: FlagSettings;
@@ -63,8 +29,8 @@ export function FlagsSetup({
   const bestScore = best[scoreKey(settings.mode, settings.scope, settings.level)] ?? 0;
 
   return (
-    <section className="animate-rise rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
-      <h2 className="mb-5 text-xl font-black">Nieuw spel</h2>
+    <Panel as="section" className="animate-rise" padding="lg">
+      <h2 className="mb-5 font-display text-2xl tracking-tight">Nieuw spel</h2>
 
       <OptionPicker
         columns={2}
@@ -75,7 +41,14 @@ export function FlagsSetup({
       />
 
       <div className="mt-5">
-        <ScopePicker selected={settings.scope} onSelect={onScopeChange} />
+        <OptionPicker
+          columns="2-3"
+          legend="Waar wil je spelen?"
+          options={FLAG_SCOPE_OPTIONS}
+          selected={settings.scope}
+          size="compact"
+          onSelect={onScopeChange}
+        />
       </div>
 
       <div className="mt-5">
@@ -83,15 +56,16 @@ export function FlagsSetup({
           legend="Niveau"
           options={flagLevelOptions(settings.scope)}
           selected={settings.level}
+          size="compact"
           onSelect={onLevelChange}
         />
       </div>
 
-      <p className="mt-4 rounded-xl bg-muted px-3 py-2 text-center text-sm font-semibold text-muted-foreground">
+      <p className="mt-4 rounded-xl bg-muted px-3 py-2 text-center text-sm font-semibold tabular-nums text-muted-foreground">
         {bestScore > 0 ? `Beste score: ${bestScore} sterren` : "Nog geen score"}
       </p>
 
       <SetupActions onStart={onStart} />
-    </section>
+    </Panel>
   );
 }

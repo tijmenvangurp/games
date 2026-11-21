@@ -45,10 +45,10 @@ export function GameShell({
         fitViewport && "md:h-svh md:min-h-0 md:overflow-hidden",
       )}
     >
-      <div className="flex min-w-0 items-center gap-2 border-b border-border pb-3">
+      <div className="flex w-full min-w-0 items-center border-b border-border pb-3">
         <PageHeader
           actions={
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-1">
               {showSpeech ? <SpeechToggle /> : null}
               <SoundToggle />
               {onNewGame ? (
@@ -58,11 +58,11 @@ export function GameShell({
               ) : null}
             </div>
           }
-          onBack={onBack}
           backLabel={backLabel}
           subtitle={subtitle}
           title={title}
           titleClassName={titleClassName}
+          onBack={onBack}
         />
       </div>
       {children}

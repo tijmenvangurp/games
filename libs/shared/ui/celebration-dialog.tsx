@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { m } from "motion/react";
 import { playSound } from "@shared/lib";
 import { Button } from "./button";
 import { Confetti } from "./confetti";
+import { Dialog } from "./dialog";
 import { LayoutGrid, Sparkles, Star, Trophy } from "./icons";
 
 interface CelebrationDialogProps {
@@ -33,53 +33,43 @@ export function CelebrationDialog({
   }, []);
 
   return (
-    <div
-      aria-describedby="celebration-description"
-      aria-labelledby="celebration-title"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/30 p-4 backdrop-blur-sm"
-      role="dialog"
-      onKeyDown={(event) => {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          onHome();
-        }
-      }}
+    <Dialog
+      className="text-center"
+      describedBy="celebration-description"
+      labelledBy="celebration-title"
+      overlay={confetti ? <Confetti pieces={28} variant="shower" /> : undefined}
+      size="sm"
+      onClose={onHome}
     >
-      {confetti ? <Confetti pieces={28} variant="shower" /> : null}
-      <m.div
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="game-panel w-full max-w-sm p-6 text-center"
-        initial={{ opacity: 0, scale: 0.94, y: 8 }}
-        transition={{ damping: 26, stiffness: 360, type: "spring" }}
+      <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
+        <Sparkles className="animate-rise size-9 text-primary" />
+        <Star className="size-9 fill-warning text-warning" />
+        <Sparkles className="animate-rise size-9 text-warning" />
+      </div>
+      <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-primary" />
+      <h2 className="font-display text-2xl tracking-tight" id="celebration-title">
+        {title}
+      </h2>
+      <p
+        className="mt-1.5 text-sm leading-relaxed text-muted-foreground"
+        id="celebration-description"
       >
-        <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
-          <Sparkles className="animate-rise size-10 text-primary" />
-          <Star className="size-10 text-warning" />
-          <Sparkles className="animate-rise size-10 text-warning" />
-        </div>
-        <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-primary" />
-        <h2 className="font-display text-2xl" id="celebration-title">
-          {title}
-        </h2>
-        <p className="mt-1 text-sm text-muted-foreground" id="celebration-description">
-          {description}
-        </p>
+        {description}
+      </p>
 
-        <div className="mt-6 space-y-2">
-          <Button autoFocus className="w-full" size="lg" variant="success" onClick={onAgain}>
-            <Sparkles aria-hidden="true" className="size-5" />
-            {againLabel}
-          </Button>
-          <Button className="min-h-11 w-full" variant="outline" onClick={onChoose}>
-            <LayoutGrid aria-hidden="true" className="size-4" />
-            {chooseLabel}
-          </Button>
-          <Button className="min-h-11 w-full" variant="ghost" onClick={onHome}>
-            {homeLabel}
-          </Button>
-        </div>
-      </m.div>
-    </div>
+      <div className="mt-6 space-y-2">
+        <Button autoFocus className="w-full" size="lg" variant="success" onClick={onAgain}>
+          <Sparkles aria-hidden="true" className="size-5" />
+          {againLabel}
+        </Button>
+        <Button className="min-h-11 w-full" variant="outline" onClick={onChoose}>
+          <LayoutGrid aria-hidden="true" className="size-4" />
+          {chooseLabel}
+        </Button>
+        <Button className="min-h-11 w-full" variant="ghost" onClick={onHome}>
+          {homeLabel}
+        </Button>
+      </div>
+    </Dialog>
   );
 }

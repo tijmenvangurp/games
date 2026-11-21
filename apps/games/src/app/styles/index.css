@@ -23,16 +23,25 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
   --color-primary-foreground: var(--primary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
+  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-ink: var(--warning-ink);
   --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
   --color-player-one: var(--player-one);
   --color-player-two: var(--player-two);
   --color-pawn-red: var(--pawn-red);
@@ -41,36 +50,14 @@
   --color-pawn-blue: var(--pawn-blue);
   --color-pawn-violet: var(--pawn-violet);
   --color-pawn-pink: var(--pawn-pink);
+  --color-parchment-surface: var(--parchment-surface);
+  --color-parchment-border: var(--parchment-border);
 }
 
-:root {
-  /* Eén rustige basis: ivoor papier, inkt en indigo als enige accent. */
-  --background: oklch(0.965 0.02 88);
-  --foreground: oklch(0.3 0.025 145);
-  --card: oklch(0.992 0.008 88);
-  --primary: #4f5d9e;
-  --primary-foreground: #f8f9ff;
-  --muted: oklch(0.935 0.02 88);
-  --muted-foreground: oklch(0.48 0.027 120);
-  --border: oklch(0.84 0.023 88);
-  --success: oklch(0.5 0.1 150);
-  --warning: oklch(0.56 0.13 72);
-  --danger: oklch(0.53 0.17 25);
-  /*
-   * Vrolijke pionkleuren voor bordspellen: rood, oranje, groen, blauw, paars
-   * en roze. Ze staan los van de feedbackkleuren; de gans en het nummer op de
-   * pion maken de speler herkenbaar, niet de kleur alleen.
-   */
-  --pawn-red: oklch(0.6 0.21 22);
-  --pawn-orange: oklch(0.66 0.17 55);
-  --pawn-green: oklch(0.62 0.16 148);
-  --pawn-blue: oklch(0.58 0.19 255);
-  --pawn-violet: oklch(0.56 0.2 300);
-  --pawn-pink: oklch(0.64 0.2 350);
-  /* De vaste kleuren van Vier op een Rij blijven rustiger van toon. */
-  --player-one: #4f5d9e;
-  --player-two: oklch(0.58 0.2 30);
-}
+/*
+ * Alle design tokens (:root CSS custom properties) komen uit het type-safe
+ * contract in `libs/shared/ui/tokens.css.ts` (Vanilla Extract).
+ */
 
 @layer base {
   * {
@@ -79,17 +66,28 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
   }
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
     background-image: radial-gradient(
       circle at 50% -18%,
-      oklch(0.93 0.04 78 / 0.45),
-      transparent 38rem
+      oklch(0.93 0.036 80 / 0.42),
+      transparent 40rem
     );
     background-attachment: fixed;
     overscroll-behavior-y: none;
+  }
+
+  ::selection {
+    background-color: var(--selection-bg);
+    color: var(--foreground);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--primary);
   }
 
   button {
@@ -108,29 +106,18 @@
 @layer games {
   /*
    * Eén surface voor panelen, kaarten en HUD's. Hairline-rand, vaste radius
-   * en nauwelijks schaduw, zodat kleur alleen voor betekenis wordt gebruikt.
+   * en rustige papierdiepte, zodat kleur alleen voor betekenis wordt gebruikt.
    */
   .game-panel {
     border: 1px solid var(--border);
-    border-radius: 0.875rem;
+    border-radius: var(--ds-radius-lg);
     background-color: var(--card);
-    box-shadow:
-      0 1px 2px oklch(0.3 0.025 145 / 0.05),
-      0 16px 36px -30px oklch(0.3 0.025 145 / 0.4);
-  }
-
-  .game-card {
-    border: 1px solid var(--border);
-    border-radius: 0.875rem;
-    background-color: var(--card);
-    box-shadow:
-      0 1px 2px oklch(0.3 0.025 145 / 0.05),
-      0 16px 36px -30px oklch(0.3 0.025 145 / 0.35);
+    box-shadow: var(--ds-shadow-panel);
   }
 
   .ganzenbord-board {
-    border-radius: 0.75rem;
-    box-shadow: 0 12px 30px -22px rgb(40 25 10 / 0.55);
+    border-radius: var(--ds-radius-md);
+    box-shadow: 0 12px 30px -22px oklch(0.25 0.024 148 / 0.45);
     overflow: hidden;
   }
 
@@ -140,7 +127,7 @@
   }
 
   .ganzenbord-pawn {
-    box-shadow: 0 2px 5px rgb(40 25 10 / 0.45);
+    box-shadow: 0 2px 5px oklch(0.25 0.024 148 / 0.4);
   }
 
   .ganzenbord-pawn-move {
@@ -168,13 +155,6 @@
     .ganzenbord-pawn-move {
       transition: none;
     }
-  }
-
-  .game-card:hover {
-    border-color: oklch(0.72 0.05 55);
-    box-shadow:
-      0 1px 2px oklch(0.3 0.025 145 / 0.06),
-      0 20px 40px -30px oklch(0.3 0.025 145 / 0.45);
   }
 
   /*
@@ -306,10 +286,10 @@
   }
 
   .memory-card-pattern {
-    background-color: #e11d48;
+    background-color: var(--pawn-red);
     background-image:
-      radial-gradient(rgba(255, 255, 255, 0.28) 0 3px, transparent 3.5px),
-      radial-gradient(rgba(255, 255, 255, 0.35) 1.5px, transparent 1.5px);
+      radial-gradient(oklch(1 0 0 / 0.28) 0 3px, transparent 3.5px),
+      radial-gradient(oklch(1 0 0 / 0.35) 1.5px, transparent 1.5px);
     background-position:
       center,
       0 0;
@@ -375,7 +355,7 @@
   }
 
   .maze-arrow {
-    color: #111827;
+    color: var(--foreground);
   }
 
   .maze-arrow .maze-line,
@@ -386,11 +366,11 @@
   }
 
   .maze-arrow[data-hint="true"] {
-    color: #ef4444;
+    color: var(--danger);
   }
 
   .maze-arrow[data-blocked="true"] {
-    color: #ef4444;
+    color: var(--danger);
     animation: maze-shake 220ms ease-in-out;
   }
 
@@ -404,7 +384,7 @@
 
   .maze-arrow:focus-visible .maze-focus {
     opacity: 1;
-    stroke: #0ea5e9;
+    stroke: var(--primary);
   }
 
   @keyframes maze-shake {
@@ -457,7 +437,7 @@
   }
 
   .maze-trail-dot {
-    fill: #111827;
+    fill: var(--foreground);
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
@@ -502,7 +482,7 @@
   }
 
   [data-creature-id]:focus-visible {
-    outline: 3px solid #0ea5e9;
+    outline: 3px solid var(--primary);
     outline-offset: 4px;
   }
 }

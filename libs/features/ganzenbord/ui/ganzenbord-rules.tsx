@@ -1,16 +1,9 @@
-import { BookOpen } from "@shared/ui";
+import { BookOpen, Disclosure } from "@shared/ui";
 
 export function GanzenbordRules() {
   return (
-    <details className="game-panel group p-3 text-sm">
-      <summary className="flex cursor-pointer list-none items-center gap-2 font-bold marker:hidden">
-        <BookOpen aria-hidden="true" className="size-4 text-primary" />
-        Spelregels
-        <span className="ml-auto text-xs font-normal text-muted-foreground group-open:hidden">
-          open
-        </span>
-      </summary>
-      <div className="mt-3 space-y-2 leading-relaxed text-muted-foreground">
+    <Disclosure icon={<BookOpen className="size-4 text-primary" />} summary="Spelregels">
+      <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
         <p>
           Je gooit met twee dobbelstenen en verzet je gans. Wie het eerst precies op vakje 63 komt,
           wint.
@@ -49,6 +42,6 @@ export function GanzenbordRules() {
           Zitten alle overgebleven spelers in de put of gevangenis, dan is het gelijkspel.
         </p>
       </div>
-    </details>
+    </Disclosure>
   );
 }

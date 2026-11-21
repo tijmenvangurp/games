@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { MEMORY_LEVELS } from "@entities/memory";
-import { playHaptic, playSound } from "@shared/lib";
-import { Button, Lightbulb, RotateCcw, Sparkles } from "@shared/ui";
+import { cn, playHaptic, playSound } from "@shared/lib";
+import { Button, Lightbulb, Panel, RotateCcw, Sparkles } from "@shared/ui";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryBoard } from "./memory-board";
 
@@ -14,21 +14,18 @@ interface HeaderCardProps {
 
 function HeaderCard({ matchedPairs, pairs, mode }: HeaderCardProps) {
   return (
-    <div className="game-panel order-1 flex items-center justify-between gap-3 p-4">
+    <Panel className="order-1 flex items-center justify-between gap-3" padding="md">
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Pokémon Memory
-        </p>
-        <p className="text-base font-black leading-tight">Vind alle paren</p>
-        <p className="text-xs text-muted-foreground">
+        <p className="font-display text-lg leading-tight">Vind alle paren</p>
+        <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
           {matchedPairs} van {pairs} paren · {mode === "auto" ? "groeit mee" : "zelf gekozen"}
         </p>
       </div>
-      <div className="text-right">
+      <div className="text-right tabular-nums">
         <p className="text-3xl font-black leading-none">{pairs}</p>
         <p className="text-xs text-muted-foreground">paren</p>
       </div>
-    </div>
+    </Panel>
   );
 }
 
@@ -53,16 +50,16 @@ function ActionButtons({
     <div className="grid grid-cols-3 gap-2">
       <Button
         aria-label="Hint"
-        className={suggestHint ? "min-h-12 ring-2 ring-amber-300" : "min-h-12"}
+        className={cn("min-h-12", suggestHint && "border-warning ring-2 ring-warning/35")}
         disabled={disabled}
         variant="outline"
         onClick={onHint}
       >
-        <Lightbulb aria-hidden="true" className="size-4 text-amber-500" />
+        <Lightbulb aria-hidden="true" className="size-4 text-warning" />
         Hint
       </Button>
       <Button className="min-h-12" disabled={atTopLevel} variant="outline" onClick={onChallenge}>
-        <Sparkles aria-hidden="true" className="size-4 text-amber-500" />
+        <Sparkles aria-hidden="true" className="size-4 text-warning" />
         Uitdaging
       </Button>
       <Button className="min-h-12" variant="outline" onClick={onAgain}>
@@ -92,7 +89,7 @@ function StatusLine({ status, moves }: { status: string; moves: number }) {
       <p aria-live="polite" className="text-center text-xs text-muted-foreground">
         {status}
       </p>
-      <p className="text-center text-xs text-muted-foreground">
+      <p className="text-center text-xs tabular-nums text-muted-foreground">
         {moves > 0
           ? `Je deed ${moves} ${moves === 1 ? "poging" : "pogingen"}.`
           : "Zoek rustig verder."}

@@ -45,7 +45,7 @@ export function ElementToken({
         )}
       >
         {undiscovered ? (
-          <span className="text-2xl font-black text-slate-500">?</span>
+          <span className="text-2xl font-black text-muted-foreground">?</span>
         ) : (
           <>
             <img

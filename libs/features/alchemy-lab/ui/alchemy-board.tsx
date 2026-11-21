@@ -57,9 +57,9 @@ function BoardToken({
         aria-label={`${element.name}${selected ? ", geselecteerd" : ""}`}
         aria-pressed={selected}
         className={cn(
-          "touch-none rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+          "touch-none rounded-xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
           isDragging && "opacity-30",
-          isOver && "bg-emerald-100/80 ring-4 ring-emerald-400/50",
+          isOver && "bg-success-soft ring-4 ring-success/40",
         )}
         type="button"
         onClick={() => {
@@ -113,8 +113,8 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
       ref={setRefs}
       aria-label="Werkbank"
       className={cn(
-        "relative min-h-72 w-full overflow-hidden rounded-3xl border-2 border-dashed bg-card/80 p-3 shadow-sm transition sm:min-h-96 md:h-full md:min-h-0 md:landscape:col-span-3",
-        isOver && "border-primary bg-primary/5",
+        "relative min-h-72 w-full overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card/85 p-3 shadow-xs transition sm:min-h-96 md:h-full md:min-h-0 md:landscape:col-span-3",
+        isOver && "border-primary bg-primary-soft/60",
       )}
       data-alchemy-board="true"
       role="group"

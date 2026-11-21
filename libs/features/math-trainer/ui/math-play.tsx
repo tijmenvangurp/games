@@ -6,71 +6,17 @@ import {
   type MathQuestion,
 } from "@entities/math";
 import { cn } from "@shared/lib";
-import { Button, Check, Flame, SpeechButton, Star, X } from "@shared/ui";
+import {
+  AnswerOption,
+  Button,
+  Panel,
+  ScoreHeader,
+  SpeechButton,
+  type AnswerState,
+} from "@shared/ui";
 import { useMathSpeech } from "../model/use-math-speech";
 import { useMathStore } from "../model/use-math-store";
 import { MathVisual } from "./math-visual";
-
-type ChoiceState = "default" | "wrong" | "correct" | "muted";
-
-interface MathHeaderProps {
-  index: number;
-  total: number;
-  stars: number;
-  streak: number;
-}
-
-function MathHeader({ index, total, stars, streak }: MathHeaderProps) {
-  return (
-    <header className="game-panel flex items-center justify-between px-3 py-2">
-      <p className="text-sm font-black text-muted-foreground">
-        Som {index + 1} van {total}
-      </p>
-      <div className="flex items-center gap-3 text-sm font-bold">
-        <span aria-label={`${stars} sterren`} className="inline-flex items-center gap-1">
-          <Star aria-hidden="true" className="size-4 fill-warning text-warning" />
-          {stars}
-        </span>
-        {streak > 0 ? (
-          <span aria-label={`${streak} op een rij`} className="inline-flex items-center gap-1">
-            <Flame aria-hidden="true" className="size-4 text-warning" />
-            {streak}
-          </span>
-        ) : null}
-      </div>
-    </header>
-  );
-}
-
-function ChoiceButton({
-  value,
-  state,
-  onSelect,
-}: {
-  value: number;
-  state: ChoiceState;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      aria-label={`Antwoord ${value}`}
-      className={cn(
-        "flex min-h-14 items-center justify-center gap-1 rounded-lg border text-2xl font-black transition active:scale-[0.99]",
-        state === "default" && "border-border bg-card hover:bg-muted",
-        state === "wrong" && "border-warning/40 bg-warning/10 text-warning",
-        state === "correct" && "border-success/40 bg-success/10 text-success",
-        state === "muted" && "border-border bg-muted text-muted-foreground opacity-50",
-      )}
-      disabled={state !== "default"}
-      type="button"
-      onClick={onSelect}
-    >
-      {value}
-      {state === "correct" ? <Check aria-hidden="true" className="size-5" /> : null}
-      {state === "wrong" ? <X aria-hidden="true" className="size-5" /> : null}
-    </button>
-  );
-}
 
 function MathChoices({
   question,
@@ -87,22 +33,26 @@ function MathChoices({
     <div aria-label="Kies het juiste antwoord" className="grid grid-cols-3 gap-2" role="group">
       {question.choices.map((choice) => {
         const isWrong = wrongChoices.includes(choice);
-        const state: ChoiceState =
+        const state: AnswerState =
           answered && choice === question.answer
             ? "correct"
             : isWrong
-              ? "wrong"
+              ? "warn"
               : answered
                 ? "muted"
                 : "default";
 
         return (
-          <ChoiceButton
+          <AnswerOption
             key={choice}
+            aria-label={`Antwoord ${choice}`}
+            className="tabular-nums"
+            size="lg"
             state={state}
-            value={choice}
-            onSelect={() => onSelect(choice)}
-          />
+            onClick={() => onSelect(choice)}
+          >
+            {choice}
+          </AnswerOption>
         );
       })}
     </div>
@@ -135,7 +85,10 @@ function MathFeedback({
       <div className="flex items-center justify-center gap-2">
         <p
           aria-live="polite"
-          className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-warning")}
+          className={cn(
+            "text-center text-sm font-bold",
+            correct ? "text-success-ink" : "text-warning-ink",
+          )}
         >
           {correct
             ? praiseSpeech(seed, question).text
@@ -170,9 +123,9 @@ function QuestionCard({
   isLast: boolean;
 }) {
   return (
-    <section className="game-panel p-4 sm:p-6">
+    <Panel as="section" padding="lg">
       <div className="flex items-center justify-center gap-1">
-        <p className="text-center text-4xl font-black tracking-tight sm:text-5xl">
+        <p className="text-center text-4xl font-black tracking-tight tabular-nums sm:text-5xl">
           {question.prompt} = ?
         </p>
         <SpeechButton label="Beluister de som" line={mathQuestionSpeech(question)} />
@@ -207,7 +160,7 @@ function QuestionCard({
           {isLast ? "Klaar" : "Volgende"}
         </Button>
       ) : null}
-    </section>
+    </Panel>
   );
 }
 
@@ -233,11 +186,10 @@ export function MathPlay() {
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
-      <MathHeader
-        index={questionIndex}
+      <ScoreHeader
+        progress={`Som ${questionIndex + 1} van ${round.questions.length}`}
         stars={stars}
         streak={streak}
-        total={round.questions.length}
       />
       <QuestionCard
         answered={answered}
