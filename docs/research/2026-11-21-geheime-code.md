@@ -10,10 +10,10 @@
 
 Bouw **Geheime Code** als een nieuw spel met een **zichtbare codekaart**: een legenda van symbolen die steeds naar dezelfde letter verwijzen. Het kind decodeert korte Nederlandse woorden door letters te tikken. Dat is precies de oefening op het werkblad, maar dan met directe feedback, zonder pen en papier.
 
-- **Geen nieuwe library voor de spellogica.** De engine is klein: een letter-symbooltabel, een controle per letter, givens en een hinttrap. Geen onderzocht pakket levert die combinatie voor Nederlandse kinderwoorden. De rest van de stack dekt alles al.
+- **Geen nieuwe library voor de spellogica.** De engine is klein: een letter-symbooltabel, een controle per letter en een hinttrap. Geen onderzocht pakket levert die combinatie voor Nederlandse kinderwoorden. De rest van de stack dekt alles al.
 - **Geen nieuwe dependency voor de UI.** Gebruik `@phosphor-icons/react` voor de symbolen, `zustand` voor de ronde, `mulberry32`/`createSeed` voor de code, `motion` voor de feedback, `playSound` voor geluid en `CelebrationDialog` voor de afsluiting. Die staan al in de repo.
 - **Curateer de woordensets.** De legenda is de vereniging van de letters van de woorden in de ronde. Laat een generator niet zelf woorden kiezen op letterzuinigheid: dan verdwijnen de woorden die het thema juist leuk maken. De engine maakt de code bij een vaste, met de hand gekozen set.
-- **Eerste versie:** drie niveaus, 4–6 woorden per ronde, thema’s **Sinterklaas**, **Tuin** en **Onder water**: 3 × 3 × 2 = 18 rondes. Liever kleiner: 2 thema’s × 3 niveaus × 2 rondes = 12. Niveau 3 (1–2 verborgen letters) hoort erbij, anders is het spel te veel overschrijven.
+- **Eerste versie:** drie niveaus, 4–6 woorden per ronde, thema’s **Sinterklaas**, **Tuin** en **Onder water**: 3 × 3 × 2 = 18 rondes. Liever kleiner: 2 thema’s × 3 niveaus × 2 rondes = 12. Niveau 3 heeft een volle code en meer letters; nergens staan vraagtekens.
 - **Spraak:** begin met `speech: { kind: "visual" }` als de audio-pass niet in de eerste PR past. Een kleine `code`-spraakgroep met de instructie en de woorden is daarna een kleine toevoeging via de bestaande TTS-pijplijn.
 - **Beeldrichting:** D’s rustige een-woordlayout, A’s serif voor titel en letters, en B’s kleur als zachte tint per symbool. De tinten komen uit de bestaande tokens; indigo blijft de actiekleur. Gebruik de bestaande Phosphor-iconen als basis en kopieer het werkblad niet.
 
@@ -65,14 +65,14 @@ De legendacode is geen leesmethode en geen vervanging van klankonderwijs: de kop
 - **Themawoordenschat.** Sinterklaas, tuin en onder water geven woorden betekenis.
 - **In de latere variant:** patronen gebruiken, letters wegstrepen en systematisch hypothese toetsen.
 
-De leeftijd voor de eerste versie is **6–8 jaar (groep 3–4)**, met hulp vanaf 5 jaar. Voor 9–12 jaar is de verborgen-codevariant interessanter. Het spel moet geen “leerresultaat” beloven dat er niet is; het is een puzzel die lezen, spellen en aandacht ondersteunt.
+De leeftijd voor de eerste versie is **6–8 jaar (groep 3–4)**, met hulp vanaf 5 jaar. Voor 9–12 jaar is de echte codekraker (niveau 4) interessanter. Het spel moet geen “leerresultaat” beloven dat er niet is; het is een puzzel die lezen, spellen en aandacht ondersteunt.
 
 ## Spelconcept en afbakening
 
 ### Eén ronde
 
 1. Het kind kiest een thema en een niveau.
-2. De codekaart staat bovenaan: elk symbool met zijn letter. Het toetsenbord toont het hele alfabet; de codekaart is de enige hint.
+2. De codekaart staat bovenaan: elk symbool met zijn letter. Het toetsenbord staat op QWERTY en toont het hele alfabet; de codekaart is de enige hint.
 3. Het eerste woord verschijnt als een rij symbolen, met daaronder lege vakjes. Geen letters vooraf en geen opgelicht symbool. Het kind tikt een letter; die vult het eerste lege vakje.
 4. **Goed:** de letter blijft staan, het vakje wordt rustig groen en de volgende lege plek wordt actief. **Fout:** de letter gaat terug, het vakje wordt amber en het bijbehorende vakje in de codekaart licht kort op. Geen rood kruis, geen foutgeluid en geen levens.
 5. Na twee fouten op dezelfde plek licht de symboolcel in de codekaart op; niet de letter. Na vier fouten pas vult de app de letter in met een neutrale “kijk, deze letter”-melding. Zo blijft de opgave een code, geen invuloefening.
@@ -90,21 +90,21 @@ De feedback volgt [ADR 0026](../adr/0026-adaptief-niveaumodel.md):
 
 ### Moeilijkheid
 
-| Niveau    | Codekaart                           | Woorden                  | Toetsenbord  | Hulp                                       |
-| --------- | ----------------------------------- | ------------------------ | ------------ | ------------------------------------------ |
-| 1         | Zichtbaar, vaste volgorde           | 4 woorden, 3–4 letters   | Hele alfabet | Symboolcel na twee fouten                  |
-| 2         | Zichtbaar, geschudde volgorde       | 6 woorden, 3–6 letters   | Hele alfabet | Symboolcel na twee fouten                  |
-| 3         | 1–2 letters verborgen als `?`       | 5–6 woorden, 3–6 letters | Hele alfabet | Eén gegeven voorkomen per verborgen letter |
-| 4 (later) | Geen volledige kaart; enkele givens | 5–7 woorden of één zin   | Hele alfabet | Patronen en herhaalsymbolen                |
+| Niveau    | Codekaart                           | Woorden                | Toetsenbord | Hulp                        |
+| --------- | ----------------------------------- | ---------------------- | ----------- | --------------------------- |
+| 1         | Zichtbaar, vaste volgorde           | 4 woorden, 3–4 letters | QWERTY      | Symboolcel na twee fouten   |
+| 2         | Zichtbaar, geschudde volgorde       | 6 woorden, 3–6 letters | QWERTY      | Symboolcel na twee fouten   |
+| 3         | Zichtbaar, geschudde volgorde       | 6 woorden, 3–6 letters | QWERTY      | Symboolcel na twee fouten   |
+| 4 (later) | Geen volledige kaart; enkele givens | 5–7 woorden of één zin | QWERTY      | Patronen en herhaalsymbolen |
 
 De volgorde van de codekaart is een bewuste moeilijkheidsknop. Het kind zoekt **van symbool naar letter**, niet andersom. Sorteren op letter helpt dus niet; niveau 1 gebruikt daarom een vaste, herkenbare volgorde (de catalogusvolgorde), niveau 2 een geschudde volgorde. Als de kaart op letter zou worden gesorteerd, moet het kind alsnog alle symbolen scannen.
 
-Op niveau 3 verbergt de kaart een of twee letters. In de woorden staat van elke verborgen letter één voorkomen al ingevuld. Het kind vult dat vakje, de codekaart onthult de letter, en daarna kan het de andere woorden verder decoderen. Zo is de puzzel oplosbaar zonder dat het kind het woord al kent, en zonder extra plaatjes of audio. Dat is de eerste echte “kraak”-stap.
+De codekaart is altijd volledig: **geen vraagtekens**. Niveau 3 onderscheidt zich door meer woorden, meer letters en een geschudde kaart. Zo hoeft het kind nooit te gokken hoe een woord eindigt; de code blijft de enige bron van letters.
 
 ### Aannames en eerste versie
 
 - Het kind leest Nederlands en kent de meeste letters; een ouder of leerkracht kan helpen.
-- Touch-first, met muis en fysiek toetsenbord als extra invoer. Geen verplicht schermtoetsenbord met QWERTY-layout.
+- Touch-first, met muis en fysiek toetsenbord als extra invoer. Het schermtoetsenbord staat op QWERTY.
 - Geen account, geen backend, geen analytics; voortgang staat lokaal.
 - Geen tijdsdruk en geen competitie.
 - De eerste versie bevat niveau 1–3, de thema’s **Sinterklaas**, **Tuin** en **Onder water**, en twee rondes per thema per niveau (18 rondes). Voor een kleinere eerste PR: 2 thema’s × 3 niveaus × 2 rondes = 12. Niveau 4 (echte codekraker) is een aparte onderzoeksstap.
@@ -146,7 +146,7 @@ Ik heb op **2026-11-21** gezocht in het npm-register en op GitHub, en de metadat
 
 | Kandidaat                                                                                                                                                                                         | Wat het levert                                                                        | Oordeel                                                                                                                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Eigen engine in `libs/entities/geheime-code`**                                                                                                                                                  | Symbool-lettertabel, givens, controle per letter, deterministische code               | **Voorkeur.** Ongeveer 80–120 regels, geen dependency, precies de gewenste regels en goed testbaar.                                                               |
+| **Eigen engine in `libs/entities/geheime-code`**                                                                                                                                                  | Symbool-lettertabel, controle per letter, deterministische code                       | **Voorkeur.** Ongeveer 80–120 regels, geen dependency, precies de gewenste regels en goed testbaar.                                                               |
 | [`@apiverve/cryptogram`](https://www.npmjs.com/package/@apiverve/cryptogram)                                                                                                                      | Een HTTP-API die een letter-substitutiepuzzel genereert.                              | **Afgevallen.** De generator draait op hun server; `axios` en een API-key horen niet in een statische app. Dit breekt de CSP en de regel “geen externe requests”. |
 | [`mez-encryption`](https://github.com/MoonesMezher/mez-encryption)                                                                                                                                | Caesar- en Pigpen-codering van tekst, met educatieve uitleg.                          | **Afgevallen.** Het levert geen legenda, geen woorden en geen UI. De Pigpen-tekens zijn Unicode-benaderingen, geen nette SVG’s.                                   |
 | [`substitutioncipher-js`](https://github.com/SubramanyaKS/substitutioncipher)                                                                                                                     | Simpele substitutie van letters.                                                      | **Afgevallen.** Alleen encoderen/decoderen; geen symbolen, geen legenda, geen spel. De engine is kleiner dan de dependency.                                       |
@@ -183,16 +183,16 @@ De bestaande stack is al in eerdere onderzoeken gecontroleerd en voldoet: `react
 
 ### Invoer en UI
 
-| Onderdeel          | Keuze                                                                                                       | Waarom                                                                                                                                                                           |
-| ------------------ | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Letters tikken     | Een eigen raster van 12 of 26 letterknoppen met `Button`/`game-panel`.                                      | Simpel, toegankelijk en precies de gewenste volgorde. `react-simple-keyboard` is gebouwd voor een volledig toetsenbord met een layout-API; voor een letterkiezer is dat omwegen. |
-| Fysiek toetsenbord | `react-hotkeys-hook`, zoals Typepret.                                                                       | Al aanwezig; werkt op desktop en tablet met toetsenbord.                                                                                                                         |
-| Slepen             | Niet nodig. `@dnd-kit/core` is aanwezig, maar tikken is voor jonge kinderen en toetsenbordgebruikers beter. | Minder motorische eisen en eenvoudiger te testen.                                                                                                                                |
-| Feedback           | `motion/react` met `useReducedMotion`; korte schaal- en kleurtransities.                                    | Al in de repo; geen constante animaties.                                                                                                                                         |
-| Viering            | `CelebrationDialog` en `Confetti`.                                                                          | Bestaande, gerichte viering.                                                                                                                                                     |
-| Geluid             | `playSound("tap")` bij een toets, `"match"` bij goed, `"almost"` bij een woord, `"win"` bij de ronde.       | Bestaande gesynthetiseerde set; geen nieuwe audiobestanden.                                                                                                                      |
+| Onderdeel          | Keuze                                                                                                       | Waarom                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Letters tikken     | Een eigen QWERTY-raster van 26 letterknoppen met `Button`.                                                  | QWERTY, zodat het kind dezelfde volgorde ziet als op een echt toetsenbord. |
+| Fysiek toetsenbord | `react-hotkeys-hook`, zoals Typepret.                                                                       | Al aanwezig; werkt op desktop en tablet met toetsenbord.                   |
+| Slepen             | Niet nodig. `@dnd-kit/core` is aanwezig, maar tikken is voor jonge kinderen en toetsenbordgebruikers beter. | Minder motorische eisen en eenvoudiger te testen.                          |
+| Feedback           | `motion/react` met `useReducedMotion`; korte schaal- en kleurtransities.                                    | Al in de repo; geen constante animaties.                                   |
+| Viering            | `CelebrationDialog` en `Confetti`.                                                                          | Bestaande, gerichte viering.                                               |
+| Geluid             | `playSound("tap")` bij een toets, `"match"` bij goed, `"almost"` bij een woord, `"win"` bij de ronde.       | Bestaande gesynthetiseerde set; geen nieuwe audiobestanden.                |
 
-De letterkiezer is bewust **geen** volledig toetsenbord. Op niveau 1 ziet het kind alleen de letters die in de codekaart staan, in een rustige volgorde. Dat verlaagt de cognitieve last: het kind hoeft niet tussen 26 letters te zoeken. Op niveau 2 komt het hele alfabet. Een eigen raster is dan ook minder code dan een library met een eigen layout-API en CSS.
+De letterkiezer staat op **QWERTY**, met dezelfde verspringende rijen als een echt toetsenbord. Zo leert het kind de volgorde die het later op een fysiek toetsenbord terugziet. Het hele alfabet is altijd zichtbaar; de codekaart bepaalt welke letter je nodig hebt.
 
 ### Iconen
 
@@ -269,7 +269,7 @@ Als de audio-pass niet in de eerste PR past, is `speech: { kind: "visual" }` een
 De woordensets zijn het echte ontwerpwerk, niet de engine. Daarom:
 
 - **Per ronde één compacte set.** De legenda is de vereniging van de letters. Houd die op 12–14 voor niveau 1–2, anders wordt de codekaart op een telefoon te hoog.
-- **Mix korte en langere woorden.** Niveau 1: 3–4 letters. Niveau 2 en 3: 3–6 letters met een paar gedeelde letters, zodat de givens nuttig zijn.
+- **Mix korte en langere woorden.** Niveau 1: 3–4 letters. Niveau 2 en 3: 3–6 letters. De codekaart blijft altijd volledig.
 - **Herhaal letters binnen de set.** `boot` heeft twee o’s; dat leert dat hetzelfde symbool altijd dezelfde letter is.
 - **Vermijd verwarrende symbolen.** Een ster, hart, maan en sleutel zijn duidelijk verschillend. Twee verschillende bladvormen of twee soorten vissen zijn dat niet.
 - **Wees terughoudend met “piet”.** Het woord kan als woord in een Sinterklaassset, zonder afbeelding van personen. Wil de maintainer gevoeligheden vermijden, dan zijn `mijter`, `staf`, `baard`, `boot`, `pakje`, `schoen`, `snoep` en `boek` voldoende. Dit is een open vraag, geen technische eis.
@@ -290,7 +290,7 @@ Dit zijn alleen de sets uit de huidige korte lijsten; met een grotere themalijst
 Voor de eerste versie is daarom een kleine, gecureerde set genoeg:
 
 - **3 thema’s:** Sinterklaas, Tuin, Onder water.
-- **3 niveaus:** kijk & schrijf, zoek & schrijf, kraak de code (1–2 verborgen letters).
+- **3 niveaus:** kijk & schrijf, zoek & schrijf, kraak de code (volle code, meer letters).
 - **2 rondes per thema per niveau:** 18 rondes, elk 4–6 woorden.
 - Liever kleiner: **2 thema’s × 3 niveaus × 2 rondes = 12 rondes**; de derde thema is de eerste uitbreiding.
 
@@ -342,7 +342,7 @@ libs/pages/geheime-code/
 1. De pagina leest de store en toont de setup of de ronde.
 2. De setup kiest een thema en niveau; de store roept `buildPuzzle(set, seed)` aan.
 3. De engine kiest een willekeurige bijectie tussen de letters van de set en de symbolen. Dezelfde letter krijgt overal hetzelfde symbool; verschillende letters krijgen verschillende symbolen.
-4. De engine bouwt de rijen: per woord een array van `{ letter, symbol }`. Op niveau 3 markeert hij de givens en de verborgen legendaletters.
+4. De engine bouwt de rijen: per woord een array van `{ letter, symbol }`. De codekaart bevat altijd alle letters; er zijn geen givens of vraagtekens.
 5. De UI toont de codekaart en de actieve woordrij. Elke tik gaat naar de store; de store controleert en geeft de nieuwe toestand terug.
 6. Bij het laatste woord schrijft de store het resultaat naar `localStorage` en opent de pagina de viering.
 
@@ -361,11 +361,10 @@ De engine is puur: geen React, geen `localStorage`, geen `Date.now()` in de rege
 - **Entity-tests** in `tests/node/geheime-code.test.ts`:
   - elke set heeft unieke woorden en alleen `a–z`;
   - de vereniging van de letters is ≤ het maximum van het niveau;
+  - de codekaart bevat altijd letters en nooit een vraagteken;
   - de mapping is een bijectie (geen dubbele letters of symbolen);
   - elk woord is volledig codeerbaar;
-  - dezelfde seed geeft dezelfde puzzel;
-  - elke verborgen letter heeft minstens één given;
-  - de givens zijn uniek per verborgen letter.
+  - dezelfde seed geeft dezelfde puzzel.
 - **Feature-tests** met Testing Library: een goede letter blijft staan, een foute letter gaat terug, de hint verschijnt na twee fouten, een woord en een ronde sluiten af.
 - **E2E** in `e2e/geheime-code.spec.ts`: start een ronde, decodeer één woord, controleer de viering en test op 390 px en 1024 px op horizontale overflow.
 - **Kwaliteitsgate:** `pnpm run quality`, daarna `pnpm run fsd` en `boundaries` voor de nieuwe slices. Reken op de gebruikelijke Fallow-regels; houd de UI in de feature en de entity puur, dan zijn er geen uitzonderingen nodig.
@@ -424,12 +423,12 @@ Daarom: **de woorden worden gecureerd, de code wordt gegenereerd.** De engine ka
 ## Risico’s en open vragen
 
 1. **De beginletter-val.** Een kind kan “mijter → M” denken. Onderscheid de legendacode daarom expliciet van de beginlettercode, met een korte eerste uitleg en een voorbeeld. Overweeg om in de generator te vermijden dat de Nederlandse naam van een symbool met dezelfde letter begint als de letter die het voorstelt.
-2. **Het spel is vooral overschrijven.** Met een zichtbare legenda is het een lookup-oefening, geen cryptogram. Dat is voor 6–8 jaar precies goed, maar voor 9+ te makkelijk. Niveau 3 (verborgen legendaletters) en niveau 4 (echte codekraker) zijn nodig om de belofte “code kraken” waar te maken.
+2. **Het spel is vooral overschrijven.** Met een zichtbare legenda is het een lookup-oefening, geen cryptogram. Dat is voor 6–8 jaar precies goed, maar voor 9+ te makkelijk. Niveau 3 (volle code, meer letters) en niveau 4 (echte codekraker) zijn nodig om de belofte “code kraken” waar te maken.
 3. **De legenda op een telefoon.** 12 symbolen passen; 14–16 wordt krap. Cap de eerste versie op 12–14 en test de hoogte op 390 × 844. Als de kaart te hoog wordt, is een compacte kaart met alleen de symbolen van het huidige woord een alternatief, maar dan verliest het kind het overzicht.
-4. **De woordkeuze is het grootste werk.** De engine is klein; de thema’s, de lettervereniging en de givens zijn dat niet. Elke set moet met de hand worden gecontroleerd en getest.
+4. **De woordkeuze is het grootste werk.** De engine is klein; de thema’s en de lettervereniging zijn dat niet. Elke set moet met de hand worden gecontroleerd en getest.
 5. **“Piet”.** Het woord kan als woord voorkomen, maar de keuze vraagt aandacht. Geen afbeeldingen van personen; de maintainer beslist of het woord in de Sinterklaassset blijft.
 6. **Spraak en dubbele audio.** De Woordzoeker heeft al woordaudio. Als Geheime Code dezelfde woorden gebruikt, moeten de regels naar een gedeelde module, anders krijgt de audiocatalogus dubbele id’s. Dat is een kleine refactor, geen blokkade.
-7. **Adaptief of vaste niveaus.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) maakt adaptief de standaard waar een zinvolle as bestaat. Die as is er: woordlengte, legenda-orde en givens. De eerste versie kan met vaste niveaus starten, maar log de pogingen (woord, goed/fout, hints, tijd) al wel volgens het ADR-model, zodat de ladder later zonder migratie kan worden aangezet.
+7. **Adaptief of vaste niveaus.** [ADR 0026](../adr/0026-adaptief-niveaumodel.md) maakt adaptief de standaard waar een zinvolle as bestaat. Die as is er: woordlengte en legenda-orde. De eerste versie kan met vaste niveaus starten, maar log de pogingen (woord, goed/fout, hints, tijd) al wel volgens het ADR-model, zodat de ladder later zonder migratie kan worden aangezet.
 8. **Hoofdletters of kleine letters.** Het werkblad gebruikt hoofdletters; de app en het lezen in groep 3 gebruiken vooral kleine letters. Kies kleine letters voor de woorden en de legenda, of maak het een niveau-instelling. Test het met kinderen voordat het definitief wordt.
 9. **Schermlezer.** Elk symbool heeft een Nederlandse naam nodig; de codekaart moet als lijst of tabel leesbaar zijn; de woordrij moet “ster, leeg” zeggen en niet de letter verklappen. Dit is extra ontwerpwerk, maar het maakt het spel inclusief.
 10. **Geen bewijs van leereffect.** Dit is een puzzel, geen interventie. We claimen hooguit dat het letterherkenning, spelling en aandacht oefent; niet dat het lezen versnelt.

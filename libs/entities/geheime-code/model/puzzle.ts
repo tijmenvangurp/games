@@ -35,29 +35,6 @@ function assignSymbols(
   return mapping;
 }
 
-function firstOccurrences(
-  words: readonly string[],
-  hiddenLetters: readonly string[],
-): ReadonlyMap<string, { row: number; cell: number }> {
-  const found = new Map<string, { row: number; cell: number }>();
-
-  for (const [row, word] of words.entries()) {
-    for (const [cell, letter] of [...word].entries()) {
-      if (hiddenLetters.includes(letter) && !found.has(letter)) {
-        found.set(letter, { row, cell });
-      }
-    }
-  }
-
-  for (const letter of hiddenLetters) {
-    if (!found.has(letter)) {
-      throw new Error(`Verborgen letter ${letter} komt niet in de woorden voor`);
-    }
-  }
-
-  return found;
-}
-
 function validateSet(set: WordSet): void {
   if (set.words.length === 0) {
     throw new Error(`Woordenset ${set.id} is leeg`);
@@ -70,12 +47,6 @@ function validateSet(set: WordSet): void {
       throw new Error(`Woord ${word} in ${set.id} is niet lowercase a-z`);
     }
   }
-  if (set.level === 3 && (set.hidden?.length ?? 0) === 0) {
-    throw new Error(`Niveau 3-set ${set.id} heeft geen verborgen letters`);
-  }
-  if (set.level !== 3 && set.hidden !== undefined) {
-    throw new Error(`Set ${set.id} heeft verborgen letters buiten niveau 3`);
-  }
 }
 
 export function createPuzzle(set: WordSet, random: () => number): Puzzle {
@@ -83,15 +54,9 @@ export function createPuzzle(set: WordSet, random: () => number): Puzzle {
 
   const letters = lettersIn(set.words);
   const symbolByLetter = assignSymbols(letters, random);
-  const hiddenLetters = set.hidden ?? [];
-  const givens = firstOccurrences(set.words, hiddenLetters);
 
   const table: readonly CodeTableCell[] = letters
-    .map((letter) => ({
-      letter,
-      symbolId: symbolByLetter[letter]!,
-      hidden: hiddenLetters.includes(letter),
-    }))
+    .map((letter) => ({ letter, symbolId: symbolByLetter[letter]! }))
     .sort((first, second) => {
       if (set.level === 1) {
         return (SYMBOL_ORDER[first.symbolId] ?? 0) - (SYMBOL_ORDER[second.symbolId] ?? 0);
@@ -101,16 +66,12 @@ export function createPuzzle(set: WordSet, random: () => number): Puzzle {
 
   const orderedTable = set.level === 1 ? table : shuffled(table, random);
 
-  const rows: readonly CodeWordRow[] = set.words.map((word, rowIndex) => ({
+  const rows: readonly CodeWordRow[] = set.words.map((word) => ({
     word,
-    cells: [...word].map<CodeWordCell>((letter, cellIndex) => {
-      const given = givens.get(letter);
-      return {
-        letter,
-        symbolId: symbolByLetter[letter]!,
-        given: given?.row === rowIndex && given.cell === cellIndex,
-      };
-    }),
+    cells: [...word].map<CodeWordCell>((letter) => ({
+      letter,
+      symbolId: symbolByLetter[letter]!,
+    })),
   }));
 
   return {
@@ -120,15 +81,14 @@ export function createPuzzle(set: WordSet, random: () => number): Puzzle {
     set,
     table: orderedTable,
     rows,
-    hiddenLetters,
   };
 }
 
-/** De eerste niet-gegeven lege cel van een woord, of -1 als het woord klaar is. */
+/** De eerste lege cel van een woord, of -1 als het woord klaar is. */
 export function firstEmptyCell(row: CodeWordRow, entries: readonly string[]): number {
-  return row.cells.findIndex((cell, index) => !cell.given && !entries[index]);
+  return row.cells.findIndex((_, index) => !entries[index]);
 }
 
 export function wordComplete(row: CodeWordRow, entries: readonly string[]): boolean {
-  return row.cells.every((cell, index) => Boolean(entries[index]));
+  return row.cells.every((_, index) => Boolean(entries[index]));
 }

@@ -20,10 +20,6 @@ function lettersOf(set: WordSet): string[] {
   return [...new Set(set.words.join(""))].sort();
 }
 
-function countLetter(set: WordSet, letter: string): number {
-  return [...set.words.join("")].filter((value) => value === letter).length;
-}
-
 describe("geheime code: woordensets", () => {
   it("heeft twee gecureerde rondes per thema en niveau", () => {
     expect(WORD_SETS).toHaveLength(THEMES.length * LEVELS.length * 2);
@@ -49,22 +45,6 @@ describe("geheime code: woordensets", () => {
 
       const letters = lettersOf(set);
       expect(letters.length).toBeLessThanOrEqual(set.level === 1 ? 12 : 14);
-    }
-  });
-
-  it("verbergt alleen op niveau 3 een of twee letters", () => {
-    for (const set of WORD_SETS) {
-      if (set.level !== 3) {
-        expect(set.hidden).toBeUndefined();
-        continue;
-      }
-      const letters = lettersOf(set);
-      expect(set.hidden?.length).toBeGreaterThanOrEqual(1);
-      expect(set.hidden?.length).toBeLessThanOrEqual(2);
-      for (const letter of set.hidden ?? []) {
-        expect(letters).toContain(letter);
-        expect(countLetter(set, letter)).toBeGreaterThanOrEqual(2);
-      }
     }
   });
 });
@@ -105,18 +85,10 @@ describe("geheime code: puzzel bouwen", () => {
     expect(second.table).toHaveLength(lettersOf(levelTwo).length);
   });
 
-  it("verbergt op niveau 3 precies de afgesproken letters en geeft één voorkomen", () => {
+  it("toont altijd letters in de codekaart", () => {
     for (const set of WORD_SETS.filter((entry) => entry.level === 3)) {
       const puzzle = createPuzzle(set, mulberry32(42));
-      const hidden = new Set(set.hidden ?? []);
-      const hiddenTable = puzzle.table.filter((cell) => cell.hidden);
-      expect(hiddenTable.map((cell) => cell.letter).sort()).toEqual([...hidden].sort());
-
-      const given = puzzle.rows.flatMap((row) =>
-        row.cells.filter((cell) => cell.given).map((cell) => cell.letter),
-      );
-      expect(given.sort()).toEqual([...hidden].sort());
-      expect(new Set(given).size).toBe(given.length);
+      expect(puzzle.table.every((cell) => /^[a-z]$/.test(cell.letter))).toBe(true);
     }
   });
 

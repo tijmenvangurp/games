@@ -20,66 +20,25 @@ function toneStyle(symbolId: string): CSSProperties {
 interface CodeTokenProps {
   symbolId: string;
   letter: ReactNode;
-  hidden?: boolean;
-  active?: boolean;
   hint?: boolean;
-  wrong?: boolean;
   label: string;
-  onClick?: () => void;
   className?: string;
 }
 
-export function CodeToken({
-  symbolId,
-  letter,
-  hidden = false,
-  active = false,
-  hint = false,
-  wrong = false,
-  label,
-  onClick,
-  className,
-}: CodeTokenProps) {
-  const classes = cn(
-    "code-token flex min-h-16 w-full flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 transition",
-    hidden && "is-hidden",
-    wrong && "is-wrong",
-    active && "ring-2 ring-primary",
-    hint && "ring-2 ring-warning",
-    onClick && "cursor-pointer active:scale-95",
-    className,
-  );
-  const content = (
-    <>
-      <SymbolIcon id={symbolId} className="size-6 sm:size-7" />
-      <span
-        className={cn(
-          "font-display text-lg leading-none",
-          hidden ? "text-muted-foreground" : "text-foreground",
-        )}
-      >
-        {letter}
-      </span>
-    </>
-  );
-
-  if (onClick) {
-    return (
-      <button
-        aria-label={label}
-        className={classes}
-        style={toneStyle(symbolId)}
-        type="button"
-        onClick={onClick}
-      >
-        {content}
-      </button>
-    );
-  }
-
+export function CodeToken({ symbolId, letter, hint = false, label, className }: CodeTokenProps) {
   return (
-    <div aria-label={label} className={classes} role="img" style={toneStyle(symbolId)}>
-      {content}
+    <div
+      aria-label={label}
+      className={cn(
+        "code-token flex min-h-16 w-full flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5",
+        hint && "ring-2 ring-warning",
+        className,
+      )}
+      role="img"
+      style={toneStyle(symbolId)}
+    >
+      <SymbolIcon id={symbolId} className="size-6 sm:size-7" />
+      <span className="font-display text-lg leading-none text-foreground">{letter}</span>
     </div>
   );
 }

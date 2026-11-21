@@ -25,20 +25,14 @@ export function CodeWord({
         const symbol = SYMBOL_BY_ID[cell.symbolId];
         const filled = entries[index] ?? "";
         const active = !wordDone && index === activeCell;
-        const label = `${symbol?.name ?? "symbool"}, ${
-          filled ? `letter ${filled}` : "leeg"
-        }${cell.given ? ", gegeven" : ""}`;
+        const label = `${symbol?.name ?? "symbool"}, ${filled ? `letter ${filled}` : "leeg"}`;
 
         return (
           <button
             key={`${cell.letter}-${index}`}
             aria-current={active ? "step" : undefined}
-            aria-disabled={cell.given || undefined}
             aria-label={label}
-            className={cn(
-              "flex w-12 flex-col items-center gap-1 rounded-xl sm:w-14",
-              cell.given ? "cursor-default" : "cursor-pointer",
-            )}
+            className="flex w-12 cursor-pointer flex-col items-center gap-1 rounded-xl sm:w-14"
             type="button"
             onClick={() => onSelect(index)}
           >
@@ -48,16 +42,9 @@ export function CodeWord({
                 "relative flex size-11 items-center justify-center rounded-xl border border-border bg-card font-display text-2xl transition sm:size-12",
                 active && "border-primary ring-2 ring-primary/25",
                 wrongCell === index && "border-warning bg-warning/10 code-shake",
-                cell.given && "bg-muted",
               )}
             >
               {filled}
-              {cell.given ? (
-                <span
-                  aria-hidden="true"
-                  className="absolute -right-1 -top-1 size-2 rounded-full bg-primary"
-                />
-              ) : null}
             </span>
           </button>
         );

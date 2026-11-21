@@ -22,20 +22,16 @@ export interface WordSet {
   /** Twee rondes per thema en niveau. */
   readonly round: 1 | 2;
   readonly words: readonly string[];
-  /** Alleen op niveau 3: de letters die in de codekaart verborgen zijn. */
-  readonly hidden?: readonly string[];
 }
 
 export interface CodeTableCell {
   readonly letter: string;
   readonly symbolId: string;
-  readonly hidden: boolean;
 }
 
 export interface CodeWordCell {
   readonly letter: string;
   readonly symbolId: string;
-  readonly given: boolean;
 }
 
 export interface CodeWordRow {
@@ -51,7 +47,6 @@ export interface Puzzle {
   /** In weergavevolgorde: op niveau 1 vast, daarna geschud. */
   readonly table: readonly CodeTableCell[];
   readonly rows: readonly CodeWordRow[];
-  readonly hiddenLetters: readonly string[];
 }
 
 export interface RoundResult {

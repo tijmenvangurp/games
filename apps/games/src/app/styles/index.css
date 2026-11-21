@@ -831,15 +831,6 @@
     background: color-mix(in oklab, var(--code-tint, var(--primary)) 10%, var(--card));
   }
 
-  .code-token.is-hidden {
-    border-style: dashed;
-  }
-
-  .code-token.is-wrong {
-    border-color: var(--warning);
-    background: color-mix(in oklab, var(--warning) 10%, var(--card));
-  }
-
   .code-shake {
     animation: code-shake 280ms ease-out;
   }

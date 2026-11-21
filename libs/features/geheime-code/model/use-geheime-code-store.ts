@@ -25,9 +25,6 @@ interface GeheimeCodeStore {
   entries: readonly (readonly string[])[];
   activeRow: number;
   activeCell: number;
-  tableTarget: string | null;
-  tableWrong: boolean;
-  revealed: readonly string[];
   hintLetter: string | null;
   wrongCell: number | null;
   wordMistakes: number;
@@ -44,7 +41,6 @@ interface GeheimeCodeStore {
   typeLetter: (raw: string) => void;
   clearCell: () => void;
   selectCell: (cell: number) => void;
-  selectTableLetter: (letter: string) => void;
   nextWord: () => void;
 }
 
@@ -62,9 +58,6 @@ const INITIAL_STATE = {
   entries: [],
   activeRow: 0,
   activeCell: 0,
-  tableTarget: null,
-  tableWrong: false,
-  revealed: [],
   hintLetter: null,
   wrongCell: null,
   wordMistakes: 0,
@@ -76,7 +69,7 @@ const INITIAL_STATE = {
 };
 
 function emptyEntries(puzzle: Puzzle): string[][] {
-  return puzzle.rows.map((row) => row.cells.map((cell) => (cell.given ? cell.letter : "")));
+  return puzzle.rows.map((row) => row.cells.map(() => ""));
 }
 
 function startRound(set: SetState, theme: ThemeId, level: LevelId, round: 1 | 2): void {
@@ -96,9 +89,6 @@ function startRound(set: SetState, theme: ThemeId, level: LevelId, round: 1 | 2)
     entries,
     activeRow: 0,
     activeCell,
-    tableTarget: null,
-    tableWrong: false,
-    revealed: [],
     hintLetter: null,
     wrongCell: null,
     wordMistakes: 0,
@@ -159,24 +149,6 @@ function fillCurrentCell(set: SetState, get: GetState, letter: string, options: 
   }
 }
 
-function handleTableLetter(set: SetState, get: GetState, letter: string): void {
-  const { tableTarget, revealed } = get();
-  if (!tableTarget) {
-    return;
-  }
-  if (letter === tableTarget) {
-    set({
-      revealed: [...revealed, tableTarget],
-      tableTarget: null,
-      tableWrong: false,
-      hintLetter: null,
-    });
-    playSound("match");
-    return;
-  }
-  set({ tableWrong: true });
-}
-
 function handleWordLetter(
   set: SetState,
   get: GetState,
@@ -211,13 +183,9 @@ function handleLetter(set: SetState, get: GetState, raw: string): void {
   if (!state.puzzle || state.result) {
     return;
   }
-  if (state.tableTarget) {
-    handleTableLetter(set, get, letter);
-    return;
-  }
   const row = state.puzzle.rows[state.activeRow];
   const cell = row?.cells[state.activeCell];
-  if (!row || !cell || cell.given) {
+  if (!row || !cell) {
     return;
   }
   handleWordLetter(set, get, row, cell, letter);
@@ -225,10 +193,6 @@ function handleLetter(set: SetState, get: GetState, raw: string): void {
 
 function clearCell(set: SetState, get: GetState): void {
   const state = get();
-  if (state.tableTarget) {
-    set({ tableTarget: null, tableWrong: false });
-    return;
-  }
   if (!state.puzzle || state.result) {
     return;
   }
@@ -238,16 +202,8 @@ function clearCell(set: SetState, get: GetState): void {
   }
 
   let index = state.activeCell;
-  if (!state.entries[state.activeRow]?.[index]) {
-    for (let candidate = index - 1; candidate >= 0; candidate -= 1) {
-      if (!row.cells[candidate]?.given) {
-        index = candidate;
-        break;
-      }
-    }
-  }
-  if (row.cells[index]?.given) {
-    return;
+  if (!state.entries[state.activeRow]?.[index] && index > 0) {
+    index -= 1;
   }
 
   const rowEntries = [...(state.entries[state.activeRow] ?? [])];
@@ -261,19 +217,10 @@ function clearCell(set: SetState, get: GetState): void {
 function selectCell(set: SetState, get: GetState, cell: number): void {
   const state = get();
   const row = state.puzzle?.rows[state.activeRow];
-  if (!row?.cells[cell] || row.cells[cell]?.given) {
+  if (!row?.cells[cell]) {
     return;
   }
   set({ activeCell: cell, wrongCell: null });
-}
-
-function selectTableLetter(set: SetState, get: GetState, letter: string): void {
-  const state = get();
-  const cell = state.puzzle?.table.find((entry) => entry.letter === letter);
-  if (!cell?.hidden || state.revealed.includes(letter)) {
-    return;
-  }
-  set({ tableTarget: letter, tableWrong: false, wrongCell: null });
 }
 
 function nextWord(set: SetState, get: GetState): void {
@@ -299,8 +246,6 @@ function nextWord(set: SetState, get: GetState): void {
     wordHints: 0,
     hintLetter: null,
     wrongCell: null,
-    tableTarget: null,
-    tableWrong: false,
   });
 }
 
@@ -317,6 +262,5 @@ export const useGeheimeCodeStore = create<GeheimeCodeStore>((set, get) => ({
   typeLetter: (raw) => handleLetter(set, get, raw),
   clearCell: () => clearCell(set, get),
   selectCell: (cell) => selectCell(set, get, cell),
-  selectTableLetter: (letter) => selectTableLetter(set, get, letter),
   nextWord: () => nextWord(set, get),
 }));

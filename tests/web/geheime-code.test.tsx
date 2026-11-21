@@ -17,9 +17,6 @@ beforeEach(() => {
     entries: [],
     activeRow: 0,
     activeCell: 0,
-    tableTarget: null,
-    tableWrong: false,
-    revealed: [],
     hintLetter: null,
     wrongCell: null,
     wordMistakes: 0,
@@ -142,25 +139,9 @@ describe("geheime code scherm", () => {
     expect(loadProgress().best["tuin-1"]).toBe(4);
   });
 
-  it("laat op niveau 3 een verborgen letter in de code invullen", async () => {
+  it("toont op niveau 3 letters in de code en geen vraagtekens", async () => {
     await startRound(/Sinterklaas/, /Kraak de code/);
-
-    const hiddenButtons = screen.getAllByRole("button", { name: /letter onbekend/ });
-    if (hiddenButtons.length === 0) {
-      throw new Error("Geen verborgen codecel");
-    }
-    fireEvent.click(hiddenButtons[0]!);
-    const target = useGeheimeCodeStore.getState().tableTarget;
-    expect(target).toBeTruthy();
-    if (!target) {
-      throw new Error("Geen tabeldoel");
-    }
-
-    const wrong = target === "a" ? "b" : "a";
-    fireEvent.click(screen.getByRole("button", { name: wrong.toUpperCase() }));
-    expect(useGeheimeCodeStore.getState().tableWrong).toBe(true);
-
-    fireEvent.click(screen.getByRole("button", { name: target.toUpperCase() }));
-    expect(useGeheimeCodeStore.getState().revealed).toContain(target);
+    expect(screen.queryByText("?")).toBeNull();
+    expect(screen.getByLabelText("Code").textContent).toMatch(/[a-z]/);
   });
 });

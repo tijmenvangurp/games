@@ -12,22 +12,12 @@ interface RoundViewProps {
   entries: readonly (readonly string[])[];
   activeRow: number;
   activeCell: number;
-  tableTarget: string | null;
-  tableWrong: boolean;
-  revealed: readonly string[];
   hintLetter: string | null;
   wrongCell: number | null;
   wordDone: boolean;
 }
 
-function announcementFor(
-  tableTarget: string | null,
-  wordDone: boolean,
-  wrongCell: number | null,
-): string {
-  if (tableTarget) {
-    return "Kies de letter voor de code.";
-  }
+function announcementFor(wordDone: boolean, wrongCell: number | null): string {
   if (wordDone) {
     return "Woord klaar.";
   }
@@ -62,9 +52,6 @@ function RoundView({
   entries,
   activeRow,
   activeCell,
-  tableTarget,
-  tableWrong,
-  revealed,
   hintLetter,
   wrongCell,
   wordDone,
@@ -80,14 +67,7 @@ function RoundView({
       aria-label="Geheime code"
       className="mx-auto flex w-full max-w-2xl flex-col gap-3 sm:gap-4"
     >
-      <CodeTable
-        hintLetter={hintLetter}
-        puzzle={puzzle}
-        revealed={revealed}
-        tableTarget={tableTarget}
-        tableWrong={tableWrong}
-        onSelect={(letter) => useGeheimeCodeStore.getState().selectTableLetter(letter)}
-      />
+      <CodeTable hintLetter={hintLetter} puzzle={puzzle} />
 
       <Panel as="section" className="code-card" padding="md">
         <CodeWord
@@ -108,7 +88,7 @@ function RoundView({
         ) : null}
 
         <p aria-live="polite" className="sr-only">
-          {announcementFor(tableTarget, wordDone, wrongCell)}
+          {announcementFor(wordDone, wrongCell)}
         </p>
       </Panel>
 
@@ -137,9 +117,6 @@ export function GeheimeCodePlay() {
       entries={state.entries}
       hintLetter={state.hintLetter}
       puzzle={state.puzzle}
-      revealed={state.revealed}
-      tableTarget={state.tableTarget}
-      tableWrong={state.tableWrong}
       wordDone={state.wordDone}
       wrongCell={state.wrongCell}
     />

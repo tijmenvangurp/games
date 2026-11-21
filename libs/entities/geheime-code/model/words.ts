@@ -21,7 +21,7 @@ export const LEVEL_LABEL: Readonly<Record<LevelId, string>> = {
 export const LEVEL_DESCRIPTION: Readonly<Record<LevelId, string>> = {
   1: "Vier korte woorden. De code staat open.",
   2: "Zes woorden en meer letters.",
-  3: "Een of twee letters in de code zijn geheim.",
+  3: "De volle code, zonder hulp.",
 };
 
 /**
@@ -65,7 +65,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 1,
     words: ["pakje", "fiets", "snoep", "schoen", "sint", "boot"],
-    hidden: ["p", "t"],
   },
   {
     id: "sinterklaas-3-2",
@@ -73,7 +72,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 2,
     words: ["mijter", "snoep", "sint", "boek", "boot", "staf"],
-    hidden: ["t", "s"],
   },
   {
     id: "tuin-1-1",
@@ -109,7 +107,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 1,
     words: ["bloem", "vijver", "blad", "roos", "nest"],
-    hidden: ["b", "r"],
   },
   {
     id: "tuin-3-2",
@@ -117,7 +114,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 2,
     words: ["water", "vogel", "nest", "zon", "roos", "blad"],
-    hidden: ["n", "o"],
   },
   {
     id: "onderwater-1-1",
@@ -153,7 +149,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 1,
     words: ["vis", "krab", "boot", "koraal", "walvis", "alg"],
-    hidden: ["a", "l"],
   },
   {
     id: "onderwater-3-2",
@@ -161,7 +156,6 @@ export const WORD_SETS: readonly WordSet[] = [
     level: 3,
     round: 2,
     words: ["zee", "zand", "walvis", "alg", "diep", "haai"],
-    hidden: ["z", "d"],
   },
 ];
 
