@@ -34,5 +34,8 @@
       "cache": true
     }
   },
-  "parallel": 4
+  "parallel": 4,
+  "affected": {
+    "legacy": true
+  }
 }
