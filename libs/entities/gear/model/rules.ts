@@ -5,7 +5,6 @@ import {
   gearRadius,
   gearTeeth,
   holePoint,
-  type ConnectionKind,
   type Point,
 } from "./geometry";
 import { allLevels } from "./levels";
@@ -19,6 +18,7 @@ import type {
   Output,
   OutputPose,
   Placement,
+  PoseConnectionKind,
   TrayItem,
 } from "./types";
 
@@ -37,7 +37,7 @@ interface GearNode {
 }
 
 interface GearEdge {
-  kind: "mesh" | "rigid" | ConnectionKind;
+  kind: "mesh" | "rigid" | PoseConnectionKind;
   from: string;
   to: string;
   /** Signed speed factor from `from` to `to`. */
@@ -165,6 +165,27 @@ function buildEdges(
   const byHole = new Map(nodes.map((node) => [node.holeId, node]));
 
   for (const placement of placements) {
+    if (placement.kind === "axle") {
+      const ends = placementNodes(byHole, placement.fromHoleId, placement.toHoleId);
+      if (!ends) {
+        continue;
+      }
+      const { from, to } = ends;
+      // Een as is star: beide wielen draaien even snel en dezelfde kant op.
+      for (const [source, target] of [
+        [from, to],
+        [to, from],
+      ] as const) {
+        addEdge(adjacency, {
+          kind: "axle",
+          from: source.key,
+          to: target.key,
+          speedFactor: 1,
+          phase: "rigid",
+        });
+      }
+      continue;
+    }
     if (
       placement.kind !== "open-belt" &&
       placement.kind !== "crossed-belt" &&
@@ -295,6 +316,7 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
   const connections: ConnectionPose[] = [];
   for (const placement of placements) {
     if (
+      placement.kind !== "axle" &&
       placement.kind !== "open-belt" &&
       placement.kind !== "crossed-belt" &&
       placement.kind !== "chain"
@@ -308,6 +330,28 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
     }
     const fromRotor = rotors.get(from.key);
     const toRotor = rotors.get(to.key);
+    const active = Boolean(fromRotor?.driven && toRotor?.driven && !jammed);
+
+    if (placement.kind === "axle") {
+      const length = distanceBetween(from.center, to.center);
+      connections.push({
+        key: `axle:${placement.fromHoleId}:${placement.toHoleId}`,
+        kind: "axle",
+        fromKey: from.key,
+        toKey: to.key,
+        path: `M ${from.center.x} ${from.center.y} L ${to.center.x} ${to.center.y}`,
+        active,
+        surfaceSpeed: 0,
+        runs: [
+          { from: from.center, to: to.center },
+          { from: from.center, to: to.center },
+        ],
+        length,
+        chainPitch: 1,
+      });
+      continue;
+    }
+
     const fromRadius = gearRadius(from.size);
     const toRadius = gearRadius(to.size);
     // Het loopvlak van een riem of ketting heeft de oppervlaktesnelheid van de
@@ -322,7 +366,7 @@ export function drive(level: Level, placements: readonly Placement[]): DriveResu
       fromKey: from.key,
       toKey: to.key,
       path: connectionPath(placement.kind, from.center, fromRadius, to.center, toRadius),
-      active: Boolean(fromRotor?.driven && toRotor?.driven && !jammed),
+      active,
       surfaceSpeed,
       runs:
         placement.kind === "chain"
@@ -474,7 +518,7 @@ function canPlaceLink(
   holes: ReadonlyMap<string, Hole>,
   slots: readonly GearSlot[],
   placements: readonly Placement[],
-  next: Extract<Placement, { kind: "open-belt" | "crossed-belt" | "chain" }>,
+  next: Extract<Placement, { kind: "open-belt" | "crossed-belt" | "chain" | "axle" }>,
 ): boolean {
   if (next.fromHoleId === next.toHoleId) {
     return false;
@@ -489,7 +533,8 @@ function canPlaceLink(
     if (
       placement.kind !== "open-belt" &&
       placement.kind !== "crossed-belt" &&
-      placement.kind !== "chain"
+      placement.kind !== "chain" &&
+      placement.kind !== "axle"
     ) {
       continue;
     }
@@ -499,6 +544,10 @@ function canPlaceLink(
   }
 
   const distance = distanceBetween(holePoint(ends.from), holePoint(ends.to));
+  if (next.kind === "axle") {
+    // De as mag niet samenvallen met een tandcontact: dan doen de tanden mee.
+    return distance > gearRadius(ends.fromSlot.size) + gearRadius(ends.toSlot.size);
+  }
   return distance > Math.abs(gearRadius(ends.fromSlot.size) - gearRadius(ends.toSlot.size));
 }
 
@@ -533,6 +582,8 @@ export function trayItemMatches(item: TrayItem, placement: Placement): boolean {
       return item.kind === "belt" && item.crossed === true;
     case "chain":
       return item.kind === "chain";
+    case "axle":
+      return item.kind === "axle";
   }
 }
 
@@ -574,6 +625,7 @@ function describePlacement(placement: Placement): string {
     case "open-belt":
     case "crossed-belt":
     case "chain":
+    case "axle":
       return `${placement.kind} ${placement.fromHoleId} -> ${placement.toHoleId}`;
   }
 }
@@ -705,7 +757,8 @@ function validateConnections(
     if (
       placement.kind !== "open-belt" &&
       placement.kind !== "crossed-belt" &&
-      placement.kind !== "chain"
+      placement.kind !== "chain" &&
+      placement.kind !== "axle"
     ) {
       continue;
     }
@@ -718,7 +771,11 @@ function validateConnections(
       continue;
     }
     const distance = distanceBetween(holePoint(from), holePoint(to));
-    if (distance <= Math.abs(gearRadius(fromSlot.size) - gearRadius(toSlot.size))) {
+    const minimum =
+      placement.kind === "axle"
+        ? gearRadius(fromSlot.size) + gearRadius(toSlot.size)
+        : Math.abs(gearRadius(fromSlot.size) - gearRadius(toSlot.size));
+    if (distance <= minimum) {
       errors.push(`Connection ${describePlacement(placement)} has no room between the wheels`);
     }
   }
@@ -775,5 +832,7 @@ export function trayLabel(item: TrayItem): string {
       return item.crossed === true ? "Gekruiste ketting" : "Ketting";
     case "chain":
       return "Ketting";
+    case "axle":
+      return "As";
   }
 }

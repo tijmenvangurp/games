@@ -34,8 +34,14 @@ function link(
   };
 }
 
+function axle(from: readonly [number, number], to: readonly [number, number]): Placement {
+  return { kind: "axle", fromHoleId: hole(from[0], from[1]), toHoleId: hole(to[0], to[1]) };
+}
+
 type GearPlacement = Extract<Placement, { kind: "gear" }>;
 type LinkPlacement = Extract<Placement, { kind: "open-belt" | "crossed-belt" | "chain" }>;
+type AxlePlacement = Extract<Placement, { kind: "axle" }>;
+type ConnectionPlacement = LinkPlacement | AxlePlacement;
 
 function outputAt(level: Level, index = 0): OutputPose {
   const output = drive(level, level.solution).outputs[index];
@@ -93,6 +99,24 @@ function linkBetween(kind: LinkPlacement["kind"], from: string, to: string): Lin
   return { kind, fromHoleId: from, toHoleId: to };
 }
 
+function hasAxle(level: Level): boolean {
+  return level.tray.some((item) => item.kind === "axle");
+}
+
+function connectionKinds(level: Level): ConnectionPlacement["kind"][] {
+  return hasAxle(level) ? [...linkKinds(level), "axle"] : linkKinds(level);
+}
+
+function connectionBetween(
+  kind: ConnectionPlacement["kind"],
+  from: string,
+  to: string,
+): ConnectionPlacement {
+  return kind === "axle"
+    ? { kind: "axle", fromHoleId: from, toHoleId: to }
+    : linkBetween(kind, from, to);
+}
+
 function fixedHoles(level: Level): string[] {
   return [level.motor.holeId, ...level.outputs.map((output) => output.holeId)];
 }
@@ -100,7 +124,7 @@ function fixedHoles(level: Level): string[] {
 function singlePlacementSolves(
   level: Level,
   gears: readonly GearPlacement[],
-  kinds: readonly LinkPlacement["kind"][],
+  kinds: readonly ConnectionPlacement["kind"][],
 ): boolean {
   for (const gear of gears) {
     if (canPlace(level, [], gear) && solvedBy(level, [gear])) {
@@ -111,8 +135,8 @@ function singlePlacementSolves(
   for (const kind of kinds) {
     for (let first = 0; first < holes.length; first += 1) {
       for (let second = first + 1; second < holes.length; second += 1) {
-        const link = linkBetween(kind, holes[first] as string, holes[second] as string);
-        if (canPlace(level, [], link) && solvedBy(level, [link])) {
+        const connection = connectionBetween(kind, holes[first] as string, holes[second] as string);
+        if (canPlace(level, [], connection) && solvedBy(level, [connection])) {
           return true;
         }
       }
@@ -134,10 +158,10 @@ function twoGearsSolve(level: Level, gears: readonly GearPlacement[]): boolean {
   return false;
 }
 
-function gearPlusLinkSolves(
+function gearPlusConnectionSolves(
   level: Level,
   gears: readonly GearPlacement[],
-  kinds: readonly LinkPlacement["kind"][],
+  kinds: readonly ConnectionPlacement["kind"][],
 ): boolean {
   for (const gear of gears) {
     if (!canPlace(level, [], gear)) {
@@ -149,11 +173,11 @@ function gearPlusLinkSolves(
     ];
     for (const kind of kinds) {
       for (const [from, to] of ends) {
-        const link = linkBetween(kind, from, to);
+        const connection = connectionBetween(kind, from, to);
         if (
-          coversTray(level, [gear, link]) &&
-          canPlace(level, [gear], link) &&
-          solvedBy(level, [gear, link])
+          coversTray(level, [gear, connection]) &&
+          canPlace(level, [gear], connection) &&
+          solvedBy(level, [gear, connection])
         ) {
           return true;
         }
@@ -163,20 +187,20 @@ function gearPlusLinkSolves(
   return false;
 }
 
-function twoLinksSolve(level: Level, kinds: readonly LinkPlacement["kind"][]): boolean {
+function twoConnectionsSolve(level: Level, kinds: readonly ConnectionPlacement["kind"][]): boolean {
   const holes = fixedHoles(level);
-  const links: LinkPlacement[] = [];
+  const connections: ConnectionPlacement[] = [];
   for (const kind of kinds) {
     for (let first = 0; first < holes.length; first += 1) {
       for (let second = first + 1; second < holes.length; second += 1) {
-        links.push(linkBetween(kind, holes[first] as string, holes[second] as string));
+        connections.push(connectionBetween(kind, holes[first] as string, holes[second] as string));
       }
     }
   }
-  for (let first = 0; first < links.length; first += 1) {
-    const a = links[first] as LinkPlacement;
-    for (let second = first + 1; second < links.length; second += 1) {
-      const b = links[second] as LinkPlacement;
+  for (let first = 0; first < connections.length; first += 1) {
+    const a = connections[first] as ConnectionPlacement;
+    for (let second = first + 1; second < connections.length; second += 1) {
+      const b = connections[second] as ConnectionPlacement;
       if (coversTray(level, [a, b]) && canPlace(level, [a], b) && solvedBy(level, [a, b])) {
         return true;
       }
@@ -197,7 +221,7 @@ function hasSolutionWithin(level: Level, limit: 1 | 2): boolean {
   }
 
   const gears = gearCandidates(level);
-  const kinds = linkKinds(level);
+  const kinds = connectionKinds(level);
   if (singlePlacementSolves(level, gears, kinds)) {
     return true;
   }
@@ -206,8 +230,8 @@ function hasSolutionWithin(level: Level, limit: 1 | 2): boolean {
   }
   return (
     twoGearsSolve(level, gears) ||
-    gearPlusLinkSolves(level, gears, kinds) ||
-    twoLinksSolve(level, kinds)
+    gearPlusConnectionSolves(level, gears, kinds) ||
+    twoConnectionsSolve(level, kinds)
   );
 }
 
@@ -241,6 +265,10 @@ const LEVEL_IDS = [
   "de-boog",
   "drie-machines",
   "de-dubbele-trap",
+  "de-eerste-as",
+  "de-versnelling",
+  "de-verdeelas",
+  "de-sluis",
 ] as const;
 
 const INTRODUCES = [
@@ -273,20 +301,25 @@ const INTRODUCES = [
   "gear-arch",
   "chain-and-gear-split",
   "four-gear-split",
+  "rigid-axle",
+  "axle-overdrive",
+  "axle-split",
+  "output-through",
 ] as const;
 
 const BELT_TO_FAR_TARGET = link("open-belt", [0, 2], [9, 2]);
 
 describe("gear levels: catalogue", () => {
-  it("holds twenty-nine levels in the brief's order", () => {
+  it("holds thirty-three levels in the brief's order", () => {
     const levels = allLevels();
 
-    expect(LEVEL_COUNT).toBe(29);
-    expect(levels).toHaveLength(29);
+    expect(LEVEL_COUNT).toBe(33);
+    expect(levels).toHaveLength(33);
     expect(levels.map((level) => level.id)).toEqual([...LEVEL_IDS]);
     expect(levels.map((level) => level.introduces)).toEqual([...INTRODUCES]);
     expect(levels.map((level) => level.chapter)).toEqual([
-      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7,
+      1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 8, 8,
+      8, 8,
     ]);
     levels.forEach((level, index) => {
       expect(levelAt(index)).toBe(level);
@@ -629,6 +662,62 @@ describe("gear levels: chapter 7", () => {
 
   it("eist voor ieder nieuw level minstens drie plaatsingen", () => {
     for (const level of allLevels().filter((candidate) => candidate.chapter === 7)) {
+      expect(level.solution.length, level.id).toBeGreaterThanOrEqual(3);
+      expect(evaluate(level, level.solution), level.id).toBe("solved");
+      expect(hasSolutionWithin(level, 2), level.id).toBe(false);
+    }
+  });
+});
+
+describe("gear levels: chapter 8", () => {
+  it("laat level 30 via een as op een derde snelheid draaien", () => {
+    const level = levelAt(29);
+
+    expect(level.solution).toEqual([gear(4, 3, 3), gear(8, 6, 1), axle([4, 3], [8, 6])]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
+    expect(outputAt(level).speed).toBeCloseTo(1 / 3, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("laat level 31 via een as drie keer zo snel draaien", () => {
+    const level = levelAt(30);
+
+    expect(level.solution).toEqual([gear(2, 3, 1), gear(7, 3, 3), axle([2, 3], [7, 3])]);
+    expect(outputAt(level)).toMatchObject({ satisfied: true, direction: 1 });
+    expect(outputAt(level).speed).toBeCloseTo(3, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("splitst level 32 in een snelle en een trage tak", () => {
+    const level = levelAt(31);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([gear(4, 4, 3), gear(8, 7, 1), axle([4, 4], [8, 7])]);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
+    expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
+    expect(result.outputs[1]?.speed).toBeCloseTo(1 / 3, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("stuurt level 33 door het eerste doel heen", () => {
+    const level = levelAt(32);
+    const result = drive(level, level.solution);
+
+    expect(level.solution).toEqual([
+      gear(2, 4, 1),
+      gear(5, 4, 2),
+      gear(11, 4, 1),
+      axle([8, 4], [11, 4]),
+    ]);
+    expect(level.holes).toHaveLength(90);
+    expect(result.outputs.map((output) => output.satisfied)).toEqual([true, true]);
+    expect(result.outputs[0]?.speed).toBeCloseTo(-1, 6);
+    expect(result.outputs[1]?.speed).toBeCloseTo(0.5, 6);
+    expect(evaluate(level, level.solution)).toBe("solved");
+  });
+
+  it("eist ook in hoofdstuk 8 minstens drie plaatsingen", () => {
+    for (const level of allLevels().filter((candidate) => candidate.chapter === 8)) {
       expect(level.solution.length, level.id).toBeGreaterThanOrEqual(3);
       expect(evaluate(level, level.solution), level.id).toBe("solved");
       expect(hasSolutionWithin(level, 2), level.id).toBe(false);

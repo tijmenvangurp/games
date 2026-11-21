@@ -25,21 +25,25 @@ export interface Output {
 }
 
 export type LinkKind = "open-belt" | "crossed-belt" | "chain";
+/** The connection drawings on the board; an axle is rigid, not a band. */
+export type PoseConnectionKind = LinkKind | "axle";
 
 export type TrayItem =
   | { id: string; kind: "gear"; size: GearSize }
   | { id: string; kind: "belt"; crossed?: boolean }
-  | { id: string; kind: "chain" };
+  | { id: string; kind: "chain" }
+  | { id: string; kind: "axle" };
 
 export type Placement =
   | { kind: "gear"; holeId: string; size: GearSize }
   | { kind: "loose-belt"; holeId: string; link: LinkKind }
-  | { kind: LinkKind; fromHoleId: string; toHoleId: string };
+  | { kind: LinkKind; fromHoleId: string; toHoleId: string }
+  | { kind: "axle"; fromHoleId: string; toHoleId: string };
 
 export interface Level {
   id: string;
   name: string;
-  chapter: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  chapter: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   introduces: string;
   intro: string;
   cols: number;
@@ -75,7 +79,7 @@ export interface BeltRun {
 
 export interface ConnectionPose {
   key: string;
-  kind: "open-belt" | "crossed-belt" | "chain";
+  kind: PoseConnectionKind;
   fromKey: string;
   toKey: string;
   /** Closed SVG path in board coordinates. Blijft de bron voor de ketting. */

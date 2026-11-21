@@ -16,6 +16,7 @@ import {
   connectionKey,
   holeForGearKey,
   holesForPlacement,
+  isConnectionPlacement,
   isLinkPlacement,
   linkPlacementKind,
   nextSolutionPlacement,
@@ -353,7 +354,7 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
   if (key.startsWith("belt:")) {
     const wantedKey = key.slice("belt:".length);
     const placement = placements.find(
-      (candidate) => isLinkPlacement(candidate) && connectionKey(candidate) === wantedKey,
+      (candidate) => isConnectionPlacement(candidate) && connectionKey(candidate) === wantedKey,
     );
     return placement ? { placement } : null;
   }
@@ -361,7 +362,7 @@ function findPlaced(placements: readonly Placement[], key: string): FoundPlaceme
 }
 
 function attachedPlacements(state: DraaiwerkStore, removed: Placement): Placement[] {
-  if (removed.kind === "loose-belt" || isLinkPlacement(removed)) {
+  if (removed.kind === "loose-belt" || isConnectionPlacement(removed)) {
     return [];
   }
   const holes = holesForPlacement(removed);
@@ -373,7 +374,7 @@ function attachedPlacements(state: DraaiwerkStore, removed: Placement): Placemen
       return holes.has(placement.holeId);
     }
     return (
-      isLinkPlacement(placement) &&
+      isConnectionPlacement(placement) &&
       (holes.has(placement.fromHoleId) || holes.has(placement.toHoleId))
     );
   });
@@ -556,6 +557,39 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
       }
     }
     set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
+    return;
+  }
+
+  if (item.kind === "axle") {
+    if (!state.pendingGearKey) {
+      set({
+        pendingGearKey: key,
+        feedback: "Tik nu een tweede tandwiel voor de as.",
+        feedbackTone: "info",
+      });
+      playSound("select");
+      playHaptic("select");
+      return;
+    }
+
+    const anchorHoleId = holeForGearKey(state.level, state.pendingGearKey);
+    if (anchorHoleId === holeId) {
+      set({ pendingGearKey: null, feedback: null, feedbackTone: null });
+      return;
+    }
+    if (!anchorHoleId) {
+      return;
+    }
+
+    const placement: Placement = {
+      kind: "axle",
+      fromHoleId: anchorHoleId,
+      toHoleId: holeId,
+    };
+    const placed = attemptPlacement(set, get, placement, item.id);
+    if (placed) {
+      set({ selectedTrayId: null, pendingGearKey: null });
+    }
     return;
   }
 

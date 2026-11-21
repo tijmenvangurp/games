@@ -78,6 +78,14 @@ function linkAt(
   };
 }
 
+function axleAt(from: readonly [number, number], to: readonly [number, number]): Placement {
+  return {
+    kind: "axle",
+    fromHoleId: `${from[0]},${from[1]}`,
+    toHoleId: `${to[0]},${to[1]}`,
+  };
+}
+
 function gearPose(result: DriveResult, key: string): GearPose {
   const pose = result.gears.find((gear) => gear.key === key);
   if (!pose) {
@@ -441,6 +449,9 @@ describe("gear rules: belt runs and surface speed", () => {
       const result = drive(level, level.solution);
 
       for (const connection of result.connections) {
+        if (connection.kind === "axle") {
+          continue;
+        }
         const from = gearPose(result, connection.fromKey);
         const to = gearPose(result, connection.toKey);
         const expected = connectionLength(
@@ -481,6 +492,9 @@ describe("gear rules: belt runs and surface speed", () => {
       expect(result.connections.length).toBeGreaterThan(0);
 
       for (const connection of result.connections) {
+        if (connection.kind === "axle") {
+          continue;
+        }
         const from = gearPose(result, connection.fromKey);
         const to = gearPose(result, connection.toKey);
         const precise = connectionLength(
@@ -791,6 +805,82 @@ describe("gear rules: level validation", () => {
     const result = drive(blank, []);
     expect(result.outputs[0]?.satisfied).toBe(false);
     expect(result.solved).toBe(false);
+  });
+});
+
+describe("gear rules: axle", () => {
+  it("draait twee wielen even snel en dezelfde kant op", () => {
+    const level = makeLevel({
+      cols: 9,
+      rows: 3,
+      motor: motorAt(0, 1),
+      outputs: [targetAt(7, 1)],
+      solution: [gearAt(2, 1, 1), gearAt(5, 1, 1), axleAt([2, 1], [5, 1])],
+    });
+    const result = drive(level, level.solution);
+
+    expect(result.solved).toBe(true);
+    expect(gearPose(result, "gear:2,1").speed).toBeCloseTo(-1, 6);
+    expect(gearPose(result, "gear:5,1").speed).toBeCloseTo(-1, 6);
+    expect(result.outputs[0]?.speed).toBeCloseTo(1, 6);
+    expect(result.outputs[0]?.direction).toBe(1);
+  });
+
+  it("verandert de snelheid via de maat aan de andere kant van de as", () => {
+    const level = makeLevel({
+      cols: 12,
+      rows: 3,
+      motor: motorAt(0, 1),
+      outputs: [targetAt(11, 1)],
+      solution: [gearAt(4, 1, 3), gearAt(9, 1, 1), axleAt([4, 1], [9, 1])],
+    });
+
+    expect(drive(level, level.solution).outputs[0]?.speed).toBeCloseTo(1 / 3, 6);
+  });
+
+  it("weigert een as korter dan de twee wielen", () => {
+    const level = makeLevel({
+      cols: 4,
+      rows: 5,
+      motor: motorAt(0, 2, 2),
+      outputs: [targetAt(1, 2)],
+    });
+
+    expect(canPlace(level, [], axleAt([0, 2], [1, 2]))).toBe(false);
+  });
+
+  it("weigert een tweede verbinding tussen hetzelfde paar", () => {
+    const level = makeLevel({
+      cols: 9,
+      rows: 3,
+      motor: motorAt(0, 1),
+      outputs: [targetAt(8, 1)],
+      solution: [gearAt(2, 1, 1), gearAt(6, 1, 1), axleAt([2, 1], [6, 1])],
+    });
+
+    expect(
+      canPlace(
+        level,
+        [gearAt(2, 1, 1), gearAt(6, 1, 1), axleAt([2, 1], [6, 1])],
+        axleAt([2, 1], [6, 1]),
+      ),
+    ).toBe(false);
+    expect(
+      canPlace(
+        level,
+        [gearAt(2, 1, 1), gearAt(6, 1, 1), axleAt([2, 1], [6, 1])],
+        linkAt("chain", [2, 1], [6, 1]),
+      ),
+    ).toBe(false);
+  });
+
+  it("levert een zichtbare as-verbinding op", () => {
+    const level = levelAt(29);
+    const connection = drive(level, level.solution).connections[0];
+
+    expect(connection).toMatchObject({ kind: "axle", active: true });
+    expect(connection?.length).toBeGreaterThan(0);
+    expect(trayLabel({ id: "as", kind: "axle" })).toBe("As");
   });
 });
 
