@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { frenchAudioSrc, frenchExampleAudioSrc, type FrenchLesson } from "@entities/french";
-import { Button, Volume2 } from "@shared/ui";
+import { Button, Panel, Volume2 } from "@shared/ui";
 import { useFrenchProgressStore } from "../model/use-french-progress-store";
 import { FrenchFlashcard } from "./french-flashcard";
 import { FrenchFlashcardSummary } from "./french-flashcard-summary";
@@ -50,20 +50,18 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
-      <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
+      <Panel className="flex items-center justify-between gap-3 px-4 py-3" padding="none">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Oefen met kaarten
-          </p>
-          <p className="text-sm font-bold">
+          <p className="text-xs font-semibold text-muted-foreground">Oefen met kaarten</p>
+          <p className="text-sm font-bold tabular-nums">
             Kaart {index + 1} van {items.length}
           </p>
         </div>
-        <div className="text-right text-xs text-muted-foreground">
+        <div className="text-right text-xs tabular-nums text-muted-foreground">
           <p>{known} gekend</p>
           <p>{practice} te oefenen</p>
         </div>
-      </div>
+      </Panel>
 
       <FrenchFlashcard flipped={flipped} item={item} onFlip={() => setFlipped((value) => !value)} />
 

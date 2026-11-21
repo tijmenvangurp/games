@@ -6,7 +6,7 @@ import {
   type PlayerState,
   type TurnEvent,
 } from "@entities/ganzenbord";
-import { Button, Play } from "@shared/ui";
+import { Button, Panel, Play } from "@shared/ui";
 import { eventCard, type TurnAnimation } from "../model/animation";
 import { eventMessage, playerName, statusHint, turnText } from "../model/presentation";
 import { useGanzenbordStore } from "../model/use-ganzenbord-store";
@@ -233,7 +233,7 @@ function DicePanel() {
   const computerTurn = current?.controller === "computer" && !finished;
 
   return (
-    <div className="game-panel flex flex-col gap-2 p-3">
+    <Panel className="flex flex-col gap-2" padding="sm">
       <GanzenbordDice ref={diceRef} onDone={handleDiceDone} />
       <Button
         aria-label="Gooi met de dobbelstenen"
@@ -247,7 +247,7 @@ function DicePanel() {
         {rollButtonLabel(finished, rolling, animating, computerTurn)}
       </Button>
       <DiceStatus {...diceStatusText(game, events, rolling, current, computerTurn, animation)} />
-    </div>
+    </Panel>
   );
 }
 

@@ -5,19 +5,20 @@ import {
   type FlagQuestion,
   type FlagScope,
 } from "@entities/geography";
-import { cn } from "@shared/lib";
-import { Button, Check, X } from "@shared/ui";
+import { cn, praiseFor } from "@shared/lib";
+import { AnswerOption, Button, Flag, Panel, ScoreHeader, type AnswerState } from "@shared/ui";
 import { useFlagStore } from "../model/use-flags-store";
 import { PlaceMap } from "./place-map";
-
-type ChoiceState = "default" | "wrong" | "correct" | "muted";
 
 function FlagPicture({ code, className }: { code: string; className?: string }) {
   return (
     <img
       alt=""
       aria-hidden="true"
-      className={cn("aspect-4/3 w-full rounded-xl border object-cover", className)}
+      className={cn(
+        "aspect-4/3 h-auto w-full rounded-xl border border-border object-cover",
+        className,
+      )}
       height={480}
       src={flagSrc({ code })}
       width={640}
@@ -25,26 +26,9 @@ function FlagPicture({ code, className }: { code: string; className?: string }) 
   );
 }
 
-function ChoiceMark({ state }: { state: ChoiceState }) {
-  if (state === "correct") {
-    return <Check aria-hidden="true" className="size-5 shrink-0 text-emerald-600" />;
-  }
-  if (state === "wrong") {
-    return <X aria-hidden="true" className="size-5 shrink-0 text-rose-500" />;
-  }
-  return null;
-}
-
-const CHOICE_CLASSES: Record<ChoiceState, string> = {
-  default: "border-border bg-card hover:bg-muted",
-  wrong: "border-rose-300 bg-rose-50",
-  correct: "border-emerald-400 bg-emerald-50",
-  muted: "border-border bg-muted opacity-50",
-};
-
 interface ChoiceProps {
   subject: { code: string; name: string };
-  state: ChoiceState;
+  state: AnswerState;
   /** Dense layout for levels with many choices, such as all twelve provinces. */
   compact: boolean;
   onSelect: () => void;
@@ -52,39 +36,27 @@ interface ChoiceProps {
 
 function NameChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
-    <button
+    <AnswerOption
       aria-label={subject.name}
-      className={cn(
-        "flex items-center justify-center gap-2 rounded-2xl border-2 font-bold transition active:scale-95",
-        compact ? "min-h-12 px-1 text-sm" : "min-h-14 px-3 text-base",
-        CHOICE_CLASSES[state],
-      )}
-      disabled={state !== "default"}
-      type="button"
+      size={compact ? "sm" : "md"}
+      state={state}
       onClick={onSelect}
     >
       {subject.name}
-      <ChoiceMark state={state} />
-    </button>
+    </AnswerOption>
   );
 }
 
 function FlagChoice({ subject, state, compact, onSelect }: ChoiceProps) {
   return (
-    <button
+    <AnswerOption
       aria-label={subject.name}
-      className={cn(
-        "flex items-center justify-center gap-1 rounded-2xl border-2 transition active:scale-95",
-        compact ? "min-h-14 p-1" : "min-h-16 p-2",
-        CHOICE_CLASSES[state],
-      )}
-      disabled={state !== "default"}
-      type="button"
+      className={compact ? "min-h-14 gap-1 p-1" : "min-h-16 gap-1 p-2"}
+      state={state}
       onClick={onSelect}
     >
       <FlagPicture code={subject.code} />
-      <ChoiceMark state={state} />
-    </button>
+    </AnswerOption>
   );
 }
 
@@ -93,7 +65,7 @@ function choiceState(
   code: string,
   wrongChoices: readonly string[],
   answered: boolean,
-): ChoiceState {
+): AnswerState {
   if (answered && code === question.subject.code) {
     return "correct";
   }
@@ -118,7 +90,9 @@ function FlagChoices({
     question.direction === "vlag-naar-land"
       ? compact
         ? "grid-cols-2 sm:grid-cols-3"
-        : "grid-cols-1 sm:grid-cols-2"
+        : count === 3
+          ? "grid-cols-1 sm:grid-cols-3"
+          : "grid-cols-1 sm:grid-cols-2"
       : compact
         ? "grid-cols-4 sm:grid-cols-6"
         : count === 3
@@ -135,16 +109,16 @@ function FlagChoices({
           <NameChoice
             key={subject.code}
             compact={compact}
-            subject={subject}
             state={state}
+            subject={subject}
             onSelect={select}
           />
         ) : (
           <FlagChoice
             key={subject.code}
             compact={compact}
-            subject={subject}
             state={state}
+            subject={subject}
             onSelect={select}
           />
         );
@@ -157,21 +131,35 @@ function FlagFeedback({
   question,
   answered,
   correct,
+  praise,
 }: {
   question: FlagQuestion;
   answered: boolean;
   correct: boolean;
+  praise: string;
 }) {
   if (!answered) {
     return (
-      <p aria-live="polite" className="text-center text-sm font-semibold text-muted-foreground">
-        Kies het juiste antwoord.
-      </p>
+      <Panel
+        className="flex flex-col items-center justify-center gap-2 text-center lg:min-h-64"
+        padding="lg"
+        surface="subtle"
+      >
+        <span
+          aria-hidden="true"
+          className="grid size-11 place-items-center rounded-full bg-card text-primary shadow-xs"
+        >
+          <Flag className="size-5" />
+        </span>
+        <p aria-live="polite" className="text-sm font-semibold text-muted-foreground">
+          Kies het juiste antwoord.
+        </p>
+      </Panel>
     );
   }
 
   const message = correct
-    ? "Goed zo!"
+    ? praise
     : question.direction === "vlag-naar-land"
       ? `Het juiste antwoord is ${question.subject.name}.`
       : `De juiste vlag is de vlag van ${question.subject.name}.`;
@@ -182,7 +170,7 @@ function FlagFeedback({
         aria-live="polite"
         className={cn(
           "text-center text-sm font-bold",
-          correct ? "text-emerald-700" : "text-rose-600",
+          correct ? "text-success-ink" : "text-danger-ink",
         )}
       >
         {message}
@@ -198,10 +186,12 @@ function FlagFeedback({
 function QuestionCard({
   question,
   isLast,
+  praise,
   scope,
 }: {
   question: FlagQuestion;
   isLast: boolean;
+  praise: string;
   scope: FlagScope;
 }) {
   const wrongChoices = useFlagStore((state) => state.wrongChoices);
@@ -210,7 +200,7 @@ function QuestionCard({
   const showsFlag = question.direction === "vlag-naar-land";
 
   return (
-    <section className="rounded-3xl border bg-card p-4 shadow-sm sm:p-6">
+    <Panel as="section" padding="lg">
       <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
         <div>
           <p className="text-center text-sm font-bold text-muted-foreground">
@@ -219,10 +209,10 @@ function QuestionCard({
 
           {showsFlag ? (
             <div className="mx-auto mt-3 max-w-sm">
-              <FlagPicture className="bg-white" code={question.subject.code} />
+              <FlagPicture className="bg-card" code={question.subject.code} />
             </div>
           ) : (
-            <p className="mt-3 text-center text-3xl font-black tracking-tight sm:text-4xl">
+            <p className="mt-3 text-center font-display text-3xl tracking-tight sm:text-4xl">
               {question.subject.name}
             </p>
           )}
@@ -233,7 +223,7 @@ function QuestionCard({
         </div>
 
         <div className="mt-4 lg:mt-0">
-          <FlagFeedback answered={answered} correct={correct} question={question} />
+          <FlagFeedback answered={answered} correct={correct} praise={praise} question={question} />
 
           {answered ? (
             <Button
@@ -247,7 +237,7 @@ function QuestionCard({
           ) : null}
         </div>
       </div>
-    </section>
+    </Panel>
   );
 }
 
@@ -264,17 +254,14 @@ export function FlagsPlay() {
 
   return (
     <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
-      <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
-        <p className="text-sm font-black text-muted-foreground">
-          Vraag {questionIndex + 1} van {round.questions.length}
-        </p>
-        <div className="flex items-center gap-3 text-sm font-bold">
-          <span aria-label={`${stars} sterren`}>⭐ {stars}</span>
-          {streak > 0 ? <span aria-label={`${streak} op een rij`}>🔥 {streak}</span> : null}
-        </div>
-      </header>
+      <ScoreHeader
+        progress={`Vraag ${questionIndex + 1} van ${round.questions.length}`}
+        stars={stars}
+        streak={streak}
+      />
       <QuestionCard
         isLast={questionIndex + 1 >= round.questions.length}
+        praise={praiseFor(round.seed, questionIndex)}
         question={question}
         scope={round.scope}
       />

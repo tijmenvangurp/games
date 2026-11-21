@@ -1,5 +1,5 @@
 import type { WordSearchDifficulty, WordSearchTheme } from "@entities/word-search";
-import { OptionPicker, SetupActions } from "@shared/ui";
+import { OptionPicker, SetupPanel } from "@shared/ui";
 import {
   WORD_SEARCH_DIFFICULTY_OPTIONS,
   WORD_SEARCH_THEME_OPTIONS,
@@ -20,27 +20,23 @@ export function WordSearchSetup({
   onStart,
 }: WordSearchSetupProps) {
   return (
-    <section className="game-panel animate-rise p-4 sm:p-6">
-      <h2 className="mb-5 font-display text-2xl">Nieuw spel</h2>
-
+    <SetupPanel onStart={onStart}>
       <OptionPicker
         legend="Moeilijkheid"
         options={WORD_SEARCH_DIFFICULTY_OPTIONS}
         selected={settings.difficulty}
+        size="compact"
         onSelect={onDifficultyChange}
       />
 
-      <div className="mt-5">
-        <OptionPicker
-          columns={3}
-          legend="Welk thema?"
-          options={WORD_SEARCH_THEME_OPTIONS}
-          selected={settings.theme}
-          onSelect={onThemeChange}
-        />
-      </div>
-
-      <SetupActions onStart={onStart} />
-    </section>
+      <OptionPicker
+        columns={3}
+        legend="Welk thema?"
+        options={WORD_SEARCH_THEME_OPTIONS}
+        selected={settings.theme}
+        size="compact"
+        onSelect={onThemeChange}
+      />
+    </SetupPanel>
   );
 }

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
-import { Check, X } from "@shared/ui";
+import { Check, Panel, X } from "@shared/ui";
 import { MURDOKU_V1_LEGEND, murdokuLegend } from "../lib/legend";
 import { MurdokuObjectIcon } from "./murdoku-object-icon";
 
@@ -29,7 +29,7 @@ export function MurdokuObjectLegend({ puzzle, lootName, className }: MurdokuObje
   ] as const;
 
   return (
-    <div className={cn("game-panel grid grid-cols-1 gap-4 p-4 sm:grid-cols-2", className)}>
+    <Panel className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2", className)} padding="md">
       {groups.map((group) => (
         <div key={group.label} className="min-w-0">
           <h3 className="flex items-center gap-1.5 text-sm font-medium">
@@ -62,6 +62,6 @@ export function MurdokuObjectLegend({ puzzle, lootName, className }: MurdokuObje
         Een raam is geen vakje: het zit op de muur.
         {lootName ? <> De buit ({lootName}) heeft een eigen icoon en is geen meubel.</> : null}
       </p>
-    </div>
+    </Panel>
   );
 }

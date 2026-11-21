@@ -1,5 +1,5 @@
 import type { MurdokuSettings } from "@features/murdoku-game";
-import { Button } from "@shared/ui";
+import { Button, Panel } from "@shared/ui";
 
 interface MurdokuSettingsSectionProps {
   settings: MurdokuSettings;
@@ -13,7 +13,7 @@ interface MurdokuSettingsSectionProps {
  */
 export function MurdokuSettingsSection({ settings, onAutoCross }: MurdokuSettingsSectionProps) {
   return (
-    <section aria-labelledby="murdoku-instellingen" className="game-panel p-4 sm:p-5">
+    <Panel as="section" aria-labelledby="murdoku-instellingen" padding="md">
       <h2 className="font-display text-xl" id="murdoku-instellingen">
         Zo speel ik
       </h2>
@@ -35,6 +35,6 @@ export function MurdokuSettingsSection({ settings, onAutoCross }: MurdokuSetting
         Automatisch wegstrepen zet zelf een kruisje in de rij en kolom van iemand die je plaatst. Zo
         hoef je die vakjes niet zelf weg te strepen.
       </p>
-    </section>
+    </Panel>
   );
 }

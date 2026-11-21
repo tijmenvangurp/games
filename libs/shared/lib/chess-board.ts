@@ -226,12 +226,13 @@ export function chessBoardOptions({
     allowDrawingArrows: false,
     animationDurationInMs: 160,
     boardStyle: {
-      borderRadius: "1.25rem",
+      borderRadius: "1rem",
+      border: "1px solid var(--border)",
       overflow: "hidden",
-      boxShadow: "0 24px 60px -32px rgba(15, 23, 42, 0.55)",
+      boxShadow: "var(--ds-shadow-panel)",
     },
-    lightSquareStyle: { backgroundColor: "#fef3c7" },
-    darkSquareStyle: { backgroundColor: "#7dd3fc" },
+    lightSquareStyle: { backgroundColor: "#f6efe0" },
+    darkSquareStyle: { backgroundColor: "#8fa8c2" },
     squareStyles,
     canDragPiece: ({ isSparePiece, piece }) =>
       !isSparePiece && piece.pieceType.startsWith(dragColor),

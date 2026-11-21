@@ -1,5 +1,6 @@
 import { getPokemon } from "@entities/pokedex";
 import { cn, playHaptic, playSound } from "@shared/lib";
+import { Panel } from "@shared/ui";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryCard } from "./memory-card";
 
@@ -61,7 +62,7 @@ export function MemoryBoard() {
   };
 
   return (
-    <div className="game-panel mx-auto w-full max-w-2xl p-2 sm:p-3">
+    <Panel className="mx-auto w-full max-w-2xl p-2 sm:p-3" padding="none">
       <div className={cn("grid w-full gap-2 sm:gap-3", columnsFor(scene.pairs))}>
         {scene.cards.map((pokemonId, index) => {
           const pokemon = getPokemon(pokemonId);
@@ -83,6 +84,6 @@ export function MemoryBoard() {
           );
         })}
       </div>
-    </div>
+    </Panel>
   );
 }

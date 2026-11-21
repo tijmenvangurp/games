@@ -1,4 +1,4 @@
-import { Button, Volume2 } from "@shared/ui";
+import { Button, Panel, Volume2 } from "@shared/ui";
 
 interface FrenchAudioPanelProps {
   kind: "word" | "phrase";
@@ -11,21 +11,20 @@ export function FrenchAudioPanel({ kind, onReplay }: FrenchAudioPanelProps) {
   const ariaLabel = isWord ? "Beluister het Franse woord" : "Beluister de Franse zin";
 
   return (
-    <div className="game-panel p-5 text-center">
-      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
-      <button
+    <Panel className="text-center" padding="lg">
+      <p className="text-sm font-semibold text-muted-foreground">{label}</p>
+      <Button
         aria-label={ariaLabel}
-        className="mx-auto mt-3 grid size-24 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
-        type="button"
+        className="mx-auto mt-3 size-24 rounded-full p-0"
         onClick={() => onReplay(1)}
       >
         <Volume2 aria-hidden="true" className="size-10" />
-      </button>
+      </Button>
       <div className="mt-3 flex justify-center gap-2">
         <Button size="sm" variant="outline" onClick={() => onReplay(0.7)}>
           Langzaam
         </Button>
       </div>
-    </div>
+    </Panel>
   );
 }

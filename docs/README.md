@@ -11,6 +11,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `../VENDORED.md` — de 1:1 overgenomen MIT-code: bron, commit, licentie, lokale patches en updateprocedure.
 - `tooling.md` — Nx-daemon, cache, Fallow, TTS, Varlock en de bijbehorende permission-regels.
 - `design-system.md` — de visuele basis, gedeelde componenten en spraak.
+- `thumbnails.md` — de stijlafspraken en prompts voor de spelthumbnails, plus het script dat ze bouwt en controleert.
 - `agents/issue-tracker.md` — GitHub Issues via `gh`.
 - `agents/triage-labels.md` — de labels voor de triage-skills.
 - `agents/domain.md` — hoe de skills `GLOSSARY.md` en de ADR's lezen.

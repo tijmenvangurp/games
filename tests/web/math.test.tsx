@@ -3,7 +3,7 @@ import { createMemoryHistory } from "@tanstack/react-router";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
-import type { MathQuestion, MathRound } from "@entities/math";
+import { praiseSpeech, type MathQuestion, type MathRound } from "@entities/math";
 import { DEFAULT_MATH_SETTINGS, loadMathState, useMathStore } from "@features/math-trainer";
 
 beforeEach(() => {
@@ -58,7 +58,7 @@ function answerCurrentCorrectly() {
   const question = currentQuestion();
   clickAnswer(question.answer);
   expect(useMathStore.getState().answered).toBe(true);
-  expect(screen.getByText("Goed gerekend!")).toBeTruthy();
+  expect(screen.getByText(praiseSpeech(currentRound().seed, question).text)).toBeTruthy();
 }
 
 function advanceRound() {
@@ -127,7 +127,7 @@ describe("math trainer", () => {
     expect(useMathStore.getState().answered).toBe(true);
     expect(useMathStore.getState().correct).toBe(true);
     expect(useMathStore.getState().stars).toBe(0);
-    expect(screen.getByText("Goed gerekend!")).toBeTruthy();
+    expect(screen.getByText(praiseSpeech(currentRound().seed, question).text)).toBeTruthy();
     expect(screen.getByText(/Tel verder vanaf/)).toBeTruthy();
   });
 

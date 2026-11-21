@@ -1,5 +1,14 @@
 import type { MazeLevel } from "@entities/arrow";
-import { ArrowLeft, Button, Lightbulb, RotateCcw, SoundToggle, Undo2 } from "@shared/ui";
+import {
+  ArrowLeft,
+  Button,
+  Lightbulb,
+  Panel,
+  ProgressBar,
+  RotateCcw,
+  SoundToggle,
+  Undo2,
+} from "@shared/ui";
 
 interface MazeHudProps {
   level: MazeLevel;
@@ -24,10 +33,8 @@ export function MazeHud({
   onHint,
   onRestart,
 }: MazeHudProps) {
-  const progress = level.arrows.length === 0 ? 0 : removedCount / level.arrows.length;
-
   return (
-    <header className="game-panel space-y-2 p-3">
+    <Panel as="header" className="space-y-2" padding="sm">
       <div className="flex items-center gap-0.5">
         <Button aria-label="Terug" size="icon" variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
@@ -48,19 +55,12 @@ export function MazeHud({
       </div>
 
       <div className="flex items-center gap-2">
-        <div
-          aria-label={`${removedCount} van ${level.arrows.length} pijlen weg`}
-          aria-valuemax={level.arrows.length}
-          aria-valuemin={0}
-          aria-valuenow={removedCount}
-          className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted"
-          role="progressbar"
-        >
-          <div
-            className="h-full rounded-full bg-primary transition-all duration-300"
-            style={{ width: `${progress * 100}%` }}
-          />
-        </div>
+        <ProgressBar
+          className="flex-1"
+          label={`${removedCount} van ${level.arrows.length} pijlen weg`}
+          max={level.arrows.length}
+          value={removedCount}
+        />
         <Button aria-label="Hint" disabled={!playing} size="icon" variant="ghost" onClick={onHint}>
           <Lightbulb aria-hidden="true" className="size-5 text-warning" />
         </Button>
@@ -70,11 +70,11 @@ export function MazeHud({
       </div>
 
       <div className="flex items-baseline justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="text-xs font-semibold tabular-nums text-muted-foreground">
           Level {levelIndex + 1}
         </p>
-        <p className="text-sm font-black">{level.name}</p>
+        <p className="font-display text-base">{level.name}</p>
       </div>
-    </header>
+    </Panel>
   );
 }

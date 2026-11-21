@@ -1,31 +1,28 @@
-import { Button, Play } from "@shared/ui";
-import { cn } from "@shared/lib";
+import { Button, Play, StatusBanner } from "@shared/ui";
 
 interface QuizFeedbackProps {
   correct: boolean;
+  praise: string;
   targetName: string;
   onNext: () => void;
 }
 
-export function QuizFeedback({ correct, targetName, onNext }: QuizFeedbackProps) {
+export function QuizFeedback({ correct, praise, targetName, onNext }: QuizFeedbackProps) {
   return (
-    <div
-      className={cn(
-        "animate-pop rounded-lg border p-4 text-center",
-        correct ? "border-success/45 bg-success/10" : "border-warning/45 bg-warning/10",
-      )}
+    <StatusBanner
+      align="center"
+      className="animate-pop flex-col p-4"
       role="status"
+      tone={correct ? "success" : "warning"}
     >
-      <p className={cn("text-lg font-black", correct ? "text-success" : "text-warning")}>
-        {correct ? "Je vond het!" : "Nog niet."}
-      </p>
-      <p className="text-sm text-muted-foreground">
+      <p className="text-lg font-bold">{correct ? praise : "Nog niet."}</p>
+      <p className="mt-0.5 text-sm font-medium opacity-85">
         {correct ? `Het is ${targetName}.` : `Het juiste antwoord is ${targetName}.`}
       </p>
       <Button className="mt-3 w-full" variant={correct ? "success" : "default"} onClick={onNext}>
         <Play aria-hidden="true" className="size-4" />
         Volgende Pokémon
       </Button>
-    </div>
+    </StatusBanner>
   );
 }

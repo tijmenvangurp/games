@@ -3,9 +3,9 @@ import type { PuzzleMapArea } from "@entities/geography";
 import { cn } from "@shared/lib";
 
 const COUNTRY_CLASSES = {
-  context: "fill-emerald-100 stroke-emerald-200",
-  target: "fill-white stroke-primary/70",
-  placed: "fill-emerald-400 stroke-emerald-700",
+  context: "flag-map-country",
+  target: "flag-map-slot",
+  placed: "flag-map-placed",
 } as const;
 
 function countryKind(isTarget: boolean, isPlaced: boolean): keyof typeof COUNTRY_CLASSES {
@@ -106,7 +106,7 @@ export function PuzzleMap({
   return (
     <svg
       aria-label={`Kaart met ${total} lege plekken`}
-      className="w-full rounded-2xl bg-sky-50"
+      className="flag-map w-full"
       data-testid="puzzle-map"
       ref={svgRef}
       role="group"
@@ -130,7 +130,7 @@ export function PuzzleMap({
             <circle
               key={`hint-${area.code}`}
               aria-hidden="true"
-              className="pointer-events-none fill-primary"
+              className="flag-map-hint pointer-events-none"
               cx={area.x}
               cy={area.y}
               r={2.2}

@@ -8,7 +8,7 @@ import {
   useFrenchQuizStore,
 } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, GameIcon, LayoutGrid, Play, Puzzle, Trophy } from "@shared/ui";
+import { Button, GameIcon, LayoutGrid, Panel, Play, Puzzle, Trophy } from "@shared/ui";
 
 type FrenchMode = "intro" | "quiz" | "cards" | "build";
 
@@ -27,7 +27,10 @@ export function FrenchLessonPage() {
         title="Bonjour !"
         titleClassName="text-xl sm:text-2xl"
       >
-        <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
+        <Panel
+          className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 text-center"
+          padding="lg"
+        >
           <h2 className="font-display text-2xl">Les niet gevonden</h2>
           <p className="text-muted-foreground">
             Deze les bestaat niet of is nog niet gepubliceerd.
@@ -35,7 +38,7 @@ export function FrenchLessonPage() {
           <Button size="lg" onClick={() => navigate({ to: "/frans" })}>
             Terug naar lessen
           </Button>
-        </div>
+        </Panel>
       </GameShell>
     );
   }
@@ -71,16 +74,16 @@ export function FrenchLessonPage() {
     >
       {mode === "intro" ? (
         <div className="mx-auto flex w-full max-w-xl flex-col gap-4">
-          <section className="game-panel p-6 text-center">
-            <span className="mx-auto grid size-14 place-items-center rounded-lg bg-muted text-primary">
+          <Panel as="section" className="text-center" padding="lg">
+            <span className="mx-auto grid size-14 place-items-center rounded-xl bg-primary-soft text-primary">
               <GameIcon aria-hidden="true" name="french-lesson" size={30} />
             </span>
             <h2 className="mt-2 font-display text-3xl leading-snug">{lesson.title}</h2>
             <p className="mt-2 text-muted-foreground">{lesson.subtitle}</p>
-            <p className="mt-3 text-sm font-semibold text-muted-foreground">
+            <p className="mt-3 text-sm font-semibold tabular-nums text-muted-foreground">
               {lesson.items.length} items · {lesson.level}
             </p>
-          </section>
+          </Panel>
 
           <Button size="lg" onClick={() => startQuiz(false)}>
             <Play aria-hidden="true" className="size-5" />

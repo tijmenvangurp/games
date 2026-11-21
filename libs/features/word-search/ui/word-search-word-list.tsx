@@ -10,7 +10,11 @@ interface WordSearchWordListProps {
 
 export function WordSearchWordList({ words, found, onHint }: WordSearchWordListProps) {
   return (
-    <div aria-label="Te zoeken woorden" className="flex flex-wrap gap-2" role="group">
+    <div
+      aria-label="Te zoeken woorden"
+      className="grid grid-cols-2 gap-1.5 lg:grid-cols-1"
+      role="group"
+    >
       {words.map((word) => {
         const isFound = found.includes(word);
         const speech = wordSpeech(word);
@@ -19,21 +23,21 @@ export function WordSearchWordList({ words, found, onHint }: WordSearchWordListP
           <div
             key={word}
             className={cn(
-              "inline-flex min-h-11 items-center rounded-lg border",
+              "flex min-h-11 min-w-0 items-center justify-between rounded-xl border transition-colors",
               isFound
-                ? "border-success/40 bg-success/10 text-success"
+                ? "border-success/40 bg-success-soft text-success-ink"
                 : "border-border bg-card text-foreground",
             )}
           >
             <button
               aria-label={word}
               aria-pressed={isFound}
-              className="inline-flex min-h-11 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-bold transition active:scale-[0.99] hover:bg-muted/60"
+              className="flex min-h-11 min-w-0 flex-1 items-center gap-1.5 rounded-xl px-3 py-1.5 text-left text-sm font-bold transition hover:bg-background-subtle active:scale-[0.99]"
               type="button"
               onClick={() => onHint(word)}
             >
-              <span className={isFound ? "line-through" : undefined}>{word}</span>
-              {isFound ? <Check aria-hidden="true" className="size-4" /> : null}
+              <span className={cn("truncate", isFound && "line-through")}>{word}</span>
+              {isFound ? <Check aria-hidden="true" className="size-4 shrink-0" /> : null}
             </button>
             {speech ? (
               <SpeechButton className="mr-1 shrink-0" label={`Beluister ${word}`} line={speech} />

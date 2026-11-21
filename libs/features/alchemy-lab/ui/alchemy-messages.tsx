@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { AnimatePresence, m } from "motion/react";
 import { elementName, hintIngredient, type ElementId, type Hint } from "@entities/alchemy";
+import { Lightbulb, StatusBanner } from "@shared/ui";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import type { AlchemyFeedback } from "../model/use-alchemy-store";
 
@@ -53,29 +54,38 @@ export function AlchemyMessages({ discovered, feedback, hint }: AlchemyMessagesP
   return (
     <>
       {hint ? (
-        <p
-          aria-live="polite"
-          className="rounded-2xl border border-amber-300 bg-amber-50 px-3 py-2 text-center text-sm font-bold text-amber-900"
+        <StatusBanner
+          align="center"
+          className="min-h-0 py-2 text-sm"
+          icon={<Lightbulb className="size-4" />}
           role="status"
+          tone="warning"
         >
           {hintText(hint, discoveredSet)}
-        </p>
+        </StatusBanner>
       ) : null}
 
       <AnimatePresence initial={false}>
         {feedback && feedback.kind !== "new" ? (
-          <m.p
+          <m.div
             key={feedback.kind}
             animate={{ opacity: 1, y: 0 }}
-            aria-live="polite"
-            className="rounded-2xl border bg-muted px-3 py-2 text-center text-sm font-bold text-foreground"
             exit={{ opacity: 0, y: -4 }}
             initial={{ opacity: 0, y: 6 }}
-            role="status"
             transition={{ duration: 0.18 }}
           >
-            {feedbackText(feedback.kind, "elementId" in feedback ? feedback.elementId : undefined)}
-          </m.p>
+            <StatusBanner
+              align="center"
+              className="min-h-0 py-2 text-sm"
+              role="status"
+              tone={feedback.kind === "all-found" ? "success" : "neutral"}
+            >
+              {feedbackText(
+                feedback.kind,
+                "elementId" in feedback ? feedback.elementId : undefined,
+              )}
+            </StatusBanner>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </>

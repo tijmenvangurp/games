@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { cn } from "@shared/lib";
+import { Button, Panel, ScoreHeader } from "@shared/ui";
 import { PuzzleMap } from "./puzzle-map";
 import { DragGhost } from "./puzzle-ghost";
 import { PuzzleTray } from "./puzzle-tray";
@@ -137,13 +138,9 @@ export function PuzzlePlay() {
         <p className="text-sm font-semibold text-muted-foreground">
           De kaart kon niet laden. Probeer het nog eens.
         </p>
-        <button
-          className="rounded-xl border bg-card px-4 py-2 text-sm font-bold"
-          type="button"
-          onClick={() => void useFlagStore.getState().startPuzzle()}
-        >
+        <Button variant="outline" onClick={() => void useFlagStore.getState().startPuzzle()}>
           Opnieuw
-        </button>
+        </Button>
       </div>
     );
   }
@@ -185,18 +182,14 @@ export function PuzzlePlay() {
 
   return (
     <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
-      <header className="flex items-center justify-between rounded-2xl border bg-card px-3 py-2 shadow-sm">
-        <p className="text-sm font-black text-muted-foreground">
-          {placed.length} van {total} geplaatst
-        </p>
-        <div className="flex items-center gap-3 text-sm font-bold">
-          <span aria-label={`${stars} sterren`}>⭐ {stars}</span>
-          {streak > 0 ? <span aria-label={`${streak} op een rij`}>🔥 {streak}</span> : null}
-        </div>
-      </header>
+      <ScoreHeader
+        progress={`${placed.length} van ${total} geplaatst`}
+        stars={stars}
+        streak={streak}
+      />
 
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start">
-        <section className="rounded-3xl border bg-card p-3 shadow-sm">
+        <Panel as="section" padding="sm">
           <PuzzleMap
             areas={map.areas}
             level={round.level}
@@ -215,15 +208,15 @@ export function PuzzlePlay() {
             className={cn(
               "mt-2 text-center text-sm font-semibold",
               feedback?.kind === "correct" || feedback?.kind === "revealed"
-                ? "text-emerald-700"
+                ? "text-success-ink"
                 : feedback?.kind === "wrong"
-                  ? "text-rose-600"
+                  ? "text-danger-ink"
                   : "text-muted-foreground",
             )}
           >
             {feedbackText}
           </p>
-        </section>
+        </Panel>
 
         <PuzzleTray
           pieces={pieces}

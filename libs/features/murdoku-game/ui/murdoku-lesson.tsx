@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, ChevronLeft, ChevronRight } from "@shared/ui";
+import { Button, ChevronLeft, ChevronRight, Panel, StatusBanner } from "@shared/ui";
 import { MURDOKU_GLOSSARY, MURDOKU_LESSON_STEPS, MURDOKU_LESSON_TIPS } from "../lib/lesson";
 import { murdokuObjectName } from "../lib/legend";
 import { MurdokuDiagram } from "./murdoku-diagram";
@@ -70,18 +70,22 @@ function LessonStepper() {
   return (
     <section aria-labelledby="murdoku-les-titel" className="flex flex-col gap-3">
       <StepPicker index={index} onSelect={setIndex} />
-      <article className="game-panel flex flex-col items-center gap-3 p-4 text-center sm:p-6">
+      <Panel as="article" className="flex flex-col items-center gap-3 text-center" padding="lg">
         <h2 className="font-display text-2xl leading-tight" id="murdoku-les-titel">
           {step.title}
         </h2>
         <p className="max-w-prose text-base leading-relaxed text-muted-foreground">{step.body}</p>
         <MurdokuDiagram diagram={step.diagram} maxCell={4.5} objectName={murdokuObjectName} />
         {step.tip ? (
-          <p className="max-w-prose rounded-lg bg-warning/15 px-3 py-2 text-sm font-medium leading-relaxed">
+          <StatusBanner
+            align="center"
+            className="min-h-0 max-w-prose py-2 text-sm font-medium"
+            tone="warning"
+          >
             {step.tip}
-          </p>
+          </StatusBanner>
         ) : null}
-      </article>
+      </Panel>
       <StepNavigation index={index} onSelect={setIndex} />
     </section>
   );
@@ -100,7 +104,12 @@ function Glossary() {
       </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {MURDOKU_GLOSSARY.map((entry) => (
-          <li key={entry.id} className="game-panel flex flex-col gap-3 p-3 sm:flex-row sm:gap-4">
+          <Panel
+            key={entry.id}
+            as="li"
+            className="flex flex-col gap-3 sm:flex-row sm:gap-4"
+            padding="sm"
+          >
             <MurdokuDiagram
               className="mx-auto sm:mx-0 sm:shrink-0"
               diagram={entry.diagram}
@@ -110,7 +119,7 @@ function Glossary() {
               <h3 className="font-display text-lg leading-tight">{entry.term}</h3>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{entry.meaning}</p>
             </div>
-          </li>
+          </Panel>
         ))}
       </ul>
     </section>
@@ -134,12 +143,14 @@ function LegendAndTips() {
         </h2>
         <ul className="flex flex-col gap-2">
           {MURDOKU_LESSON_TIPS.map((tip) => (
-            <li
+            <Panel
               key={tip}
-              className="game-panel px-3 py-2 text-sm leading-relaxed text-muted-foreground"
+              as="li"
+              className="px-3 py-2 text-sm leading-relaxed text-muted-foreground"
+              padding="none"
             >
               {tip}
-            </li>
+            </Panel>
           ))}
         </ul>
       </section>

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { findTarget } from "@entities/hidden-object";
 import { playHaptic, playSound } from "@shared/lib";
-import { Button, RotateCcw, Search } from "@shared/ui";
+import { Button, Panel, RotateCcw, Search } from "@shared/ui";
 import { useSeekStore } from "../model/use-seek-store";
 import { CreatureGlyph } from "./creature-glyph";
 import { SeekScene } from "./seek-scene";
@@ -54,7 +54,7 @@ export function SeekPlay() {
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
-        <div className="order-1 game-panel flex items-center gap-3 p-3">
+        <Panel className="order-1 flex items-center gap-3" padding="sm">
           <svg
             aria-label="Doel: de Wobbel met een ster op de hoed"
             className="size-16 shrink-0"
@@ -65,12 +65,10 @@ export function SeekPlay() {
             <CreatureGlyph creature={target} />
           </svg>
           <div className="min-w-0">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-              Zoek deze
-            </p>
-            <p className="text-base font-black leading-tight">Wobbel met de ster</p>
+            <p className="text-xs font-semibold text-muted-foreground">Zoek deze</p>
+            <p className="font-display text-lg leading-tight">Wobbel met de ster</p>
           </div>
-        </div>
+        </Panel>
 
         <div className="order-3 space-y-3">
           <div className="grid grid-cols-2 gap-2">

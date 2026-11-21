@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { isFinished, isPlayable, landingRow, type FourInARowGame } from "@entities/four-in-a-row";
+import { Panel } from "@shared/ui";
 import { FourInARowColumn } from "./four-in-a-row-column";
 
 interface FourInARowBoardProps {
@@ -15,7 +16,7 @@ export function FourInARowBoard({ game, onDrop }: FourInARowBoardProps) {
   const latest = game.last ? `${game.last.column}:${game.last.row}` : null;
 
   return (
-    <div aria-label="Speelbord" className="game-panel w-full p-1.5 sm:p-3" role="group">
+    <Panel aria-label="Speelbord" className="w-full p-1.5 sm:p-3" padding="none" role="group">
       <div className="flex gap-0.5 rounded-lg bg-muted p-1 sm:gap-1.5 sm:p-1.5">
         {game.board.map((cells, column) => {
           const row = hovered === column ? landingRow(game.board, column) : -1;
@@ -36,6 +37,6 @@ export function FourInARowBoard({ game, onDrop }: FourInARowBoardProps) {
           );
         })}
       </div>
-    </div>
+    </Panel>
   );
 }

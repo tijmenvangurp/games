@@ -1,4 +1,16 @@
-import { Button, Confetti, LayoutGrid, Lightbulb, RotateCcw, Trophy, Undo2 } from "@shared/ui";
+import {
+  Badge,
+  Button,
+  Confetti,
+  LayoutGrid,
+  Lightbulb,
+  Panel,
+  ProgressBar,
+  RotateCcw,
+  StatusBanner,
+  Trophy,
+  Undo2,
+} from "@shared/ui";
 import { cn } from "@shared/lib";
 import type { DriveResult, Level, TrayItem } from "@entities/gear";
 import { chapterName, outputName } from "../model/labels";
@@ -53,7 +65,6 @@ export function DraaiwerkHud({
 
   const total = level.tray.length;
   const placedCount = solving ? total : usedTrayIds.length;
-  const progress = total === 0 ? 0 : placedCount / total;
   const allUsed = total > 0 && usedTrayIds.length >= total;
   const gauges = level.outputs
     .filter((output) => output.minSpeed !== undefined || output.maxSpeed !== undefined)
@@ -66,22 +77,22 @@ export function DraaiwerkHud({
   const statusText = statusMessage(level, result, feedback, instruction, allUsed);
 
   const tone = result.solved
-    ? "text-success"
+    ? "text-success-ink"
     : result.jammed || feedbackTone === "warn"
-      ? "text-warning"
+      ? "text-warning-ink"
       : "text-muted-foreground";
 
   return (
-    <header className="game-panel px-3 py-2.5 sm:px-4">
+    <Panel as="header" className="px-3.5 py-2.5 sm:px-4" padding="none">
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             <span className="sm:hidden">Hoofdstuk {level.chapter}</span>
             <span className="hidden sm:inline">
               Hoofdstuk {level.chapter} · {chapterName(level.chapter)}
             </span>
           </p>
-          <h2 className="text-base font-black leading-tight tracking-tight sm:text-lg">
+          <h2 className="font-display text-lg leading-tight tracking-tight sm:text-xl">
             Level {levelIndex + 1} · {level.name}
           </h2>
         </div>
@@ -110,27 +121,21 @@ export function DraaiwerkHud({
 
       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <p className="min-w-0 flex-1 text-xs font-medium leading-snug">
-          <span className="mr-1.5 inline-flex rounded-full bg-primary/10 px-2 py-0.5 align-middle text-[10px] font-black uppercase tracking-wider text-primary">
-            Nieuw:
-          </span>
+          <Badge className="mr-1.5 align-middle" size="sm" tone="primary">
+            Nieuw
+          </Badge>
           {level.intro}
         </p>
 
         <div className="flex shrink-0 items-center gap-2">
-          <div
-            aria-label={`${placedCount} van ${total} onderdelen geplaatst`}
-            aria-valuemax={total}
-            aria-valuemin={0}
-            aria-valuenow={placedCount}
-            className="h-1.5 w-20 overflow-hidden rounded-full bg-muted"
-            role="progressbar"
-          >
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
-              style={{ width: `${progress * 100}%` }}
-            />
-          </div>
-          <span className="text-[10px] font-bold text-muted-foreground">
+          <ProgressBar
+            className="w-20"
+            label={`${placedCount} van ${total} onderdelen geplaatst`}
+            max={total}
+            tone={solving ? "success" : "primary"}
+            value={placedCount}
+          />
+          <span className="text-xs font-bold tabular-nums text-muted-foreground">
             {solving ? "klaar" : `${usedTrayIds.length}/${total}`}
           </span>
         </div>
@@ -152,16 +157,19 @@ export function DraaiwerkHud({
       ) : null}
 
       {result.solved ? (
-        <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-success/30 bg-success/10 p-2">
+        <StatusBanner
+          action={
+            <Button size="sm" variant="success" onClick={onNext}>
+              {hasNext ? "Volgende level" : "Opnieuw spelen"}
+            </Button>
+          }
+          className="mt-2 min-h-0 p-2"
+          icon={<Trophy className="size-5" />}
+          tone="success"
+        >
           <Confetti pieces={celebrate ? 48 : 30} variant="shower" />
-          <Trophy aria-hidden="true" className="size-5 text-success" />
-          <p className="min-w-0 flex-1 text-sm font-bold text-success">
-            {hasNext ? "Gelukt!" : "Alle levels gehaald!"}
-          </p>
-          <Button size="sm" variant="success" onClick={onNext}>
-            {hasNext ? "Volgende level" : "Opnieuw spelen"}
-          </Button>
-        </div>
+          <span className="text-sm font-bold">{hasNext ? "Gelukt!" : "Alle levels gehaald!"}</span>
+        </StatusBanner>
       ) : null}
 
       <p
@@ -175,6 +183,6 @@ export function DraaiwerkHud({
       >
         {statusText}
       </p>
-    </header>
+    </Panel>
   );
 }

@@ -17,7 +17,7 @@ export function DragGhost({ ghost, piece }: DragGhostProps) {
     <>
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed z-50 size-20 -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 border-primary bg-white/90 p-1 shadow-lg"
+        className="pointer-events-none fixed z-50 size-20 -translate-x-1/2 -translate-y-1/2 rounded-xl border-2 border-primary bg-card/95 p-1 shadow-lg"
         style={{ left: ghost.x, top: ghost.y }}
       >
         <PieceShape piece={piece} />

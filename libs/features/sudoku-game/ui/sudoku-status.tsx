@@ -1,4 +1,4 @@
-import { Confetti } from "@shared/ui";
+import { Confetti, StatusBanner } from "@shared/ui";
 
 interface SudokuStatusProps {
   hintMessage: string | null;
@@ -14,19 +14,19 @@ export function SudokuStatus({
   celebration,
 }: SudokuStatusProps) {
   return (
-    <div aria-live="polite" className="space-y-1 text-center text-xs text-muted-foreground">
+    <div aria-live="polite" className="space-y-1.5 text-center text-xs text-muted-foreground">
       {celebration ? <Confetti key={celebration} /> : null}
       {celebration ? (
-        <p className="animate-rise rounded-lg bg-success/10 px-3 py-2 text-sm font-bold text-success">
+        <StatusBanner align="center" className="animate-rise min-h-0 py-2 text-sm" tone="success">
           {celebration}
-        </p>
+        </StatusBanner>
       ) : null}
       {hintMessage ? (
-        <p className="rounded-lg bg-warning/15 px-3 py-2 text-sm font-semibold text-warning">
+        <StatusBanner align="center" className="min-h-0 py-2 text-sm" tone="warning">
           {hintMessage}
-        </p>
+        </StatusBanner>
       ) : null}
-      <p>{status}</p>
+      <p className="tabular-nums">{status}</p>
       {almostSolved ? <p className="font-semibold text-primary">Nog één vakje!</p> : null}
     </div>
   );
