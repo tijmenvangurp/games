@@ -39,6 +39,11 @@ function instructionFor(item: TrayItem | null, pendingGearKey: string | null): s
   if (item.kind === "gear") {
     return "Tik op een leeg gat voor het tandwiel.";
   }
+  if (item.kind === "axle") {
+    return pendingGearKey
+      ? "Tik nu een tweede tandwiel voor de as."
+      : "Tik op een tandwiel voor de as.";
+  }
   return "Tik op een tandwiel om de ketting eromheen te hangen.";
 }
 

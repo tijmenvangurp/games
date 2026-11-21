@@ -7,6 +7,7 @@ import {
   type DriveResult,
   type Level,
   type Placement,
+  type TrayItem,
 } from "@entities/gear";
 import {
   DEFAULT_DRAAIWERK_PROGRESS,
@@ -289,6 +290,34 @@ describe("draaiwerk", () => {
 
     expect(useDraaiwerkStore.getState().status).toBe("solved");
     expect(useDraaiwerkStore.getState().placements).toHaveLength(2);
+  });
+
+  it("bouwt level 30 met twee tandwielen en een as", () => {
+    useDraaiwerkStore.setState({ unlocked: 30 });
+    useDraaiwerkStore.getState().startLevel(29);
+    renderGame();
+
+    const level = levelAt(29);
+    const gears = level.tray.filter(
+      (item): item is Extract<TrayItem, { kind: "gear" }> => item.kind === "gear",
+    );
+    const axle = level.tray.find((item) => item.kind === "axle");
+    if (gears.length !== 2 || !axle) {
+      throw new Error("Level 30 does not have two gears and an axle");
+    }
+
+    fireEvent.click(trayNode(gears[0]!.id));
+    fireEvent.click(holeNode("4,3"));
+    fireEvent.click(trayNode(gears[1]!.id));
+    fireEvent.click(holeNode("8,6"));
+
+    fireEvent.click(trayNode(axle.id));
+    fireEvent.click(gearNode(gearKeyAt(level, "4,3")));
+    expect(useDraaiwerkStore.getState().pendingGearKey).toBe(gearKeyAt(level, "4,3"));
+    fireEvent.click(gearNode(gearKeyAt(level, "8,6")));
+
+    expect(useDraaiwerkStore.getState().status).toBe("solved");
+    expect(useDraaiwerkStore.getState().placements).toHaveLength(3);
   });
 
   it("explains blocked holes and overlapping gears", () => {

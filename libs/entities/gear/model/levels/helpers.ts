@@ -16,6 +16,12 @@ export function createHoles(cols: number, rows: number): Hole[] {
   return holes;
 }
 
+/** A board with missing holes, for corridors and dead ends. */
+export function holesExcept(cols: number, rows: number, missing: readonly string[]): Hole[] {
+  const gone = new Set(missing);
+  return createHoles(cols, rows).filter((hole) => !gone.has(hole.id));
+}
+
 export function trayGear(id: string, size: GearSize): TrayItem {
   return { id, kind: "gear", size };
 }
@@ -26,6 +32,10 @@ export function trayBelt(id: string, crossed = false): TrayItem {
 
 export function trayChain(id: string): TrayItem {
   return { id, kind: "chain" };
+}
+
+export function trayAxle(id: string): TrayItem {
+  return { id, kind: "axle" };
 }
 
 export function gearAt(col: number, row: number, size: GearSize): Placement {

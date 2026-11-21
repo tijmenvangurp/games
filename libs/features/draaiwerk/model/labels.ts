@@ -7,6 +7,8 @@ const CHAPTER_NAMES: Record<number, string> = {
   4: "Kracht",
   5: "Machines",
   6: "De fabriek",
+  7: "De tandwielkamer",
+  8: "De aandrijving",
 };
 
 export function chapterName(chapter: number): string {
@@ -39,6 +41,14 @@ const NEW_LABELS: Record<string, string> = {
   "diagonal-train": "diagonale route",
   "three-outputs": "drie uitgangen",
   finale: "productielijn",
+  "three-gear-train": "drie tandwielen",
+  "gear-arch": "tandwielboog",
+  "chain-and-gear-split": "kettingen en tandwiel",
+  "four-gear-split": "dubbele tandwieltrein",
+  "rigid-axle": "as",
+  "axle-overdrive": "versnelling",
+  "axle-split": "verdeelas",
+  "output-through": "door het doel",
 };
 
 export function introducesLabel(introduces: string): string {
@@ -61,6 +71,8 @@ export function trayShortLabel(item: TrayItem): string {
       return item.crossed === true ? "Gekruist" : "Ketting";
     case "chain":
       return "Ketting";
+    case "axle":
+      return "As";
   }
 }
 

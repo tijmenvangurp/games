@@ -51,7 +51,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0029-agent-harness.md` — APM, gedeelde skills en MCP's, wat lokaal blijft en welke data de machine verlaat.
 - `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
 - `adr/0031-vendored-murdoku-engine.md` — de 1:1 MIT-overname, het formatter- en lintbeleid, de coverage- en Fallow-grens en de onderhoudsafspraak.
-- `adr/0032-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, 25 levels in zes hoofdstukken en de landscape-tabletlayout.
+- `adr/0032-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, 33 levels in acht hoofdstukken, de starre as en de landscape-tabletlayout.
 
 ## Onderzoek
 
