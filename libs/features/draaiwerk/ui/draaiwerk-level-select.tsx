@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Check, Lock } from "@shared/ui";
+import { Check, Lock, Panel } from "@shared/ui";
 import { cn } from "@shared/lib";
 import type { Level } from "@entities/gear";
 import { chapterName, introducesLabel } from "../model/labels";
@@ -57,7 +57,7 @@ export function DraaiwerkLevelSelect({
         ).length;
 
         return (
-          <section className="game-panel p-2.5 sm:p-3" key={chapter}>
+          <Panel key={chapter} as="section" className="p-2.5 sm:p-3" padding="none">
             <div className="mb-1.5 flex items-baseline justify-between gap-2">
               <div className="min-w-0">
                 <h2 className="font-display text-base leading-tight sm:text-lg">
@@ -122,7 +122,7 @@ export function DraaiwerkLevelSelect({
                 );
               })}
             </div>
-          </section>
+          </Panel>
         );
       })}
 

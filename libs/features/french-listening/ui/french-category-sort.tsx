@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import type { FrenchLesson } from "@entities/french";
 import { createSeed, playSound } from "@shared/lib";
-import { Button, Check, RotateCcw, Sparkles } from "@shared/ui";
+import { Button, Check, Panel, RotateCcw, Sparkles } from "@shared/ui";
 import { createSortRound, type SortWord } from "../model/sort";
 import { SortCategoryBox, SortWordBank } from "./french-category-sort-parts";
 
@@ -99,20 +99,18 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
-      <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
+      <Panel className="flex items-center justify-between gap-3 px-4 py-3" padding="none">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Voortgang
-          </p>
-          <p className="text-sm font-bold">
+          <p className="text-xs font-semibold text-muted-foreground">Voortgang</p>
+          <p className="text-sm font-bold tabular-nums">
             {round.words.length - unplaced.length} van {round.words.length} geplaatst
           </p>
         </div>
-        <div className="text-right">
+        <div className="text-right tabular-nums">
           <p className="text-2xl font-black leading-none">{score}</p>
           <p className="text-xs text-muted-foreground">goed</p>
         </div>
-      </div>
+      </Panel>
 
       <p className="text-center text-sm text-muted-foreground">
         Sleep een woord naar een categorie, of tik het woord en daarna de categorie.
@@ -155,25 +153,25 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       </DndContext>
 
       {checked ? (
-        <div aria-live="polite" className="game-panel space-y-2 p-4">
+        <Panel aria-live="polite" className="space-y-2" padding="md">
           <p
             className={
               score === round.words.length
-                ? "flex items-center justify-center gap-1.5 font-black text-success"
-                : "flex items-center justify-center gap-1.5 font-black text-warning"
+                ? "flex items-center justify-center gap-1.5 font-bold text-success-ink"
+                : "flex items-center justify-center gap-1.5 font-bold text-warning-ink"
             }
           >
             <Sparkles aria-hidden="true" className="size-5" />
             {score === round.words.length ? "Alles goed!" : "Nog niet."}
           </p>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm tabular-nums text-muted-foreground">
             Je had {score} van {round.words.length} goed.
           </p>
           <Button className="w-full" size="lg" onClick={restart}>
             <RotateCcw aria-hidden="true" className="size-5" />
             Nieuwe ronde
           </Button>
-        </div>
+        </Panel>
       ) : (
         <Button className="w-full" disabled={!allPlaced} size="lg" onClick={check}>
           <Check aria-hidden="true" className="size-5" />

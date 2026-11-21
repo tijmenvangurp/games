@@ -1,6 +1,7 @@
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { PuzzlePiece } from "@entities/geography";
 import { cn } from "@shared/lib";
+import { Check, Panel } from "@shared/ui";
 
 export function PieceShape({ piece }: { piece: PuzzlePiece | undefined }) {
   if (!piece) {
@@ -37,7 +38,7 @@ export function PuzzleTray({
   onKeyboardSelect,
 }: PuzzleTrayProps) {
   return (
-    <section className="rounded-3xl border bg-card p-3 shadow-sm">
+    <Panel as="section" padding="sm">
       <p className="sr-only">Puzzelstukken</p>
       <div className="grid grid-cols-4 gap-2">
         {subjects.map((country) => {
@@ -50,11 +51,11 @@ export function PuzzleTray({
               aria-label={`${country.name} (stuk)`}
               aria-pressed={isSelected}
               className={cn(
-                "relative flex aspect-square touch-none items-center justify-center rounded-2xl border-2 bg-white p-1 transition active:scale-95",
+                "relative flex aspect-square touch-none items-center justify-center rounded-xl border bg-card p-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                 isSelected
-                  ? "border-primary ring-2 ring-primary/30"
-                  : "border-border hover:bg-muted",
-                isPlaced && "opacity-30",
+                  ? "border-primary bg-primary-soft ring-2 ring-primary/25"
+                  : "border-border hover:border-border-strong hover:bg-background-subtle",
+                isPlaced && "opacity-35",
               )}
               disabled={isPlaced}
               type="button"
@@ -74,15 +75,15 @@ export function PuzzleTray({
               {isPlaced ? (
                 <span
                   aria-hidden="true"
-                  className="absolute inset-0 grid place-items-center text-xl"
+                  className="absolute inset-0 grid place-items-center text-success-ink"
                 >
-                  ✓
+                  <Check className="size-6" />
                 </span>
               ) : null}
             </button>
           );
         })}
       </div>
-    </section>
+    </Panel>
   );
 }

@@ -6,7 +6,7 @@ import {
   type ChessMode,
 } from "@entities/chess";
 import { cn } from "@shared/lib";
-import { Bot, Button, OptionPicker, Panel, Play, Users } from "@shared/ui";
+import { Bot, Button, OptionPicker, Panel, Play, SetupPanel, TextInput, Users } from "@shared/ui";
 import { SIDE_LABEL } from "../model/presentation";
 import { MAX_NAME_LENGTH } from "../model/settings";
 import { useChessGameStore } from "../model/use-chess-game-store";
@@ -71,12 +71,11 @@ function PlayerSetup({ color }: { readonly color: Color }) {
         {isComputer ? (
           <p className="flex min-h-11 flex-1 items-center font-bold text-foreground">Computer</p>
         ) : (
-          <input
+          <TextInput
             aria-label={`Naam voor ${label.toLowerCase()}`}
-            className="min-h-11 w-32 flex-1 rounded-xl border border-border bg-card px-3 text-base font-semibold text-foreground transition focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+            className="w-32 flex-1"
             maxLength={MAX_NAME_LENGTH}
             placeholder={label}
-            type="text"
             value={player.name}
             onChange={(event) => setPlayerName(color, event.target.value)}
           />
@@ -122,18 +121,13 @@ export function ChessGameSetup() {
   const moveCount = useChessGameStore((state) => state.history.length);
 
   return (
-    <Panel
-      as="section"
-      className="animate-rise mx-auto flex w-full max-w-xl flex-col gap-5"
-      padding="lg"
+    <SetupPanel
+      className="mx-auto w-full max-w-xl"
+      startLabel={canResume ? "Nieuwe partij" : "Spelen"}
+      subtitle="Kies je tegenstander, een avatar en een naam. Daarna zie je meteen wie aan zet is."
+      title="Nieuwe partij"
+      onStart={startGame}
     >
-      <div className="space-y-1">
-        <h2 className="font-display text-2xl tracking-tight">Nieuwe partij</h2>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Kies je tegenstander, een avatar en een naam. Daarna zie je meteen wie aan zet is.
-        </p>
-      </div>
-
       {canResume ? (
         <section className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary-soft p-3.5">
           <div className="min-w-0 flex-1">
@@ -182,11 +176,6 @@ export function ChessGameSetup() {
         <PlayerSetup color="w" />
         <PlayerSetup color="b" />
       </div>
-
-      <Button className="w-full" size="lg" variant="success" onClick={startGame}>
-        <Play aria-hidden="true" className="size-5" />
-        {canResume ? "Nieuwe partij" : "Spelen"}
-      </Button>
-    </Panel>
+    </SetupPanel>
   );
 }

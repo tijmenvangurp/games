@@ -9,7 +9,7 @@ import {
   type FourInARowMode,
   type Player,
 } from "@entities/four-in-a-row";
-import { Button, OptionPicker, SetupActions } from "@shared/ui";
+import { Button, OptionPicker, Panel, SetupPanel } from "@shared/ui";
 import { playerName, standText } from "../model/presentation";
 import type { FourInARowSettings } from "../model/settings";
 
@@ -49,42 +49,38 @@ export function FourInARowSetup({
   const startingPlayer = againstComputer ? "one" : startingPlayerAfter(game);
 
   return (
-    <section className="game-panel animate-rise p-4 sm:p-6">
-      <h2 className="mb-5 text-xl font-black">Nieuw spel</h2>
-
+    <SetupPanel onStart={onStart}>
       <OptionPicker
         columns={2}
         legend="Tegenstander"
         options={MODE_OPTIONS}
         selected={settings.mode}
+        size="compact"
         onSelect={onModeChange}
       />
 
       {againstComputer ? (
-        <div className="mt-5">
-          <OptionPicker
-            columns={3}
-            legend="Niveau van de computer"
-            options={LEVEL_OPTIONS}
-            selected={settings.level}
-            onSelect={onLevelChange}
-          />
-        </div>
+        <OptionPicker
+          columns={3}
+          legend="Niveau van de computer"
+          options={LEVEL_OPTIONS}
+          selected={settings.level}
+          size="compact"
+          onSelect={onLevelChange}
+        />
       ) : null}
 
-      <div className="mt-5">
-        <OptionPicker
-          columns={2}
-          legend="Grootte van het bord"
-          options={BOARD_SIZE_OPTIONS}
-          selected={settings.size}
-          onSelect={onSizeChange}
-        />
-      </div>
+      <OptionPicker
+        columns={2}
+        legend="Grootte van het bord"
+        options={BOARD_SIZE_OPTIONS}
+        selected={settings.size}
+        onSelect={onSizeChange}
+      />
 
-      <div className="mt-5 flex items-center justify-between gap-2 rounded-lg bg-muted px-3 py-2">
+      <Panel className="flex items-center justify-between gap-2" padding="sm" surface="subtle">
         <div className="min-w-0">
-          <p className="text-sm font-bold">Stand: {standText(score, settings.mode)}</p>
+          <p className="text-sm font-bold tabular-nums">Stand: {standText(score, settings.mode)}</p>
           <p className="text-sm text-muted-foreground">
             {playerName(startingPlayer, settings.mode)} begint deze partij.
           </p>
@@ -92,9 +88,9 @@ export function FourInARowSetup({
         <Button className="shrink-0" size="sm" variant="ghost" onClick={onResetScore}>
           Stand op nul
         </Button>
-      </div>
+      </Panel>
 
-      <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
+      <ul className="space-y-1 text-sm text-muted-foreground">
         <li>Om de beurt laat je een schijf in een kolom vallen.</li>
         <li>Vier op een rij, recht of schuin? Dan win je.</li>
         <li>Is het bord vol, dan is het gelijkspel.</li>
@@ -104,8 +100,6 @@ export function FourInARowSetup({
           <li>De verliezer begint de volgende partij.</li>
         )}
       </ul>
-
-      <SetupActions onStart={onStart} />
-    </section>
+    </SetupPanel>
   );
 }

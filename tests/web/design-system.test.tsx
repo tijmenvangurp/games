@@ -11,7 +11,9 @@ import {
   Panel,
   ProgressBar,
   ScoreHeader,
+  SetupPanel,
   StatusBanner,
+  TextInput,
   vars,
 } from "@shared/ui";
 
@@ -100,12 +102,16 @@ describe("design system primitives", () => {
     const onClick = vi.fn();
     render(
       <div>
-        <AnswerOption state="default" onClick={onClick}>
+        <AnswerOption badge="A" state="default" onClick={onClick}>
           Open
         </AnswerOption>
-        <AnswerOption state="correct">Goed</AnswerOption>
+        <AnswerOption badge="B" state="correct">
+          Goed
+        </AnswerOption>
         <AnswerOption state="wrong">Fout</AnswerOption>
-        <AnswerOption state="warn">Bijna</AnswerOption>
+        <AnswerOption badge="C" state="warn" wrongIcon="retry">
+          Bijna
+        </AnswerOption>
         <AnswerOption state="muted">Uit</AnswerOption>
       </div>,
     );
@@ -188,5 +194,27 @@ describe("design system primitives", () => {
     expect(screen.getByText("Nieuw")).toBeTruthy();
     expect(screen.getByText("Meer uitleg")).toBeTruthy();
     expect(screen.getByText("Uitlegtekst")).toBeTruthy();
+  });
+
+  it("renders SetupPanel and TextInput", () => {
+    const onStart = vi.fn();
+    render(
+      <SetupPanel
+        headerAddon={<span>123</span>}
+        note="Beste score: 8"
+        subtitle="Korte uitleg"
+        title="Nieuw spel"
+        onStart={onStart}
+      >
+        <TextInput aria-label="Spelernaam" placeholder="Naam" />
+      </SetupPanel>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Nieuw spel" })).toBeTruthy();
+    expect(screen.getByText("Korte uitleg")).toBeTruthy();
+    expect(screen.getByText("Beste score: 8")).toBeTruthy();
+    expect(screen.getByLabelText("Spelernaam")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Spelen" }));
+    expect(onStart).toHaveBeenCalledTimes(1);
   });
 });

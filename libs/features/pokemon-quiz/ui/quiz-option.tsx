@@ -1,6 +1,5 @@
 import type { Pokemon } from "@entities/pokedex";
-import { AnswerOption, Check, RotateCcw, type AnswerState } from "@shared/ui";
-import { cn } from "@shared/lib";
+import { AnswerOption, type AnswerState } from "@shared/ui";
 
 const OPTION_LETTERS = ["A", "B", "C", "D", "E"] as const;
 
@@ -11,13 +10,6 @@ const OPTION_STATE: Record<QuizAnswerState, AnswerState> = {
   correct: "correct",
   wrong: "warn",
   muted: "muted",
-};
-
-const BADGE_CLASSES: Record<QuizAnswerState, string> = {
-  idle: "bg-muted text-muted-foreground",
-  correct: "bg-success text-success-foreground",
-  wrong: "bg-warning text-primary-foreground",
-  muted: "bg-muted text-muted-foreground",
 };
 
 function answerState(answered: boolean, isCorrect: boolean, isSelected: boolean): QuizAnswerState {
@@ -53,25 +45,14 @@ export function QuizOption({
     <AnswerOption
       aria-label={option.name}
       aria-pressed={option.id === selectedId}
-      className="w-full justify-start gap-3 px-3 text-left font-bold"
+      badge={OPTION_LETTERS[index]}
       data-answer-state={state}
       disabled={answered}
-      showIndicator={false}
-      size="md"
       state={OPTION_STATE[state]}
+      wrongIcon="retry"
       onClick={() => onSelect(option.id)}
     >
-      <span
-        className={cn(
-          "grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold",
-          BADGE_CLASSES[state],
-        )}
-      >
-        {OPTION_LETTERS[index]}
-      </span>
-      <span className="min-w-0 flex-1">{option.name}</span>
-      {state === "correct" ? <Check aria-hidden="true" className="size-5 shrink-0" /> : null}
-      {state === "wrong" ? <RotateCcw aria-hidden="true" className="size-5 shrink-0" /> : null}
+      {option.name}
     </AnswerOption>
   );
 }

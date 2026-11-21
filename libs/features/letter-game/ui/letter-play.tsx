@@ -10,7 +10,7 @@ import {
   type LetterWord,
   type VangerQuestion,
 } from "@entities/letter";
-import { Button } from "@shared/ui";
+import { Button, Panel } from "@shared/ui";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
@@ -365,7 +365,7 @@ function QuestionCard({
   isLast: boolean;
 }) {
   return (
-    <section className="game-panel p-4 sm:p-6">
+    <Panel as="section" padding="lg">
       <QuestionView
         answered={answered}
         filled={filled}
@@ -393,7 +393,7 @@ function QuestionCard({
           {isLast ? "Klaar" : "Volgende"}
         </Button>
       ) : null}
-    </section>
+    </Panel>
   );
 }
 
@@ -419,12 +419,12 @@ export function LetterPlay() {
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
-      <header className="game-panel flex items-center justify-between px-3 py-2">
-        <p className="text-sm font-black text-muted-foreground">
+      <Panel as="header" className="flex items-center justify-between px-3.5 py-2.5" padding="none">
+        <p className="text-sm font-bold tabular-nums text-muted-foreground">
           {header.unit} {index + 1} van {round.questions.length}
         </p>
         <span className="text-sm font-bold text-primary">{header.title}</span>
-      </header>
+      </Panel>
       <QuestionCard
         answered={answered}
         correct={correct}

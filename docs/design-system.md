@@ -70,7 +70,10 @@ zodat een rode schijf nooit als fout leest.
 - `GameMenu` — spelkaarten in een rustig raster met lokale thumbnail, `GameIcon`, serif spelnaam
   en korte uitleg. De hele kaart is de link; er staat geen extra "Openen"-regel.
 - `Panel` — type-safe surface (`card`, `subtle`, `elevated`, `dashed`) met vaste padding- en
-  interactie-varianten; vervangt losse `rounded-3xl border bg-card`-divs.
+  interactie-varianten; vervangt alle losse `.game-panel`- en kaart-divs.
+- `SetupPanel` — uniforme instellingenkaart voor alle startschermen met serif titel, optionele
+  subtitel, score-balk en `SetupActions`.
+- `TextInput` — type-safe tekstinvoer met vaste hoogte (44 px), rand en focusring.
 - `Button` — `default`, `outline`, `soft`, `ghost`, `success` en `danger` met tactiele diepte en
   vaste focusring.
 - `ChoiceCard` / `OptionPicker` — keuze met label, optioneel symbool of icoon (`leading`),

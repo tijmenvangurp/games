@@ -1,6 +1,7 @@
 import { Fragment, useMemo } from "react";
 import type { PersonId, Puzzle } from "@entities/murdoku";
 import { cn } from "@shared/lib";
+import { Panel } from "@shared/ui";
 import { suspectColor } from "../lib/palette";
 import { clueWords, sameClueFocus, type MurdokuClueFocus } from "../lib/clue-words";
 import { createMurdokuText } from "../lib/text";
@@ -54,13 +55,14 @@ export function MurdokuClueCards({
 
         return (
           <li key={suspect.id} className="min-w-0">
-            <div
+            <Panel
               className={cn(
-                "game-panel flex h-full w-full min-w-0 flex-col gap-2.5 p-3 text-left transition-colors",
+                "flex h-full w-full min-w-0 flex-col gap-2.5 text-left transition-colors",
                 selected
-                  ? "border-primary bg-primary/5 ring-2 ring-primary/25"
-                  : "hover:bg-muted/60",
+                  ? "border-primary bg-primary-soft ring-2 ring-primary/25"
+                  : "hover:bg-background-subtle",
               )}
+              padding="sm"
             >
               <button
                 aria-pressed={selected}
@@ -114,7 +116,7 @@ export function MurdokuClueCards({
                   </span>
                 ))}
               </span>
-            </div>
+            </Panel>
           </li>
         );
       })}

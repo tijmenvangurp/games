@@ -14,12 +14,13 @@ export { PageHeader } from "./page-header";
 export { Panel } from "./panel";
 export { ProgressBar } from "./progress-bar";
 export { ScoreHeader } from "./score-header";
-export { SetupActions } from "./setup-actions";
+export { SetupPanel } from "./setup-panel";
 export { SoundToggle } from "./sound-toggle";
 export { SpeechButton } from "./speech-button";
 export { SpeechToggle } from "./speech-toggle";
 export { SpokenText } from "./spoken-text";
 export { StatusBanner, type StatusTone } from "./status-banner";
+export { TextInput } from "./text-input";
 export { vars } from "./tokens.css";
 export {
   AppWindow,

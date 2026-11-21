@@ -1,13 +1,13 @@
-import type { ComponentPropsWithoutRef, ElementType } from "react";
+import type { ComponentProps, ElementType } from "react";
 import { cn } from "@shared/lib";
 import { panelRecipe, type PanelVariants } from "./panel.css";
 
-type PanelElement = "div" | "section" | "header" | "aside" | "article" | "fieldset";
+type PanelElement = "div" | "section" | "header" | "aside" | "article" | "fieldset" | "li";
 
 export type PanelProps<T extends PanelElement = "div"> = {
   as?: T;
 } & PanelVariants &
-  Omit<ComponentPropsWithoutRef<T>, "as">;
+  Omit<ComponentProps<T>, "as">;
 
 export function Panel<T extends PanelElement = "div">({
   as,

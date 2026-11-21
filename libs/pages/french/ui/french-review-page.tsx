@@ -3,7 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { allFrenchItems, dueItemIds, type FrenchItem, type FrenchLesson } from "@entities/french";
 import { FrenchQuiz, useFrenchProgressStore, useFrenchQuizStore } from "@features/french-listening";
 import { GameShell } from "@widgets/game-shell";
-import { Button, Play, RotateCcw } from "@shared/ui";
+import { Button, Panel, Play, RotateCcw } from "@shared/ui";
 
 function createReviewLesson(items: readonly FrenchItem[]): FrenchLesson {
   return {
@@ -44,8 +44,11 @@ export function FrenchReviewPage() {
       {reviewItems ? (
         <FrenchQuiz />
       ) : (
-        <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
-          <span className="grid size-14 place-items-center rounded-lg bg-muted text-primary">
+        <Panel
+          className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 text-center"
+          padding="lg"
+        >
+          <span className="grid size-14 place-items-center rounded-xl bg-primary-soft text-primary">
             <RotateCcw aria-hidden="true" className="size-7" />
           </span>
           <h2 className="font-display text-2xl">Herhalen</h2>
@@ -64,7 +67,7 @@ export function FrenchReviewPage() {
               Terug naar lessen
             </Button>
           )}
-        </div>
+        </Panel>
       )}
     </GameShell>
   );

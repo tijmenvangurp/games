@@ -5,7 +5,7 @@ import {
   type LetterLesson,
   type LetterProgressMap,
 } from "@entities/letter";
-import { BookOpen, Button, Ear, Eye, Panel, Play, TrainFront } from "@shared/ui";
+import { BookOpen, Button, Ear, Eye, Panel, Play, SetupPanel, TrainFront } from "@shared/ui";
 
 interface LetterSetupProps {
   progress: LetterProgressMap;
@@ -32,14 +32,12 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
   const known = knownLetters(progress);
 
   return (
-    <Panel as="section" className="animate-rise mx-auto w-full max-w-xl" padding="lg">
-      <h2 className="font-display text-2xl tracking-tight">Kies je les</h2>
-      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
-        10 letters · 6 vragen per les. Hoor de klank en kies de letter, lees woorden of bouw ze
-        zelf.
-      </p>
-
-      <div className="mt-4 grid gap-2">
+    <SetupPanel
+      className="mx-auto w-full max-w-xl"
+      subtitle="10 letters · 6 vragen per les. Hoor de klank en kies de letter, lees woorden of bouw ze zelf."
+      title="Kies je les"
+    >
+      <div className="grid gap-2">
         {LETTER_LESSONS.map((lesson) => (
           <Button
             key={lesson.id}
@@ -57,7 +55,7 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
         ))}
       </div>
 
-      <div className="mt-4 grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {LETTERS.map((letter) => (
           <span
             key={letter.id}
@@ -68,19 +66,19 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
         ))}
       </div>
 
-      <p className="mt-3 text-sm font-semibold text-muted-foreground">
+      <p className="text-sm font-semibold text-muted-foreground">
         {known.length > 0
           ? `Deze letters ken je al: ${known.join(", ")}.`
           : "We beginnen met i, k, m, s, p, v, e, n, t en a."}
       </p>
 
-      <Panel className="mt-4 text-sm" padding="sm" surface="subtle">
+      <Panel className="text-sm" padding="sm" surface="subtle">
         <p className="font-bold">Tip voor ouders</p>
         <p className="mt-1 leading-relaxed text-muted-foreground">
           Laat je kind na de ronde een letter op papier schrijven of een gelezen woord aanwijzen in
           een boek. Dat helpt bij het onthouden.
         </p>
       </Panel>
-    </Panel>
+    </SetupPanel>
   );
 }

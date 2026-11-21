@@ -1,4 +1,4 @@
-import { Button, Lightbulb, RotateCcw, SpeechButton, ZoomIn, ZoomOut } from "@shared/ui";
+import { Button, Lightbulb, Panel, RotateCcw, SpeechButton, ZoomIn, ZoomOut } from "@shared/ui";
 import type { WordSearchFeedback } from "../model/audio";
 import { WordSearchWordList } from "./word-search-word-list";
 
@@ -79,12 +79,12 @@ export function WordSearchSidebar({
 }: WordSearchSidebarProps) {
   return (
     <aside className="space-y-3 lg:order-2 lg:col-span-1">
-      <div className="game-panel p-3">
+      <Panel padding="sm">
         <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
           Te zoeken
         </p>
         <WordSearchWordList found={found} words={words} onHint={onHint} />
-      </div>
+      </Panel>
 
       <WordSearchActions
         complete={complete}
