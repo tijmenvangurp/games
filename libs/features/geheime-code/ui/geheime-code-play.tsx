@@ -1,6 +1,6 @@
 import type { Puzzle } from "@entities/geheime-code";
 import { cn } from "@shared/lib";
-import { Button, Panel } from "@shared/ui";
+import { Button, Confetti, Panel } from "@shared/ui";
 import { useGeheimeCodeKeyboard } from "../model/use-geheime-code-keyboard";
 import { useGeheimeCodeStore } from "../model/use-geheime-code-store";
 import { AlphabetKeyboard } from "./alphabet-keyboard";
@@ -80,11 +80,14 @@ function RoundView({
         />
 
         {wordDone ? (
-          <div className="mt-4 flex justify-center">
-            <Button size="lg" onClick={() => useGeheimeCodeStore.getState().nextWord()}>
-              {last ? "Klaar" : "Volgende"}
-            </Button>
-          </div>
+          <>
+            <Confetti key={`word-${activeRow}`} pieces={18} variant="burst" />
+            <div className="mt-4 flex justify-center">
+              <Button size="lg" onClick={() => useGeheimeCodeStore.getState().nextWord()}>
+                {last ? "Klaar" : "Volgende"}
+              </Button>
+            </div>
+          </>
         ) : null}
 
         <p aria-live="polite" className="sr-only">

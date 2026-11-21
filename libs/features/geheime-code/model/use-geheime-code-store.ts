@@ -143,9 +143,9 @@ function fillCurrentCell(set: SetState, get: GetState, letter: string, options: 
     wrongCell: null,
     hintLetter: null,
   });
-  playSound(options.hints > 0 ? "hint" : complete ? "almost" : "match");
+  playSound(options.hints > 0 ? "hint" : complete ? "surprise" : "match");
   if (complete) {
-    playHaptic("match");
+    playHaptic("surprise");
   }
 }
 
