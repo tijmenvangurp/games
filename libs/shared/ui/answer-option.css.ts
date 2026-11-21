@@ -5,6 +5,7 @@ export const answerOptionRecipe = recipe({
   base: {
     "@layer": {
       [componentsLayer]: {
+        position: "relative",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

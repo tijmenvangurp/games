@@ -13,6 +13,51 @@ const BADGE_CLASSES: Record<AnswerState, string> = {
   muted: "bg-muted text-muted-foreground",
 };
 
+/** Alleen deze drie staten krijgen een vinkje of kruisje in beeld. */
+const MARKED_STATES: ReadonlySet<AnswerState> = new Set(["correct", "wrong", "warn"]);
+
+const OVERLAY_TONE: Partial<Record<AnswerState, string>> = {
+  correct: "text-success-ink",
+  wrong: "text-danger-ink",
+  warn: "text-warning-ink",
+};
+
+interface AnswerIndicatorProps {
+  state: AnswerState;
+  wrongIcon: "x" | "retry";
+  /** Op een antwoord met afbeelding of losse tekst: als chip in de hoek. */
+  overlay: boolean;
+}
+
+/**
+ * Het vinkje of kruisje van een antwoord. Zonder letterbadge ligt het als
+ * chip in de hoek, zodat een afbeelding of lang woord de volle breedte houdt.
+ */
+function AnswerIndicator({ state, wrongIcon, overlay }: AnswerIndicatorProps) {
+  if (!MARKED_STATES.has(state)) {
+    return null;
+  }
+
+  const Icon = state === "correct" ? Check : wrongIcon === "retry" ? RotateCcw : X;
+  const iconSize = overlay ? "size-4" : "size-5";
+
+  if (!overlay) {
+    return <Icon aria-hidden="true" className={cn(iconSize, "shrink-0")} />;
+  }
+
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute right-1.5 top-1.5 grid size-6 place-items-center rounded-full bg-card shadow-xs",
+        OVERLAY_TONE[state],
+      )}
+    >
+      <Icon className={iconSize} />
+    </span>
+  );
+}
+
 interface AnswerOptionProps extends Omit<ComponentProps<"button">, "children"> {
   state?: AnswerState;
   size?: AnswerOptionVariants["size"];
@@ -58,15 +103,8 @@ export function AnswerOption({
         </span>
       ) : null}
       {badge ? <span className="min-w-0 flex-1">{children}</span> : children}
-      {showIndicator && state === "correct" ? (
-        <Check aria-hidden="true" className="size-5 shrink-0" />
-      ) : null}
-      {showIndicator && (state === "wrong" || state === "warn") ? (
-        wrongIcon === "retry" ? (
-          <RotateCcw aria-hidden="true" className="size-5 shrink-0" />
-        ) : (
-          <X aria-hidden="true" className="size-5 shrink-0" />
-        )
+      {showIndicator ? (
+        <AnswerIndicator overlay={!badge} state={state} wrongIcon={wrongIcon} />
       ) : null}
     </button>
   );
