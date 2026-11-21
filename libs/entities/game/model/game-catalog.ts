@@ -57,7 +57,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "puzzel",
     status: "available",
     to: "/sudoku",
-    thumbnail: "/thumbnails/sudoku-4c71fa62.jpg",
+    thumbnail: "/thumbnails/sudoku-e4fcab84.jpg",
     speech: { kind: "visual", reason: "Het bord en de symbolen zijn visueel." },
   },
   {
@@ -67,7 +67,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "taal-rekenen",
     status: "available",
     to: "/rekenen",
-    thumbnail: "/thumbnails/math-trainer-52c58abf.jpg",
+    thumbnail: "/thumbnails/math-trainer-da25caae.jpg",
     speech: { kind: "group", folders: ["math"] },
   },
   {
@@ -77,7 +77,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "puzzel",
     status: "available",
     to: "/pijlen",
-    thumbnail: "/thumbnails/arrows-65ece2ce.jpg",
+    thumbnail: "/thumbnails/arrows-a4ec6b93.jpg",
     speech: { kind: "visual", reason: "De pijlen en het bord zijn visueel." },
   },
   {
@@ -87,7 +87,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "puzzel",
     status: "available",
     to: "/zoeken",
-    thumbnail: "/thumbnails/seek-3c60cc62.jpg",
+    thumbnail: "/thumbnails/seek-f83e0e6c.jpg",
     speech: { kind: "visual", reason: "Het zoekveld is visueel." },
   },
   {
@@ -97,7 +97,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "taal-rekenen",
     status: "available",
     to: "/woordzoeker",
-    thumbnail: "/thumbnails/word-search-bdb93413.jpg",
+    thumbnail: "/thumbnails/word-search-5e025073.jpg",
     speech: { kind: "group", folders: ["words"] },
   },
   {
@@ -107,7 +107,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "ontdekken",
     status: "available",
     to: "/mengelmoes",
-    thumbnail: "/thumbnails/alchemy-0cda3400.jpg",
+    thumbnail: "/thumbnails/alchemy-c3cbcc1c.jpg",
     speech: { kind: "visual", reason: "Sleep- en combinatiespel; de elementen zijn visueel." },
   },
   {
@@ -117,7 +117,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "puzzel",
     status: "available",
     to: "/draaiwerk",
-    thumbnail: "/thumbnails/draaiwerk-a86e4c8b.jpg",
+    thumbnail: "/thumbnails/draaiwerk-51030cb3.jpg",
     speech: { kind: "visual", reason: "Het bord, de tandwielen en de beweging zijn visueel." },
   },
   {
@@ -127,7 +127,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "spel",
     status: "available",
     to: "/memory",
-    thumbnail: "/thumbnails/memory-707e748b.jpg",
+    thumbnail: "/thumbnails/memory-05209404.jpg",
     speech: { kind: "visual", reason: "Alleen de instructie; nog geen spraakcatalogus." },
   },
   {
@@ -137,7 +137,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "ontdekken",
     status: "available",
     to: "/raad",
-    thumbnail: "/thumbnails/pokemon-quiz-0327a69d.jpg",
+    thumbnail: "/thumbnails/pokemon-quiz-8337dbba.jpg",
     speech: { kind: "pending", reason: "Buiten scope; later opnieuw bekijken." },
   },
   {
@@ -147,7 +147,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "spel",
     status: "available",
     to: "/schaken",
-    thumbnail: "/thumbnails/chess-tutorial-6b1e58dd.jpg",
+    thumbnail: "/thumbnails/chess-tutorial-5b0b4ee9.jpg",
     speech: { kind: "group", folders: ["chess", "chess-puzzles"] },
   },
   {
@@ -157,7 +157,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "ontdekken",
     status: "available",
     to: "/vlaggen",
-    thumbnail: "/thumbnails/flags-bd19d257.jpg",
+    thumbnail: "/thumbnails/flags-5d95e955.jpg",
     speech: { kind: "pending", reason: "Optioneel; volgt later." },
   },
   {
@@ -167,7 +167,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "taal-rekenen",
     status: "available",
     to: "/frans",
-    thumbnail: "/thumbnails/french-listening-ffc3da24.jpg",
+    thumbnail: "/thumbnails/french-listening-04c12487.jpg",
     speech: { kind: "legacy", reason: "Heeft een eigen Franse audiospeler." },
   },
   {
@@ -177,7 +177,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "taal-rekenen",
     status: "available",
     to: "/letters",
-    thumbnail: "/thumbnails/letters-6b90ec8a.jpg",
+    thumbnail: "/thumbnails/letters-c2cbac01.jpg",
     speech: { kind: "legacy", reason: "Heeft een eigen Nathalie-audiospeler." },
   },
   {
@@ -187,7 +187,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "spel",
     status: "available",
     to: "/vier-op-een-rij",
-    thumbnail: "/thumbnails/four-in-a-row-fa19af46.jpg",
+    thumbnail: "/thumbnails/four-in-a-row-4f16fd00.jpg",
     speech: { kind: "visual", reason: "Het bord en de schijven zijn visueel." },
   },
   {
@@ -197,7 +197,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "spel",
     status: "available",
     to: "/ganzenbord",
-    thumbnail: "/thumbnails/ganzenbord-500e8c19.jpg",
+    thumbnail: "/thumbnails/ganzenbord-2bd2a083.jpg",
     speech: {
       kind: "visual",
       reason: "Het bord, de dobbelsteen en de ganzepionnen zijn visueel.",
@@ -210,7 +210,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "taal-rekenen",
     status: "available",
     to: "/typepret",
-    thumbnail: "/thumbnails/typepret-9e07ea14.jpg",
+    thumbnail: "/thumbnails/typepret-4931ec16.jpg",
     speech: {
       kind: "visual",
       reason: "Het toetsenbord en de doeltekens zijn visueel.",
@@ -224,7 +224,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     category: "puzzel",
     status: "available",
     to: "/mysterie",
-    thumbnail: "/thumbnails/wie-was-het-a87a3622.jpg",
+    thumbnail: "/thumbnails/wie-was-het-c4330a6d.jpg",
     speech: {
       kind: "visual",
       reason: "De plattegrond, de portretten en de aanwijzingen zijn visueel.",

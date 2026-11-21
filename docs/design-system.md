@@ -116,7 +116,8 @@ zodat een rode schijf nooit als fout leest.
 - Voeg geen nieuwe emoji toe aan UI-chrome. Emoji's mogen wel in leerinhoud of spelersavatars staan.
 - Nieuwe spellen krijgen een item in `GameIcon` en een regel in `gameCatalog`.
 - Spelthumbnails staan lokaal in `apps/games/public/thumbnails` (800 × 500, JPEG) met een
-  contenthash in de bestandsnaam.
+  contenthash in de bestandsnaam. De stijl, de prompts per spel en `pnpm run thumbnails` staan in
+  `thumbnails.md`.
 - Houd touch-targets op minimaal 44 px en respecteer `pt-safe`/`pb-safe`.
 
 ## Iconen
