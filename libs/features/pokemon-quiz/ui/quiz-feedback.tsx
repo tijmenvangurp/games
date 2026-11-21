@@ -3,11 +3,12 @@ import { cn } from "@shared/lib";
 
 interface QuizFeedbackProps {
   correct: boolean;
+  praise: string;
   targetName: string;
   onNext: () => void;
 }
 
-export function QuizFeedback({ correct, targetName, onNext }: QuizFeedbackProps) {
+export function QuizFeedback({ correct, praise, targetName, onNext }: QuizFeedbackProps) {
   return (
     <div
       className={cn(
@@ -17,7 +18,7 @@ export function QuizFeedback({ correct, targetName, onNext }: QuizFeedbackProps)
       role="status"
     >
       <p className={cn("text-lg font-black", correct ? "text-success" : "text-warning")}>
-        {correct ? "Je vond het!" : "Nog niet."}
+        {correct ? praise : "Nog niet."}
       </p>
       <p className="text-sm text-muted-foreground">
         {correct ? `Het is ${targetName}.` : `Het juiste antwoord is ${targetName}.`}

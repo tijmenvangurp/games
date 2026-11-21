@@ -5,6 +5,7 @@ import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { COUNTRIES, PROVINCES, type FlagQuestion } from "@entities/geography";
 import { DEFAULT_FLAG_SETTINGS, useFlagStore } from "@features/flag-game";
+import { praiseFor } from "@shared/lib";
 
 const STORAGE_KEY = "games.vlaggen.v1";
 
@@ -61,8 +62,10 @@ function clickChoice(code: string) {
 
 function answerCurrentCorrectly() {
   const question = currentQuestion();
+  const { questionIndex, round } = useFlagStore.getState();
   clickChoice(question.subject.code);
   expect(useFlagStore.getState().answered).toBe(true);
+  expect(screen.getByText(praiseFor(round?.seed ?? 0, questionIndex))).toBeTruthy();
 
   const lastQuestion =
     useFlagStore.getState().questionIndex + 1 >=

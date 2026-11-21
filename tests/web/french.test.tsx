@@ -5,6 +5,7 @@ import { App } from "@app/app";
 import { createAppRouter } from "@app/router";
 import { LESSON_ANIMAUX } from "@entities/french";
 import { useFrenchProgressStore, useFrenchQuizStore } from "@features/french-listening";
+import { praiseFor } from "@shared/lib";
 
 beforeEach(() => {
   cleanup();
@@ -73,7 +74,7 @@ describe("Frans luisterspel", () => {
 
     expect(useFrenchQuizStore.getState().answered).toBe(true);
     expect(useFrenchQuizStore.getState().correctCount).toBe(1);
-    expect(screen.getByText("Je vond het!")).toBeTruthy();
+    expect(screen.getByText(praiseFor(question.seed))).toBeTruthy();
     expect(screen.getByText(question.item.fr)).toBeTruthy();
     expect(
       screen.getByRole("button", { name: question.item.nl }).getAttribute("data-answer-state"),
@@ -147,7 +148,7 @@ describe("Frans luisterspel", () => {
     }
     fireEvent.click(screen.getByRole("button", { name: "Controleer" }));
 
-    expect(screen.getByText("Je vond het!")).toBeTruthy();
+    expect(screen.getByText(praiseFor(0))).toBeTruthy();
     expect(screen.getByText(phrase.fr)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Volgende" }));

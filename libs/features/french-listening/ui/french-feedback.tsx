@@ -4,15 +4,22 @@ import { Button, Volume2 } from "@shared/ui";
 interface FrenchFeedbackProps {
   item: FrenchItem;
   correct: boolean;
+  praise: string;
   onNext: () => void;
   onPlayExample: () => void;
 }
 
-export function FrenchFeedback({ item, correct, onNext, onPlayExample }: FrenchFeedbackProps) {
+export function FrenchFeedback({
+  item,
+  correct,
+  praise,
+  onNext,
+  onPlayExample,
+}: FrenchFeedbackProps) {
   return (
     <div aria-live="polite" className="game-panel space-y-3 p-4">
       <p className={correct ? "font-black text-success" : "font-black text-warning"}>
-        {correct ? "Je vond het!" : "Nog niet."}
+        {correct ? praise : "Nog niet."}
       </p>
       {!correct ? (
         <p className="text-sm text-muted-foreground">
