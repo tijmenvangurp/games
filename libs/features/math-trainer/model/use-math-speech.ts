@@ -26,18 +26,19 @@ export function useMathSpeech({
   correct,
   wrongChoices,
 }: MathSpeechInput): void {
-  const seed = round?.seed ?? "geen";
+  const seed = round?.seed ?? 0;
+  const keySeed = round?.seed ?? "geen";
   useAutoSpeech(
-    question ? `math-question-${seed}-${question.id}` : "math-question-none",
+    question ? `math-question-${keySeed}-${question.id}` : "math-question-none",
     question ? mathQuestionSpeech(question) : null,
   );
   useAutoSpeech(
     question
-      ? `math-feedback-${seed}-${question.id}-${answered}-${correct}-${wrongChoices.length}`
+      ? `math-feedback-${keySeed}-${question.id}-${answered}-${correct}-${wrongChoices.length}`
       : "math-feedback-none",
     question
       ? answered
-        ? mathFeedbackSpeech(question, correct)
+        ? mathFeedbackSpeech(question, correct, seed)
         : wrongChoices.length > 0
           ? [MATH_LINES.almost]
           : null

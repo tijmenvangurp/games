@@ -896,6 +896,26 @@
     "coach-selected-own": {
       "folder": "chess",
       "textHash": "2a2078f6"
+    },
+    "math-praise-knap": {
+      "folder": "math",
+      "textHash": "f1a3100a"
+    },
+    "math-praise-top": {
+      "folder": "math",
+      "textHash": "dde35eab"
+    },
+    "math-praise-helemaal": {
+      "folder": "math",
+      "textHash": "a8c4703c"
+    },
+    "math-praise-slim": {
+      "folder": "math",
+      "textHash": "053e5202"
+    },
+    "math-praise-ster": {
+      "folder": "math",
+      "textHash": "1c8c305e"
     }
   },
   "model": "speaches-ai/piper-nl_BE-nathalie-medium",

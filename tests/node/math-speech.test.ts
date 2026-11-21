@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  MATH_LINES,
+  MATH_PRAISE_LINES,
   MATH_SPEECH_GROUPS,
   mathFeedbackSpeech,
   mathQuestionSpeech,
   numberSpeech,
   operatorSpeech,
+  praiseSpeech,
   type MathQuestion,
 } from "@entities/math";
 
@@ -37,11 +38,21 @@ describe("reken-spraak", () => {
   });
 
   it("bouwt positieve en negatieve feedback", () => {
-    expect(mathFeedbackSpeech(QUESTION, true)).toEqual([MATH_LINES.correct]);
-    expect(mathFeedbackSpeech(QUESTION, false).map((line) => line.id)).toEqual([
+    expect(mathFeedbackSpeech(QUESTION, true, 0)).toEqual([praiseSpeech(0, QUESTION)]);
+    expect(mathFeedbackSpeech(QUESTION, false, 0).map((line) => line.id)).toEqual([
       "math-answer-prefix",
       "math-number-15",
     ]);
+  });
+
+  it("wisselt de bemoediging per ronde en per som", () => {
+    expect(praiseSpeech(3, QUESTION)).toBe(praiseSpeech(3, QUESTION));
+    expect(
+      new Set(MATH_PRAISE_LINES.map((_, index) => praiseSpeech(index, QUESTION).id)).size,
+    ).toBe(MATH_PRAISE_LINES.length);
+    expect(praiseSpeech(0, { ...QUESTION, id: 0 })).not.toBe(
+      praiseSpeech(0, { ...QUESTION, id: 1 }),
+    );
   });
 
   it("hergebruikt dezelfde getalclips voor antwoorden", () => {
@@ -52,7 +63,7 @@ describe("reken-spraak", () => {
 
   it("levert één catalogus met alle getallen, bewerkingen en feedback", () => {
     const lines = MATH_SPEECH_GROUPS.flatMap((group) => group.lines);
-    expect(lines).toHaveLength(110);
+    expect(lines).toHaveLength(115);
     expect(new Set(lines.map((line) => line.id)).size).toBe(lines.length);
   });
 });

@@ -2,6 +2,7 @@ import {
   explanationFor,
   mathFeedbackSpeech,
   mathQuestionSpeech,
+  praiseSpeech,
   type MathQuestion,
 } from "@entities/math";
 import { cn } from "@shared/lib";
@@ -110,11 +111,13 @@ function MathChoices({
 
 function MathFeedback({
   question,
+  seed,
   answered,
   correct,
   wrongCount,
 }: {
   question: MathQuestion;
+  seed: number;
   answered: boolean;
   correct: boolean;
   wrongCount: number;
@@ -134,9 +137,14 @@ function MathFeedback({
           aria-live="polite"
           className={cn("text-center text-sm font-bold", correct ? "text-success" : "text-warning")}
         >
-          {correct ? "Goed gerekend!" : `Het juiste antwoord is ${question.answer}.`}
+          {correct
+            ? praiseSpeech(seed, question).text
+            : `Het juiste antwoord is ${question.answer}.`}
         </p>
-        <SpeechButton label="Beluister het antwoord" line={mathFeedbackSpeech(question, correct)} />
+        <SpeechButton
+          label="Beluister het antwoord"
+          line={mathFeedbackSpeech(question, correct, seed)}
+        />
       </div>
       <MathVisual question={question} />
       <p className="text-center text-sm font-semibold text-muted-foreground">
@@ -148,12 +156,14 @@ function MathFeedback({
 
 function QuestionCard({
   question,
+  seed,
   wrongChoices,
   answered,
   correct,
   isLast,
 }: {
   question: MathQuestion;
+  seed: number;
   wrongChoices: readonly number[];
   answered: boolean;
   correct: boolean;
@@ -182,6 +192,7 @@ function QuestionCard({
           answered={answered}
           correct={correct}
           question={question}
+          seed={seed}
           wrongCount={wrongChoices.length}
         />
       </div>
@@ -233,6 +244,7 @@ export function MathPlay() {
         correct={correct}
         isLast={questionIndex + 1 >= round.questions.length}
         question={question}
+        seed={round.seed}
         wrongChoices={wrongChoices}
       />
     </div>
