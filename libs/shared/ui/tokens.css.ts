@@ -59,6 +59,10 @@ export const vars = createGlobalThemeContract({
     parchmentSurface: "parchment-surface",
     parchmentBorder: "parchment-border",
     parchmentInk: "parchment-ink",
+    /* Kaarten van Vlaggenreis: water, land en de rand ertussen. */
+    mapWater: "map-water",
+    mapLand: "map-land",
+    mapLandStroke: "map-land-stroke",
   },
   font: {
     sans: "ds-font-sans",
@@ -144,6 +148,14 @@ createGlobalTheme(":root", vars, {
     parchmentSurface: "oklch(0.915 0.048 84)",
     parchmentBorder: "oklch(0.73 0.088 80)",
     parchmentInk: "oklch(0.31 0.055 56)",
+    /*
+     * Kaartkleuren voor Vlaggenreis. Water is een koele leisteen-tint die
+     * duidelijk onder het warme papier ligt; land blijft bijna wit zodat de
+     * omtrek en de highlight het werk doen.
+     */
+    mapWater: "oklch(0.86 0.035 232)",
+    mapLand: "oklch(0.985 0.012 96)",
+    mapLandStroke: "oklch(0.62 0.04 210)",
   },
   font: {
     sans: 'ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, -apple-system, "Segoe UI", sans-serif',

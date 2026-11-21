@@ -35,23 +35,24 @@ De ontwerpwaarden leven als één enkele, type-safe bron van waarheid in
   Daardoor staan ze boven `@layer base` en onder `@layer utilities`, zodat layout-overrides via
   `className` (samengesteld met `cn()`) altijd schoon werken zonder `!important`.
 
-| Token                                        | Gebruik                                                       |
-| -------------------------------------------- | ------------------------------------------------------------- |
-| `vars.color.background` / `backgroundSubtle` | Warm ivoor papier en rustige ingelaten vlakken                |
-| `vars.color.foreground` / `mutedForeground`  | Diepe inkt en secundaire tekst (≥ 4,5:1 contrast)             |
-| `vars.color.card` / `cardElevated`           | Panelen, kaarten en zwevende dialogen                         |
-| `vars.color.muted`                           | Rustige vlakken en uitgeschakelde staten                      |
-| `vars.color.border` / `borderStrong`         | Hairline-randen en tactiele hover-randen                      |
-| `vars.color.primary` / `primarySoft`         | Actie, selectie, actieve staat en zachte selectietint         |
-| `vars.color.success` / `successSoft` / `Ink` | Goed, gevonden, opgelost                                      |
-| `vars.color.warning` / `warningSoft` / `Ink` | Hint, aandacht, bijna                                         |
-| `vars.color.danger` / `dangerSoft` / `Ink`   | Fout, conflict, verloren                                      |
-| `vars.color.pawnRed` … `pawnPink`            | Pionkleuren voor bordspellen (los van feedbackkleuren)        |
-| `vars.color.playerOne` / `playerTwo`         | Vaste kleuren voor Vier op een Rij                            |
-| `vars.color.parchmentBg` … `parchmentInk`    | Perkament-palet voor historische bordspellen zoals Ganzenbord |
-| `vars.radius.sm` … `xl` / `pill`             | Vaste radiusschaal: `8px`, `12px`, `16px`, `20px`, pil        |
-| `vars.shadow.tactile` / `panel` / `dialog`   | Fysieke papierdiepte zonder harde blokschaduwen               |
-| `vars.motion.fast` / `normal` / `slow`       | Consistente duur en `easeOut`-curve                           |
+| Token                                               | Gebruik                                                                            |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `vars.color.background` / `backgroundSubtle`        | Warm ivoor papier en rustige ingelaten vlakken                                     |
+| `vars.color.foreground` / `mutedForeground`         | Diepe inkt en secundaire tekst (≥ 4,5:1 contrast)                                  |
+| `vars.color.card` / `cardElevated`                  | Panelen, kaarten en zwevende dialogen                                              |
+| `vars.color.muted`                                  | Rustige vlakken en uitgeschakelde staten                                           |
+| `vars.color.border` / `borderStrong`                | Hairline-randen en tactiele hover-randen                                           |
+| `vars.color.primary` / `primarySoft`                | Actie, selectie, actieve staat en zachte selectietint                              |
+| `vars.color.success` / `successSoft` / `Ink`        | Goed, gevonden, opgelost                                                           |
+| `vars.color.warning` / `warningSoft` / `Ink`        | Hint, aandacht, bijna                                                              |
+| `vars.color.danger` / `dangerSoft` / `Ink`          | Fout, conflict, verloren                                                           |
+| `vars.color.pawnRed` … `pawnPink`                   | Pionkleuren voor bordspellen (los van feedbackkleuren)                             |
+| `vars.color.playerOne` / `playerTwo`                | Vaste kleuren voor Vier op een Rij                                                 |
+| `vars.color.parchmentBg` … `parchmentInk`           | Perkament-palet voor historische bordspellen zoals Ganzenbord                      |
+| `vars.color.mapWater` / `mapLand` / `mapLandStroke` | Kaartvlakken van Vlaggenreis: koel water, bijna-wit land en een zichtbare kustlijn |
+| `vars.radius.sm` … `xl` / `pill`                    | Vaste radiusschaal: `8px`, `12px`, `16px`, `20px`, pil                             |
+| `vars.shadow.tactile` / `panel` / `dialog`          | Fysieke papierdiepte zonder harde blokschaduwen                                    |
+| `vars.motion.fast` / `normal` / `slow`              | Consistente duur en `easeOut`-curve                                                |
 
 Typografie: één systeem-sans (`ui-rounded` / systeem-sans) voor tekst, een systeem-serif voor
 schermkoppen en spelnamen (`font-display`), en `tabular-nums` voor scores en tellers. Geen
