@@ -38,7 +38,7 @@ const PRAISE_LINES: readonly SpeechLine[] = [
   line("math-praise-top", "Top gedaan!"),
   line("math-praise-helemaal", "Helemaal goed!"),
   line("math-praise-slim", "Slim gerekend!"),
-  line("math-praise-ster", "Jij bent een ster!"),
+  line("math-praise-goedzo", "Goedzo!"),
 ];
 
 export const MATH_PRAISE_LINES = PRAISE_LINES;
