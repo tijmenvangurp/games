@@ -1,5 +1,5 @@
 import { frenchAudioSrc, type FrenchItem } from "@entities/french";
-import { Button, Check, RotateCcw, Sparkles, Volume2 } from "@shared/ui";
+import { Button, Check, Panel, RotateCcw, Sparkles, Volume2 } from "@shared/ui";
 import type { SentenceToken } from "../model/sentence";
 import { useFrenchAudio } from "./use-french-audio";
 
@@ -11,17 +11,20 @@ interface FinishedProps {
 
 export function SentenceBuilderFinished({ score, total, onRestart }: FinishedProps) {
   return (
-    <div className="game-panel mx-auto flex w-full max-w-xl flex-col items-center gap-4 p-6 text-center">
+    <Panel
+      className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 text-center"
+      padding="lg"
+    >
       <Sparkles aria-hidden="true" className="size-10 text-primary" />
       <h2 className="font-display text-2xl">Klaar!</h2>
-      <p className="text-muted-foreground">
+      <p className="tabular-nums text-muted-foreground">
         Je had {score} van {total} zinnen goed.
       </p>
       <Button size="lg" onClick={onRestart}>
         <RotateCcw aria-hidden="true" className="size-5" />
         Opnieuw
       </Button>
-    </div>
+    </Panel>
   );
 }
 
@@ -33,20 +36,18 @@ interface HeaderProps {
 
 export function SentenceBuilderHeader({ index, total, score }: HeaderProps) {
   return (
-    <div className="game-panel flex items-center justify-between gap-3 px-4 py-3">
+    <Panel className="flex items-center justify-between gap-3 px-4 py-3" padding="none">
       <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          Bouw de zin
-        </p>
-        <p className="text-sm font-bold">
+        <p className="text-xs font-semibold text-muted-foreground">Bouw de zin</p>
+        <p className="text-sm font-bold tabular-nums">
           Zin {index + 1} van {total}
         </p>
       </div>
-      <div className="text-right">
+      <div className="text-right tabular-nums">
         <p className="text-2xl font-black leading-none">{score}</p>
         <p className="text-xs text-muted-foreground">goed</p>
       </div>
-    </div>
+    </Panel>
   );
 }
 
@@ -54,11 +55,9 @@ export function SentencePrompt({ item }: { item: FrenchItem }) {
   const { play } = useFrenchAudio();
 
   return (
-    <div className="game-panel p-4 text-center">
-      <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-        Maak deze zin in het Frans
-      </p>
-      <p className="mt-1 text-lg font-black">{item.nl}</p>
+    <Panel className="text-center" padding="md">
+      <p className="text-xs font-semibold text-muted-foreground">Maak deze zin in het Frans</p>
+      <p className="mt-1 text-lg font-bold">{item.nl}</p>
       <Button
         aria-label="Beluister de Franse zin"
         className="mt-2"
@@ -69,7 +68,7 @@ export function SentencePrompt({ item }: { item: FrenchItem }) {
         <Volume2 aria-hidden="true" className="size-5" />
         Beluister
       </Button>
-    </div>
+    </Panel>
   );
 }
 
@@ -140,8 +139,8 @@ interface FeedbackProps {
 
 export function SentenceFeedback({ item, correct, praise, onNext }: FeedbackProps) {
   return (
-    <div aria-live="polite" className="game-panel space-y-2 p-4">
-      <p className={correct ? "font-black text-success" : "font-black text-warning"}>
+    <Panel aria-live="polite" className="space-y-2" padding="md">
+      <p className={correct ? "font-bold text-success-ink" : "font-bold text-warning-ink"}>
         {correct ? praise : "Nog niet."}
       </p>
       <p className="text-sm text-muted-foreground">
@@ -150,7 +149,7 @@ export function SentenceFeedback({ item, correct, praise, onNext }: FeedbackProp
       <Button className="w-full" size="lg" onClick={onNext}>
         Volgende
       </Button>
-    </div>
+    </Panel>
   );
 }
 

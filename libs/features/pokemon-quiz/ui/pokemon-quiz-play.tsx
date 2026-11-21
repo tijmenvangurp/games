@@ -1,5 +1,6 @@
 import { getPokemon, type Pokemon } from "@entities/pokedex";
 import { playHaptic, playSound, praiseFor } from "@shared/lib";
+import { Panel } from "@shared/ui";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
@@ -56,16 +57,16 @@ export function PokemonQuizPlay() {
       </div>
 
       <aside className="order-2 space-y-3 lg:col-span-2">
-        <div className="game-panel flex items-center justify-between gap-3 p-4">
-          <p className="text-sm font-black">
+        <Panel className="flex items-center justify-between gap-3" padding="md">
+          <p className="text-sm font-bold tabular-nums">
             {correctCount} van {rounds} goed
           </p>
 
-          <div className="text-right">
+          <div className="text-right tabular-nums">
             <p className="text-3xl font-black leading-none">{rounds}</p>
             <p className="text-xs text-muted-foreground">rondes</p>
           </div>
-        </div>
+        </Panel>
 
         <div aria-label="Kies de juiste naam" className="grid gap-2" role="group">
           {options.map((option, index) => (

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
-import { Check } from "@shared/ui";
+import { Check, Panel } from "@shared/ui";
 import { cn } from "@shared/lib";
 import { trayLabel, type TrayItem } from "@entities/gear";
 import { trayShortLabel } from "../model/labels";
@@ -108,16 +108,18 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
   });
 
   return (
-    <section
+    <Panel
+      as="section"
       ref={(node) => setNodeRef(node)}
       aria-label={removing ? "Onderdelen, sleep hier om weg te halen" : "Onderdelen"}
       className={cn(
-        "game-panel flex min-h-0 min-w-0 flex-col p-2.5 transition sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2",
+        "flex min-h-0 min-w-0 flex-col p-2.5 transition sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2",
         removing && "border-dashed border-primary/60",
-        isOver && "bg-primary/5 ring-2 ring-primary/20",
+        isOver && "bg-primary-soft ring-2 ring-primary/20",
       )}
       data-drop-over={isOver ? "true" : "false"}
       data-tray-drop="true"
+      padding="none"
     >
       <div className="mb-2 flex shrink-0 items-baseline justify-between gap-2">
         <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
@@ -152,6 +154,6 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
           />
         ))}
       </div>
-    </section>
+    </Panel>
   );
 }

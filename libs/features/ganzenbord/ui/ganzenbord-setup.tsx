@@ -6,7 +6,7 @@ import {
   type PlayerId,
 } from "@entities/ganzenbord";
 import { cn } from "@shared/lib";
-import { Button, OptionPicker, SetupActions } from "@shared/ui";
+import { Button, OptionPicker, Panel, SetupPanel, TextInput } from "@shared/ui";
 import {
   CONTROLLER_OPTIONS,
   PLAYER_COUNT_OPTIONS,
@@ -36,18 +36,17 @@ export function GanzenbordSetup({
   const players = PLAYER_IDS.slice(0, settings.playerCount);
 
   return (
-    <section className="game-panel animate-rise p-4 sm:p-6">
-      <h2 className="mb-5 text-xl font-black">Nieuw spel</h2>
-
+    <SetupPanel onStart={onStart}>
       <OptionPicker
         columns={3}
         legend="Aantal spelers"
         options={PLAYER_COUNT_OPTIONS}
         selected={settings.playerCount}
+        size="compact"
         onSelect={onPlayerCountChange}
       />
 
-      <div className="mt-5 space-y-2">
+      <div className="space-y-2.5">
         <p className="text-sm font-semibold">Wie spelen er mee?</p>
         {players.map((id) => {
           const controller = settings.controllers[id];
@@ -55,27 +54,26 @@ export function GanzenbordSetup({
           const number = playerNumber(id);
 
           return (
-            <div key={id} className="rounded-lg border border-border bg-card px-2.5 py-2">
+            <Panel key={id} padding="sm" surface="subtle">
               <div className="flex items-center gap-2">
-                <PlayerToken color={color} className="size-5" />
-                <input
+                <PlayerToken color={color} className="size-5 shrink-0" />
+                <TextInput
                   aria-label={`Naam van speler ${number}`}
                   autoComplete="off"
-                  className="min-h-11 min-w-0 flex-1 rounded-lg border border-border bg-background px-2.5 text-sm font-bold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+                  className="flex-1 text-sm"
                   maxLength={MAX_PLAYER_NAME_LENGTH}
                   placeholder={playerName({ id, controller })}
                   spellCheck={false}
-                  type="text"
                   value={settings.names[id][controller]}
                   onChange={(event) => onNameChange(id, event.target.value)}
                 />
-                <div className="flex shrink-0 gap-0.5 rounded-lg border border-border p-0.5">
+                <div className="flex shrink-0 gap-0.5 rounded-xl border border-border bg-card p-0.5">
                   {CONTROLLER_OPTIONS.map((option) => (
                     <Button
                       key={option.value}
                       aria-label={`Speler ${number}: ${option.label.toLowerCase()}`}
                       aria-pressed={controller === option.value}
-                      className="h-8 px-2.5"
+                      className="h-9 px-2.5"
                       size="sm"
                       variant={controller === option.value ? "default" : "ghost"}
                       onClick={() => onControllerChange(id, option.value)}
@@ -87,7 +85,7 @@ export function GanzenbordSetup({
               </div>
               <div
                 aria-label={`Kleur van speler ${number}`}
-                className="mt-1 flex flex-wrap gap-1"
+                className="mt-1.5 flex flex-wrap gap-1"
                 role="group"
               >
                 {PLAYER_COLOR_OPTIONS.map((option) => (
@@ -96,9 +94,9 @@ export function GanzenbordSetup({
                     aria-label={option.label}
                     aria-pressed={color === option.value}
                     className={cn(
-                      "grid size-11 place-items-center rounded-full border-2 transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
+                      "grid size-11 place-items-center rounded-full border-2 transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                       color === option.value
-                        ? "border-primary bg-primary/10"
+                        ? "border-primary bg-primary-soft"
                         : "border-transparent hover:bg-muted",
                     )}
                     type="button"
@@ -108,7 +106,7 @@ export function GanzenbordSetup({
                   </button>
                 ))}
               </div>
-            </div>
+            </Panel>
           );
         })}
         <p className="text-xs text-muted-foreground">
@@ -117,11 +115,7 @@ export function GanzenbordSetup({
         </p>
       </div>
 
-      <div className="mt-5">
-        <GanzenbordRules />
-      </div>
-
-      <SetupActions onStart={onStart} />
-    </section>
+      <GanzenbordRules />
+    </SetupPanel>
   );
 }

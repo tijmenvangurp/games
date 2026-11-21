@@ -151,20 +151,22 @@ export function MurdokuGameBody({
 
   return (
     <>
-      <div className="flex flex-col gap-5 pb-2">
-        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{intro}</p>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button asChild className="min-h-11" variant="outline">
-            <Link to="/mysterie/zaken" onClick={actions.chooseCase}>
-              Kies een andere zaak
-            </Link>
-          </Button>
-          <Button asChild className="min-h-11" variant="outline">
-            <Link to="/mysterie/les">Zo werkt het</Link>
-          </Button>
+      <div className="flex flex-col gap-3.5 pb-2">
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
+          <p className="min-w-0 flex-1 text-sm leading-relaxed text-muted-foreground">{intro}</p>
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Button asChild className="min-h-11" size="sm" variant="outline">
+              <Link to="/mysterie/zaken" onClick={actions.chooseCase}>
+                Kies een andere zaak
+              </Link>
+            </Button>
+            <Button asChild className="min-h-11" size="sm" variant="outline">
+              <Link to="/mysterie/les">Zo werkt het</Link>
+            </Button>
+          </div>
         </div>
 
-        <div className="flex min-w-0 flex-col gap-5 lg:landscape:grid lg:landscape:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] lg:landscape:items-start lg:landscape:gap-6">
+        <div className="flex min-w-0 flex-col gap-4 lg:landscape:grid lg:landscape:grid-cols-[minmax(0,1fr)_minmax(22rem,28rem)] lg:landscape:items-start lg:landscape:gap-6">
           <div className="min-w-0 lg:landscape:sticky lg:landscape:top-4 lg:landscape:self-start">
             <MurdokuBoardSection
               autoCross={settings.autoCross}

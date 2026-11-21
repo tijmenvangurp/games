@@ -1,5 +1,5 @@
 import type { Ref } from "react";
-import { Button } from "@shared/ui";
+import { Button, Panel, StatusBanner } from "@shared/ui";
 
 interface MurdokuRevealProps {
   /** De afloopzin met de dief en de kamer van de buit. */
@@ -23,12 +23,7 @@ export function MurdokuReveal({
   onRestart,
 }: MurdokuRevealProps) {
   return (
-    <section
-      ref={ref}
-      aria-labelledby="murdoku-afloop"
-      className="game-panel p-4 sm:p-5"
-      tabIndex={-1}
-    >
+    <Panel as="section" ref={ref} aria-labelledby="murdoku-afloop" padding="md" tabIndex={-1}>
       <h2 className="font-display text-xl" id="murdoku-afloop">
         De dief
       </h2>
@@ -37,13 +32,13 @@ export function MurdokuReveal({
         De buit staat ook op de plattegrond; de kamer van de buit is omlijnd.
       </p>
       {progressMessage ? (
-        <p className="mt-2 rounded-lg bg-success/10 px-3 py-2 text-sm leading-relaxed text-success">
+        <StatusBanner className="mt-2 min-h-0 py-2 text-sm font-medium" tone="success">
           {progressMessage}
-        </p>
+        </StatusBanner>
       ) : null}
       <Button className="mt-3 min-h-11" variant="outline" onClick={onRestart}>
         Nog een keer
       </Button>
-    </section>
+    </Panel>
   );
 }

@@ -365,4 +365,19 @@ describe("games app", () => {
     fireEvent.click(screen.getByRole("button", { name: /Naar het menu/ }));
     expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();
   });
+
+  it("filters games on the home screen by category", async () => {
+    renderApp("/");
+    expect(await screen.findByRole("heading", { name: "Spellen" })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ontdekken" }));
+    expect(screen.getByRole("link", { name: /Mengelmoes/ })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Sudoku/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Alles" }));
+    expect(screen.getByRole("link", { name: /Sudoku/ })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "Verras me!" }));
+    expect(await screen.findByRole("button", { name: "Terug naar het menu" })).toBeTruthy();
+  });
 });

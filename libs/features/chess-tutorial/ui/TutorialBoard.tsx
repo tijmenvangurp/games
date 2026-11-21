@@ -3,10 +3,11 @@ import type { PieceSymbol } from "chess.js";
 import type { ChessboardOptions } from "react-chessboard";
 import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
 import {
-  Button,
   ArrowRight,
+  Button,
   Check,
   ChessBoard,
+  Disclosure,
   Eye,
   LayoutGrid,
   Lightbulb,
@@ -15,7 +16,9 @@ import {
   SpeechButton,
   SpokenText,
   Star,
+  StatusBanner,
   X,
+  type StatusTone,
 } from "@shared/ui";
 import { CHESS_LEVEL_LINES, coachSpeechFor, type CoachSpeech } from "../model/audio";
 import { levelFor, nextLevelId } from "../model/levels";
@@ -54,15 +57,18 @@ function TutorialHeader({ currentIndex, level, titleId }: TutorialHeaderProps) {
     <header className="flex items-center gap-3">
       <span
         aria-hidden="true"
-        className="grid size-12 shrink-0 place-items-center rounded-lg border border-primary/30 bg-primary/5 text-3xl leading-none text-primary"
+        className="grid size-12 shrink-0 place-items-center rounded-xl border border-primary/25 bg-primary-soft text-3xl leading-none text-primary"
       >
         {PIECE_GLYPHS[level.playerPiece]}
       </span>
       <div className="min-w-0">
-        <p className="text-xs font-black uppercase tracking-widest text-primary">
+        <p className="text-xs font-semibold tabular-nums text-muted-foreground">
           Les {currentIndex + 1} van {TUTORIAL_LEVEL_IDS.length}
         </p>
-        <h2 id={titleId} className="text-xl font-black leading-tight text-foreground sm:text-2xl">
+        <h2
+          id={titleId}
+          className="font-display text-2xl leading-tight tracking-tight text-foreground"
+        >
           {level.title}
         </h2>
       </div>
@@ -79,15 +85,12 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
   return (
-    <details ref={detailsRef} className="rounded-lg border border-border bg-card">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-lg px-3 text-sm font-bold text-muted-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 [&::-webkit-details-marker]:hidden">
-        <LayoutGrid aria-hidden="true" className="size-4" />
-        Kies een les
-      </summary>
-      <nav
-        aria-label="Kies een schaakles"
-        className="grid grid-cols-5 gap-2 p-3 pt-0 sm:grid-cols-9"
-      >
+    <Disclosure
+      detailsRef={detailsRef}
+      icon={<LayoutGrid className="size-4 text-primary" />}
+      summary="Kies een les"
+    >
+      <nav aria-label="Kies een schaakles" className="grid grid-cols-5 gap-2 sm:grid-cols-9">
         {TUTORIAL_LEVEL_IDS.map((levelId, index) => {
           const level = levelFor(levelId);
           const active = levelId === currentLevelId;
@@ -99,10 +102,10 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
               aria-label={`Les ${index + 1}: ${level.title}`}
               aria-pressed={active}
               className={cn(
-                "flex min-h-11 flex-col items-center justify-center rounded-lg border px-1 py-1 text-xs font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
+                "flex min-h-11 flex-col items-center justify-center rounded-xl border px-1 py-1 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                 active
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-card text-muted-foreground hover:bg-muted/60",
+                  ? "border-primary bg-primary-soft text-primary"
+                  : "border-border bg-card text-muted-foreground hover:border-border-strong hover:bg-background-subtle",
               )}
               title={level.title}
               onClick={() => {
@@ -115,14 +118,14 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
               <span aria-hidden="true" className="text-lg leading-none">
                 {PIECE_GLYPHS[level.playerPiece]}
               </span>
-              <span aria-hidden="true" className="text-xs leading-tight">
+              <span aria-hidden="true" className="text-xs leading-tight tabular-nums">
                 {index + 1}
               </span>
             </button>
           );
         })}
       </nav>
-    </details>
+    </Disclosure>
   );
 }
 
@@ -152,32 +155,24 @@ function coachTone(
   status: TutorialStatus,
   feedback: TutorialFeedback,
   preview: TutorialPreview | null,
-): string {
-  if (status === "completed") {
-    return "bg-success/10 text-success";
+): StatusTone {
+  if (status === "completed" || feedback === "moved") {
+    return "success";
   }
 
   if (status === "stuck") {
-    return "bg-warning/15 text-warning";
+    return "warning";
   }
 
   if (feedback === "illegal") {
-    return "bg-danger/10 text-danger";
+    return "danger";
   }
 
-  if (feedback === "hint") {
-    return "bg-primary/10 text-primary";
+  if (feedback === "hint" || preview) {
+    return "primary";
   }
 
-  if (feedback === "moved") {
-    return "bg-success/10 text-success";
-  }
-
-  if (preview) {
-    return "bg-primary/5 text-foreground";
-  }
-
-  return "bg-muted text-foreground";
+  return "neutral";
 }
 
 function coachIcon(
@@ -214,20 +209,15 @@ function coachIcon(
 
 function CoachBubble({ feedback, preview, speech, status }: CoachBubbleProps) {
   return (
-    <div
+    <StatusBanner
+      action={<SpeechButton label="Beluister de coach" line={speech.lines} />}
       aria-atomic="true"
-      aria-live="polite"
-      className={cn(
-        "flex min-h-14 items-center gap-3 rounded-lg px-4 py-3 text-base font-bold leading-snug sm:text-lg",
-        coachTone(status, feedback, preview),
-      )}
+      className="min-h-14 text-base sm:text-lg"
+      icon={coachIcon(status, feedback, preview)}
+      tone={coachTone(status, feedback, preview)}
     >
-      <span aria-hidden="true" className="shrink-0">
-        {coachIcon(status, feedback, preview)}
-      </span>
-      <span className="min-w-0 flex-1">{speech.text}</span>
-      <SpeechButton className="shrink-0" label="Beluister de coach" line={speech.lines} />
-    </div>
+      {speech.text}
+    </StatusBanner>
   );
 }
 
@@ -309,12 +299,8 @@ function WhyCard({ level }: { readonly level: TutorialLevel }) {
   const speech = CHESS_LEVEL_LINES[level.id];
 
   return (
-    <details className="rounded-lg border border-border bg-card">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center gap-2 rounded-lg px-3 text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 [&::-webkit-details-marker]:hidden">
-        <Lightbulb aria-hidden="true" className="size-4 text-warning" />
-        Waarom?
-      </summary>
-      <div className="space-y-2 px-4 pb-4 text-sm font-medium text-muted-foreground">
+    <Disclosure icon={<Lightbulb className="size-4 text-warning" />} summary="Waarom?">
+      <div className="space-y-2 text-sm font-medium text-muted-foreground">
         <SpokenText line={speech.explanation} label="Beluister de uitleg" />
         <SpokenText
           className="font-bold text-primary"
@@ -323,7 +309,7 @@ function WhyCard({ level }: { readonly level: TutorialLevel }) {
           text={`Tip: ${level.hint}`}
         />
       </div>
-    </details>
+    </Disclosure>
   );
 }
 

@@ -1,5 +1,6 @@
 import { PokeballMark, pokemonArtworkSrc, type Pokemon } from "@entities/pokedex";
 import { cn } from "@shared/lib";
+import { Panel } from "@shared/ui";
 
 interface QuizArtworkProps {
   target: Pokemon;
@@ -16,7 +17,7 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
   const fragmentVisible = fragment && !answered;
 
   return (
-    <div className="game-panel relative overflow-hidden p-3 sm:p-5">
+    <Panel className="relative overflow-hidden p-3 sm:p-5" padding="none">
       <PokeballMark className="pointer-events-none absolute -right-10 -top-10 size-44 opacity-10 sm:size-56" />
       <div className="relative mx-auto flex aspect-square w-full max-w-md items-center justify-center overflow-hidden rounded-lg">
         <img
@@ -43,6 +44,6 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
       >
         {answered ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}
       </p>
-    </div>
+    </Panel>
   );
 }

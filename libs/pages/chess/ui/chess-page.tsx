@@ -1,36 +1,38 @@
+import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { GameShell } from "@widgets/game-shell";
-import { cn } from "@shared/lib";
-import { Play } from "@shared/ui";
+import { GraduationCap, Panel, Play, Puzzle, Swords } from "@shared/ui";
 
 interface ChessHubCardProps {
   readonly to: "/schaken/les" | "/schaken/partij" | "/puzzels";
-  readonly emoji: string;
+  readonly icon: ReactNode;
   readonly title: string;
   readonly description: string;
-  readonly accentClassName: string;
 }
 
-function ChessHubCard({ to, emoji, title, description, accentClassName }: ChessHubCardProps) {
+function ChessHubCard({ to, icon, title, description }: ChessHubCardProps) {
   return (
-    <Link
-      className={cn(
-        "group flex min-h-40 flex-col rounded-3xl border bg-gradient-to-br p-5 shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30",
-        accentClassName,
-      )}
-      to={to}
-    >
-      <div className="flex items-start justify-between">
-        <span aria-hidden="true" className="text-4xl">
-          {emoji}
-        </span>
-        <span className="grid size-9 place-items-center rounded-full bg-white/80 text-primary shadow-sm transition group-hover:bg-white">
-          <Play aria-hidden="true" className="size-4" />
-        </span>
-      </div>
-      <h2 className="mt-3 text-lg font-black">{title}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      <span className="mt-auto pt-4 text-sm font-bold text-primary">Spelen</span>
+    <Link className="group flex focus-visible:outline-none" to={to}>
+      <Panel
+        className="flex h-full min-h-44 w-full flex-col group-focus-visible:ring-4 group-focus-visible:ring-primary/25"
+        interactive
+        padding="lg"
+      >
+        <div className="flex items-start justify-between">
+          <span
+            aria-hidden="true"
+            className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary"
+          >
+            {icon}
+          </span>
+          <span className="grid size-9 place-items-center rounded-full bg-muted text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+            <Play aria-hidden="true" className="size-4" />
+          </span>
+        </div>
+        <h2 className="mt-4 font-display text-xl leading-snug tracking-tight">{title}</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
+        <span className="mt-auto pt-4 text-sm font-bold text-primary">Spelen</span>
+      </Panel>
     </Link>
   );
 }
@@ -40,9 +42,9 @@ export function ChessPage() {
 
   return (
     <GameShell
-      onBack={() => navigate({ to: "/" })}
       subtitle="Les, puzzels of een partij"
       title="Schaken"
+      onBack={() => navigate({ to: "/" })}
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
         <p className="text-muted-foreground">
@@ -50,23 +52,20 @@ export function ChessPage() {
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <ChessHubCard
-            accentClassName="from-violet-100 via-violet-50 to-white"
             description="Leer stap voor stap alle stukken en zet je eerste schaakmat."
-            emoji="♞"
+            icon={<GraduationCap className="size-6" />}
             title="Schaakles"
             to="/schaken/les"
           />
           <ChessHubCard
-            accentClassName="from-sky-100 via-sky-50 to-white"
             description="Speel tegen de computer of samen op dit scherm. Kies een avatar en zie meteen wie aan zet is."
-            emoji="♟️"
+            icon={<Swords className="size-6" />}
             title="Schaakpartij"
             to="/schaken/partij"
           />
           <ChessHubCard
-            accentClassName="from-teal-100 via-emerald-50 to-white"
             description="Los korte puzzels op: zet schaakmat of win een stuk."
-            emoji="🧩"
+            icon={<Puzzle className="size-6" />}
             title="Schaakpuzzels"
             to="/puzzels"
           />

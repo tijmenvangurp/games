@@ -8,7 +8,7 @@ import {
   type ChessMode,
   type ChessResult,
 } from "@entities/chess";
-import { chessBoardOptions, chessSquareStyles, cn } from "@shared/lib";
+import { chessBoardOptions, chessSquareStyles } from "@shared/lib";
 import {
   Button,
   CelebrationDialog,
@@ -16,7 +16,9 @@ import {
   Flag,
   LayoutGrid,
   Lightbulb,
+  StatusBanner,
   Undo2,
+  type StatusTone,
 } from "@shared/ui";
 import {
   capturedBy,
@@ -77,16 +79,16 @@ function PlayerCards({
   );
 }
 
-function statusClassName(feedback: string | null, result: ChessResult): string {
+function statusToneFor(feedback: string | null, result: ChessResult): StatusTone {
   if (feedback) {
-    return "bg-amber-100 text-amber-950";
+    return "warning";
   }
 
   if (result.kind !== "playing") {
-    return "bg-emerald-100 text-emerald-950";
+    return "success";
   }
 
-  return result.check ? "bg-rose-100 text-rose-950" : "bg-sky-50 text-sky-950";
+  return result.check ? "danger" : "primary";
 }
 
 interface StatusPanelProps {
@@ -99,18 +101,14 @@ interface StatusPanelProps {
 
 function StatusPanel({ feedback, status, result, mode, humanColor }: StatusPanelProps) {
   return (
-    <div
-      aria-atomic="true"
-      aria-live="polite"
-      className={cn("rounded-2xl px-4 py-3", statusClassName(feedback, result))}
-    >
-      <p className="text-base font-black leading-snug sm:text-lg">{feedback ?? status}</p>
-      <p className="mt-0.5 text-xs font-semibold opacity-80">
+    <StatusBanner aria-atomic="true" tone={statusToneFor(feedback, result)}>
+      <p className="text-base font-bold leading-snug sm:text-lg">{feedback ?? status}</p>
+      <p className="mt-0.5 text-xs font-medium opacity-80">
         {mode === "computer"
           ? `Jij speelt met ${SIDE_LABEL[humanColor].toLowerCase()} · de computer met ${SIDE_LABEL[otherColor(humanColor)].toLowerCase()}.`
           : "Jullie spelen om de beurt op dit scherm."}
       </p>
-    </div>
+    </StatusBanner>
   );
 }
 

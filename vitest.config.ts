@@ -1,7 +1,9 @@
+import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import { defineConfig } from "vitest/config";
 import { aliases } from "./tools/aliases.ts";
 
 export default defineConfig({
+  plugins: [vanillaExtractPlugin()],
   resolve: {
     alias: aliases,
   },

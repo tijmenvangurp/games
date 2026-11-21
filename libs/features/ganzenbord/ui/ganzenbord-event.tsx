@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import { m, useReducedMotion } from "motion/react";
 import {
   Bed,
   Bridge,
@@ -13,7 +12,7 @@ import {
   Trophy,
 } from "@phosphor-icons/react";
 import type { GanzenbordGame, TurnEvent, TurnEventKind } from "@entities/ganzenbord";
-import { Button } from "@shared/ui";
+import { Button, Dialog } from "@shared/ui";
 import { eventArt } from "../model/event-art";
 import { eventMessage } from "../model/presentation";
 import { GooseMark } from "./goose-mark";
@@ -72,48 +71,35 @@ interface GanzenbordEventProps {
 export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProps) {
   const message = eventMessage(game, event);
   const art = eventArt(event);
-  const reduceMotion = useReducedMotion();
 
   return (
-    <div
-      aria-labelledby="ganzenbord-event-title"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/20 p-4 backdrop-blur-xs"
-      role="dialog"
-      onKeyDown={(keyboardEvent) => {
-        if (keyboardEvent.key === "Escape") {
-          keyboardEvent.preventDefault();
-          onContinue();
-        }
-      }}
+    <Dialog
+      className="p-4 sm:p-5"
+      labelledBy="ganzenbord-event-title"
+      size="md"
+      tone="parchment"
+      onClose={onContinue}
     >
-      <m.div
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="max-h-full w-full max-w-md overflow-y-auto rounded-2xl border-2 border-[#c9a45c] bg-[#fff8e7] p-4 text-[#3f2a18] shadow-2xl"
-        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.92, y: 12 }}
-        transition={{ damping: 26, stiffness: 360, type: "spring" }}
-      >
-        <div className="flex items-start gap-3">
-          {art ? (
-            <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-[#c9a45c] bg-[#f0dfb8] sm:size-24">
-              <img alt="" className="size-full object-contain" src={art} />
-            </span>
-          ) : (
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#f0dfb8]">
-              <EventIcon kind={event.kind} />
-            </span>
-          )}
-          <div className="min-w-0">
-            <h2 className="font-black" id="ganzenbord-event-title">
-              {TITLES[event.kind]}
-            </h2>
-            {message ? <p className="text-sm leading-snug opacity-80">{message}</p> : null}
-          </div>
+      <div className="flex items-start gap-3">
+        {art ? (
+          <span className="grid size-20 shrink-0 place-items-center overflow-hidden rounded-xl border-2 border-parchment-border bg-parchment-surface sm:size-24">
+            <img alt="" className="size-full object-contain" src={art} />
+          </span>
+        ) : (
+          <span className="grid size-11 shrink-0 place-items-center rounded-full bg-parchment-surface">
+            <EventIcon kind={event.kind} />
+          </span>
+        )}
+        <div className="min-w-0">
+          <h2 className="font-display text-xl tracking-tight" id="ganzenbord-event-title">
+            {TITLES[event.kind]}
+          </h2>
+          {message ? <p className="mt-1 text-sm leading-snug opacity-85">{message}</p> : null}
         </div>
-        <Button autoFocus className="mt-3 w-full" size="lg" variant="outline" onClick={onContinue}>
-          Verder
-        </Button>
-      </m.div>
-    </div>
+      </div>
+      <Button autoFocus className="mt-4 w-full" size="lg" variant="outline" onClick={onContinue}>
+        Verder
+      </Button>
+    </Dialog>
   );
 }

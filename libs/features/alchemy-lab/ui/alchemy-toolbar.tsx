@@ -1,5 +1,5 @@
 import { ELEMENTS } from "@entities/alchemy";
-import { Button, LayoutGrid, Lightbulb, RotateCcw } from "@shared/ui";
+import { Button, LayoutGrid, Lightbulb, Panel, RotateCcw } from "@shared/ui";
 
 interface AlchemyToolbarProps {
   discoveredCount: number;
@@ -17,8 +17,11 @@ export function AlchemyToolbar({
   onClear,
 }: AlchemyToolbarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 rounded-3xl border bg-card px-3 py-2 shadow-sm">
-      <p className="text-sm font-bold" data-testid="alchemy-progress">
+    <Panel
+      className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5"
+      padding="none"
+    >
+      <p className="text-sm font-bold tabular-nums" data-testid="alchemy-progress">
         <span className="text-lg font-black">{discoveredCount}</span>{" "}
         <span className="text-muted-foreground">/ {ELEMENTS.length} ontdekt</span>
       </p>
@@ -29,7 +32,7 @@ export function AlchemyToolbar({
           variant="outline"
           onClick={onHint}
         >
-          <Lightbulb aria-hidden="true" className="size-4" />
+          <Lightbulb aria-hidden="true" className="size-4 text-warning" />
           Hint
         </Button>
         <Button
@@ -50,6 +53,6 @@ export function AlchemyToolbar({
           Opruimen
         </Button>
       </div>
-    </div>
+    </Panel>
   );
 }

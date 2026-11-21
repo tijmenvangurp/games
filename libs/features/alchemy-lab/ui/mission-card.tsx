@@ -1,5 +1,5 @@
 import { MISSIONS, completedMissionCount, isMissionDone, missionById } from "@entities/alchemy";
-import { Button, Check } from "@shared/ui";
+import { Badge, Button, Check, Panel } from "@shared/ui";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 
 export function AlchemyMissionCard() {
@@ -11,25 +11,27 @@ export function AlchemyMissionCard() {
   const completed = completedMissionCount(discovered);
 
   return (
-    <section
+    <Panel
+      as="section"
       aria-label="Opdracht"
-      className="flex min-w-0 items-center gap-2 rounded-2xl border bg-card px-3 py-2 shadow-sm"
+      className="flex min-w-0 items-center gap-2.5 px-3.5 py-2.5"
       data-testid="alchemy-mission"
+      padding="none"
     >
       <div aria-live="polite" className="min-w-0 flex-1">
-        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+        <p className="text-xs font-semibold tabular-nums text-muted-foreground">
           Opdracht {completed}/{MISSIONS.length}
         </p>
-        <p className="truncate text-sm font-black" title={mission?.title}>
+        <p className="truncate text-sm font-bold" title={mission?.title}>
           {mission ? mission.title : "Alle opdrachten gedaan!"}
         </p>
       </div>
 
       {done ? (
-        <span className="flex shrink-0 items-center gap-1 rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700">
+        <Badge tone="success">
           <Check aria-hidden="true" className="size-3.5" />
           Gelukt!
-        </span>
+        </Badge>
       ) : null}
 
       {mission ? (
@@ -43,6 +45,6 @@ export function AlchemyMissionCard() {
           {done ? "Volgende" : "Andere"}
         </Button>
       ) : null}
-    </section>
+    </Panel>
   );
 }

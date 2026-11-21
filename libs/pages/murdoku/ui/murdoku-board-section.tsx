@@ -11,7 +11,16 @@ import {
   type MurdokuHintState,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
-import { Button, Check, CircleQuestionMark, Lightbulb, RotateCcw, Undo2, X } from "@shared/ui";
+import {
+  Button,
+  Check,
+  CircleQuestionMark,
+  Lightbulb,
+  Panel,
+  RotateCcw,
+  Undo2,
+  X,
+} from "@shared/ui";
 
 /** De knoppen en tikacties van het bord, gebundeld zodat de sectie leesbaar blijft. */
 interface MurdokuBoardActions {
@@ -236,7 +245,7 @@ function MurdokuBoardPanel({
   );
 
   return (
-    <div className="game-panel p-3 sm:p-5">
+    <Panel className="p-3 sm:p-5" padding="none">
       <div className="mx-auto w-full max-w-lg lg:landscape:max-w-none">
         <MurdokuBoard
           crosses={crosses}
@@ -255,7 +264,7 @@ function MurdokuBoardPanel({
           onCellTap={onCellTap}
         />
       </div>
-    </div>
+    </Panel>
   );
 }
 

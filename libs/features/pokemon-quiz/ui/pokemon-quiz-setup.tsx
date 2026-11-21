@@ -1,5 +1,5 @@
 import { PokemonAssetsCredits } from "@entities/pokedex";
-import { OptionPicker, SetupActions } from "@shared/ui";
+import { OptionPicker, SetupPanel } from "@shared/ui";
 import { POKEMON_QUIZ_DIFFICULTY_OPTIONS, type PokemonQuizSettings } from "../model/settings";
 import type { QuizDifficulty } from "../model/quiz";
 
@@ -11,9 +11,7 @@ interface PokemonQuizSetupProps {
 
 export function PokemonQuizSetup({ settings, onDifficultyChange, onStart }: PokemonQuizSetupProps) {
   return (
-    <section className="game-panel animate-rise p-4 sm:p-6">
-      <h2 className="mb-5 font-display text-2xl">Nieuw spel</h2>
-
+    <SetupPanel footer={<PokemonAssetsCredits />} onStart={onStart}>
       <OptionPicker
         columns={2}
         legend="Moeilijkheid"
@@ -21,10 +19,6 @@ export function PokemonQuizSetup({ settings, onDifficultyChange, onStart }: Poke
         selected={settings.difficulty}
         onSelect={onDifficultyChange}
       />
-
-      <SetupActions onStart={onStart} />
-
-      <PokemonAssetsCredits />
-    </section>
+    </SetupPanel>
   );
 }

@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T07:57:30.597Z",
+  "title": "Design System: Spellen",
+  "extensions": {
+    "colorMeta": {
+      "indigo-accent": {
+        "role": "primary",
+        "displayName": "Craftsman Indigo",
+        "canonical": "oklch(0.485 0.125 268)",
+        "tonalRamp": [
+          "oklch(0.2 0.08 268)",
+          "oklch(0.3 0.105 268)",
+          "oklch(0.4 0.125 268)",
+          "oklch(0.485 0.125 268)",
+          "oklch(0.6 0.105 268)",
+          "oklch(0.74 0.075 268)",
+          "oklch(0.87 0.045 268)",
+          "oklch(0.945 0.026 268)"
+        ]
+      },
+      "ivory-paper": {
+        "role": "neutral",
+        "displayName": "Ivory Paper",
+        "canonical": "oklch(0.968 0.017 86)",
+        "tonalRamp": [
+          "oklch(0.22 0.018 86)",
+          "oklch(0.35 0.02 86)",
+          "oklch(0.5 0.022 86)",
+          "oklch(0.66 0.024 86)",
+          "oklch(0.8 0.023 86)",
+          "oklch(0.9 0.02 86)",
+          "oklch(0.946 0.02 86)",
+          "oklch(0.968 0.017 86)"
+        ]
+      },
+      "cotton-card": {
+        "role": "neutral",
+        "displayName": "Cotton Card",
+        "canonical": "oklch(0.994 0.006 86)",
+        "tonalRamp": [
+          "oklch(0.25 0.01 86)",
+          "oklch(0.4 0.012 86)",
+          "oklch(0.56 0.012 86)",
+          "oklch(0.72 0.012 86)",
+          "oklch(0.85 0.01 86)",
+          "oklch(0.93 0.008 86)",
+          "oklch(0.975 0.007 86)",
+          "oklch(0.994 0.006 86)"
+        ]
+      },
+      "deep-ink": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "oklch(0.25 0.024 148)",
+        "tonalRamp": [
+          "oklch(0.16 0.02 148)",
+          "oklch(0.25 0.024 148)",
+          "oklch(0.36 0.024 148)",
+          "oklch(0.48 0.022 148)",
+          "oklch(0.62 0.018 148)",
+          "oklch(0.76 0.014 148)",
+          "oklch(0.88 0.01 148)",
+          "oklch(0.95 0.006 148)"
+        ]
+      },
+      "botanical-green": {
+        "role": "semantic",
+        "displayName": "Botanical Green",
+        "canonical": "oklch(0.465 0.115 152)",
+        "tonalRamp": [
+          "oklch(0.2 0.07 152)",
+          "oklch(0.3 0.09 152)",
+          "oklch(0.38 0.105 152)",
+          "oklch(0.465 0.115 152)",
+          "oklch(0.58 0.1 152)",
+          "oklch(0.72 0.075 152)",
+          "oklch(0.86 0.048 152)",
+          "oklch(0.945 0.032 152)"
+        ]
+      },
+      "warm-ochre": {
+        "role": "semantic",
+        "displayName": "Warm Ochre",
+        "canonical": "oklch(0.55 0.14 68)",
+        "tonalRamp": [
+          "oklch(0.24 0.07 66)",
+          "oklch(0.34 0.095 66)",
+          "oklch(0.44 0.12 68)",
+          "oklch(0.55 0.14 68)",
+          "oklch(0.66 0.13 70)",
+          "oklch(0.78 0.105 74)",
+          "oklch(0.89 0.068 76)",
+          "oklch(0.955 0.042 78)"
+        ]
+      },
+      "terracotta-red": {
+        "role": "semantic",
+        "displayName": "Terracotta Red",
+        "canonical": "oklch(0.51 0.175 24)",
+        "tonalRamp": [
+          "oklch(0.22 0.095 24)",
+          "oklch(0.32 0.13 24)",
+          "oklch(0.41 0.155 24)",
+          "oklch(0.51 0.175 24)",
+          "oklch(0.62 0.15 24)",
+          "oklch(0.75 0.11 24)",
+          "oklch(0.87 0.065 24)",
+          "oklch(0.952 0.032 24)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display Serif",
+        "purpose": "Home screen title and large word/country prompts."
+      },
+      "headline": {
+        "displayName": "Headline Serif",
+        "purpose": "GameShell titles, setup panel headings, dialog titles, and menu card names."
+      },
+      "title": {
+        "displayName": "UI Title",
+        "purpose": "HUD titles, player cards, and prominent status messages."
+      },
+      "body": {
+        "displayName": "Body Rounded Sans",
+        "purpose": "Short child-friendly instructions, game descriptions, and parent tips."
+      },
+      "label": {
+        "displayName": "UI Label",
+        "purpose": "Fieldset legends, buttons, badges, and tabular counters."
+      },
+      "mono": {
+        "displayName": "Typing Monospace",
+        "purpose": "Target letter groups in Typepret."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tactile",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 0 oklch(0.74 0.028 82 / 0.65), 0 4px 10px -4px oklch(0.25 0.024 148 / 0.14)",
+        "purpose": "Subtle physical paper lift for outline buttons, choice cards, and answer options."
+      },
+      {
+        "name": "tactile-primary",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.24), 0 2.5px 0 oklch(0.33 0.12 268 / 0.78), 0 6px 14px -6px oklch(0.485 0.125 268 / 0.42)",
+        "purpose": "Tactile bottom lip on primary indigo buttons."
+      },
+      {
+        "name": "tactile-success",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.24), 0 2.5px 0 oklch(0.31 0.1 152 / 0.78), 0 6px 14px -6px oklch(0.465 0.115 152 / 0.42)",
+        "purpose": "Tactile bottom lip on botanical-green Start/Next buttons."
+      },
+      {
+        "name": "panel",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.85), 0 1px 2px oklch(0.25 0.024 148 / 0.06), 0 14px 30px -22px oklch(0.25 0.024 148 / 0.26)",
+        "purpose": "Resting paper depth for panels, HUD bars, disclosures, and menu cards."
+      },
+      {
+        "name": "card-hover",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.9), 0 3px 6px oklch(0.25 0.024 148 / 0.08), 0 22px 42px -20px oklch(0.25 0.024 148 / 0.32)",
+        "purpose": "Elevated hover state for interactive menu and hub cards."
+      },
+      {
+        "name": "dialog",
+        "value": "inset 0 1px 0 oklch(1 0 0 / 0.92), 0 6px 16px oklch(0.25 0.024 148 / 0.1), 0 32px 68px -24px oklch(0.25 0.024 148 / 0.38)",
+        "purpose": "Modal dialogs floating above the blurred warm-ink backdrop."
+      }
+    ],
+    "motion": [
+      {
+        "name": "fast",
+        "value": "140ms",
+        "purpose": "Button, choice-card, and answer-option state feedback."
+      },
+      {
+        "name": "normal",
+        "value": "220ms",
+        "purpose": "Card hover lifts and chevron rotations."
+      },
+      {
+        "name": "slow",
+        "value": "340ms",
+        "purpose": "Progress-bar fills and thumbnail zoom micro-interactions."
+      },
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Exponential ease-out curve for calm, responsive transitions."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "390px"
+      },
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Success Action Button",
+      "kind": "button",
+      "refersTo": "button-success",
+      "description": "Primary Start/Next call to action in setup panels and dialogs.",
+      "html": "<button class=\"ds-btn-success\" type=\"button\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"6 3 20 12 6 21 6 3\"/></svg>Spelen</button>",
+      "css": ".ds-btn-success { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 3.5rem; padding: 0 1.5rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1px solid var(--success, oklch(0.465 0.115 152)); background: var(--success, oklch(0.465 0.115 152)); color: var(--success-foreground, oklch(0.985 0.008 152)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 1rem; font-weight: 700; box-shadow: var(--ds-shadow-tactile-success); cursor: pointer; transition: background-color 140ms cubic-bezier(0.22, 1, 0.36, 1), transform 140ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 140ms ease; } .ds-btn-success:hover { background: var(--success-hover, oklch(0.415 0.115 152)); border-color: var(--success-hover, oklch(0.415 0.115 152)); } .ds-btn-success:active { transform: translateY(1px) scale(0.99); } .ds-btn-success:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus-ring, oklch(0.485 0.125 268 / 0.28)); }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Indigo primary action button.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">Terug naar de werkbank</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.75rem; padding: 0 1rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1px solid var(--primary, oklch(0.485 0.125 268)); background: var(--primary, oklch(0.485 0.125 268)); color: var(--primary-foreground, oklch(0.985 0.005 268)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.875rem; font-weight: 600; box-shadow: var(--ds-shadow-tactile-primary); cursor: pointer; transition: background-color 140ms cubic-bezier(0.22, 1, 0.36, 1), transform 140ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-btn-primary:hover { background: var(--primary-hover, oklch(0.435 0.13 268)); border-color: var(--primary-hover, oklch(0.435 0.13 268)); } .ds-btn-primary:active { transform: translateY(1px) scale(0.99); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus-ring, oklch(0.485 0.125 268 / 0.28)); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Tactile cotton-paper secondary control for Hint, Undo, and Reset.",
+      "html": "<button class=\"ds-btn-outline\" type=\"button\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8\"/><path d=\"M3 3v5h5\"/></svg>Opnieuw</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; height: 2.75rem; padding: 0 1rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1px solid var(--border, oklch(0.845 0.022 86)); background: var(--card, oklch(0.994 0.006 86)); color: var(--foreground, oklch(0.25 0.024 148)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.875rem; font-weight: 600; box-shadow: var(--ds-shadow-tactile); cursor: pointer; transition: background-color 140ms cubic-bezier(0.22, 1, 0.36, 1), border-color 140ms ease, transform 140ms ease; } .ds-btn-outline:hover { background: var(--background-subtle, oklch(0.946 0.02 86)); border-color: var(--border-strong, oklch(0.74 0.028 82)); } .ds-btn-outline:active { transform: translateY(1px) scale(0.99); } .ds-btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus-ring, oklch(0.485 0.125 268 / 0.28)); }"
+    },
+    {
+      "name": "Choice Card",
+      "kind": "card",
+      "refersTo": "choice-card-selected",
+      "description": "Selectable option tile in game setup screens (default and selected states).",
+      "html": "<div class=\"ds-choice-row\"><button class=\"ds-choice ds-choice--selected\" aria-pressed=\"true\" type=\"button\"><span class=\"ds-choice-label\">Makkelijk</span></button><button class=\"ds-choice\" aria-pressed=\"false\" type=\"button\"><span class=\"ds-choice-label\">Gemiddeld</span></button></div>",
+      "css": ".ds-choice-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; } .ds-choice { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 3.25rem; padding: 0.625rem 0.75rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1.5px solid var(--border, oklch(0.845 0.022 86)); background: var(--card, oklch(0.994 0.006 86)); color: var(--foreground, oklch(0.25 0.024 148)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.875rem; font-weight: 700; box-shadow: var(--ds-shadow-tactile); cursor: pointer; transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease; } .ds-choice:hover { background: var(--background-subtle, oklch(0.946 0.02 86)); border-color: var(--border-strong, oklch(0.74 0.028 82)); } .ds-choice--selected { border-color: var(--primary, oklch(0.485 0.125 268)); background: var(--primary-soft, oklch(0.945 0.026 268)); color: var(--primary, oklch(0.485 0.125 268)); box-shadow: inset 0 0 0 1px oklch(0.485 0.125 268 / 0.22); } .ds-choice:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus-ring, oklch(0.485 0.125 268 / 0.28)); }"
+    },
+    {
+      "name": "Status Banner",
+      "kind": "custom",
+      "refersTo": "status-banner-success",
+      "description": "Semantic feedback banner with tinted wash and accessible ink.",
+      "html": "<div class=\"ds-status-success\" role=\"status\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg><span>Schaakmat! Knap gedaan.</span></div>",
+      "css": ".ds-status-success { display: flex; min-height: 3rem; align-items: center; gap: 0.75rem; padding: 0.625rem 1rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1px solid oklch(0.465 0.115 152 / 0.3); background: var(--success-soft, oklch(0.945 0.032 152)); color: var(--success-ink, oklch(0.35 0.095 152)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.9375rem; font-weight: 700; }"
+    },
+    {
+      "name": "Paper Panel",
+      "kind": "card",
+      "refersTo": "panel-card",
+      "description": "Cotton-paper surface for setup forms, boards, and game HUDs.",
+      "html": "<section class=\"ds-panel\"><h3 class=\"ds-panel-title\">Nieuw spel</h3><p class=\"ds-panel-copy\">Kies je niveau en druk op Spelen.</p></section>",
+      "css": ".ds-panel { padding: 1.25rem; border-radius: var(--ds-radius-lg, 1rem); border: 1px solid var(--border, oklch(0.845 0.022 86)); background: var(--card, oklch(0.994 0.006 86)); color: var(--foreground, oklch(0.25 0.024 148)); box-shadow: var(--ds-shadow-panel); } .ds-panel-title { margin: 0; font-family: var(--ds-font-display, Georgia, serif); font-size: 1.5rem; font-weight: 400; letter-spacing: -0.015em; } .ds-panel-copy { margin: 0.375rem 0 0; font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.875rem; color: var(--muted-foreground, oklch(0.45 0.024 120)); }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge-primary",
+      "description": "Compact pill badge with tabular numerals.",
+      "html": "<span class=\"ds-badge\">17 spellen</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.625rem; border-radius: var(--ds-radius-pill, 9999px); background: var(--primary-soft, oklch(0.945 0.026 268)); color: var(--primary, oklch(0.485 0.125 268)); font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.75rem; font-weight: 700; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Page Header",
+      "kind": "nav",
+      "refersTo": "panel-card",
+      "description": "Full-width GameShell header with back button, serif title, and right-aligned utility controls.",
+      "html": "<header class=\"ds-header\"><button class=\"ds-icon-btn\" type=\"button\" aria-label=\"Terug\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/></svg></button><div class=\"ds-header-text\"><span class=\"ds-header-title\">Sudoku</span><span class=\"ds-header-sub\">Kies je puzzel</span></div><button class=\"ds-icon-btn\" type=\"button\" aria-label=\"Geluid\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><polygon points=\"11 5 6 9 2 9 2 15 6 15 11 19 11 5\"/><path d=\"M15.54 8.46a5 5 0 0 1 0 7.07\"/></svg></button></header>",
+      "css": ".ds-header { display: flex; align-items: center; gap: 0.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border, oklch(0.845 0.022 86)); color: var(--foreground, oklch(0.25 0.024 148)); } .ds-header-text { display: flex; flex: 1; flex-direction: column; min-width: 0; } .ds-header-title { font-family: var(--ds-font-display, Georgia, serif); font-size: 1.5rem; line-height: 1.2; letter-spacing: -0.015em; } .ds-header-sub { font-family: var(--ds-font-sans, system-ui, sans-serif); font-size: 0.875rem; color: var(--muted-foreground, oklch(0.45 0.024 120)); } .ds-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: var(--ds-radius-md, 0.75rem); border: 1px solid transparent; background: transparent; color: inherit; cursor: pointer; transition: background-color 140ms ease; } .ds-icon-btn:hover { background: var(--muted, oklch(0.935 0.019 86)); } .ds-icon-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--focus-ring, oklch(0.485 0.125 268 / 0.28)); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Paper Workbench",
+    "overview": "Spellen looks and feels like a calm Montessori paper workbench: warm ivory paper laid flat under soft daylight, deep readable ink, crisp cotton cards with gentle physical weight, and one craftsman indigo accent. Children should never have to fight through rainbow gradients, flashing badges, or decorative chrome just to read a question or move a piece.\n\nEvery visual decision serves attention and touch clarity. Interactive controls—buttons, choice cards, answer tiles, and disclosures—carry subtle paper lift at rest and a quiet tactile press on touch so kids immediately feel what is clickable without visual noise. Color is reserved strictly for meaning: action and selection in indigo, feedback in botanical green, warm ochre, and terracotta red, and playful hues only inside game pieces themselves.",
+    "keyCharacteristics": [
+      "Warm ivory paper ground (`ivory-paper`) with brighter cotton paper cards (`cotton-card`) and recessed warm wells (`warm-recess`).",
+      "Single craftsman indigo accent (`indigo-accent`) paired with meaning-only feedback triplets (base, soft wash, high-contrast ink).",
+      "Tactile, calm elevation: soft warm-ink drop shadows and hairline borders instead of harsh black shadows or flat wireframes.",
+      "System editorial serif for screen and game titles paired with rounded system sans for friendly UI legibility and `tabular-nums` on every counter.",
+      "Unified line-icon family (Lucide for UI controls, Phosphor for game identity); zero emojis in UI chrome."
+    ],
+    "rules": [
+      {
+        "name": "The Meaning-Only Color Rule",
+        "body": "Never use raw Tailwind palette scales (`slate`, `emerald`, `rose`, `sky`, `amber`) or decorative gradients in UI chrome. Indigo is exclusively for action and selection; green, ochre, and terracotta are exclusively for feedback.",
+        "section": "colors"
+      },
+      {
+        "name": "The Player-Piece Separation Rule",
+        "body": "Player and pawn colors belong strictly to game pieces (board discs, goose pawns, element badges). Active player emphasis uses neutral ink/border contrast or `indigo-accent`, never feedback green or red.",
+        "section": "colors"
+      },
+      {
+        "name": "The Serif-For-Titles Rule",
+        "body": "Screen headings, setup headings, card titles, and dialog titles use the display serif (`font-display`) at weight 400 with tight tracking (`-0.02em`), never heavy all-caps sans.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Counter Rule",
+        "body": "Every star count, streak, round counter, move number, and progress ratio (such as 4 of 242 or 1 of 10) uses `tabular-nums` so digits never jitter during play.",
+        "section": "typography"
+      },
+      {
+        "name": "The Warm-Ink Shadow Rule",
+        "body": "Every shadow is tinted with `deep-ink` (or the button's own hue), never cold gray or pure black, so elevation reads as warm paper depth.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do define all new design tokens in `libs/shared/ui/tokens.css.ts` and compose component styles via Vanilla Extract recipes in `@layer components` merged with `cn()`.",
+      "Do use `GameShell`, `Panel`, `Button`, `OptionPicker`, `AnswerOption`, `StatusBanner`, `Dialog`, `ProgressBar`, `ScoreHeader`, `Badge`, and `Disclosure` before building custom markup.",
+      "Do keep touch targets at least `44 × 44 px`, respect `pt-safe`/`pb-safe`, and verify layouts at both `390 × 844` and `1024 × 768` with zero horizontal overflow.",
+      "Do use `tabular-nums` on every counter, score, star count, and progress indicator.",
+      "Do respect `prefers-reduced-motion` on all transitions, spring dialogs, and board animations."
+    ],
+    "donts": [
+      "Don't use raw Tailwind color palettes (`bg-slate-*`, `bg-emerald-*`, `bg-rose-*`, `bg-amber-*`, `bg-sky-*`) or hex literals in UI chrome.",
+      "Don't use `!important` anywhere in CSS; rely on the `@layer theme, base, components, utilities, games, motion` cascade.",
+      "Don't put emojis in UI chrome (buttons, headers, tabs, status counters); use Lucide or Phosphor icons via `libs/shared/ui/`. Emojis are only for learning content or player avatars.",
+      "Don't add rainbow gradients, eyebrow kickers above headings, hard zero-blur drop shadows, or external fonts/images/requests.",
+      "Don't mix unrelated corner radii (`rounded-3xl` panels next to `rounded-lg` cards) within the same screen."
+    ]
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { ELEMENTS, getElement, type AlchemyElement } from "@entities/alchemy";
 import { cn } from "@shared/lib";
+import { Panel } from "@shared/ui";
 import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import { shelfIconItemId, shelfItemId } from "./dnd-ids";
@@ -108,16 +109,18 @@ export function AlchemyShelf() {
   const visibleElements = filterAndSortElements(elements, category, sort);
 
   return (
-    <section
+    <Panel
+      as="section"
       aria-label="Mijn elementen"
-      className="flex min-h-0 min-w-0 flex-col rounded-3xl border bg-card p-3 shadow-sm sm:p-4 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
+      className="flex min-h-0 min-w-0 flex-col md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
+      padding="sm"
     >
       <div className="mb-2 shrink-0">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
             Mijn elementen
           </h2>
-          <p className="text-sm font-bold">
+          <p className="text-sm font-bold tabular-nums">
             {elements.length} van {ELEMENTS.length}
           </p>
         </div>
@@ -159,6 +162,6 @@ export function AlchemyShelf() {
           )}
         </div>
       </div>
-    </section>
+    </Panel>
   );
 }

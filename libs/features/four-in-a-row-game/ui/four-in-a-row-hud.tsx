@@ -1,6 +1,6 @@
 import { PLAYERS, type FourInARowMode, type Player } from "@entities/four-in-a-row";
 import { cn } from "@shared/lib";
-import { Button, RotateCcw, Undo2 } from "@shared/ui";
+import { Button, Panel, RotateCcw, Undo2 } from "@shared/ui";
 import { playerName } from "../model/presentation";
 
 function PlayerChip({
@@ -58,7 +58,7 @@ export function FourInARowHud({
   onRestart,
 }: FourInARowHudProps) {
   return (
-    <div className="game-panel flex items-center justify-between gap-2 p-2 sm:p-3">
+    <Panel className="flex items-center justify-between gap-2 p-2 sm:p-3" padding="none">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
         {PLAYERS.map((player) => (
           <PlayerChip
@@ -85,6 +85,6 @@ export function FourInARowHud({
           <RotateCcw aria-hidden="true" className="size-5" />
         </Button>
       </div>
-    </div>
+    </Panel>
   );
 }

@@ -31,40 +31,40 @@ Wat blijft gelden:
 
 Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 
-| Library                                                            | Waarvoor                                                            |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| `react`, `react-dom`                                               | UI en rendering                                                     |
-| `@tanstack/react-router`                                           | routes en type-safe navigatie (`apps/games/src/app/router.tsx`)     |
-| `zustand`                                                          | spel- en UI-state per feature (`libs/features/*/model/`)            |
-| `tailwindcss`, `@tailwindcss/vite`                                 | styling, tokens en `@layer` (`apps/games/src/app/styles/index.css`) |
-| `clsx`, `tailwind-merge`                                           | `cn()` in `@shared/lib` voor conditionele classes                   |
-| `class-variance-authority`                                         | varianten van `Button` en verwanten                                 |
-| `@radix-ui/react-slot`                                             | `asChild` op `Button`                                               |
-| `lucide-react`                                                     | UI-iconen, geëxporteerd via `@shared/ui`                            |
-| `@phosphor-icons/react`                                            | spelidentiteit via `GameIcon`                                       |
-| `@iconify-json/fluent-emoji-flat`, `@iconify-json/ph`              | elementiconen voor Mengelmoes, dev-time gegenereerd uit Iconify     |
-| `@dnd-kit/core`                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)          |
-| `chess.js`                                                         | schaakregels en zetgeneratie                                        |
-| `react-chessboard`                                                 | schaakbord                                                          |
-| `stockfish.js`                                                     | lokale schaakengine in een worker (wasm)                            |
-| `sudoku-gen`                                                       | sudoku-generator                                                    |
-| `react-dice-complete`                                              | dobbelstenen en worpanimatie in Ganzenbord                          |
-| `react-simple-keyboard`                                            | toetsenbord als weergave in Typepret                                |
-| `react-hotkeys-hook`                                               | toetsaanslagen opvangen in Typepret                                 |
-| `sharp`                                                            | dev-time uitsneden van Ganzenbordprenten uit het bord               |
-| `d3-geo`, `topojson-client`                                        | wereld- en provinciekaarten                                         |
-| `vite`, `@vitejs/plugin-react`                                     | dev-server en build                                                 |
-| `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react` | unit- en componenttests                                             |
-| `@playwright/test`                                                 | e2e in `e2e/`                                                       |
-| `nx`                                                               | taken, cache en projectgraaf                                        |
-| `typescript`                                                       | typecheck                                                           |
-| `oxlint`, `oxfmt`                                                  | lint en formatting                                                  |
-| `steiger`, `@feature-sliced/steiger-plugin`                        | FSD-grenzen                                                         |
-| `fallow`                                                           | dead code, layer boundaries en CSS-regels                           |
-| `husky`, `@commitlint/cli`                                         | git-hooks en commitconventies                                       |
-| `tsx`                                                              | TypeScript-scripts in `scripts/`                                    |
-| `varlock`                                                          | env-schema, validatie en lokale secrets                             |
-| `wrangler`                                                         | deploy naar Cloudflare Workers                                      |
+| Library                                                                            | Waarvoor                                                                                           |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `react`, `react-dom`                                                               | UI en rendering                                                                                    |
+| `@tanstack/react-router`                                                           | routes en type-safe navigatie (`apps/games/src/app/router.tsx`)                                    |
+| `zustand`                                                                          | spel- en UI-state per feature (`libs/features/*/model/`)                                           |
+| `tailwindcss`, `@tailwindcss/vite`                                                 | styling, tokens en `@layer` (`apps/games/src/app/styles/index.css`)                                |
+| `clsx`, `tailwind-merge`                                                           | `cn()` in `@shared/lib` voor conditionele classes                                                  |
+| `@vanilla-extract/css`, `@vanilla-extract/recipes`, `@vanilla-extract/vite-plugin` | zero-runtime type-safe design tokens (`tokens.css.ts`) en component-recipes in `@layer components` |
+| `@radix-ui/react-slot`                                                             | `asChild` op `Button`                                                                              |
+| `lucide-react`                                                                     | UI-iconen, geëxporteerd via `@shared/ui`                                                           |
+| `@phosphor-icons/react`                                                            | spelidentiteit via `GameIcon`                                                                      |
+| `@iconify-json/fluent-emoji-flat`, `@iconify-json/ph`                              | elementiconen voor Mengelmoes, dev-time gegenereerd uit Iconify                                    |
+| `@dnd-kit/core`                                                                    | slepen en neerzetten (woordzoeker, mengelmoes, woordtrein)                                         |
+| `chess.js`                                                                         | schaakregels en zetgeneratie                                                                       |
+| `react-chessboard`                                                                 | schaakbord                                                                                         |
+| `stockfish.js`                                                                     | lokale schaakengine in een worker (wasm)                                                           |
+| `sudoku-gen`                                                                       | sudoku-generator                                                                                   |
+| `react-dice-complete`                                                              | dobbelstenen en worpanimatie in Ganzenbord                                                         |
+| `react-simple-keyboard`                                                            | toetsenbord als weergave in Typepret                                                               |
+| `react-hotkeys-hook`                                                               | toetsaanslagen opvangen in Typepret                                                                |
+| `sharp`                                                                            | dev-time uitsneden van Ganzenbordprenten uit het bord                                              |
+| `d3-geo`, `topojson-client`                                                        | wereld- en provinciekaarten                                                                        |
+| `vite`, `@vitejs/plugin-react`                                                     | dev-server en build                                                                                |
+| `vitest`, `@vitest/coverage-v8`, `jsdom`, `@testing-library/react`                 | unit- en componenttests                                                                            |
+| `@playwright/test`                                                                 | e2e in `e2e/`                                                                                      |
+| `nx`                                                                               | taken, cache en projectgraaf                                                                       |
+| `typescript`                                                                       | typecheck                                                                                          |
+| `oxlint`, `oxfmt`                                                                  | lint en formatting                                                                                 |
+| `steiger`, `@feature-sliced/steiger-plugin`                                        | FSD-grenzen                                                                                        |
+| `fallow`                                                                           | dead code, layer boundaries en CSS-regels                                                          |
+| `husky`, `@commitlint/cli`                                                         | git-hooks en commitconventies                                                                      |
+| `tsx`                                                                              | TypeScript-scripts in `scripts/`                                                                   |
+| `varlock`                                                                          | env-schema, validatie en lokale secrets                                                            |
+| `wrangler`                                                                         | deploy naar Cloudflare Workers                                                                     |
 
 Ontbreekt er iets? Voeg het toe en zet het in deze tabel.
 

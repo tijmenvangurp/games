@@ -21,18 +21,18 @@ export function PageHeader({
   titleClassName,
 }: PageHeaderProps) {
   return (
-    <header className="flex min-w-0 items-center gap-2">
+    <header className="flex w-full min-w-0 flex-1 items-center gap-2">
       {onBack ? (
-        <Button aria-label={backLabel} size="icon" variant="ghost" onClick={onBack}>
+        <Button aria-label={backLabel} size="icon" variant="outline" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
         </Button>
       ) : (
-        <span aria-hidden="true" className="size-11" />
+        <span aria-hidden="true" className="size-11 shrink-0" />
       )}
       <div className="min-w-0 flex-1">
         <h1
           className={cn(
-            "truncate font-display text-2xl font-normal tracking-tight",
+            "truncate font-display text-xl font-normal leading-tight tracking-tight sm:text-2xl",
             titleClassName,
           )}
         >
@@ -40,7 +40,7 @@ export function PageHeader({
         </h1>
         {subtitle ? <p className="truncate text-sm text-muted-foreground">{subtitle}</p> : null}
       </div>
-      {actions ? <div className="flex shrink-0 items-center">{actions}</div> : null}
+      {actions ? <div className="flex shrink-0 items-center gap-1">{actions}</div> : null}
     </header>
   );
 }

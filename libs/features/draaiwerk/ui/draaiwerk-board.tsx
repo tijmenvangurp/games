@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState, type MouseEvent, type Ref } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { Panel } from "@shared/ui";
 import {
   boardViewBox,
   connectionPath,
@@ -595,22 +596,18 @@ export function DraaiwerkBoard({
       ? connectionPath(ghost.link, anchor.center, anchorRadius, virtual, virtualRadius)
       : null;
 
-    return {
-      path,
-      kind: ghost.link,
-      target: snapped,
-      virtual,
-      virtualRadius,
-    };
+    return { path, kind: ghost.link, target: snapped, virtual, virtualRadius };
   }, [ghost, level, placements, result.gears]);
 
   return (
-    <section
+    <Panel
       aria-label={`Tandwielbord van ${level.name}`}
-      className="game-panel relative min-h-72 overflow-hidden p-1 sm:min-h-80 sm:p-2 md:h-full md:min-h-0 md:landscape:col-span-5"
+      as="section"
+      className="relative min-h-72 overflow-hidden p-1 sm:min-h-80 sm:p-2 md:h-full md:min-h-0 md:landscape:col-span-5"
       data-draaiwerk-board="true"
       data-level-id={level.id}
       data-status={status}
+      padding="none"
     >
       <svg
         ref={svgRef}
@@ -806,6 +803,6 @@ export function DraaiwerkBoard({
           })}
         </g>
       </svg>
-    </section>
+    </Panel>
   );
 }
