@@ -114,6 +114,14 @@
         "maxCrap": 1700,
         "maxUnitSize": 640,
         "reason": "1:1 vendored MIT-renderlaag (LifeValuable/murdoku): canvas-art voor meubels, vloeren en portretten. Gemeten maxima: cyclomatisch 84 (drawFloorTile), cognitief 143 (drawFloorTile) en 615 regels (drawFloorTile). Onze teksten, palette, preview-fixture en bordcomponent vallen buiten deze override en zijn getest."
+      },
+      {
+        "files": ["scripts/build-thumbnails.ts"],
+        "maxCyclomatic": 8,
+        "maxCognitive": 10,
+        "maxCrap": 80,
+        "maxUnitSize": 120,
+        "reason": "Dev-only script zonder unit-tests: het leest de catalogus en de bestanden en heeft daardoor vertakkingen voor ontbrekende bestanden, verkeerde afmetingen en een stale hash. De uitvoer wordt bewaakt door pnpm run thumbnails:check in de kwaliteitsgate."
       }
     ]
   },
