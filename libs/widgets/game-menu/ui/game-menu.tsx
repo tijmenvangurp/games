@@ -36,8 +36,8 @@ export function GameMenu({ category = "all" }: GameMenuProps) {
                 />
               </div>
             </div>
-            <div className="flex flex-1 flex-col px-4 pb-5 pt-3.5 sm:px-5">
-              <div className="flex items-center gap-2.5">
+            <div className="flex flex-1 items-center px-4 pb-4 pt-3.5 sm:px-5">
+              <div className="flex min-w-0 items-center gap-2.5">
                 <span aria-hidden="true" className={menuCardIcon}>
                   <GameIcon name={game.id} size={18} />
                 </span>
@@ -45,9 +45,6 @@ export function GameMenu({ category = "all" }: GameMenuProps) {
                   {game.name}
                 </h2>
               </div>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {game.description}
-              </p>
             </div>
           </Link>
         ) : (
@@ -56,7 +53,6 @@ export function GameMenu({ category = "all" }: GameMenuProps) {
               <GameIcon aria-hidden="true" name={game.id} size={24} />
             </span>
             <h2 className="mt-4 font-display text-xl leading-snug">{game.name}</h2>
-            <p className="mt-1.5 text-sm leading-relaxed">{game.description}</p>
             <div className="mt-auto pt-4">
               <Badge tone="neutral">Binnenkort</Badge>
             </div>
