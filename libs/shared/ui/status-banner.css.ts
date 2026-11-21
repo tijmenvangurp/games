@@ -14,7 +14,7 @@ export const statusBannerRecipe = recipe({
         borderStyle: "solid",
         paddingBlock: "0.625rem",
         paddingInline: "1rem",
-        fontSize: "0.9375rem",
+        fontSize: "1rem",
         fontWeight: 700,
         lineHeight: 1.35,
       },

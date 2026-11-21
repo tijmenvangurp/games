@@ -23,7 +23,8 @@ export const choiceCardRecipe = recipe({
           boxShadow: `0 0 0 4px ${vars.color.focusRing}`,
         },
         ":active": {
-          transform: "translateY(1px) scale(0.99)",
+          transform: "translateY(2px)",
+          boxShadow: vars.shadow.none,
         },
       },
     },
@@ -36,7 +37,7 @@ export const choiceCardRecipe = recipe({
             borderColor: vars.color.primary,
             backgroundColor: vars.color.primarySoft,
             color: vars.color.primary,
-            boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.primary} 22%, transparent)`,
+            boxShadow: `inset 0 1px 3px color-mix(in oklab, ${vars.color.primary} 16%, transparent), 0 0 0 1px color-mix(in oklab, ${vars.color.primary} 18%, transparent)`,
           },
         },
       },

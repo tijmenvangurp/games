@@ -45,14 +45,14 @@ export function GameShell({
         fitViewport && "md:h-svh md:min-h-0 md:overflow-hidden",
       )}
     >
-      <div className="flex w-full min-w-0 items-center border-b border-border pb-3">
+      <div className="flex w-full min-w-0 items-center border-b border-border/80 pb-3.5">
         <PageHeader
           actions={
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5 rounded-xl border border-border/80 bg-card/85 p-0.5 shadow-xs">
               {showSpeech ? <SpeechToggle /> : null}
               <SoundToggle />
               {onNewGame ? (
-                <Button aria-label="Nieuw spel" size="icon" variant="outline" onClick={onNewGame}>
+                <Button aria-label="Nieuw spel" size="icon" variant="ghost" onClick={onNewGame}>
                   <Plus aria-hidden="true" className="size-5" />
                 </Button>
               ) : null}

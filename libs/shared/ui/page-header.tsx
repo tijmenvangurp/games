@@ -23,7 +23,7 @@ export function PageHeader({
   return (
     <header className="flex w-full min-w-0 flex-1 items-center gap-2">
       {onBack ? (
-        <Button aria-label={backLabel} size="icon" variant="ghost" onClick={onBack}>
+        <Button aria-label={backLabel} size="icon" variant="outline" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
         </Button>
       ) : (

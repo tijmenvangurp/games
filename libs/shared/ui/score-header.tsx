@@ -1,3 +1,4 @@
+import { Badge } from "./badge";
 import { Flame, Star } from "./icons";
 import { Panel } from "./panel";
 
@@ -10,18 +11,18 @@ interface ScoreHeaderProps {
 
 export function ScoreHeader({ progress, stars, streak = 0 }: ScoreHeaderProps) {
   return (
-    <Panel as="header" className="flex items-center justify-between px-3.5 py-2.5" padding="none">
+    <Panel as="header" className="flex items-center justify-between px-3.5 py-2" padding="none">
       <p className="text-sm font-bold tabular-nums text-muted-foreground">{progress}</p>
-      <div className="flex items-center gap-3 text-sm font-bold tabular-nums">
-        <span aria-label={`${stars} sterren`} className="inline-flex items-center gap-1">
-          <Star aria-hidden="true" className="size-4 fill-warning text-warning" />
+      <div className="flex items-center gap-1.5">
+        <Badge aria-label={`${stars} sterren`} tone="warning">
+          <Star aria-hidden="true" className="size-3.5 fill-warning text-warning" />
           {stars}
-        </span>
+        </Badge>
         {streak > 0 ? (
-          <span aria-label={`${streak} op een rij`} className="inline-flex items-center gap-1">
-            <Flame aria-hidden="true" className="size-4 text-warning" />
+          <Badge aria-label={`${streak} op een rij`} tone="primary">
+            <Flame aria-hidden="true" className="size-3.5" />
             {streak}
-          </span>
+          </Badge>
         ) : null}
       </div>
     </Panel>

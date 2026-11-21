@@ -1,7 +1,17 @@
+export type GameCategory = "puzzel" | "taal-rekenen" | "spel" | "ontdekken";
+
+export const GAME_CATEGORIES: readonly { readonly id: GameCategory; readonly label: string }[] = [
+  { id: "puzzel", label: "Puzzel & Logica" },
+  { id: "taal-rekenen", label: "Taal & Rekenen" },
+  { id: "spel", label: "Bord & Geheugen" },
+  { id: "ontdekken", label: "Ontdekken" },
+];
+
 interface GameCatalogBase {
   id: string;
   name: string;
   description: string;
+  category: GameCategory;
 }
 
 export type GameSpeech =
@@ -44,6 +54,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "sudoku",
     name: "Sudoku",
     description: "Puzzel met cijfers of dieren. Kies 4 × 4, 6 × 6 of 9 × 9.",
+    category: "puzzel",
     status: "available",
     to: "/sudoku",
     thumbnail: "/thumbnails/sudoku-4c71fa62.jpg",
@@ -53,6 +64,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "math-trainer",
     name: "Tafel Topper",
     description: "Oefen plus, min, keer en deel. Verdien sterren.",
+    category: "taal-rekenen",
     status: "available",
     to: "/rekenen",
     thumbnail: "/thumbnails/math-trainer-52c58abf.jpg",
@@ -62,6 +74,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "arrows",
     name: "Pijlen",
     description: "Haal alle pijlen weg zonder dat ze tegen elkaar botsen.",
+    category: "puzzel",
     status: "available",
     to: "/pijlen",
     thumbnail: "/thumbnails/arrows-65ece2ce.jpg",
@@ -71,6 +84,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "seek",
     name: "Waar is Wobbel?",
     description: "Zoek het monstertje met de ster tussen alle andere Wobbels.",
+    category: "puzzel",
     status: "available",
     to: "/zoeken",
     thumbnail: "/thumbnails/seek-3c60cc62.jpg",
@@ -80,6 +94,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "word-search",
     name: "Woordzoeker",
     description: "Zoek woorden in de tuin, onder water of tussen de Pokémon.",
+    category: "taal-rekenen",
     status: "available",
     to: "/woordzoeker",
     thumbnail: "/thumbnails/word-search-bdb93413.jpg",
@@ -89,6 +104,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "alchemy",
     name: "Mengelmoes",
     description: "Sleep elementen op elkaar en ontdek wat er ontstaat.",
+    category: "ontdekken",
     status: "available",
     to: "/mengelmoes",
     thumbnail: "/thumbnails/alchemy-0cda3400.jpg",
@@ -98,6 +114,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "draaiwerk",
     name: "Draaiwerk",
     description: "Verbind tandwielen, riemen en kettingen. Laat de lamp branden en de lift omhoog.",
+    category: "puzzel",
     status: "available",
     to: "/draaiwerk",
     thumbnail: "/thumbnails/draaiwerk-a86e4c8b.jpg",
@@ -107,6 +124,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "memory",
     name: "Pokémon Memory",
     description: "Zoek de paren tussen de 151 Pokémon uit Generatie 1.",
+    category: "spel",
     status: "available",
     to: "/memory",
     thumbnail: "/thumbnails/memory-707e748b.jpg",
@@ -116,6 +134,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "pokemon-quiz",
     name: "Wie is deze Pokémon?",
     description: "Kies de juiste naam bij het plaatje. 3, 4 of 5 namen.",
+    category: "ontdekken",
     status: "available",
     to: "/raad",
     thumbnail: "/thumbnails/pokemon-quiz-0327a69d.jpg",
@@ -125,6 +144,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "chess",
     name: "Schaken",
     description: "Leer de stukken, los puzzels op of speel een partij.",
+    category: "spel",
     status: "available",
     to: "/schaken",
     thumbnail: "/thumbnails/chess-tutorial-6b1e58dd.jpg",
@@ -134,6 +154,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "flags",
     name: "Vlaggenreis",
     description: "Leer vlaggen én leg landen of provincies op de juiste plek.",
+    category: "ontdekken",
     status: "available",
     to: "/vlaggen",
     thumbnail: "/thumbnails/flags-bd19d257.jpg",
@@ -143,6 +164,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "french-listening",
     name: "Bonjour !",
     description: "Luister naar Frans en kies de juiste Nederlandse vertaling.",
+    category: "taal-rekenen",
     status: "available",
     to: "/frans",
     thumbnail: "/thumbnails/french-listening-ffc3da24.jpg",
@@ -152,6 +174,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "letters",
     name: "Letterpret",
     description: "Hoor de klank, zoek de letter, bouw en lees woordjes.",
+    category: "taal-rekenen",
     status: "available",
     to: "/letters",
     thumbnail: "/thumbnails/letters-6b90ec8a.jpg",
@@ -161,6 +184,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "four-in-a-row",
     name: "Vier op een Rij",
     description: "Maak vier op een rij, samen of tegen de computer.",
+    category: "spel",
     status: "available",
     to: "/vier-op-een-rij",
     thumbnail: "/thumbnails/four-in-a-row-fa19af46.jpg",
@@ -170,6 +194,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "ganzenbord",
     name: "Ganzenbord",
     description: "Gooi met de dobbelstenen en race met je gans naar 63.",
+    category: "spel",
     status: "available",
     to: "/ganzenbord",
     thumbnail: "/thumbnails/ganzenbord-500e8c19.jpg",
@@ -182,6 +207,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     id: "typepret",
     name: "Typepret",
     description: "Leer blind typen: vinger op de basisrij en tik de letter die oplicht.",
+    category: "taal-rekenen",
     status: "available",
     to: "/typepret",
     thumbnail: "/thumbnails/typepret-9e07ea14.jpg",
@@ -195,6 +221,7 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     name: "Wie was het?",
     description:
       "Lees de aanwijzingen, vul de plattegrond in en vind de dief die als enige bij de buit was.",
+    category: "puzzel",
     status: "available",
     to: "/mysterie",
     thumbnail: "/thumbnails/wie-was-het-a87a3622.jpg",

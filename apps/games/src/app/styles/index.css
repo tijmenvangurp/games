@@ -71,11 +71,15 @@
 
   body {
     @apply m-0 bg-background font-sans text-foreground antialiased;
-    background-image: radial-gradient(
-      circle at 50% -18%,
-      oklch(0.93 0.036 80 / 0.42),
-      transparent 40rem
-    );
+    background-image:
+      radial-gradient(circle at 50% -18%, oklch(0.92 0.04 78 / 0.45), transparent 42rem),
+      radial-gradient(oklch(0.3 0.024 148 / 0.06) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      26px 26px;
+    background-position:
+      0 0,
+      13px 13px;
     background-attachment: fixed;
     overscroll-behavior-y: none;
   }

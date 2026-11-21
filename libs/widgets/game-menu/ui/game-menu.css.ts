@@ -20,7 +20,8 @@ export const menuCard = style({
     boxShadow: vars.shadow.cardHover,
   },
   ":active": {
-    transform: "translateY(0)",
+    transform: "translateY(1px)",
+    boxShadow: vars.shadow.panel,
   },
   ":focus-visible": {
     outline: "none",
@@ -28,14 +29,19 @@ export const menuCard = style({
   },
 });
 
+export const menuCardMat = style({
+  padding: `${vars.space.sm} ${vars.space.sm} 0`,
+});
+
 export const menuCardMedia = style({
   position: "relative",
   aspectRatio: "16 / 10",
   overflow: "hidden",
+  borderRadius: vars.radius.md,
   backgroundColor: vars.color.backgroundSubtle,
-  borderBottomWidth: "1px",
-  borderBottomStyle: "solid",
-  borderBottomColor: `color-mix(in oklab, ${vars.color.border} 70%, transparent)`,
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: `color-mix(in oklab, ${vars.color.border} 78%, transparent)`,
 });
 
 export const menuCardThumb = style({
@@ -48,6 +54,30 @@ export const menuCardThumb = style({
   selectors: {
     [`${menuCard}:hover &`]: {
       transform: "scale(1.03)",
+    },
+  },
+});
+
+export const menuCardIcon = style({
+  display: "grid",
+  height: "2.125rem",
+  width: "2.125rem",
+  flexShrink: 0,
+  placeItems: "center",
+  borderRadius: vars.radius.sm,
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: `color-mix(in oklab, ${vars.color.primary} 18%, transparent)`,
+  backgroundColor: vars.color.primarySoft,
+  color: vars.color.primary,
+  transitionProperty: "background-color, border-color, color",
+  transitionDuration: vars.motion.fast,
+  transitionTimingFunction: vars.motion.easeOut,
+  selectors: {
+    [`${menuCard}:hover &`]: {
+      borderColor: vars.color.primary,
+      backgroundColor: vars.color.primary,
+      color: vars.color.primaryForeground,
     },
   },
 });

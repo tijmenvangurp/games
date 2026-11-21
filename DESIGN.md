@@ -48,13 +48,25 @@ typography:
     letterSpacing: "0em"
   body:
     fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, sans-serif'
-    fontSize: "0.9375rem"
+    fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.55
+    letterSpacing: "0em"
+  body-sm:
+    fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, sans-serif'
+    fontSize: "0.875rem"
+    fontWeight: 600
+    lineHeight: 1.4
     letterSpacing: "0em"
   label:
     fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, sans-serif'
     fontSize: "0.75rem"
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: "0em"
+  label-xs:
+    fontFamily: 'ui-rounded, "SF Pro Rounded", "Segoe UI Variable Display", system-ui, sans-serif'
+    fontSize: "0.6875rem"
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: "0em"
@@ -219,11 +231,11 @@ Tactile paper layering—a hybrid of tonal surface stepping (`ivory-paper` → `
 
 ### Shadow Vocabulary
 
-- **Tactile** (`0 1px 0 oklch(0.25 0.024 148 / 0.08), 0 2px 6px -2px oklch(0.25 0.024 148 / 0.1)`): Resting outline buttons, choice cards, and answer options.
-- **Tactile Primary / Success** (`0 2px 0 oklch(0.34 0.12 268 / 0.55), 0 4px 12px -4px oklch(0.485 0.125 268 / 0.35)` and botanical green equivalent): Solid call-to-action buttons (`Spelen`, `Volgende`).
-- **Panel** (`0 1px 2px oklch(0.25 0.024 148 / 0.05), 0 12px 28px -20px oklch(0.25 0.024 148 / 0.22)`): Resting panels, HUD bars, disclosures, and menu cards.
-- **Card Hover** (`0 2px 4px oklch(0.25 0.024 148 / 0.06), 0 18px 36px -20px oklch(0.25 0.024 148 / 0.3)`): Interactive menu and hub cards lifting `-2px` to `-3px` on pointer hover.
-- **Dialog** (`0 4px 12px oklch(0.25 0.024 148 / 0.08), 0 28px 60px -24px oklch(0.25 0.024 148 / 0.34)`): Floating modals above a blurred warm-ink backdrop (`backdrop-filter: blur(4px)`).
+- **Tactile** (`inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 0 oklch(0.74 0.028 82 / 0.65), 0 4px 10px -4px oklch(0.25 0.024 148 / 0.14)`): Resting outline buttons, choice cards, and answer options.
+- **Tactile Primary / Success** (`inset 0 1px 0 oklch(1 0 0 / 0.24), 0 2.5px 0 oklch(0.33 0.12 268 / 0.78), 0 6px 14px -6px oklch(0.485 0.125 268 / 0.42)` and botanical green equivalent): Solid call-to-action buttons (`Spelen`, `Volgende`).
+- **Panel** (`inset 0 1px 0 oklch(1 0 0 / 0.85), 0 1px 2px oklch(0.25 0.024 148 / 0.06), 0 14px 30px -22px oklch(0.25 0.024 148 / 0.26)`): Resting panels, HUD bars, disclosures, and menu cards.
+- **Card Hover** (`inset 0 1px 0 oklch(1 0 0 / 0.9), 0 3px 6px oklch(0.25 0.024 148 / 0.08), 0 22px 42px -20px oklch(0.25 0.024 148 / 0.32)`): Interactive menu and hub cards lifting `-2px` to `-3px` on pointer hover.
+- **Dialog** (`inset 0 1px 0 oklch(1 0 0 / 0.92), 0 6px 16px oklch(0.25 0.024 148 / 0.1), 0 32px 68px -24px oklch(0.25 0.024 148 / 0.38)`): Floating modals above a blurred warm-ink backdrop (`backdrop-filter: blur(4px)`).
 
 ### Named Rules
 

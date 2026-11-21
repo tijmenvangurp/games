@@ -41,12 +41,17 @@ export function CelebrationDialog({
       size="sm"
       onClose={onHome}
     >
-      <div aria-hidden="true" className="mb-2 flex justify-center gap-1 text-4xl">
-        <Sparkles className="animate-rise size-9 text-primary" />
-        <Star className="size-9 fill-warning text-warning" />
-        <Sparkles className="animate-rise size-9 text-warning" />
+      <div
+        aria-hidden="true"
+        className="mx-auto mb-4 flex size-20 items-center justify-center rounded-full border border-warning/35 bg-warning-soft shadow-xs"
+      >
+        <Trophy className="size-10 text-warning-ink" />
       </div>
-      <Trophy aria-hidden="true" className="mx-auto mb-2 size-12 text-primary" />
+      <div aria-hidden="true" className="mb-2 flex justify-center gap-1.5">
+        <Sparkles className="animate-rise size-4 text-primary" />
+        <Star className="size-4 fill-warning text-warning" />
+        <Sparkles className="animate-rise size-4 text-warning" />
+      </div>
       <h2 className="font-display text-2xl tracking-tight" id="celebration-title">
         {title}
       </h2>

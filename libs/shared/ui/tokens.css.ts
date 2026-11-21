@@ -167,16 +167,18 @@ createGlobalTheme(":root", vars, {
   },
   shadow: {
     none: "none",
-    tactile: "0 1px 0 oklch(0.25 0.024 148 / 0.08), 0 2px 6px -2px oklch(0.25 0.024 148 / 0.1)",
+    tactile:
+      "inset 0 1px 0 oklch(1 0 0 / 0.85), 0 2px 0 oklch(0.74 0.028 82 / 0.65), 0 4px 10px -4px oklch(0.25 0.024 148 / 0.14)",
     tactilePrimary:
-      "0 2px 0 oklch(0.34 0.12 268 / 0.55), 0 4px 12px -4px oklch(0.485 0.125 268 / 0.35)",
+      "inset 0 1px 0 oklch(1 0 0 / 0.24), 0 2.5px 0 oklch(0.33 0.12 268 / 0.78), 0 6px 14px -6px oklch(0.485 0.125 268 / 0.42)",
     tactileSuccess:
-      "0 2px 0 oklch(0.32 0.1 152 / 0.55), 0 4px 12px -4px oklch(0.465 0.115 152 / 0.35)",
-    panel: "0 1px 2px oklch(0.25 0.024 148 / 0.05), 0 12px 28px -20px oklch(0.25 0.024 148 / 0.22)",
+      "inset 0 1px 0 oklch(1 0 0 / 0.24), 0 2.5px 0 oklch(0.31 0.1 152 / 0.78), 0 6px 14px -6px oklch(0.465 0.115 152 / 0.42)",
+    panel:
+      "inset 0 1px 0 oklch(1 0 0 / 0.85), 0 1px 2px oklch(0.25 0.024 148 / 0.06), 0 14px 30px -22px oklch(0.25 0.024 148 / 0.26)",
     cardHover:
-      "0 2px 4px oklch(0.25 0.024 148 / 0.06), 0 18px 36px -20px oklch(0.25 0.024 148 / 0.3)",
+      "inset 0 1px 0 oklch(1 0 0 / 0.9), 0 3px 6px oklch(0.25 0.024 148 / 0.08), 0 22px 42px -20px oklch(0.25 0.024 148 / 0.32)",
     dialog:
-      "0 4px 12px oklch(0.25 0.024 148 / 0.08), 0 28px 60px -24px oklch(0.25 0.024 148 / 0.34)",
+      "inset 0 1px 0 oklch(1 0 0 / 0.92), 0 6px 16px oklch(0.25 0.024 148 / 0.1), 0 32px 68px -24px oklch(0.25 0.024 148 / 0.38)",
   },
   motion: {
     fast: "140ms",
