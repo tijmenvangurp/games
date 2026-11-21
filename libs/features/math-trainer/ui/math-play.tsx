@@ -2,9 +2,10 @@ import {
   explanationFor,
   mathFeedbackSpeech,
   mathQuestionSpeech,
-  praiseSpeech,
+  praiseText,
   type MathQuestion,
 } from "@entities/math";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import {
   AnswerOption,
@@ -15,6 +16,7 @@ import {
   type AnswerState,
 } from "@shared/ui";
 import { useMathSpeech } from "../model/use-math-speech";
+import { mathTrainerTexts } from "../model/texts";
 import { useMathStore } from "../model/use-math-store";
 import { MathVisual } from "./math-visual";
 
@@ -29,8 +31,9 @@ function MathChoices({
   answered: boolean;
   onSelect: (choice: number) => void;
 }) {
+  const t = useTexts(mathTrainerTexts);
   return (
-    <div aria-label="Kies het juiste antwoord" className="grid grid-cols-3 gap-2" role="group">
+    <div aria-label={t.chooseLabel} className="grid grid-cols-3 gap-2" role="group">
       {question.choices.map((choice) => {
         const isWrong = wrongChoices.includes(choice);
         const state: AnswerState =
@@ -45,7 +48,7 @@ function MathChoices({
         return (
           <AnswerOption
             key={choice}
-            aria-label={`Antwoord ${choice}`}
+            aria-label={t.answer(choice)}
             className="tabular-nums"
             size="lg"
             state={state}
@@ -72,10 +75,11 @@ function MathFeedback({
   correct: boolean;
   wrongCount: number;
 }) {
+  const t = useTexts(mathTrainerTexts);
   if (!answered) {
     return (
       <p aria-live="polite" className="text-center text-sm font-semibold text-muted-foreground">
-        {wrongCount > 0 ? "Bijna! Probeer nog één keer." : "Kies het juiste antwoord."}
+        {wrongCount > 0 ? t.almost : t.choose}
       </p>
     );
   }
@@ -90,14 +94,9 @@ function MathFeedback({
             correct ? "text-success-ink" : "text-warning-ink",
           )}
         >
-          {correct
-            ? praiseSpeech(seed, question).text
-            : `Het juiste antwoord is ${question.answer}.`}
+          {correct ? praiseText(seed, question) : t.correctAnswer(question.answer)}
         </p>
-        <SpeechButton
-          label="Beluister het antwoord"
-          line={mathFeedbackSpeech(question, correct, seed)}
-        />
+        <SpeechButton label={t.listenAnswer} line={mathFeedbackSpeech(question, correct, seed)} />
       </div>
       <MathVisual question={question} />
       <p className="text-center text-sm font-semibold text-muted-foreground">
@@ -122,13 +121,14 @@ function QuestionCard({
   correct: boolean;
   isLast: boolean;
 }) {
+  const t = useTexts(mathTrainerTexts);
   return (
     <Panel as="section" padding="lg">
       <div className="flex items-center justify-center gap-1">
         <p className="text-center text-4xl font-black tracking-tight tabular-nums sm:text-5xl">
           {question.prompt} = ?
         </p>
-        <SpeechButton label="Beluister de som" line={mathQuestionSpeech(question)} />
+        <SpeechButton label={t.listenQuestion} line={mathQuestionSpeech(question)} />
       </div>
 
       <div className="mt-5">
@@ -157,7 +157,7 @@ function QuestionCard({
           variant="success"
           onClick={() => useMathStore.getState().next()}
         >
-          {isLast ? "Klaar" : "Volgende"}
+          {isLast ? t.done : t.next}
         </Button>
       ) : null}
     </Panel>
@@ -173,6 +173,7 @@ export function MathPlay() {
   const stars = useMathStore((state) => state.stars);
   const streak = useMathStore((state) => state.streak);
   const question = round?.questions[questionIndex];
+  const t = useTexts(mathTrainerTexts);
 
   useMathSpeech({ round, question, answered, correct, wrongChoices });
 
@@ -187,7 +188,7 @@ export function MathPlay() {
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <ScoreHeader
-        progress={`Som ${questionIndex + 1} van ${round.questions.length}`}
+        progress={t.progress(questionIndex + 1, round.questions.length)}
         stars={stars}
         streak={streak}
       />

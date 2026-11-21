@@ -10,13 +10,11 @@ export const DEFAULT_SEEK_SETTINGS: SeekSettings = {
   theme: "tuin",
 };
 
+// De labels staan per taal in `texts.ts`; hier staan de waarden en de rastermaat.
 export const SEEK_DIFFICULTY_OPTIONS = [
-  { value: "makkelijk", label: "Makkelijk", hint: "5 × 5" },
-  { value: "gemiddeld", label: "Gemiddeld", hint: "7 × 7" },
-  { value: "moeilijk", label: "Moeilijk", hint: "9 × 9" },
+  { value: "makkelijk", hint: "5 × 5" },
+  { value: "gemiddeld", hint: "7 × 7" },
+  { value: "moeilijk", hint: "9 × 9" },
 ] as const;
 
-export const SEEK_THEME_OPTIONS = [
-  { value: "tuin", label: "Tuin", hint: "Bloemen en blaadjes" },
-  { value: "onderwater", label: "Onder water", hint: "Bubbels en schelpen" },
-] as const;
+export const SEEK_THEME_OPTIONS = [{ value: "tuin" }, { value: "onderwater" }] as const;

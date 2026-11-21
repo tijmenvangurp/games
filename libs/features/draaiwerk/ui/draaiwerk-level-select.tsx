@@ -1,8 +1,10 @@
 import { useMemo } from "react";
-import { Check, Lock, Panel } from "@shared/ui";
+import { LevelStatusBadge, Panel } from "@shared/ui";
 import { cn } from "@shared/lib";
-import type { Level } from "@entities/gear";
+import { useLanguage, useTexts } from "@shared/i18n";
+import { levelText, type Level } from "@entities/gear";
 import { chapterName, introducesLabel } from "../model/labels";
+import { draaiwerkTexts } from "../model/texts";
 
 interface DraaiwerkLevelSelectProps {
   levels: readonly Level[];
@@ -29,6 +31,8 @@ export function DraaiwerkLevelSelect({
   finished,
   onSelect,
 }: DraaiwerkLevelSelectProps) {
+  const t = useTexts(draaiwerkTexts);
+  const language = useLanguage();
   const chapters = useMemo(() => {
     const groups = new Map<number, ChapterEntry[]>();
     levels.forEach((level, index) => {
@@ -45,8 +49,7 @@ export function DraaiwerkLevelSelect({
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-2.5">
       <p className="px-1 text-xs leading-snug text-muted-foreground sm:text-sm">
-        Elk level voegt iets nieuws toe. Kies een level en bouw de beweging van de motor naar het
-        doel.
+        {t.levelSelectIntro}
       </p>
 
       {chapters.map(({ chapter, entries }) => {
@@ -64,11 +67,11 @@ export function DraaiwerkLevelSelect({
                   {chapterName(chapter)}
                 </h2>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Hoofdstuk {chapter} · level {first}–{last}
+                  {t.chapterRange(chapter, first, last)}
                 </p>
               </div>
               <p className="shrink-0 text-[10px] font-bold text-muted-foreground">
-                {done}/{entries.length} gehaald
+                {t.chapterDone(done, entries.length)}
               </p>
             </div>
 
@@ -77,12 +80,13 @@ export function DraaiwerkLevelSelect({
                 const locked = index >= unlocked;
                 const completed = index < unlocked - 1 || (finished && index === levels.length - 1);
                 const active = index === current && !locked;
+                const name = levelText(level, language).name;
 
                 return (
                   <button
                     key={level.id}
-                    aria-label={`Level ${index + 1}, ${level.name}${
-                      locked ? ", vergrendeld" : completed ? ", gehaald" : ""
+                    aria-label={`Level ${index + 1}, ${name}${
+                      locked ? t.lockedSuffix : completed ? t.completedSuffix : ""
                     }`}
                     aria-current={active ? "step" : undefined}
                     className={cn(
@@ -104,20 +108,12 @@ export function DraaiwerkLevelSelect({
                     <span className="pr-5 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
                       Level {index + 1}
                     </span>
-                    <span className="text-sm font-black leading-tight">{level.name}</span>
+                    <span className="text-sm font-black leading-tight">{name}</span>
                     <span className="text-[10px] leading-tight text-muted-foreground">
                       {introducesLabel(level.introduces)}
                     </span>
 
-                    <span className="absolute right-2 top-2">
-                      {locked ? (
-                        <Lock aria-hidden="true" className="size-4" />
-                      ) : completed ? (
-                        <span className="grid size-5 place-items-center rounded-full bg-success text-white">
-                          <Check aria-hidden="true" className="size-3" />
-                        </span>
-                      ) : null}
-                    </span>
+                    <LevelStatusBadge completed={completed} locked={locked} />
                   </button>
                 );
               })}
@@ -128,8 +124,8 @@ export function DraaiwerkLevelSelect({
 
       <p className="text-center text-xs text-muted-foreground">
         {finished
-          ? `${levels.length} van ${levels.length} levels gehaald`
-          : `${Math.min(unlocked, levels.length)} van ${levels.length} levels vrijgespeeld`}
+          ? t.allLevelsDone(levels.length)
+          : t.levelsUnlocked(Math.min(unlocked, levels.length), levels.length)}
       </p>
     </div>
   );

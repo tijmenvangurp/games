@@ -1,5 +1,9 @@
 import { geometryFor, type SudokuSize } from "@entities/sudoku";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
+import { sudokuTexts } from "../model/texts";
+
+type CellTexts = (typeof sudokuTexts)["nl"]["cell"];
 
 const SYMBOL_TEXT_SIZE: Record<SudokuSize, string> = {
   4: "text-4xl",
@@ -53,25 +57,25 @@ function emphasisClassName(props: SudokuCellProps): string {
   );
 }
 
-function label(props: SudokuCellProps): string {
-  const value = props.symbol ?? "leeg";
+function label(props: SudokuCellProps, t: CellTexts): string {
+  const value = props.symbol ?? t.empty;
   const flags = [
-    props.isGiven && "vast",
-    props.isHinted && "hint",
-    props.isHintTarget && "tip",
-    props.isConflict && "conflict",
-    props.isMistake && "nog niet goed",
+    props.isGiven && t.given,
+    props.isHinted && t.hinted,
+    props.isHintTarget && t.hintTarget,
+    props.isConflict && t.conflict,
+    props.isMistake && t.mistake,
   ].filter(Boolean);
-  const row = props.row + 1;
-  const col = props.col + 1;
-  return `${value}, rij ${row}, kolom ${col}${flags.length > 0 ? `, ${flags.join(", ")}` : ""}`;
+  const position = t.position(value, props.row + 1, props.col + 1);
+  return `${position}${flags.length > 0 ? `, ${flags.join(", ")}` : ""}`;
 }
 
 export function SudokuCell(props: SudokuCellProps) {
+  const t = useTexts(sudokuTexts).cell;
   return (
     <button
       type="button"
-      aria-label={label(props)}
+      aria-label={label(props, t)}
       aria-pressed={props.isSelected}
       className={cn(
         "relative flex aspect-square select-none items-center justify-center border-b border-r border-border leading-none transition-colors",

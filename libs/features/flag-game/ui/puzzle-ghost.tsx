@@ -1,4 +1,6 @@
-import type { PuzzlePiece } from "@entities/geography";
+import { subjectNameInSentence, type PuzzlePiece } from "@entities/geography";
+import { useLanguage, useTexts } from "@shared/i18n";
+import { flagTexts } from "../model/texts";
 import { useFlagStore } from "../model/use-flags-store";
 import { PieceShape } from "./puzzle-tray";
 
@@ -9,9 +11,11 @@ interface DragGhostProps {
 
 /** The piece that follows the finger while dragging. */
 export function DragGhost({ ghost, piece }: DragGhostProps) {
-  const name = useFlagStore((state) =>
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
+  const subject = useFlagStore((state) =>
     state.puzzle?.round.questions.find((question) => question.subject.code === ghost.code),
-  )?.subject.name;
+  )?.subject;
 
   return (
     <>
@@ -23,7 +27,7 @@ export function DragGhost({ ghost, piece }: DragGhostProps) {
         <PieceShape piece={piece} />
       </div>
       <span aria-live="assertive" className="sr-only">
-        {name ? `${name} vasthouden` : ""}
+        {subject ? t.holding(subjectNameInSentence(subject, language)) : ""}
       </span>
     </>
   );

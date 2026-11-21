@@ -8,10 +8,15 @@ type PhraseInput = Omit<FrenchItem, "kind" | "reviewed" | "example" | "contrastW
   distractors: readonly string[];
 };
 
-export function word(input: WordInput): FrenchItem {
+/** Het id blijft letterlijk, zodat de Engelse betekenissen per item compleet moeten zijn. */
+export function word<const Id extends string>(
+  input: WordInput & { id: Id },
+): FrenchItem & { id: Id } {
   return { ...input, kind: "word", reviewed: true };
 }
 
-export function phrase(input: PhraseInput): FrenchItem {
+export function phrase<const Id extends string>(
+  input: PhraseInput & { id: Id },
+): FrenchItem & { id: Id } {
   return { ...input, kind: "phrase", reviewed: true };
 }

@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-typepret",
     "entities-typepret",
+    "shared-i18n",
     "shared-lib",
     "shared-ui"
   ]

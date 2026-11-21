@@ -1,6 +1,8 @@
 import type { MathLevel, MathMode } from "@entities/math";
+import { useTexts } from "@shared/i18n";
 import { OptionPicker, SetupPanel } from "@shared/ui";
-import { bestKey, levelOptionsFor, MATH_MODE_OPTIONS, type MathSettings } from "../model/settings";
+import { bestKey, levelOptionsFor, modeOptions, type MathSettings } from "../model/settings";
+import { mathTrainerTexts } from "../model/texts";
 
 interface MathSetupProps {
   settings: MathSettings;
@@ -17,23 +19,21 @@ export function MathSetup({
   onLevelChange,
   onStart,
 }: MathSetupProps) {
+  const t = useTexts(mathTrainerTexts).setup;
   const bestScore = best[bestKey(settings.mode, settings.level)] ?? 0;
 
   return (
-    <SetupPanel
-      note={bestScore > 0 ? `Beste score: ${bestScore} van 10 sterren` : "Nog geen score"}
-      onStart={onStart}
-    >
+    <SetupPanel note={bestScore > 0 ? t.best(bestScore) : t.noScore} onStart={onStart}>
       <OptionPicker
         columns={2}
-        legend="Soort som"
-        options={MATH_MODE_OPTIONS}
+        legend={t.mode}
+        options={modeOptions()}
         selected={settings.mode}
         onSelect={onModeChange}
       />
 
       <OptionPicker
-        legend="Niveau"
+        legend={t.level}
         options={levelOptionsFor(settings.mode)}
         selected={settings.level}
         size="compact"

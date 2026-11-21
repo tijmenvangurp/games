@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { completedUnits, filledCount, type CompletedUnit, type PlayState } from "@entities/sudoku";
+import { getTexts } from "@shared/i18n";
 import { playSound, vibrate } from "@shared/lib";
+import { sudokuTexts } from "./texts";
 
 const CELEBRATION_MS = 1800;
 
@@ -9,7 +11,7 @@ function unitKey(unit: CompletedUnit): string {
 }
 
 function unitLabel(unit: CompletedUnit): string {
-  return unit.kind === "row" ? `Rij ${unit.index + 1}` : `Blok ${unit.index + 1}`;
+  return getTexts(sudokuTexts).celebration[unit.kind](unit.index + 1);
 }
 
 function completedKeys(play: PlayState): Set<string> {
@@ -33,8 +35,8 @@ function freshUnits(play: PlayState, celebrated: ReadonlySet<string>): Completed
 }
 
 function celebrationMessage(units: readonly CompletedUnit[]): string {
-  const labels = units.map(unitLabel);
-  return labels.length === 1 ? `${labels[0]} klaar!` : `${labels.join(" en ")} klaar!`;
+  const t = getTexts(sudokuTexts).celebration;
+  return t.done(units.map(unitLabel).join(t.and));
 }
 
 function halfDone(play: PlayState): boolean {
@@ -56,7 +58,7 @@ function halfwayMessage(play: PlayState, celebrated: boolean): string | null {
   if (play.solved || celebrated || !halfDone(play)) {
     return null;
   }
-  return "Halverwege!";
+  return getTexts(sudokuTexts).celebration.halfway;
 }
 
 /**

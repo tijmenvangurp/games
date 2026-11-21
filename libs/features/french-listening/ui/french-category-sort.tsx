@@ -15,6 +15,8 @@ import { createSeed, playSound } from "@shared/lib";
 import { Button, Check, Panel, RotateCcw, Sparkles } from "@shared/ui";
 import { createSortRound, type SortWord } from "../model/sort";
 import { SortCategoryBox, SortWordBank } from "./french-category-sort-parts";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 interface FrenchCategorySortProps {
   lessons: readonly FrenchLesson[];
@@ -22,6 +24,7 @@ interface FrenchCategorySortProps {
 
 export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
   const [seed, setSeed] = useState(createSeed);
+  const t = useTexts(frenchTexts);
   const round = createSortRound(lessons, seed);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [placements, setPlacements] = useState<Record<string, string>>({});
@@ -101,20 +104,18 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
       <Panel className="flex items-center justify-between gap-3 px-4 py-3" padding="none">
         <div>
-          <p className="text-xs font-semibold text-muted-foreground">Voortgang</p>
+          <p className="text-xs font-semibold text-muted-foreground">{t.progress}</p>
           <p className="text-sm font-bold tabular-nums">
-            {round.words.length - unplaced.length} van {round.words.length} geplaatst
+            {t.placed(round.words.length - unplaced.length, round.words.length)}
           </p>
         </div>
         <div className="text-right tabular-nums">
           <p className="text-2xl font-black leading-none">{score}</p>
-          <p className="text-xs text-muted-foreground">goed</p>
+          <p className="text-xs text-muted-foreground">{t.correctLabel}</p>
         </div>
       </Panel>
 
-      <p className="text-center text-sm text-muted-foreground">
-        Sleep een woord naar een categorie, of tik het woord en daarna de categorie.
-      </p>
+      <p className="text-center text-sm text-muted-foreground">{t.sortHint}</p>
 
       <DndContext
         collisionDetection={pointerWithin}
@@ -153,31 +154,47 @@ export function FrenchCategorySort({ lessons }: FrenchCategorySortProps) {
       </DndContext>
 
       {checked ? (
-        <Panel aria-live="polite" className="space-y-2" padding="md">
-          <p
-            className={
-              score === round.words.length
-                ? "flex items-center justify-center gap-1.5 font-bold text-success-ink"
-                : "flex items-center justify-center gap-1.5 font-bold text-warning-ink"
-            }
-          >
-            <Sparkles aria-hidden="true" className="size-5" />
-            {score === round.words.length ? "Alles goed!" : "Nog niet."}
-          </p>
-          <p className="text-center text-sm tabular-nums text-muted-foreground">
-            Je had {score} van {round.words.length} goed.
-          </p>
-          <Button className="w-full" size="lg" onClick={restart}>
-            <RotateCcw aria-hidden="true" className="size-5" />
-            Nieuwe ronde
-          </Button>
-        </Panel>
+        <SortResult score={score} total={round.words.length} onRestart={restart} />
       ) : (
         <Button className="w-full" disabled={!allPlaced} size="lg" onClick={check}>
           <Check aria-hidden="true" className="size-5" />
-          Controleer
+          {t.check}
         </Button>
       )}
     </div>
+  );
+}
+
+interface SortResultProps {
+  score: number;
+  total: number;
+  onRestart: () => void;
+}
+
+/** De uitslag na het controleren, met een knop voor een nieuwe ronde. */
+function SortResult({ score, total, onRestart }: SortResultProps) {
+  const t = useTexts(frenchTexts);
+  const perfect = score === total;
+
+  return (
+    <Panel aria-live="polite" className="space-y-2" padding="md">
+      <p
+        className={
+          perfect
+            ? "flex items-center justify-center gap-1.5 font-bold text-success-ink"
+            : "flex items-center justify-center gap-1.5 font-bold text-warning-ink"
+        }
+      >
+        <Sparkles aria-hidden="true" className="size-5" />
+        {perfect ? t.allCorrect : t.notYet}
+      </p>
+      <p className="text-center text-sm tabular-nums text-muted-foreground">
+        {t.scored(score, total)}
+      </p>
+      <Button className="w-full" size="lg" onClick={onRestart}>
+        <RotateCcw aria-hidden="true" className="size-5" />
+        {t.newRound}
+      </Button>
+    </Panel>
   );
 }

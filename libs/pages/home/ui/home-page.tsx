@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { GAME_CATEGORIES, gameCatalog, type GameCategory } from "@entities/game";
+import { GAME_CATEGORIES, categoryLabel, gameCatalog, type GameCategory } from "@entities/game";
 import { GameMenu } from "@widgets/game-menu";
-import { Button, Dices } from "@shared/ui";
+import { useLanguage, useTranslation } from "@shared/i18n";
+import { Button, Dices, LanguageSwitcher } from "@shared/ui";
 
 type FilterValue = GameCategory | "all";
 
 export function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const language = useLanguage();
   const [category, setCategory] = useState<FilterValue>("all");
 
   const openRandomGame = () => {
@@ -26,7 +29,7 @@ export function HomePage() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-baseline gap-3">
             <h1 className="font-display text-4xl font-normal tracking-tight sm:text-5xl">
-              Spellen
+              {t("home.title")}
             </h1>
             <span aria-hidden="true" className="inline-flex items-center gap-1.5">
               <span className="size-2.5 rounded-full bg-pawn-blue" />
@@ -36,20 +39,23 @@ export function HomePage() {
             </span>
           </div>
 
-          <Button size="sm" variant="soft" onClick={openRandomGame}>
-            <Dices aria-hidden="true" className="size-4" />
-            Verras me!
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="soft" onClick={openRandomGame}>
+              <Dices aria-hidden="true" className="size-4" />
+              {t("home.surprise")}
+            </Button>
+            <LanguageSwitcher />
+          </div>
         </div>
 
-        <nav aria-label="Filter spellen op soort" className="flex flex-wrap gap-2">
+        <nav aria-label={t("home.filterLabel")} className="flex flex-wrap gap-2">
           <Button
             aria-pressed={category === "all"}
             size="sm"
             variant={category === "all" ? "default" : "outline"}
             onClick={() => setCategory("all")}
           >
-            Alles
+            {t("home.all")}
           </Button>
           {GAME_CATEGORIES.map((item) => (
             <Button
@@ -59,7 +65,7 @@ export function HomePage() {
               variant={category === item.id ? "default" : "outline"}
               onClick={() => setCategory(item.id)}
             >
-              {item.label}
+              {categoryLabel(item.id, language)}
             </Button>
           ))}
         </nav>

@@ -1,18 +1,18 @@
 import {
+  CONTROLLERS,
   MAX_PLAYER_NAME_LENGTH,
+  PLAYER_COLORS,
   PLAYER_IDS,
   type Controller,
   type PlayerColor,
   type PlayerId,
 } from "@entities/ganzenbord";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button, OptionPicker, Panel, SetupPanel, TextInput } from "@shared/ui";
-import {
-  CONTROLLER_OPTIONS,
-  PLAYER_COUNT_OPTIONS,
-  type GanzenbordSettings,
-} from "../model/settings";
-import { PLAYER_COLOR_OPTIONS, playerName, playerNumber } from "../model/presentation";
+import { PLAYER_COUNTS, type GanzenbordSettings } from "../model/settings";
+import { playerName, playerNumber } from "../model/presentation";
+import { ganzenbordTexts, ganzenbordUiTexts } from "../model/texts";
 import { GanzenbordRules } from "./ganzenbord-rules";
 import { PlayerToken } from "./player-token";
 
@@ -33,21 +33,24 @@ export function GanzenbordSetup({
   onNameChange,
   onColorChange,
 }: GanzenbordSetupProps) {
+  const t = useTexts(ganzenbordUiTexts);
+  const names = useTexts(ganzenbordTexts);
   const players = PLAYER_IDS.slice(0, settings.playerCount);
+  const countOptions = PLAYER_COUNTS.map((value) => ({ value, label: names.playerCount(value) }));
 
   return (
     <SetupPanel onStart={onStart}>
       <OptionPicker
         columns={3}
-        legend="Aantal spelers"
-        options={PLAYER_COUNT_OPTIONS}
+        legend={t.playerCountLegend}
+        options={countOptions}
         selected={settings.playerCount}
         size="compact"
         onSelect={onPlayerCountChange}
       />
 
       <div className="space-y-2.5">
-        <p className="text-sm font-semibold">Wie spelen er mee?</p>
+        <p className="text-sm font-semibold">{t.whoPlays}</p>
         {players.map((id) => {
           const controller = settings.controllers[id];
           const color = settings.colors[id];
@@ -58,7 +61,7 @@ export function GanzenbordSetup({
               <div className="flex items-center gap-2">
                 <PlayerToken color={color} className="size-5 shrink-0" />
                 <TextInput
-                  aria-label={`Naam van speler ${number}`}
+                  aria-label={t.nameOf(number)}
                   autoComplete="off"
                   className="flex-1 text-sm"
                   maxLength={MAX_PLAYER_NAME_LENGTH}
@@ -68,51 +71,48 @@ export function GanzenbordSetup({
                   onChange={(event) => onNameChange(id, event.target.value)}
                 />
                 <div className="flex shrink-0 gap-0.5 rounded-xl border border-border bg-card p-0.5">
-                  {CONTROLLER_OPTIONS.map((option) => (
+                  {CONTROLLERS.map((option) => (
                     <Button
-                      key={option.value}
-                      aria-label={`Speler ${number}: ${option.label.toLowerCase()}`}
-                      aria-pressed={controller === option.value}
+                      key={option}
+                      aria-label={t.controllerOf(number, names.controllers[option])}
+                      aria-pressed={controller === option}
                       className="h-9 px-2.5"
                       size="sm"
-                      variant={controller === option.value ? "default" : "ghost"}
-                      onClick={() => onControllerChange(id, option.value)}
+                      variant={controller === option ? "default" : "ghost"}
+                      onClick={() => onControllerChange(id, option)}
                     >
-                      {option.label}
+                      {names.controllers[option]}
                     </Button>
                   ))}
                 </div>
               </div>
               <div
-                aria-label={`Kleur van speler ${number}`}
+                aria-label={t.colorOf(number)}
                 className="mt-1.5 flex flex-wrap gap-1"
                 role="group"
               >
-                {PLAYER_COLOR_OPTIONS.map((option) => (
+                {PLAYER_COLORS.map((option) => (
                   <button
-                    key={option.value}
-                    aria-label={option.label}
-                    aria-pressed={color === option.value}
+                    key={option}
+                    aria-label={names.colors[option]}
+                    aria-pressed={color === option}
                     className={cn(
                       "grid size-11 place-items-center rounded-full border-2 transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
-                      color === option.value
+                      color === option
                         ? "border-primary bg-primary-soft"
                         : "border-transparent hover:bg-muted",
                     )}
                     type="button"
-                    onClick={() => onColorChange(id, option.value)}
+                    onClick={() => onColorChange(id, option)}
                   >
-                    <PlayerToken color={option.value} className="size-7" />
+                    <PlayerToken color={option} className="size-7" />
                   </button>
                 ))}
               </div>
             </Panel>
           );
         })}
-        <p className="text-xs text-muted-foreground">
-          Kies per speler of die door een mens of door de computer wordt gespeeld. Speler 1 begint.
-          Een eigen naam en kleur zijn optioneel.
-        </p>
+        <p className="text-xs text-muted-foreground">{t.setupHint}</p>
       </div>
 
       <GanzenbordRules />

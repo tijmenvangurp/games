@@ -1,41 +1,25 @@
 import {
-  KLANK_POSITION_PHRASES,
   LETTER_BY_ID,
   type JachtQuestion,
   type KlankQuestion,
   type LeesQuestion,
   type LetterId,
-  type LetterLesson,
   type LetterQuestion,
   type LetterWord,
   type VangerQuestion,
 } from "@entities/letter";
+import { useTexts } from "@shared/i18n";
 import { Button, Panel } from "@shared/ui";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import { LetterTile } from "./letter-tile";
 import { PlekView } from "./plek-view";
+import { letterTexts, type LetterTexts } from "./texts";
 import { TrainView } from "./train-view";
 import { WordTile } from "./word-tile";
 import { ZoomView } from "./zoom-view";
 
 type ChoiceState = "default" | "correct" | "wrong" | "muted";
-
-function lessonHeader(lesson: LetterLesson): { unit: string; title: string } {
-  if (lesson === "woorden") {
-    return { unit: "Woord", title: "Woordlezen" };
-  }
-  if (lesson === "trein") {
-    return { unit: "Woord", title: "Woordtrein" };
-  }
-  if (lesson === "klankplek") {
-    return { unit: "Klank", title: "Klankplek" };
-  }
-  if (lesson === "zoemlees") {
-    return { unit: "Woord", title: "Zoemlees" };
-  }
-  return { unit: "Vraag", title: "Letterronde" };
-}
 
 function choiceState(
   letter: LetterId,
@@ -86,17 +70,14 @@ function KlankView({
   answered: boolean;
   wrongChoices: readonly string[];
 }) {
+  const t = useTexts(letterTexts);
   return (
     <>
-      <LetterAudio
-        autoPlay
-        label={`Luister naar de klank ${question.target}`}
-        src={question.sound}
-      />
+      <LetterAudio autoPlay label={t.listenSound(question.target)} src={question.sound} />
       <div className="mt-3">
-        <Prompt>Welke letter hoort bij deze klank?</Prompt>
+        <Prompt>{t.klankPrompt}</Prompt>
       </div>
-      <div aria-label="Kies de letter" className="mt-4 grid grid-cols-3 gap-2" role="group">
+      <div aria-label={t.chooseLetter} className="mt-4 grid grid-cols-3 gap-2" role="group">
         {question.choices.map((letter) => (
           <LetterTile
             key={letter}
@@ -120,17 +101,14 @@ function VangerView({
   answered: boolean;
   wrongChoices: readonly string[];
 }) {
+  const t = useTexts(letterTexts);
   return (
     <>
-      <LetterAudio
-        autoPlay
-        label={`Luister naar ${question.word.word}`}
-        src={question.word.audio}
-      />
+      <LetterAudio autoPlay label={t.listenWord(question.word.word)} src={question.word.audio} />
       <div className="mt-3">
-        <Prompt>Welk woord hoor je? Welke letter hoort vooraan?</Prompt>
+        <Prompt>{t.vangerPrompt}</Prompt>
       </div>
-      <div aria-label="Kies de eerste letter" className="mt-4 grid grid-cols-3 gap-2" role="group">
+      <div aria-label={t.chooseFirstLetter} className="mt-4 grid grid-cols-3 gap-2" role="group">
         {question.choices.map((letter) => (
           <LetterTile
             key={letter}
@@ -154,18 +132,19 @@ function JachtView({
   answered: boolean;
   wrongChoices: readonly string[];
 }) {
+  const t = useTexts(letterTexts);
   return (
     <>
       <LetterAudio
         autoPlay
-        label={`Luister naar de klank ${question.target}`}
+        label={t.listenSound(question.target)}
         src={LETTER_BY_ID[question.target].sound}
       />
       <div className="mt-3 text-center">
-        <Prompt>Zoek deze letter:</Prompt>
+        <Prompt>{t.jachtPrompt}</Prompt>
         <p className="mt-1 text-6xl font-black text-primary">{question.target}</p>
       </div>
-      <div aria-label="Zoek de letter" className="mt-4 grid grid-cols-3 gap-2" role="group">
+      <div aria-label={t.findLetter} className="mt-4 grid grid-cols-3 gap-2" role="group">
         {question.choices.map((letter) => (
           <LetterTile
             key={letter}
@@ -189,17 +168,18 @@ function LeesView({
   answered: boolean;
   wrongChoices: readonly string[];
 }) {
+  const t = useTexts(letterTexts);
   return (
     <>
       <LetterAudio
         autoPlay
-        label={`Luister naar ${question.target.word}`}
+        label={t.listenWord(question.target.word)}
         src={question.target.audio}
       />
       <div className="mt-3">
-        <Prompt>Luister en lees. Welk woord hoor je?</Prompt>
+        <Prompt>{t.leesPrompt}</Prompt>
       </div>
-      <div aria-label="Kies het woord" className="mt-4 grid gap-2" role="group">
+      <div aria-label={t.chooseWord} className="mt-4 grid gap-2" role="group">
         {question.choices.map((word) => (
           <WordTile
             key={word.id}
@@ -214,41 +194,41 @@ function LeesView({
   );
 }
 
-function successMessage(question: LetterQuestion): string {
+function successMessage(t: LetterTexts, question: LetterQuestion): string {
   switch (question.kind) {
     case "klank":
-      return `Ja! Dit is de ${question.target}. Luister nog eens.`;
+      return t.success.klank(question.target);
     case "vanger":
-      return `Ja! ${question.word.word} begint met de ${question.target}.`;
+      return t.success.vanger(question.word.word, question.target);
     case "jacht":
-      return `Ja, dit is de ${question.target}.`;
+      return t.success.jacht(question.target);
     case "lees":
-      return `Ja! Dit is ${question.target.word}.`;
+      return t.success.lees(question.target.word);
     case "plek":
-      return `Ja! De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+      return t.success.plek(question.target, t.positions[question.position], question.word.word);
     case "zoem":
-      return `Ja! Je las ${question.word.word}.`;
+      return t.success.zoem(question.word.word);
     case "trein":
-      return `Goed gebouwd: ${question.word.word}.`;
+      return t.success.trein(question.word.word);
   }
 }
 
-function retryMessage(question: LetterQuestion): string {
+function retryMessage(t: LetterTexts, question: LetterQuestion): string {
   switch (question.kind) {
     case "klank":
-      return `Dit is de ${question.target}. Luister nog eens.`;
+      return t.retry.klank(question.target);
     case "vanger":
-      return `Bijna. ${question.word.word} begint met de ${question.target}.`;
+      return t.retry.vanger(question.word.word, question.target);
     case "jacht":
-      return `Dit is de ${question.target}.`;
+      return t.retry.jacht(question.target);
     case "lees":
-      return `Bijna. Dit woord is ${question.target.word}.`;
+      return t.retry.lees(question.target.word);
     case "plek":
-      return `De ${question.target} zit ${KLANK_POSITION_PHRASES[question.position]} ${question.word.word}.`;
+      return t.retry.plek(question.target, t.positions[question.position], question.word.word);
     case "zoem":
-      return `Het woord is ${question.word.word}.`;
+      return t.retry.zoem(question.word.word);
     case "trein":
-      return `Het woord is ${question.word.word}.`;
+      return t.retry.trein(question.word.word);
   }
 }
 
@@ -263,18 +243,19 @@ function Feedback({
   correct: boolean;
   wrongCount: number;
 }) {
+  const t = useTexts(letterTexts);
   if (!answered) {
     if (question.kind === "trein" && wrongCount >= 2) {
       return null;
     }
     return (
       <p aria-live="polite" className="text-center text-sm font-semibold text-muted-foreground">
-        {wrongCount > 0 ? "Bijna! Probeer nog eens." : "Luister en kies."}
+        {wrongCount > 0 ? t.almost : t.listenAndChoose}
       </p>
     );
   }
 
-  const message = correct ? successMessage(question) : retryMessage(question);
+  const message = correct ? successMessage(t, question) : retryMessage(t, question);
 
   const replaySrc = (() => {
     if (question.kind === "lees") {
@@ -304,7 +285,7 @@ function Feedback({
       >
         {message}
       </p>
-      <LetterAudio autoPlay={false} label="Luister nog eens" src={replaySrc} />
+      <LetterAudio autoPlay={false} label={t.listenAgain} src={replaySrc} />
     </div>
   );
 }
@@ -364,6 +345,7 @@ function QuestionCard({
   wrongLetters: readonly LetterId[];
   isLast: boolean;
 }) {
+  const t = useTexts(letterTexts);
   return (
     <Panel as="section" padding="lg">
       <QuestionView
@@ -390,7 +372,7 @@ function QuestionCard({
           variant="success"
           onClick={() => useLetterStore.getState().next()}
         >
-          {isLast ? "Klaar" : "Volgende"}
+          {isLast ? t.done : t.next}
         </Button>
       ) : null}
     </Panel>
@@ -405,6 +387,7 @@ export function LetterPlay() {
   const wrongChoices = useLetterStore((state) => state.wrongChoices);
   const filled = useLetterStore((state) => state.filled);
   const wrongLetters = useLetterStore((state) => state.wrongLetters);
+  const t = useTexts(letterTexts);
 
   if (!round) {
     return null;
@@ -415,15 +398,13 @@ export function LetterPlay() {
     return null;
   }
 
-  const header = lessonHeader(round.lesson);
-
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <Panel as="header" className="flex items-center justify-between px-3.5 py-2.5" padding="none">
         <p className="text-sm font-bold tabular-nums text-muted-foreground">
-          {header.unit} {index + 1} van {round.questions.length}
+          {t.progress(t.units[round.lesson], index + 1, round.questions.length)}
         </p>
-        <span className="text-sm font-bold text-primary">{header.title}</span>
+        <span className="text-sm font-bold text-primary">{t.lessons[round.lesson].title}</span>
       </Panel>
       <QuestionCard
         answered={answered}

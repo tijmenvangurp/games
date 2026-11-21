@@ -1,5 +1,7 @@
-import type { MazeLevel } from "@entities/arrow";
+import { levelName, type MazeLevel } from "@entities/arrow";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { CelebrationDialog } from "@shared/ui";
+import { arrowTexts } from "../model/texts";
 
 interface MazeResultProps {
   level: MazeLevel;
@@ -18,14 +20,16 @@ export function MazeResult({
   onLevels,
   onHome,
 }: MazeResultProps) {
+  const t = useTexts(arrowTexts);
+  const language = useLanguage();
   return (
     <CelebrationDialog
       confetti
-      againLabel={hasNext ? "Volgende level" : "Opnieuw spelen"}
-      chooseLabel="Kies level"
-      description={`Level ${levelIndex + 1} · ${level.name} is opgelost.`}
-      homeLabel="Naar het menu"
-      title="Gelukt!"
+      againLabel={hasNext ? t.nextLevel : t.playAgain}
+      chooseLabel={t.chooseLevel}
+      description={t.solved(levelIndex + 1, levelName(level, language))}
+      homeLabel={t.toMenu}
+      title={t.success}
       onAgain={onNext}
       onChoose={onLevels}
       onHome={onHome}

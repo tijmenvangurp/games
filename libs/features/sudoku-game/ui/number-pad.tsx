@@ -1,5 +1,7 @@
 import type { SudokuSize } from "@entities/sudoku";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
+import { sudokuTexts } from "../model/texts";
 
 interface NumberPadProps {
   size: SudokuSize;
@@ -24,9 +26,10 @@ export function NumberPad({
   disabled,
   onPick,
 }: NumberPadProps) {
+  const t = useTexts(sudokuTexts).pad;
   return (
     <div
-      aria-label="Kies een getal of dier"
+      aria-label={t.label}
       className="grid gap-2"
       role="group"
       style={{ gridTemplateColumns: `repeat(${PAD_COLUMNS[size]}, minmax(0, 1fr))` }}
@@ -39,7 +42,7 @@ export function NumberPad({
           <button
             key={value}
             type="button"
-            aria-label={`Kies ${symbol}`}
+            aria-label={t.pick(symbol)}
             aria-pressed={activeValue === value}
             className={cn(
               "relative flex aspect-square w-full max-w-20 select-none items-center justify-center justify-self-center rounded-lg border border-border bg-card font-bold text-foreground transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:opacity-50",

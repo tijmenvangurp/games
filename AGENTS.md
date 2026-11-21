@@ -36,6 +36,7 @@ Gebruik deze eerst: ze zitten al in de app, de bundel en de tests.
 | `react`, `react-dom`                                                               | UI en rendering                                                                                    |
 | `@tanstack/react-router`                                                           | routes en type-safe navigatie (`apps/games/src/app/router.tsx`)                                    |
 | `zustand`                                                                          | spel- en UI-state per feature (`libs/features/*/model/`)                                           |
+| `i18next`, `react-i18next`, `i18next-browser-languagedetector`                     | vertalingen nl/en en taalkeuze in `localStorage` (`libs/shared/i18n/`); Nederlands is standaard    |
 | `tailwindcss`, `@tailwindcss/vite`                                                 | styling, tokens en `@layer` (`apps/games/src/app/styles/index.css`)                                |
 | `clsx`, `tailwind-merge`                                                           | `cn()` in `@shared/lib` voor conditionele classes                                                  |
 | `@vanilla-extract/css`, `@vanilla-extract/recipes`, `@vanilla-extract/vite-plugin` | zero-runtime type-safe design tokens (`tokens.css.ts`) en component-recipes in `@layer components` |
@@ -79,6 +80,7 @@ Nx monorepo met Feature-Sliced Design. Elke slice is een eigen Nx-project:
 - `libs/entities/*` — domeinmodellen en pure regels (sudoku-generator, speler-state)
 - `libs/shared/lib` — herbruikbare helpers
 - `libs/shared/ui` — UI-primitives en iconen
+- `libs/shared/i18n` — vertalingen (nl standaard, en) en taalkeuze via `i18next`
 - `tests/` — gedeelde Vitest-suites voor de kwaliteitsgate
 
 Elke lib heeft een `project.json`, een `tsconfig.json` en een public API (`index.ts`). Importeer alleen via die public API en via de aliassen (`@pages/...`, `@features/...`, `@entities/...`, `@shared/...`, `@app/...`). Een laag mag alleen van lager gelegen lagen importeren. Nx-tags (`layer:*`, `scope:*`, `type:*`) documenteren dezelfde grens; Steiger en Fallow bewaken hem.

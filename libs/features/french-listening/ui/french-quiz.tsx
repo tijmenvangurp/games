@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { frenchAudioSrc, frenchExampleAudioSrc } from "@entities/french";
 import { playSound, praiseFor } from "@shared/lib";
 import { useFrenchProgressStore } from "../model/use-french-progress-store";
@@ -9,6 +9,8 @@ import { FrenchOption } from "./french-option";
 import { FrenchQuizFinished } from "./french-quiz-finished";
 import { FrenchQuizHeader } from "./french-quiz-header";
 import { useFrenchAudio } from "./use-french-audio";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 export function FrenchQuiz() {
   const question = useFrenchQuizStore((state) => state.question);
@@ -81,7 +83,7 @@ export function FrenchQuiz() {
       />
       <FrenchAudioPanel kind={question.item.kind} onReplay={replay} />
 
-      <div aria-label="Kies de juiste vertaling" className="grid gap-2 sm:grid-cols-2" role="group">
+      <FrenchOptionGroup>
         {question.options.map((option, optionIndex) => (
           <FrenchOption
             key={option}
@@ -93,7 +95,7 @@ export function FrenchQuiz() {
             onSelect={handleAnswer}
           />
         ))}
-      </div>
+      </FrenchOptionGroup>
 
       {answered ? (
         <FrenchFeedback
@@ -104,10 +106,30 @@ export function FrenchQuiz() {
           onPlayExample={() => play(frenchExampleAudioSrc(question.item))}
         />
       ) : (
-        <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-          Kies de Nederlandse vertaling.
-        </p>
+        <FrenchChooseHint />
       )}
     </div>
+  );
+}
+
+/** De groep met antwoordknoppen, met een label in de gekozen taal. */
+function FrenchOptionGroup({ children }: { children: ReactNode }) {
+  const t = useTexts(frenchTexts);
+
+  return (
+    <div aria-label={t.chooseTranslation} className="grid gap-2 sm:grid-cols-2" role="group">
+      {children}
+    </div>
+  );
+}
+
+/** De hulpregel zolang er nog geen antwoord is gekozen. */
+function FrenchChooseHint() {
+  const t = useTexts(frenchTexts);
+
+  return (
+    <p aria-live="polite" className="text-center text-xs text-muted-foreground">
+      {t.chooseHint}
+    </p>
   );
 }

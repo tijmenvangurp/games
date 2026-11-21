@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-word-search", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-word-search", "shared-i18n", "shared-lib", "shared-ui"]
 }

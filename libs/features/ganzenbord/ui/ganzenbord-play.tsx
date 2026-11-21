@@ -6,10 +6,14 @@ import {
   type PlayerState,
   type TurnEvent,
 } from "@entities/ganzenbord";
+import { getTexts, useTexts } from "@shared/i18n";
 import { Button, Panel, Play } from "@shared/ui";
 import { eventCard, type TurnAnimation } from "../model/animation";
 import { eventMessage, playerName, statusHint, turnText } from "../model/presentation";
+import { ganzenbordTexts, ganzenbordUiTexts } from "../model/texts";
 import { useGanzenbordStore } from "../model/use-ganzenbord-store";
+
+type UiTexts = (typeof ganzenbordUiTexts)["nl"];
 import { GanzenbordBoard } from "./ganzenbord-board";
 import { GanzenbordDice, type GanzenbordDiceHandle } from "./ganzenbord-dice";
 import { GanzenbordEvent } from "./ganzenbord-event";
@@ -109,21 +113,22 @@ function useRollHandlers(diceRef: RefObject<GanzenbordDiceHandle | null>) {
 }
 
 function rollButtonLabel(
+  t: UiTexts["rollButton"],
   finished: boolean,
   rolling: boolean,
   animating: boolean,
   computerTurn: boolean,
 ): string {
   if (finished) {
-    return "Klaar";
+    return t.finished;
   }
   if (animating) {
-    return "Gaan…";
+    return t.animating;
   }
   if (rolling) {
-    return "Gooien…";
+    return t.rolling;
   }
-  return computerTurn ? "Computer gooit…" : "Gooi!";
+  return computerTurn ? t.computer : t.ready;
 }
 
 function statusLine(
@@ -131,14 +136,15 @@ function statusLine(
   current: PlayerState | undefined,
   computerTurn: boolean,
 ): string {
+  const names = getTexts(ganzenbordTexts);
   if (game.status === "draw") {
-    return "Iedereen zit vast.";
+    return names.allStuck;
   }
   if (game.status === "finished") {
-    return "De partij is klaar.";
+    return names.finished;
   }
   if (computerTurn && current) {
-    return `${playerName(current)} denkt na…`;
+    return getTexts(ganzenbordUiTexts).thinking(playerName(current));
   }
   return statusHint(game);
 }
@@ -165,8 +171,9 @@ function animationStatusText(game: GanzenbordGame, animation: TurnAnimation): st
     }
   }
 
+  const t = getTexts(ganzenbordUiTexts);
   const mover = game.players.find((player) => player.id === animation.player);
-  return `${mover ? playerName(mover) : "De gans"} gaat naar vak ${step.position}.`;
+  return t.moves(mover ? playerName(mover) : t.theGoose, step.position);
 }
 
 function diceStatusText(
@@ -178,7 +185,7 @@ function diceStatusText(
   animation: TurnAnimation | null,
 ): DiceStatusProps {
   const primary = rolling
-    ? "De dobbelstenen rollen…"
+    ? getTexts(ganzenbordUiTexts).diceRolling
     : ((animation ? animationStatusText(game, animation) : null) ?? turnText(game, events));
   const secondary = rolling || animation ? "" : statusLine(game, current, computerTurn);
   return { primary, secondary };
@@ -198,6 +205,7 @@ function DiceStatus({ primary, secondary }: DiceStatusProps) {
 }
 
 function DicePanel() {
+  const t = useTexts(ganzenbordUiTexts);
   const game = useGanzenbordStore((state) => state.game);
   const events = useGanzenbordStore((state) => state.events);
   const rolling = useGanzenbordStore((state) => state.rolling);
@@ -236,7 +244,7 @@ function DicePanel() {
     <Panel className="flex flex-col gap-2" padding="sm">
       <GanzenbordDice ref={diceRef} onDone={handleDiceDone} />
       <Button
-        aria-label="Gooi met de dobbelstenen"
+        aria-label={t.roll}
         className="w-full"
         disabled={finished || rolling || animating || computerTurn}
         size="lg"
@@ -244,7 +252,7 @@ function DicePanel() {
         onClick={handleRoll}
       >
         <Play aria-hidden="true" className="size-5" />
-        {rollButtonLabel(finished, rolling, animating, computerTurn)}
+        {rollButtonLabel(t.rollButton, finished, rolling, animating, computerTurn)}
       </Button>
       <DiceStatus {...diceStatusText(game, events, rolling, current, computerTurn, animation)} />
     </Panel>

@@ -7,7 +7,9 @@ import {
   DraaiwerkPlay,
   useDraaiwerkStore,
 } from "@features/draaiwerk";
+import { useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
+import { draaiwerkPageTexts } from "./texts";
 
 type DraaiwerkScreenName = "play" | "levels";
 
@@ -15,12 +17,19 @@ interface DraaiwerkScreenProps {
   onHome: () => void;
 }
 
-function subtitleFor(screen: DraaiwerkScreenName, levelIndex: number, chapter: number): string {
+type DraaiwerkPageTexts = (typeof draaiwerkPageTexts)["nl"];
+
+function subtitleFor(
+  t: DraaiwerkPageTexts,
+  screen: DraaiwerkScreenName,
+  levelIndex: number,
+  chapter: number,
+): string {
   if (screen === "levels") {
     const chapters = new Set(allLevels().map((level) => level.chapter)).size;
-    return `${LEVEL_COUNT} levels · ${chapters} hoofdstukken`;
+    return t.levelsSubtitle(LEVEL_COUNT, chapters);
   }
-  return `${chapterName(chapter)} · level ${levelIndex + 1} van ${LEVEL_COUNT}`;
+  return t.playSubtitle(chapterName(chapter), levelIndex + 1, LEVEL_COUNT);
 }
 
 export function DraaiwerkScreen({ onHome }: DraaiwerkScreenProps) {
@@ -30,6 +39,7 @@ export function DraaiwerkScreen({ onHome }: DraaiwerkScreenProps) {
   const finished = useDraaiwerkStore((state) => state.finished);
   const status = useDraaiwerkStore((state) => state.status);
   const [screen, setScreen] = useState<DraaiwerkScreenName>("play");
+  const t = useTexts(draaiwerkPageTexts);
 
   const hasNext = levelIndex + 1 < LEVEL_COUNT;
   const followingLevel = hasNext ? levelAt(levelIndex + 1) : null;
@@ -50,11 +60,11 @@ export function DraaiwerkScreen({ onHome }: DraaiwerkScreenProps) {
 
   return (
     <GameShell
-      backLabel={screen === "levels" ? "Terug naar het spel" : "Terug naar het menu"}
+      backLabel={screen === "levels" ? t.backToGame : undefined}
       fitViewport={screen === "play"}
       showSpeech={false}
-      subtitle={subtitleFor(screen, levelIndex, level.chapter)}
-      title="Draaiwerk"
+      subtitle={subtitleFor(t, screen, levelIndex, level.chapter)}
+      title={t.title}
       wide
       onBack={() => {
         if (screen === "levels") {

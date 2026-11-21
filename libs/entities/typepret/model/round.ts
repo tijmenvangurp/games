@@ -1,7 +1,8 @@
+import { currentLanguage } from "@shared/i18n";
 import { shuffledIndexes } from "@shared/lib";
 import { HINT_AFTER_MISTAKES, RETRY_ACCURACY, ROUND_LENGTH, UNLOCK_ACCURACY } from "./lessons";
 import type { Group, Lesson, Round, RoundResult, RoundState, Verdict } from "./types";
-import { WORDS } from "./words";
+import { wordsFor } from "./words";
 
 const GROUP_SIZE = 2;
 
@@ -23,7 +24,7 @@ function drillGroups(lesson: Lesson, random: () => number): Group[] {
 
 function wordPool(lesson: Lesson): readonly string[] {
   const { min, max } = lesson.wordLength ?? { min: 3, max: 5 };
-  return WORDS.filter(
+  return wordsFor(currentLanguage()).filter(
     (word) =>
       word.length >= min &&
       word.length <= max &&

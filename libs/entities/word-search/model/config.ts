@@ -1,3 +1,4 @@
+import type { Language } from "@shared/i18n";
 import type { WordSearchDifficulty, WordSearchTheme } from "./types";
 
 export interface WordSearchDirection {
@@ -115,3 +116,58 @@ export const WORD_SEARCH_WORDS: Record<WordSearchTheme, readonly string[]> = {
     "Clefairy",
   ],
 };
+
+/**
+ * Engelse woorden met dezelfde regels: A-Z zonder accenten, hoogstens 7 letters en
+ * minstens 12 per thema. Geen woord zit in een ander woord van hetzelfde thema.
+ * Pokémon-namen zijn in beide talen gelijk.
+ */
+const ENGLISH_WORD_SEARCH_WORDS: Record<WordSearchTheme, readonly string[]> = {
+  tuin: [
+    "flower",
+    "tree",
+    "grass",
+    "tulip",
+    "snail",
+    "bee",
+    "pond",
+    "rose",
+    "leaf",
+    "rake",
+    "spade",
+    "sun",
+    "bird",
+    "nest",
+    "seed",
+    "worm",
+  ],
+  onderwater: [
+    "fish",
+    "crab",
+    "boat",
+    "sand",
+    "coral",
+    "octopus",
+    "whale",
+    "water",
+    "wave",
+    "shark",
+    "squid",
+    "shell",
+    "dolphin",
+    "bubble",
+    "turtle",
+    "anchor",
+  ],
+  pokemon: WORD_SEARCH_WORDS.pokemon,
+};
+
+const WORDS_BY_LANGUAGE: Readonly<Record<Language, Record<WordSearchTheme, readonly string[]>>> = {
+  nl: WORD_SEARCH_WORDS,
+  en: ENGLISH_WORD_SEARCH_WORDS,
+};
+
+/** De woordenlijst van een thema in de gekozen taal. */
+export function wordSearchWords(theme: WordSearchTheme, language: Language): readonly string[] {
+  return WORDS_BY_LANGUAGE[language][theme];
+}

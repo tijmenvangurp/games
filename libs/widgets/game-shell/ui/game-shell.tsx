@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { useTranslation } from "@shared/i18n";
 import { cn, stopSpeech } from "@shared/lib";
 import { Button, PageHeader, Plus, SoundToggle, SpeechToggle } from "@shared/ui";
 
@@ -34,6 +35,7 @@ export function GameShell({
   fitViewport = false,
   children,
 }: GameShellProps) {
+  const { t } = useTranslation();
   useEffect(() => () => stopSpeech(), []);
 
   return (
@@ -52,7 +54,12 @@ export function GameShell({
               {showSpeech ? <SpeechToggle /> : null}
               <SoundToggle />
               {onNewGame ? (
-                <Button aria-label="Nieuw spel" size="icon" variant="ghost" onClick={onNewGame}>
+                <Button
+                  aria-label={t("shell.newGame")}
+                  size="icon"
+                  variant="ghost"
+                  onClick={onNewGame}
+                >
                   <Plus aria-hidden="true" className="size-5" />
                 </Button>
               ) : null}

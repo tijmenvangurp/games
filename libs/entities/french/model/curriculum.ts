@@ -8,7 +8,7 @@ import { LESSON_SALUTATIONS } from "./lessons/salutations";
 import type { FrenchItem, FrenchLesson } from "./types";
 
 /** One place that knows which lessons exist and in which order. */
-export const FRENCH_CURRICULUM = [
+export const FRENCH_CURRICULUM: readonly FrenchLesson[] = [
   LESSON_SALUTATIONS,
   LESSON_ANIMAUX,
   LESSON_FAMILLE,
@@ -16,7 +16,7 @@ export const FRENCH_CURRICULUM = [
   LESSON_ECOLE,
   LESSON_METEO,
   LESSON_CORPS,
-] as const satisfies readonly FrenchLesson[];
+];
 
 export function listPublishedLessons(): readonly FrenchLesson[] {
   return FRENCH_CURRICULUM.filter((lesson) => lesson.status === "reviewed");

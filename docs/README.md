@@ -52,6 +52,7 @@ bevat de afspraken, beslissingen en het onderzoek.
 - `adr/0030-typepret.md` — react-simple-keyboard als toetsenbord, eigen invoerlogica, acht lessen met een foutvriendelijke ronde van 20 toetsen en de ontgrendelregel.
 - `adr/0031-vendored-murdoku-engine.md` — de 1:1 MIT-overname, het formatter- en lintbeleid, de coverage- en Fallow-grens en de onderhoudsafspraak.
 - `adr/0032-draaiwerk.md` — Draaiwerk als deterministische tandwielpuzzel, de MIT-port van de involute generator, 25 levels in zes hoofdstukken en de landscape-tabletlayout.
+- `adr/0033-meertaligheid-nl-en.md` — i18next met Nederlands als standaard en Engels als keuze, `defineTexts` per slice, de taalknop en waarom voorlezen in het Engels zwijgt.
 
 ## Onderzoek
 

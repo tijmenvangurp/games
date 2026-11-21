@@ -7,12 +7,14 @@ import {
   type MurdokuClueFocus,
   type MurdokuPlayState,
 } from "@features/murdoku-game";
+import { useTexts } from "@shared/i18n";
 import { Button, CelebrationDialog } from "@shared/ui";
 import { MurdokuBoardSection } from "./murdoku-board-section";
 import { feedbackFor } from "./murdoku-copy";
 import { MurdokuReveal } from "./murdoku-reveal";
 import { MurdokuSettingsSection } from "./murdoku-settings";
 import type { MurdokuCaseView, MurdokuHintView, MurdokuSettingsView } from "./murdoku-view";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
 
 /** De acties van de pagina, gebundeld zodat de bedrading kort blijft. */
 interface MurdokuGameActions {
@@ -61,12 +63,13 @@ function MurdokuInfoSections({
   onFocusWord,
 }: MurdokuInfoSectionsProps) {
   const { puzzle, text, loot } = caseView;
+  const t = useTexts(MURDOKU_PAGE_TEXTS).game;
 
   return (
     <>
       <section aria-labelledby="murdoku-personen" className="flex flex-col gap-2.5">
         <h2 className="font-display text-xl" id="murdoku-personen">
-          Wie is wie?
+          {t.whoIsWho}
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground">
           {text.rule("aloneWithVictim")}
@@ -82,7 +85,7 @@ function MurdokuInfoSections({
 
       <section aria-labelledby="murdoku-legenda" className="flex flex-col gap-2.5">
         <h2 className="font-display text-xl" id="murdoku-legenda">
-          Waar mag je staan?
+          {t.whereToStand}
         </h2>
         <MurdokuObjectLegend lootName={loot.name} puzzle={puzzle} />
       </section>
@@ -102,12 +105,14 @@ function MurdokuSolvedDialog({
   onChoose: () => void;
   onHome: () => void;
 }) {
+  const t = useTexts(MURDOKU_PAGE_TEXTS).game;
+
   return (
     <CelebrationDialog
-      chooseLabel="Bekijk de plattegrond"
+      chooseLabel={t.viewPlan}
       confetti
       description={sentence}
-      title="Opgelost!"
+      title={t.solvedTitle}
       onAgain={onAgain}
       onChoose={onChoose}
       onHome={onHome}
@@ -130,6 +135,7 @@ export function MurdokuGameBody({
   const [showCelebration, setShowCelebration] = useState(true);
   const [boardFocusToken, setBoardFocusToken] = useState(0);
   const revealRef = useRef<HTMLElement>(null);
+  const t = useTexts(MURDOKU_PAGE_TEXTS);
   const { puzzle, text, title, intro, loot } = caseView;
   const { settings, onAutoCross } = settingsView;
   const { hint, hintMessage, clueFocus, clueMessage, onHint, onFocusWord } = hintView;
@@ -157,11 +163,11 @@ export function MurdokuGameBody({
           <div className="flex shrink-0 flex-wrap items-center gap-2">
             <Button asChild className="min-h-11" size="sm" variant="outline">
               <Link to="/mysterie/zaken" onClick={actions.chooseCase}>
-                Kies een andere zaak
+                {t.game.otherCase}
               </Link>
             </Button>
             <Button asChild className="min-h-11" size="sm" variant="outline">
-              <Link to="/mysterie/les">Zo werkt het</Link>
+              <Link to="/mysterie/les">{t.game.howItWorks}</Link>
             </Button>
           </div>
         </div>
@@ -174,7 +180,7 @@ export function MurdokuGameBody({
               canUndo={historyLength > 0}
               clueFocus={clueFocus}
               clueMessage={clueMessage}
-              feedback={feedbackFor(play, revealSentence)}
+              feedback={feedbackFor(play, revealSentence, t)}
               focusToken={boardFocusToken}
               hint={hint}
               hintMessage={hintMessage}

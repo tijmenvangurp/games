@@ -1,7 +1,9 @@
 import { PLAYERS, type FourInARowMode, type Player } from "@entities/four-in-a-row";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button, Panel, RotateCcw, Undo2 } from "@shared/ui";
 import { playerName } from "../model/presentation";
+import { fourInARowTexts } from "../model/texts";
 
 function PlayerChip({
   player,
@@ -14,6 +16,7 @@ function PlayerChip({
   score: number;
   active: boolean;
 }) {
+  const t = useTexts(fourInARowTexts);
   return (
     <div
       className={cn(
@@ -30,10 +33,7 @@ function PlayerChip({
         )}
       />
       <span className="truncate text-sm font-bold">{name}</span>
-      <span
-        aria-label={`${score} gewonnen partijen`}
-        className="ml-auto text-sm font-black text-muted-foreground"
-      >
+      <span aria-label={t.wins(score)} className="ml-auto text-sm font-black text-muted-foreground">
         {score}
       </span>
     </div>
@@ -57,6 +57,7 @@ export function FourInARowHud({
   onUndo,
   onRestart,
 }: FourInARowHudProps) {
+  const t = useTexts(fourInARowTexts);
   return (
     <Panel className="flex items-center justify-between gap-2 p-2 sm:p-3" padding="none">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-2">
@@ -73,7 +74,7 @@ export function FourInARowHud({
 
       <div className="flex shrink-0 items-center gap-1">
         <Button
-          aria-label="Ongedaan maken"
+          aria-label={t.undo}
           disabled={!canUndo}
           size="icon"
           variant="outline"
@@ -81,7 +82,7 @@ export function FourInARowHud({
         >
           <Undo2 aria-hidden="true" className="size-5" />
         </Button>
-        <Button aria-label="Opnieuw beginnen" size="icon" variant="outline" onClick={onRestart}>
+        <Button aria-label={t.restart} size="icon" variant="outline" onClick={onRestart}>
           <RotateCcw aria-hidden="true" className="size-5" />
         </Button>
       </div>

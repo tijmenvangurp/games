@@ -8,9 +8,11 @@ import {
   type PlayState,
   type SudokuHint,
 } from "@entities/sudoku";
+import { getTexts, useLanguage } from "@shared/i18n";
 import { playHaptic, playSound } from "@shared/lib";
 import { symbolsFor, type MistakeMode, type SymbolTheme } from "./settings";
 import { hintDetailText, hintText, statusText } from "./sudoku-view";
+import { sudokuTexts } from "./texts";
 import { useSudokuCelebration } from "./use-sudoku-celebration";
 import { useSudokuKeyboard } from "./use-sudoku-keyboard";
 import { useSudokuStore } from "./use-sudoku-store";
@@ -70,9 +72,8 @@ function hintMessageFor(
   if (!hintUnavailable) {
     return null;
   }
-  return solutionMistakes.length > 0
-    ? "Los eerst het vakje op dat nog niet klopt."
-    : "Er is nu geen logische hint.";
+  const t = getTexts(sudokuTexts).hint;
+  return solutionMistakes.length > 0 ? t.fixMistakeFirst : t.none;
 }
 
 interface DeriveInput {
@@ -247,6 +248,8 @@ export function useSudokuPlay() {
   const hintUnavailable = useSudokuStore((state) => state.hintUnavailable);
   const hintDetailed = useSudokuStore((state) => state.hintDetailed);
   const [check, setCheck] = useState<CheckResult | null>(null);
+  // De afgeleide teksten volgen de taal; daarom staat die in de afhankelijkheden.
+  const language = useLanguage();
   const celebration = useSudokuCelebration(play);
   useSudokuKeyboard(Boolean(play));
 
@@ -263,7 +266,16 @@ export function useSudokuPlay() {
             hintDetailed,
           })
         : EMPTY_DERIVED,
-    [play, settings.mistakeMode, settings.theme, check, hintPreview, hintUnavailable, hintDetailed],
+    [
+      play,
+      settings.mistakeMode,
+      settings.theme,
+      check,
+      hintPreview,
+      hintUnavailable,
+      hintDetailed,
+      language,
+    ],
   );
   const actions = useSudokuActions(play, hintPreview, setCheck);
 

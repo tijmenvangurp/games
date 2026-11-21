@@ -5,6 +5,8 @@ import { useFrenchProgressStore } from "../model/use-french-progress-store";
 import { FrenchFlashcard } from "./french-flashcard";
 import { FrenchFlashcardSummary } from "./french-flashcard-summary";
 import { useFrenchAudio } from "./use-french-audio";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 interface FrenchFlashcardsProps {
   lesson: FrenchLesson;
@@ -18,6 +20,7 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
   const [practice, setPractice] = useState(0);
   const [finished, setFinished] = useState(false);
   const { play } = useFrenchAudio();
+  const t = useTexts(frenchTexts);
 
   const item = items[index];
 
@@ -52,14 +55,12 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
     <div className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <Panel className="flex items-center justify-between gap-3 px-4 py-3" padding="none">
         <div>
-          <p className="text-xs font-semibold text-muted-foreground">Oefen met kaarten</p>
-          <p className="text-sm font-bold tabular-nums">
-            Kaart {index + 1} van {items.length}
-          </p>
+          <p className="text-xs font-semibold text-muted-foreground">{t.cardsLabel}</p>
+          <p className="text-sm font-bold tabular-nums">{t.card(index + 1, items.length)}</p>
         </div>
         <div className="text-right text-xs tabular-nums text-muted-foreground">
-          <p>{known} gekend</p>
-          <p>{practice} te oefenen</p>
+          <p>{t.knownCount(known)}</p>
+          <p>{t.practiceCount(practice)}</p>
         </div>
       </Panel>
 
@@ -73,7 +74,7 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
           }}
         >
           <Volume2 aria-hidden="true" className="size-5" />
-          {item.kind === "word" ? "Beluister woord" : "Beluister zin"}
+          {item.kind === "word" ? t.cardWord : t.cardPhrase}
         </Button>
         {item.example ? (
           <Button
@@ -83,17 +84,17 @@ export function FrenchFlashcards({ lesson }: FrenchFlashcardsProps) {
             }}
           >
             <Volume2 aria-hidden="true" className="size-5" />
-            Beluister voorbeeldzin
+            {t.cardExample}
           </Button>
         ) : null}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">
         <Button size="lg" variant="outline" onClick={() => mark(false)}>
-          Nog oefenen
+          {t.stillPractise}
         </Button>
         <Button size="lg" variant="success" onClick={() => mark(true)}>
-          Ken ik
+          {t.iKnow}
         </Button>
       </div>
     </div>

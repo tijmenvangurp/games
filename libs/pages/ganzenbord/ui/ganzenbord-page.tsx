@@ -7,14 +7,17 @@ import {
   winnerDescription,
   winnerTitle,
 } from "@features/ganzenbord";
+import { useTexts } from "@shared/i18n";
 import { useDelayedVisible, useGameSetupState } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
+import { ganzenbordPageTexts } from "./texts";
 
 /** Even wachten zodat de laatste zet en de finish zichtbaar blijven. */
 const WIN_FLASH_MS = 600;
 
 export function GanzenbordPage() {
+  const t = useTexts(ganzenbordPageTexts);
   const game = useGanzenbordStore((state) => state.game);
   const settings = useGanzenbordStore((state) => state.settings);
   const finished = game ? isFinished(game) : false;
@@ -28,8 +31,8 @@ export function GanzenbordPage() {
     <GameShell
       {...gameSetup}
       showSpeech={false}
-      subtitle={`${playerCount} spelers`}
-      title="Ganzenbord"
+      subtitle={t.subtitle(playerCount)}
+      title={t.title}
       wide
     >
       {setupVisible ? (
@@ -55,18 +58,18 @@ export function GanzenbordPage() {
       {setupVisible ? (
         <p className="text-center text-xs">
           <Link className="text-muted-foreground underline" to="/ganzenbord/bord">
-            Bord bijstellen
+            {t.adjustBoard}
           </Link>
         </p>
       ) : null}
 
       {resultVisible && game && !setupVisible ? (
         <CelebrationDialog
-          againLabel="Nog een potje"
-          chooseLabel="Andere spelers"
+          againLabel={t.again}
+          chooseLabel={t.choose}
           confetti={Boolean(game.winner)}
           description={winnerDescription(game)}
-          title={game.status === "draw" ? "Gelijkspel!" : winnerTitle(game)}
+          title={game.status === "draw" ? t.drawTitle : winnerTitle(game)}
           onAgain={() => useGanzenbordStore.getState().start()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

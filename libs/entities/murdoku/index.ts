@@ -17,6 +17,7 @@ export {
 } from "./model/murdoku";
 
 export { MURDOKU_CASES, MURDOKU_DEFAULT_CASE_ID, murdokuCaseById } from "./model/cases/cases";
+export { MURDOKU_CASE_TEXTS } from "./model/cases/case-texts";
 export { MURDOKU_LADDER, murdokuClueCount } from "./model/cases/levels";
 export { MURDOKU_ROOM_TINTS, murdokuRoomTint } from "./model/cases/room-tints";
 export { validateMurdokuCases } from "./model/cases/validate";

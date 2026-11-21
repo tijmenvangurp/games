@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Check, Panel } from "@shared/ui";
 import { cn } from "@shared/lib";
+import { useTexts } from "@shared/i18n";
 import { trayLabel, type TrayItem } from "@entities/gear";
 import { trayShortLabel } from "../model/labels";
+import { draaiwerkTexts } from "../model/texts";
 import { trayOrder } from "../model/tray-order";
 import { useDraaiwerkStore } from "../model/use-draaiwerk-store";
 import { TrayArt } from "./gear-art";
@@ -26,6 +28,7 @@ function TrayPart({
   const wasDragging = useRef(false);
   const dndPointerDown = listeners?.onPointerDown;
   const label = trayLabel(item);
+  const t = useTexts(draaiwerkTexts);
 
   useEffect(() => {
     if (isDragging) {
@@ -38,7 +41,7 @@ function TrayPart({
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      aria-label={`${label}${used ? ", gebruikt" : selected ? ", gekozen" : ""}`}
+      aria-label={`${label}${used ? t.usedSuffix : selected ? t.selectedSuffix : ""}`}
       aria-pressed={selected}
       className={cn(
         "group relative flex min-h-16 min-w-0 cursor-grab touch-none flex-col items-center justify-center gap-1 rounded-xl px-1 py-1.5 transition active:scale-[0.97] active:cursor-grabbing",
@@ -101,6 +104,7 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
   const selectedTrayId = useDraaiwerkStore((state) => state.selectedTrayId);
   const status = useDraaiwerkStore((state) => state.status);
   const solving = status === "solved";
+  const t = useTexts(draaiwerkTexts);
   const items = useMemo(() => trayOrder(level), [level]);
   const { isOver, setNodeRef } = useDroppable({
     id: "tray-remove",
@@ -111,7 +115,7 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
     <Panel
       as="section"
       ref={(node) => setNodeRef(node)}
-      aria-label={removing ? "Onderdelen, sleep hier om weg te halen" : "Onderdelen"}
+      aria-label={removing ? t.trayRemoving : t.tray}
       className={cn(
         "flex min-h-0 min-w-0 flex-col p-2.5 transition sm:p-3 md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2",
         removing && "border-dashed border-primary/60",
@@ -123,13 +127,13 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
     >
       <div className="mb-2 flex shrink-0 items-baseline justify-between gap-2">
         <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-          Onderdelen
+          {t.tray}
         </h2>
         {removing ? (
-          <p className="text-[10px] font-bold text-primary">Loslaten om weg te halen</p>
+          <p className="text-[10px] font-bold text-primary">{t.releaseToRemove}</p>
         ) : (
           <p className="text-[10px] font-bold text-muted-foreground">
-            {level.tray.length - usedTrayIds.length} over
+            {t.partsLeft(level.tray.length - usedTrayIds.length)}
           </p>
         )}
       </div>
@@ -141,7 +145,7 @@ export function DraaiwerkTray({ removing }: { removing: boolean }) {
         )}
       >
         {items.length === 0 ? (
-          <p className="col-span-2 py-4 text-sm text-muted-foreground">Geen onderdelen meer.</p>
+          <p className="col-span-2 py-4 text-sm text-muted-foreground">{t.noPartsLeft}</p>
         ) : null}
 
         {items.map((item) => (

@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
+import { useTexts } from "@shared/i18n";
 import { Button, Volume2 } from "@shared/ui";
+import { letterTexts } from "./texts";
 
 interface LetterAudioProps {
   src: string;
@@ -9,6 +11,7 @@ interface LetterAudioProps {
 
 export function LetterAudio({ src, label, autoPlay = true }: LetterAudioProps) {
   const ref = useRef<HTMLAudioElement>(null);
+  const t = useTexts(letterTexts);
 
   const play = () => {
     const audio = ref.current;
@@ -40,7 +43,7 @@ export function LetterAudio({ src, label, autoPlay = true }: LetterAudioProps) {
       <audio ref={ref} preload="auto" src={src} />
       <Button aria-label={label} size="lg" variant="outline" onClick={play}>
         <Volume2 aria-hidden="true" className="size-5" />
-        Luister
+        {t.listen}
       </Button>
     </div>
   );

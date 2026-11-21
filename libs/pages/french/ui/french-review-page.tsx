@@ -1,16 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { allFrenchItems, dueItemIds, type FrenchItem, type FrenchLesson } from "@entities/french";
+import {
+  allFrenchItems,
+  dueItemIds,
+  localizeItem,
+  type FrenchItem,
+  type FrenchLesson,
+} from "@entities/french";
 import { FrenchQuiz, useFrenchProgressStore, useFrenchQuizStore } from "@features/french-listening";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
 import { Button, Panel, Play, RotateCcw } from "@shared/ui";
+import { frenchPageTexts } from "./texts";
 
-function createReviewLesson(items: readonly FrenchItem[]): FrenchLesson {
+type PageTexts = (typeof frenchPageTexts)["nl"];
+
+function createReviewLesson(t: PageTexts, items: readonly FrenchItem[]): FrenchLesson {
   return {
     id: "review",
-    title: "Herhalen",
-    subtitle: "Je lastige woorden en zinnen.",
-    category: "Herhalen",
+    title: t.reviewTitle,
+    subtitle: t.reviewLessonSubtitle,
+    category: t.reviewTitle,
     emoji: "🔁",
     level: "A1.2",
     status: "reviewed",
@@ -20,9 +30,11 @@ function createReviewLesson(items: readonly FrenchItem[]): FrenchLesson {
 
 export function FrenchReviewPage() {
   const navigate = useNavigate();
+  const language = useLanguage();
+  const t = useTexts(frenchPageTexts);
   const progress = useFrenchProgressStore((state) => state.progress);
   const [reviewItems, setReviewItems] = useState<readonly FrenchItem[] | null>(null);
-  const allItems = allFrenchItems();
+  const allItems = allFrenchItems().map((item) => localizeItem(item, language));
   const dueItems = dueItemIds(progress, allItems)
     .map((id) => allItems.find((item) => item.id === id))
     .filter((item): item is FrenchItem => Boolean(item));
@@ -30,14 +42,14 @@ export function FrenchReviewPage() {
   const start = () => {
     const items = [...dueItems];
     setReviewItems(items);
-    useFrenchQuizStore.getState().start(createReviewLesson(items), allItems);
+    useFrenchQuizStore.getState().start(createReviewLesson(t, items), allItems);
   };
 
   return (
     <GameShell
       onBack={() => navigate({ to: "/frans" })}
       showSpeech={false}
-      subtitle="Je lastige woorden"
+      subtitle={t.reviewSubtitle}
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"
     >
@@ -51,20 +63,18 @@ export function FrenchReviewPage() {
           <span className="grid size-14 place-items-center rounded-xl bg-primary-soft text-primary">
             <RotateCcw aria-hidden="true" className="size-7" />
           </span>
-          <h2 className="font-display text-2xl">Herhalen</h2>
+          <h2 className="font-display text-2xl">{t.reviewTitle}</h2>
           <p className="text-muted-foreground">
-            {dueItems.length > 0
-              ? `${dueItems.length} items zijn nu aan de beurt.`
-              : "Er is nu niets te herhalen."}
+            {dueItems.length > 0 ? t.reviewReady(dueItems.length) : t.nothingToReview}
           </p>
           {dueItems.length > 0 ? (
             <Button size="lg" onClick={start}>
               <Play aria-hidden="true" className="size-5" />
-              Start herhaling
+              {t.startReview}
             </Button>
           ) : (
             <Button size="lg" variant="outline" onClick={() => navigate({ to: "/frans" })}>
-              Terug naar lessen
+              {t.backToLessons}
             </Button>
           )}
         </Panel>

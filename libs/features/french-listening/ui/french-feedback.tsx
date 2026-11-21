@@ -1,5 +1,7 @@
 import type { FrenchItem } from "@entities/french";
 import { Button, Panel, Volume2 } from "@shared/ui";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 interface FrenchFeedbackProps {
   item: FrenchItem;
@@ -16,14 +18,16 @@ export function FrenchFeedback({
   onNext,
   onPlayExample,
 }: FrenchFeedbackProps) {
+  const t = useTexts(frenchTexts);
   return (
     <Panel aria-live="polite" className="space-y-3" padding="md">
       <p className={correct ? "font-bold text-success-ink" : "font-bold text-warning-ink"}>
-        {correct ? praise : "Nog niet."}
+        {correct ? praise : t.notYet}
       </p>
       {!correct ? (
         <p className="text-sm text-muted-foreground">
-          Het juiste antwoord is <strong>{item.nl}</strong>.
+          {t.rightAnswer}
+          <strong>{item.nl}</strong>.
         </p>
       ) : null}
       <Panel padding="sm" surface="subtle">
@@ -37,22 +41,17 @@ export function FrenchFeedback({
       {item.example ? (
         <div className="flex items-start gap-2 rounded-xl border border-primary/20 bg-primary-soft p-3">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-muted-foreground">Voorbeeldzin</p>
+            <p className="text-xs font-semibold text-muted-foreground">{t.example}</p>
             <p className="text-sm font-semibold">{item.example.fr}</p>
             <p className="text-xs text-muted-foreground">{item.example.nl}</p>
           </div>
-          <Button
-            aria-label="Beluister de voorbeeldzin"
-            size="icon"
-            variant="outline"
-            onClick={onPlayExample}
-          >
+          <Button aria-label={t.playExample} size="icon" variant="outline" onClick={onPlayExample}>
             <Volume2 aria-hidden="true" className="size-5" />
           </Button>
         </div>
       ) : null}
       <Button className="w-full" size="lg" onClick={onNext}>
-        Volgende
+        {t.next}
       </Button>
     </Panel>
   );

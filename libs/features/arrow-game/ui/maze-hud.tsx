@@ -1,4 +1,5 @@
-import type { MazeLevel } from "@entities/arrow";
+import { levelName, type MazeLevel } from "@entities/arrow";
+import { useLanguage, useTexts } from "@shared/i18n";
 import {
   ArrowLeft,
   Button,
@@ -9,6 +10,7 @@ import {
   SoundToggle,
   Undo2,
 } from "@shared/ui";
+import { arrowTexts } from "../model/texts";
 
 interface MazeHudProps {
   level: MazeLevel;
@@ -33,14 +35,16 @@ export function MazeHud({
   onHint,
   onRestart,
 }: MazeHudProps) {
+  const t = useTexts(arrowTexts);
+  const language = useLanguage();
   return (
     <Panel as="header" className="space-y-2" padding="sm">
       <div className="flex items-center gap-0.5">
-        <Button aria-label="Terug" size="icon" variant="ghost" onClick={onBack}>
+        <Button aria-label={t.back} size="icon" variant="ghost" onClick={onBack}>
           <ArrowLeft aria-hidden="true" className="size-5" />
         </Button>
         <Button
-          aria-label="Ongedaan maken"
+          aria-label={t.undo}
           disabled={!canUndo || !playing}
           size="icon"
           variant="ghost"
@@ -57,14 +61,20 @@ export function MazeHud({
       <div className="flex items-center gap-2">
         <ProgressBar
           className="flex-1"
-          label={`${removedCount} van ${level.arrows.length} pijlen weg`}
+          label={t.arrowsGone(removedCount, level.arrows.length)}
           max={level.arrows.length}
           value={removedCount}
         />
-        <Button aria-label="Hint" disabled={!playing} size="icon" variant="ghost" onClick={onHint}>
+        <Button
+          aria-label={t.hint}
+          disabled={!playing}
+          size="icon"
+          variant="ghost"
+          onClick={onHint}
+        >
           <Lightbulb aria-hidden="true" className="size-5 text-warning" />
         </Button>
-        <Button aria-label="Opnieuw" size="icon" variant="ghost" onClick={onRestart}>
+        <Button aria-label={t.restart} size="icon" variant="ghost" onClick={onRestart}>
           <RotateCcw aria-hidden="true" className="size-5" />
         </Button>
       </div>
@@ -73,7 +83,7 @@ export function MazeHud({
         <p className="text-xs font-semibold tabular-nums text-muted-foreground">
           Level {levelIndex + 1}
         </p>
-        <p className="font-display text-base">{level.name}</p>
+        <p className="font-display text-base">{levelName(level, language)}</p>
       </div>
     </Panel>
   );

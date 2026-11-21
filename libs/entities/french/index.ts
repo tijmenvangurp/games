@@ -5,6 +5,7 @@ export {
   getLesson,
   listPublishedLessons,
 } from "./model/curriculum";
+export { localizeItem, localizeLesson } from "./model/english";
 export { LESSON_ANIMAUX } from "./model/lessons/animaux";
 export {
   FRENCH_PROGRESS_VERSION,

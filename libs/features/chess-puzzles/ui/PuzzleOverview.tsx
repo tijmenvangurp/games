@@ -1,8 +1,10 @@
 import { useId } from "react";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button, Check, Play } from "@shared/ui";
 import type { ChessPuzzle, PuzzleDifficulty } from "../model/types";
 import { PuzzleDifficultyPicker } from "./PuzzleDifficultyPicker";
+import { puzzleTexts } from "./texts";
 
 interface PuzzleOverviewProps {
   readonly difficulty: PuzzleDifficulty;
@@ -19,6 +21,7 @@ export function PuzzleOverview({
   onDifficultyChange,
   onSelect,
 }: PuzzleOverviewProps) {
+  const t = useTexts(puzzleTexts);
   const titleId = useId();
   const solvedCount = puzzles.filter((puzzle) => solved.has(puzzle.id)).length;
   const allSolved = puzzles.length > 0 && solvedCount === puzzles.length;
@@ -29,21 +32,21 @@ export function PuzzleOverview({
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-4">
       <header className="space-y-1 text-center">
         <h2 id={titleId} className="font-display text-2xl">
-          Kies een puzzel
+          {t.choosePuzzle}
         </h2>
         <p className="text-sm font-semibold text-muted-foreground">
-          {solvedCount} van {puzzles.length} opgelost
+          {t.solvedCount(solvedCount, puzzles.length)}
         </p>
       </header>
 
       <PuzzleDifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
 
       <div
-        aria-label="Voortgang"
+        aria-label={t.progress}
         aria-valuemax={puzzles.length}
         aria-valuemin={0}
         aria-valuenow={solvedCount}
-        aria-valuetext={`${solvedCount} van ${puzzles.length} opgelost`}
+        aria-valuetext={t.solvedCount(solvedCount, puzzles.length)}
         className="h-2 overflow-hidden rounded-full bg-muted"
         role="progressbar"
       >
@@ -61,11 +64,11 @@ export function PuzzleOverview({
           onClick={() => onSelect(nextPuzzle.id)}
         >
           <Play aria-hidden="true" className="size-5" />
-          {allSolved ? "Nog een keer" : "Verder"}
+          {allSolved ? t.again : t.continue}
         </Button>
       ) : null}
 
-      <nav aria-label="Kies een puzzel" className="grid grid-cols-5 gap-2 sm:grid-cols-7">
+      <nav aria-label={t.choosePuzzle} className="grid grid-cols-5 gap-2 sm:grid-cols-7">
         {puzzles.map((puzzle, index) => {
           const done = solved.has(puzzle.id);
 
@@ -73,7 +76,7 @@ export function PuzzleOverview({
             <button
               key={puzzle.id}
               type="button"
-              aria-label={`Puzzel ${index + 1}${done ? ", opgelost" : ", nog niet opgelost"}`}
+              aria-label={t.puzzleButton(index + 1, done)}
               className={cn(
                 "relative flex min-h-12 items-center justify-center rounded-lg border text-sm font-black transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
                 done

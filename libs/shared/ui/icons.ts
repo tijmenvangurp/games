@@ -25,6 +25,7 @@ export {
   GraduationCap,
   Grid2x2,
   Home,
+  Languages,
   LayoutGrid,
   Lightbulb,
   Lock,

@@ -9,6 +9,8 @@ import {
   type Placement,
   type TrayItem,
 } from "@entities/gear";
+import { getTexts } from "@shared/i18n";
+import { draaiwerkTexts } from "./texts";
 
 export type LinkTrayItem = Extract<TrayItem, { kind: "belt" | "chain" }>;
 
@@ -88,13 +90,13 @@ function rejectGear(
 ): string {
   const hole = level.holes.find((candidate) => candidate.id === next.holeId);
   if (!hole) {
-    return "Dat gat bestaat niet.";
+    return getTexts(draaiwerkTexts).holeMissing;
   }
   if (blocked.has(next.holeId)) {
-    return "Dit gat is geblokkeerd.";
+    return getTexts(draaiwerkTexts).holeBlocked;
   }
   if (occupied.has(next.holeId)) {
-    return "Hier zit al een tandwiel.";
+    return getTexts(draaiwerkTexts).holeTaken;
   }
 
   const center = holeCenter(level, next.holeId);
@@ -102,14 +104,14 @@ function rejectGear(
   const clash = slots.some(
     (slot) => distance(center, holeCenter(level, slot.holeId)) < radius + gearRadius(slot.size) - 1,
   );
-  return clash ? "Dit tandwiel botst met een ander." : "Dat past hier niet.";
+  return clash ? getTexts(draaiwerkTexts).gearClash : getTexts(draaiwerkTexts).doesNotFit;
 }
 
 function rejectLooseBelt(next: LooseBeltPlacement, slots: ReturnType<typeof gearSlots>): string {
   if (!slots.some((slot) => slot.holeId === next.holeId)) {
-    return "Op dit gat zit nog geen tandwiel.";
+    return getTexts(draaiwerkTexts).noGearHere;
   }
-  return "Hier hangt al een ketting.";
+  return getTexts(draaiwerkTexts).chainHere;
 }
 
 function rejectLink(level: Level, placements: readonly Placement[], next: LinkPlacement): string {
@@ -117,10 +119,10 @@ function rejectLink(level: Level, placements: readonly Placement[], next: LinkPl
   const from = slots.find((slot) => slot.holeId === next.fromHoleId);
   const to = slots.find((slot) => slot.holeId === next.toHoleId);
   if (!from || !to) {
-    return "Op dit gat zit nog geen tandwiel.";
+    return getTexts(draaiwerkTexts).noGearHere;
   }
   if (next.fromHoleId === next.toHoleId) {
-    return "Kies twee verschillende tandwielen.";
+    return getTexts(draaiwerkTexts).twoDifferentGears;
   }
 
   const pair = linkPair(next.fromHoleId, next.toHoleId);
@@ -129,17 +131,17 @@ function rejectLink(level: Level, placements: readonly Placement[], next: LinkPl
       isLinkPlacement(placement) && linkPair(placement.fromHoleId, placement.toHoleId) === pair,
   );
   if (duplicate) {
-    return "Deze twee zijn al verbonden.";
+    return getTexts(draaiwerkTexts).alreadyLinked;
   }
 
   const span = distance(holeCenter(level, next.fromHoleId), holeCenter(level, next.toHoleId));
   return span <= Math.abs(gearRadius(from.size) - gearRadius(to.size))
-    ? "De ketting past niet tussen deze wielen."
-    : "Dat past hier niet.";
+    ? getTexts(draaiwerkTexts).chainTooShort
+    : getTexts(draaiwerkTexts).doesNotFit;
 }
 
 /**
- * Explains why `canPlace` rejected a part, in child-friendly Dutch. Only called
+ * Explains why `canPlace` rejected a part, in child-friendly words, in the active language. Only called
  * after the engine said no, so the last line is a safe fallback.
  */
 export function rejectionFor(

@@ -3,10 +3,13 @@ import { useNavigate } from "@tanstack/react-router";
 import { GameShell } from "@widgets/game-shell";
 import { SetupPanel, SudokuPlay, useSudokuStore } from "@features/sudoku-game";
 import { CelebrationDialog } from "@shared/ui";
+import { useTexts } from "@shared/i18n";
 import { useGameSetupNavigation } from "@shared/lib";
+import { sudokuPageTexts } from "./texts";
 
 export function SudokuPage() {
   const navigate = useNavigate();
+  const t = useTexts(sudokuPageTexts);
   const play = useSudokuStore((state) => state.play);
   const settings = useSudokuStore((state) => state.settings);
   const [showSetup, setShowSetup] = useState(false);
@@ -16,7 +19,7 @@ export function SudokuPage() {
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(play),
-    backToGameLabel: "Terug naar je puzzel",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
@@ -36,8 +39,8 @@ export function SudokuPage() {
       showSpeech={false}
       subtitle={
         play
-          ? `${play.puzzle.size} × ${play.puzzle.size} · ${play.puzzle.difficulty}`
-          : "Kies je puzzel"
+          ? `${play.puzzle.size} × ${play.puzzle.size} · ${t.difficulty[play.puzzle.difficulty]}`
+          : t.chooseSubtitle
       }
       title="Sudoku"
     >
@@ -62,8 +65,8 @@ export function SudokuPage() {
       {play?.solved && !setupVisible ? (
         <CelebrationDialog
           confetti
-          description="Je hebt de sudoku helemaal opgelost."
-          title="Opgelost!"
+          description={t.solvedDescription}
+          title={t.solvedTitle}
           onAgain={() => useSudokuStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

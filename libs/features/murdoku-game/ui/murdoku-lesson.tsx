@@ -1,12 +1,23 @@
 import { useState } from "react";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { Button, ChevronLeft, ChevronRight, Panel, StatusBanner } from "@shared/ui";
-import { MURDOKU_GLOSSARY, MURDOKU_LESSON_STEPS, MURDOKU_LESSON_TIPS } from "../lib/lesson";
+import { MURDOKU_GLOSSARY, MURDOKU_LESSON_STEPS } from "../lib/lesson";
+import { MURDOKU_LESSON_TEXTS } from "../lib/lesson-texts";
 import { murdokuObjectName } from "../lib/legend";
 import { MurdokuDiagram } from "./murdoku-diagram";
 import { MurdokuObjectLegend } from "./murdoku-object-legend";
+import { MURDOKU_UI_TEXTS } from "./texts";
+
+/** De objectnaam onder een icoon in een diagram, in de gekozen taal. */
+function useObjectName(): (type: string) => string {
+  const language = useLanguage();
+  return (type) => murdokuObjectName(type, language);
+}
 
 /** De knoppen om met de hand van scherm te wisselen. */
 function StepNavigation({ index, onSelect }: { index: number; onSelect: (index: number) => void }) {
+  const t = useTexts(MURDOKU_UI_TEXTS).lesson;
+
   return (
     <div className="flex flex-wrap items-center justify-between gap-2">
       <Button
@@ -16,17 +27,17 @@ function StepNavigation({ index, onSelect }: { index: number; onSelect: (index: 
         onClick={() => onSelect(index - 1)}
       >
         <ChevronLeft aria-hidden="true" className="size-5" />
-        Vorige stap
+        {t.previous}
       </Button>
       <p className="text-sm font-semibold text-muted-foreground">
-        Stap {index + 1} van {MURDOKU_LESSON_STEPS.length}
+        {t.stepOf(index + 1, MURDOKU_LESSON_STEPS.length)}
       </p>
       <Button
         className="min-h-11"
         disabled={index === MURDOKU_LESSON_STEPS.length - 1}
         onClick={() => onSelect(index + 1)}
       >
-        Volgende stap
+        {t.next}
         <ChevronRight aria-hidden="true" className="size-5" />
       </Button>
     </div>
@@ -35,15 +46,18 @@ function StepNavigation({ index, onSelect }: { index: number; onSelect: (index: 
 
 /** De zes genummerde knoppen waarmee je meteen naar een scherm springt. */
 function StepPicker({ index, onSelect }: { index: number; onSelect: (index: number) => void }) {
+  const t = useTexts(MURDOKU_UI_TEXTS).lesson;
+  const steps = useTexts(MURDOKU_LESSON_TEXTS).steps;
+
   return (
-    <ol aria-label="Kies een scherm" className="flex flex-wrap justify-center gap-2">
+    <ol aria-label={t.pickStep} className="flex flex-wrap justify-center gap-2">
       {MURDOKU_LESSON_STEPS.map((step, stepIndex) => {
         const active = stepIndex === index;
 
         return (
           <li key={step.id}>
             <button
-              aria-label={`Stap ${stepIndex + 1}: ${step.title}`}
+              aria-label={t.stepLabel(stepIndex + 1, steps[step.id].title)}
               aria-pressed={active}
               className={
                 active
@@ -65,7 +79,9 @@ function StepPicker({ index, onSelect }: { index: number; onSelect: (index: numb
 /** De stappenblokken: één scherm per stap, met een keuze boven en pijlen onder. */
 function LessonStepper() {
   const [index, setIndex] = useState(0);
-  const step = MURDOKU_LESSON_STEPS[index];
+  const diagram = MURDOKU_LESSON_STEPS[index];
+  const step = useTexts(MURDOKU_LESSON_TEXTS).steps[diagram.id];
+  const objectName = useObjectName();
 
   return (
     <section aria-labelledby="murdoku-les-titel" className="flex flex-col gap-3">
@@ -75,7 +91,11 @@ function LessonStepper() {
           {step.title}
         </h2>
         <p className="max-w-prose text-base leading-relaxed text-muted-foreground">{step.body}</p>
-        <MurdokuDiagram diagram={step.diagram} maxCell={4.5} objectName={murdokuObjectName} />
+        <MurdokuDiagram
+          diagram={{ label: step.label, rows: diagram.rows }}
+          maxCell={4.5}
+          objectName={objectName}
+        />
         {step.tip ? (
           <StatusBanner
             align="center"
@@ -93,14 +113,17 @@ function LessonStepper() {
 
 /** Alle woorden uit de aanwijzingen, elk met een eigen klein diagram. */
 function Glossary() {
+  const t = useTexts(MURDOKU_UI_TEXTS).lesson;
+  const glossary = useTexts(MURDOKU_LESSON_TEXTS).glossary;
+  const objectName = useObjectName();
+
   return (
     <section aria-labelledby="murdoku-woordenlijst" className="flex flex-col gap-3">
       <h2 className="font-display text-2xl" id="murdoku-woordenlijst">
-        Woordenlijst
+        {t.glossary}
       </h2>
       <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-        Elk woord uit een aanwijzing betekent altijd hetzelfde. Tik op een woord in een aanwijzing
-        om het op het bord te zien.
+        {t.glossaryIntro}
       </p>
       <ul className="grid gap-3 sm:grid-cols-2">
         {MURDOKU_GLOSSARY.map((entry) => (
@@ -112,12 +135,14 @@ function Glossary() {
           >
             <MurdokuDiagram
               className="mx-auto sm:mx-0 sm:shrink-0"
-              diagram={entry.diagram}
-              objectName={murdokuObjectName}
+              diagram={{ label: glossary[entry.id].label, rows: entry.rows }}
+              objectName={objectName}
             />
             <div className="min-w-0">
-              <h3 className="font-display text-lg leading-tight">{entry.term}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{entry.meaning}</p>
+              <h3 className="font-display text-lg leading-tight">{glossary[entry.id].term}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                {glossary[entry.id].meaning}
+              </p>
             </div>
           </Panel>
         ))}
@@ -128,21 +153,24 @@ function Glossary() {
 
 /** De vaste objectlegenda en de twee tips voor het werken met een zaak. */
 function LegendAndTips() {
+  const t = useTexts(MURDOKU_UI_TEXTS).lesson;
+  const tips = useTexts(MURDOKU_LESSON_TEXTS).tips;
+
   return (
     <>
       <section aria-labelledby="murdoku-uitleg-legenda" className="flex flex-col gap-2.5">
         <h2 className="font-display text-2xl" id="murdoku-uitleg-legenda">
-          Waar mag je staan?
+          {t.legend}
         </h2>
         <MurdokuObjectLegend />
       </section>
 
       <section aria-labelledby="murdoku-uitleg-tips" className="flex flex-col gap-2.5">
         <h2 className="font-display text-2xl" id="murdoku-uitleg-tips">
-          Twee tips
+          {t.tips}
         </h2>
         <ul className="flex flex-col gap-2">
-          {MURDOKU_LESSON_TIPS.map((tip) => (
+          {tips.map((tip) => (
             <Panel
               key={tip}
               as="li"

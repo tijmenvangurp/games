@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-seek-and-find",
     "entities-hidden-object",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

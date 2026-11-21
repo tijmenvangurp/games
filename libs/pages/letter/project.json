@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-letter-game",
     "entities-letter",
+    "shared-i18n",
     "shared-ui"
   ]
 }

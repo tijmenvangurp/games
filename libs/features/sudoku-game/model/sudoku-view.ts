@@ -1,36 +1,22 @@
 import type { SudokuHint } from "@entities/sudoku";
+import { getTexts } from "@shared/i18n";
 import type { MistakeMode } from "./settings";
+import { sudokuTexts } from "./texts";
 
 export function hintText(hint: SudokuHint): string {
+  const t = getTexts(sudokuTexts).hint;
   if (hint.technique === "naked-single") {
-    return "In dit vakje past nog maar één cijfer.";
+    return t.single;
   }
-  switch (hint.unit) {
-    case "row":
-      return "In deze rij is nog maar één plek voor één cijfer.";
-    case "column":
-      return "In deze kolom is nog maar één plek voor één cijfer.";
-    case "box":
-      return "In dit blok is nog maar één plek voor één cijfer.";
-    default:
-      return "Er is nog maar één plek voor één cijfer.";
-  }
+  return hint.unit ? t.unit[hint.unit] : t.anywhere;
 }
 
 export function hintDetailText(hint: SudokuHint): string {
+  const t = getTexts(sudokuTexts).hint;
   if (hint.technique === "naked-single") {
-    return "Streep de cijfers weg die al in de rij, kolom en box staan.";
+    return t.singleDetail;
   }
-  switch (hint.unit) {
-    case "row":
-      return "Welk cijfer kan nergens anders in deze rij?";
-    case "column":
-      return "Welk cijfer kan nergens anders in deze kolom?";
-    case "box":
-      return "Welk cijfer kan nergens anders in dit blok?";
-    default:
-      return "Welk cijfer kan nergens anders op deze plek?";
-  }
+  return hint.unit ? t.unitDetail[hint.unit] : t.anywhereDetail;
 }
 
 interface StatusInput {
@@ -45,20 +31,21 @@ interface StatusInput {
 }
 
 export function statusText(input: StatusInput): string {
+  const t = getTexts(sudokuTexts).status;
   if (input.solved) {
-    return "Opgelost!";
+    return t.solved;
   }
   if (input.conflictCount > 0) {
-    return "Er staan dubbele cijfers.";
+    return t.duplicates;
   }
   if (input.mistakeMode === "direct" && input.mistakeCount > 0) {
-    return "Er staat nog iets niet goed.";
+    return t.notRight;
   }
   if (input.isChecked && input.checkedMistakeCount > 0) {
-    return "Er staat nog iets niet goed.";
+    return t.notRight;
   }
   if (input.isChecked) {
-    return "Alles klopt nog!";
+    return t.allGood;
   }
-  return `${input.filled} van ${input.total} vakjes ingevuld`;
+  return t.filled(input.filled, input.total);
 }

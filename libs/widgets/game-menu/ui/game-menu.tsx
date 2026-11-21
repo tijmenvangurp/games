@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { gameCatalog, type GameCategory } from "@entities/game";
+import { gameCatalog, gameText, type GameCategory } from "@entities/game";
+import { useLanguage, useTranslation } from "@shared/i18n";
 import { Badge, GameIcon } from "@shared/ui";
 import {
   menuCard,
@@ -15,6 +16,8 @@ interface GameMenuProps {
 }
 
 export function GameMenu({ category = "all" }: GameMenuProps) {
+  const { t } = useTranslation();
+  const language = useLanguage();
   const entries =
     category === "all" ? gameCatalog : gameCatalog.filter((game) => game.category === category);
 
@@ -42,7 +45,7 @@ export function GameMenu({ category = "all" }: GameMenuProps) {
                   <GameIcon name={game.id} size={18} />
                 </span>
                 <h2 className="font-display text-xl leading-snug tracking-tight sm:text-2xl">
-                  {game.name}
+                  {gameText(game, language).name}
                 </h2>
               </div>
             </div>
@@ -52,9 +55,11 @@ export function GameMenu({ category = "all" }: GameMenuProps) {
             <span className="grid size-11 place-items-center rounded-lg bg-muted">
               <GameIcon aria-hidden="true" name={game.id} size={24} />
             </span>
-            <h2 className="mt-4 font-display text-xl leading-snug">{game.name}</h2>
+            <h2 className="mt-4 font-display text-xl leading-snug">
+              {gameText(game, language).name}
+            </h2>
             <div className="mt-auto pt-4">
-              <Badge tone="neutral">Binnenkort</Badge>
+              <Badge tone="neutral">{t("home.comingSoon")}</Badge>
             </div>
           </div>
         ),

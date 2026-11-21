@@ -1,4 +1,6 @@
 import { geometryFor, isPeer, type SudokuHint, type SudokuPuzzle } from "@entities/sudoku";
+import { useTexts } from "@shared/i18n";
+import { sudokuTexts } from "../model/texts";
 import { SudokuCell } from "./sudoku-cell";
 
 interface SudokuBoardProps {
@@ -26,6 +28,7 @@ export function SudokuBoard({
   hintCells,
   onSelect,
 }: SudokuBoardProps) {
+  const t = useTexts(sudokuTexts);
   const geometry = geometryFor(puzzle.size);
   const { size } = geometry;
   const selectedValue = selected === null ? 0 : puzzle.givens[selected] || entries[selected];
@@ -59,7 +62,7 @@ export function SudokuBoard({
 
   return (
     <div
-      aria-label={`Sudoku rooster van ${size} bij ${size}`}
+      aria-label={t.board(size)}
       className="touch-manipulation overflow-hidden rounded-lg border border-border bg-card"
       role="group"
     >

@@ -1,3 +1,4 @@
+import { useTranslation } from "@shared/i18n";
 import { Button } from "./button";
 import { Play, Sparkles } from "./icons";
 
@@ -7,11 +8,8 @@ interface SetupActionsProps {
   loading?: boolean;
 }
 
-export function SetupActions({
-  onStart,
-  startLabel = "Spelen",
-  loading = false,
-}: SetupActionsProps) {
+export function SetupActions({ onStart, startLabel, loading = false }: SetupActionsProps) {
+  const { t } = useTranslation();
   return (
     <Button
       className="mt-6 w-full"
@@ -23,12 +21,12 @@ export function SetupActions({
       {loading ? (
         <>
           <Sparkles aria-hidden="true" className="size-5 animate-pulse" />
-          Spel maken…
+          {t("setup.loading")}
         </>
       ) : (
         <>
           <Play aria-hidden="true" className="size-5" />
-          {startLabel}
+          {startLabel ?? t("setup.start")}
         </>
       )}
     </Button>

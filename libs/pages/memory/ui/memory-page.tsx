@@ -4,8 +4,12 @@ import { useShallow } from "zustand/react/shallow";
 import { pairsForLevel } from "@entities/memory";
 import { MemoryPlay, MemorySetup, useMemoryStore } from "@features/memory-game";
 import { GameShell } from "@widgets/game-shell";
+import { useTexts } from "@shared/i18n";
 import { CelebrationDialog } from "@shared/ui";
 import { useGameSetupNavigation } from "@shared/lib";
+import { memoryPageTexts } from "./texts";
+
+type MemoryPageTexts = (typeof memoryPageTexts)["nl"];
 
 interface DescriptionInput {
   challengeWon: boolean;
@@ -14,32 +18,34 @@ interface DescriptionInput {
   nextPairs: number;
 }
 
-function descriptionFor({
-  challengeWon,
-  challengeTried,
-  delta,
-  nextPairs,
-}: DescriptionInput): string {
+function descriptionFor(
+  t: MemoryPageTexts,
+  { challengeWon, challengeTried, delta, nextPairs }: DescriptionInput,
+): string {
   if (challengeWon) {
-    return `Je koos de uitdaging en haalde hem. We gaan verder met ${nextPairs} paren.`;
+    return t.challengeWon(nextPairs);
   }
   if (challengeTried) {
-    return "Dat was een flinke uitdaging. Je bleef proberen; volgende keer pakken we weer een haalbaar bord.";
+    return t.challengeTried;
   }
   if (delta > 0) {
-    return `Je bleef zoeken en vond ze allemaal. Volgende keer ${nextPairs} paren.`;
+    return t.levelUp(nextPairs);
   }
   if (delta < 0) {
-    return "Je bleef proberen. Volgende keer doen we het iets rustiger aan.";
+    return t.levelDown;
   }
-  return "Je bleef zoeken en vond elk paar.";
+  return t.steady;
 }
 
-function subtitleFor(scene: { pairs: number } | null, mode: "auto" | "manual"): string {
+function subtitleFor(
+  t: MemoryPageTexts,
+  scene: { pairs: number } | null,
+  mode: "auto" | "manual",
+): string {
   if (!scene) {
-    return "Kies je spel";
+    return t.chooseSubtitle;
   }
-  return `${scene.pairs} paren · ${mode === "auto" ? "groeit mee" : "zelf gekozen"}`;
+  return t.subtitle(scene.pairs, t.modes[mode]);
 }
 
 interface CelebrationProps {
@@ -59,13 +65,14 @@ function MemoryCelebration({
   onChoose,
   onHome,
 }: CelebrationProps) {
+  const t = useTexts(memoryPageTexts);
   if (!open) {
     return null;
   }
   return (
     <CelebrationDialog
       description={description}
-      title={challengeWon ? "Uitdaging gelukt!" : "Alle Pokémon gevonden!"}
+      title={challengeWon ? t.challengeWonTitle : t.foundTitle}
       onAgain={onAgain}
       onChoose={onChoose}
       onHome={onHome}
@@ -75,6 +82,7 @@ function MemoryCelebration({
 
 export function MemoryPage() {
   const navigate = useNavigate();
+  const t = useTexts(memoryPageTexts);
   const { scene, settings, found, lastRound, isChallenge } = useMemoryStore(
     useShallow((state) => ({
       scene: state.scene,
@@ -90,12 +98,12 @@ export function MemoryPage() {
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(scene),
-    backToGameLabel: "Terug naar je spel",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
   const challengeWon = isChallenge && lastRound !== null && lastRound.delta > 0;
-  const description = descriptionFor({
+  const description = descriptionFor(t, {
     challengeWon,
     challengeTried: isChallenge && !challengeWon,
     delta: lastRound?.delta ?? 0,
@@ -111,8 +119,8 @@ export function MemoryPage() {
     <GameShell
       {...gameSetup}
       showSpeech={false}
-      subtitle={subtitleFor(scene, settings.mode)}
-      title="Pokémon Memory"
+      subtitle={subtitleFor(t, scene, settings.mode)}
+      title={t.title}
     >
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">

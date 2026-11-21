@@ -1,40 +1,33 @@
 import { useNavigate } from "@tanstack/react-router";
-import { LESSON_BY_ID, ROUND_LENGTH, type Verdict } from "@entities/typepret";
+import { LESSON_BY_ID, lessonText, ROUND_LENGTH, type Verdict } from "@entities/typepret";
 import { TypepretPlay, TypepretSetup, useTypepretStore } from "@features/typepret";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
-
-const MESSAGES: Record<Verdict, { title: string; description: string }> = {
-  ontgrendeld: {
-    title: "Goed geoefend!",
-    description: "Je typte rustig en netjes. De volgende les staat open.",
-  },
-  bijna: {
-    title: "Bijna!",
-    description: "Je bent dichtbij. Nog een keer oefenen en dan lukt het nog beter.",
-  },
-  nogmaals: {
-    title: "Nog een keer oefenen",
-    description: "Typ rustig en kijk niet naar je vingers. Elke ronde wordt makkelijker.",
-  },
-};
+import { typepretPageTexts } from "./texts";
 
 export function TypepretPage() {
   const navigate = useNavigate();
+  const language = useLanguage();
+  const t = useTexts(typepretPageTexts);
   const round = useTypepretStore((state) => state.round);
   const result = useTypepretStore((state) => state.result);
   const lessonId = useTypepretStore((state) => state.lessonId);
   const progress = useTypepretStore((state) => state.progress);
   const lesson = lessonId ? LESSON_BY_ID[lessonId] : undefined;
-  const message = result ? MESSAGES[result.verdict] : undefined;
+  // Elke uitslag heeft een titel en uitleg in beide talen.
+  const verdicts: Readonly<Record<Verdict, { title: string; description: string }>> = t.verdicts;
+  const message = result ? verdicts[result.verdict] : undefined;
 
   return (
     <GameShell
       onBack={() => navigate({ to: "/" })}
       onNewGame={round ? () => useTypepretStore.getState().leave() : undefined}
       showSpeech={false}
-      subtitle={lesson ? `${lesson.title} · ${ROUND_LENGTH} toetsen` : "Leer blind typen"}
-      title="Typepret"
+      subtitle={
+        lesson ? t.lessonSubtitle(lessonText(lesson, language).title, ROUND_LENGTH) : t.subtitle
+      }
+      title={t.title}
     >
       {round ? (
         <TypepretPlay />
@@ -47,8 +40,8 @@ export function TypepretPage() {
 
       {result && message ? (
         <CelebrationDialog
-          againLabel="Nog een ronde"
-          chooseLabel="Andere les"
+          againLabel={t.again}
+          chooseLabel={t.choose}
           confetti={result.verdict === "ontgrendeld"}
           description={message.description}
           title={message.title}

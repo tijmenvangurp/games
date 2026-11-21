@@ -1,8 +1,9 @@
+import { currentLanguage } from "@shared/i18n";
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 import {
   WORD_SEARCH_CONFIG,
   WORD_SEARCH_DIRECTIONS,
-  WORD_SEARCH_WORDS,
+  wordSearchWords,
   type WordSearchDirection,
 } from "./config";
 import type {
@@ -25,7 +26,8 @@ function pickWords(
   difficulty: WordSearchDifficulty,
   random: () => number,
 ): string[] {
-  const pool = WORD_SEARCH_WORDS[theme];
+  // Woorden in de actieve taal; een bewaard bord houdt zijn eigen woorden.
+  const pool = wordSearchWords(theme, currentLanguage());
   const { wordCount } = WORD_SEARCH_CONFIG[difficulty];
 
   return shuffledIndexes(pool.length, random)

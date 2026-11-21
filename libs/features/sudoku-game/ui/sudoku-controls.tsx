@@ -1,4 +1,6 @@
+import { useTexts } from "@shared/i18n";
 import { Button, Check, Eraser, Lightbulb, RotateCcw, Search, Undo2 } from "@shared/ui";
+import { sudokuTexts } from "../model/texts";
 
 interface SudokuControlsProps {
   hintActive: boolean;
@@ -27,38 +29,39 @@ export function SudokuControls({
   onRestart,
   onCheck,
 }: SudokuControlsProps) {
+  const t = useTexts(sudokuTexts).controls;
   return (
     <>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
         <Button variant="outline" onClick={onHint}>
           <Lightbulb aria-hidden="true" className="size-4 text-warning" />
-          {hintActive ? "Plaats" : "Hint"}
+          {hintActive ? t.place : t.hint}
         </Button>
         <Button variant="outline" disabled={!canUndo} onClick={onUndo}>
           <Undo2 aria-hidden="true" className="size-4" />
-          Ongedaan
+          {t.undo}
         </Button>
         <Button variant="outline" onClick={onErase}>
           <Eraser aria-hidden="true" className="size-4" />
-          Wissen
+          {t.erase}
         </Button>
         <Button variant="outline" onClick={onRestart}>
           <RotateCcw aria-hidden="true" className="size-4" />
-          Opnieuw
+          {t.restart}
         </Button>
       </div>
 
       {hintActive && !hintDetailed ? (
         <Button className="w-full" size="sm" variant="ghost" onClick={onHintDetail}>
           <Search aria-hidden="true" className="size-4" />
-          Waarom?
+          {t.why}
         </Button>
       ) : null}
 
       {checkMode ? (
         <Button className="w-full" disabled={solved} variant="outline" onClick={onCheck}>
           <Check aria-hidden="true" className="size-4" />
-          Controleer
+          {t.check}
         </Button>
       ) : null}
     </>

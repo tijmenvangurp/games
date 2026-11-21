@@ -18,6 +18,7 @@
     "entities-french",
     "features-french-listening",
     "widgets-game-shell",
+    "shared-i18n",
     "shared-ui"
   ]
 }

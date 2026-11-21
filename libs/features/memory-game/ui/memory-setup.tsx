@@ -1,12 +1,14 @@
 import { PokemonAssetsCredits } from "@entities/pokedex";
 import { pairsForLevel } from "@entities/memory";
+import { useTexts } from "@shared/i18n";
 import { OptionPicker, SetupPanel, StatusBanner } from "@shared/ui";
 import {
-  MEMORY_MODE_OPTIONS,
   memoryLevelOptions,
+  memoryModeOptions,
   type MemoryMode,
   type MemorySettings,
 } from "../model/settings";
+import { memoryTexts } from "../model/texts";
 
 interface MemorySetupProps {
   settings: MemorySettings;
@@ -16,18 +18,15 @@ interface MemorySetupProps {
 }
 
 export function MemorySetup({ settings, onModeChange, onLevelChange, onStart }: MemorySetupProps) {
+  const t = useTexts(memoryTexts);
   const autoPairs = pairsForLevel(settings.adaptive.levelIndex);
 
   return (
-    <SetupPanel
-      footer={<PokemonAssetsCredits />}
-      subtitle="Zoek de Pokémon-paren. De app kan het aantal paren laten meegroeien."
-      onStart={onStart}
-    >
+    <SetupPanel footer={<PokemonAssetsCredits />} subtitle={t.setupSubtitle} onStart={onStart}>
       <OptionPicker
         columns={2}
-        legend="Hoe kies je het niveau?"
-        options={MEMORY_MODE_OPTIONS}
+        legend={t.modeLegend}
+        options={memoryModeOptions(t)}
         selected={settings.mode}
         size="compact"
         onSelect={onModeChange}
@@ -35,17 +34,14 @@ export function MemorySetup({ settings, onModeChange, onLevelChange, onStart }: 
 
       {settings.mode === "auto" ? (
         <StatusBanner className="text-sm font-medium" tone="success">
-          <p className="font-bold">Je begint bij {autoPairs} paren.</p>
-          <p className="opacity-85">
-            Twee goede paren op een rij en je gaat een stapje verder. Soms is het weer even zoeken;
-            dat hoort erbij.
-          </p>
+          <p className="font-bold">{t.autoStart(autoPairs)}</p>
+          <p className="opacity-85">{t.autoExplain}</p>
         </StatusBanner>
       ) : (
         <OptionPicker
           columns={3}
-          legend="Aantal paren"
-          options={memoryLevelOptions()}
+          legend={t.levelLegend}
+          options={memoryLevelOptions(t)}
           selected={settings.manualIndex}
           size="compact"
           onSelect={onLevelChange}

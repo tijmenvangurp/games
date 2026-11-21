@@ -30,29 +30,25 @@ export function symbolsFor(size: SudokuSize, theme: SymbolTheme): readonly strin
   return ANIMAL_SYMBOLS[size];
 }
 
-export const DIFFICULTY_OPTIONS: readonly {
-  value: Difficulty;
-  label: string;
-}[] = [
-  { value: "makkelijk", label: "Makkelijk" },
-  { value: "gemiddeld", label: "Gemiddeld" },
-  { value: "moeilijk", label: "Moeilijk" },
+// De labels staan per taal in `texts.ts`; hier staan alleen de waarden.
+export const DIFFICULTY_OPTIONS: readonly { value: Difficulty }[] = [
+  { value: "makkelijk" },
+  { value: "gemiddeld" },
+  { value: "moeilijk" },
 ];
 
-export const MISTAKE_MODE_OPTIONS: readonly {
-  value: MistakeMode;
-  label: string;
-}[] = [
-  { value: "direct", label: "Direct" },
-  { value: "check", label: "Controleren" },
+export const MISTAKE_MODE_OPTIONS: readonly { value: MistakeMode }[] = [
+  { value: "direct" },
+  { value: "check" },
 ];
 
-export const SIZE_OPTIONS: readonly {
-  value: SudokuSize;
-  label: string;
-  hint: string;
-}[] = [
-  { value: 4, label: "4 × 4", hint: "Voor de jongste" },
-  { value: 6, label: "6 × 6", hint: "Iets meer uitdaging" },
-  { value: 9, label: "9 × 9", hint: "De klassieker" },
+export const THEME_OPTIONS: readonly { value: SymbolTheme }[] = [
+  { value: "numbers" },
+  { value: "animals" },
+];
+
+export const SIZE_OPTIONS: readonly { value: SudokuSize; label: string }[] = [
+  { value: 4, label: "4 × 4" },
+  { value: 6, label: "6 × 6" },
+  { value: 9, label: "9 × 9" },
 ];

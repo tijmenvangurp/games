@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { SpeechLine } from "@shared/lib";
+import { useTranslation } from "@shared/i18n";
 import { useAutoSpeech } from "@shared/lib";
 import { cn } from "@shared/lib";
 import { SpeechButton } from "./speech-button";
@@ -33,16 +34,17 @@ export function SpokenText({
   line,
   children,
   text,
-  label = "Beluister de tekst",
+  label,
   autoPlay = false,
   className,
 }: SpokenTextProps) {
+  const { t } = useTranslation();
   useAutoSpeech(speechKey(line), autoPlay ? line : null);
 
   return (
     <span className={cn("inline-flex min-w-0 items-center gap-1", className)}>
       <span className="min-w-0">{children ?? lineText(line, text)}</span>
-      <SpeechButton className="shrink-0" label={label} line={line} />
+      <SpeechButton className="shrink-0" label={label ?? t("shell.listen")} line={line} />
     </span>
   );
 }

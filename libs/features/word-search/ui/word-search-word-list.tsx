@@ -1,6 +1,8 @@
 import { cn } from "@shared/lib";
 import { Check, SpeechButton } from "@shared/ui";
+import { useTexts } from "@shared/i18n";
 import { wordSpeech } from "../model/audio";
+import { wordSearchTexts } from "./texts";
 
 interface WordSearchWordListProps {
   words: readonly string[];
@@ -9,9 +11,10 @@ interface WordSearchWordListProps {
 }
 
 export function WordSearchWordList({ words, found, onHint }: WordSearchWordListProps) {
+  const t = useTexts(wordSearchTexts);
   return (
     <div
-      aria-label="Te zoeken woorden"
+      aria-label={t.wordsToFind}
       className="grid grid-cols-2 gap-1.5 lg:grid-cols-1"
       role="group"
     >
@@ -40,7 +43,7 @@ export function WordSearchWordList({ words, found, onHint }: WordSearchWordListP
               {isFound ? <Check aria-hidden="true" className="size-4 shrink-0" /> : null}
             </button>
             {speech ? (
-              <SpeechButton className="mr-1 shrink-0" label={`Beluister ${word}`} line={speech} />
+              <SpeechButton className="mr-1 shrink-0" label={t.listenWord(word)} line={speech} />
             ) : null}
           </div>
         );

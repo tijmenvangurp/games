@@ -21,6 +21,11 @@ import {
   Undo2,
   X,
 } from "@shared/ui";
+import { useTexts } from "@shared/i18n";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
+
+/** De bordteksten van de pagina in één taal. */
+type BoardTexts = (typeof MURDOKU_PAGE_TEXTS)["nl"]["board"];
 
 /** De knoppen en tikacties van het bord, gebundeld zodat de sectie leesbaar blijft. */
 interface MurdokuBoardActions {
@@ -51,7 +56,7 @@ interface MurdokuBoardSectionProps {
   feedback: string | null;
   /** De hint die nu op het bord staat. */
   hint?: MurdokuHintState | null;
-  /** De hint als leesbare Nederlandse zin. */
+  /** De hint als leesbare zin in de gekozen taal. */
   hintMessage?: string | null;
   /** Het woord uit een aanwijzing dat op het bord oplicht. */
   clueFocus?: MurdokuClueFocus | null;
@@ -64,29 +69,30 @@ interface MurdokuBoardSectionProps {
 
 /** De regel onder het bord: feedback gaat vóór de hint, het woord en de hulpregel. */
 function boardStatus(
+  t: BoardTexts,
   puzzle: Puzzle,
   play: MurdokuPlayState,
   feedback: string | null,
   hintMessage: string | null,
   clueMessage: string | null,
 ): string {
-  return feedback ?? hintMessage ?? clueMessage ?? statusText(puzzle, play);
+  return feedback ?? hintMessage ?? clueMessage ?? statusText(t, puzzle, play);
 }
 
-function statusText(puzzle: Puzzle, play: MurdokuPlayState): string {
+function statusText(t: BoardTexts, puzzle: Puzzle, play: MurdokuPlayState): string {
   if (play.mode === "cross") {
-    return "Kruisjesstand: tik op een vrij vakje om het weg te strepen.";
+    return t.crossMode;
   }
   if (play.selected) {
     const name = puzzle.nameOf(play.selected);
     const cell = play.placements.get(play.selected);
     if (cell !== undefined) {
       const { row, col } = puzzle.board.rc(cell);
-      return `${name} staat op rij ${row + 1}, kolom ${col + 1}. Tik op een ander vakje om te verplaatsen, of op dit vakje om weg te halen.`;
+      return t.placed(name, row + 1, col + 1);
     }
-    return `${name} is gekozen. Tik op een vakje om te plaatsen.`;
+    return t.chosen(name);
   }
-  return "Kies eerst een persoon hieronder.";
+  return t.choose;
 }
 
 interface MurdokuControlsProps {
@@ -115,6 +121,8 @@ function MurdokuControls({
   onHint,
   onHelp,
 }: MurdokuControlsProps) {
+  const t = useTexts(MURDOKU_PAGE_TEXTS).board;
+
   return (
     <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
       <Button
@@ -125,27 +133,27 @@ function MurdokuControls({
         onClick={onToggleCross}
       >
         <X aria-hidden="true" className="size-5" />
-        Kruisjesstand
+        {t.cross}
       </Button>
       <Button className="min-h-11" disabled={!canUndo || solved} variant="outline" onClick={onUndo}>
         <Undo2 aria-hidden="true" className="size-5" />
-        Ongedaan maken
+        {t.undo}
       </Button>
       <Button className="min-h-11" disabled={solved} variant="outline" onClick={onReset}>
         <RotateCcw aria-hidden="true" className="size-5" />
-        Opnieuw beginnen
+        {t.restart}
       </Button>
       <Button className="min-h-11" disabled={solved} variant="outline" onClick={onHint}>
         <Lightbulb aria-hidden="true" className="size-5" />
-        Aanwijzing
+        {t.hint}
       </Button>
       <Button className="min-h-11" disabled={!canCheck} onClick={onCheck}>
         <Check aria-hidden="true" className="size-5" />
-        Controleer
+        {t.check}
       </Button>
       {onHelp ? (
         <Button
-          aria-label="Uitleg en woordenlijst"
+          aria-label={t.help}
           className="min-h-11"
           size="icon"
           variant="outline"
@@ -168,11 +176,13 @@ function MurdokuStatus({
   canCheck: boolean;
   solved: boolean;
 }) {
+  const t = useTexts(MURDOKU_PAGE_TEXTS).board;
+
   return (
     <>
       {!canCheck && !solved ? (
         <p className="mt-1 text-center text-xs leading-relaxed text-muted-foreground">
-          Controleren kan zodra iedereen op het bord staat.
+          {t.checkLater}
         </p>
       ) : null}
       <p
@@ -187,8 +197,7 @@ function MurdokuStatus({
         className="mt-1 text-center text-xs leading-relaxed text-muted-foreground"
         id="murdoku-bordhulp"
       >
-        Rijen staan links (R), kolommen boven (K). Tik nog eens op een geplaatst persoon om hem weg
-        te halen.
+        {t.boardHelp}
       </p>
     </>
   );
@@ -280,6 +289,27 @@ function hintMarks(
 }
 
 /**
+ * Een nieuwe hint zet de focus op het eerste vakje dat hij aanwijst, zodat een
+ * toetsenbordgebruiker direct op het bord staat. De uitleg leest de
+ * schermlezer voor via de statusregel; een herstelde hint bij het openen van
+ * de pagina steelt geen focus.
+ */
+function useHintFocus(hint: MurdokuHintState | null) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const previousHint = useRef(hint);
+
+  useEffect(() => {
+    if (previousHint.current === hint) return;
+    previousHint.current = hint;
+    const target = hint?.cells[0];
+    if (target === undefined) return;
+    sectionRef.current?.querySelector<HTMLButtonElement>(`[data-cell="${target}"]`)?.focus();
+  }, [hint]);
+
+  return sectionRef;
+}
+
+/**
  * Het bord met de rij- en kolomlabels, de bedieningsknoppen en de hulpregel.
  * De pagina hoeft alleen de zaak en de store-acties door te geven. Na een goede
  * controle omlijnt het bord de kamer van de buit en krijgt de dief een ring; het
@@ -306,8 +336,8 @@ export function MurdokuBoardSection({
   focusToken = 0,
   actions,
 }: MurdokuBoardSectionProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const previousHint = useRef(hint);
+  const t = useTexts(MURDOKU_PAGE_TEXTS).board;
+  const sectionRef = useHintFocus(hint);
   const wordView = useMemo(
     () => focusView(puzzle, clueFocus, play.placements),
     [puzzle, clueFocus, play.placements],
@@ -317,24 +347,12 @@ export function MurdokuBoardSection({
     [puzzle, hint, play.placements],
   );
   const solved = play.phase === "solved";
-  const status = boardStatus(puzzle, play, feedback, hintMessage, clueMessage);
-
-  // Een nieuwe hint zet de focus op het eerste vakje dat hij aanwijst, zodat een
-  // toetsenbordgebruiker direct op het bord staat. De uitleg leest de
-  // schermlezer voor via de statusregel; een herstelde hint bij het openen van
-  // de pagina steelt geen focus.
-  useEffect(() => {
-    if (previousHint.current === hint) return;
-    previousHint.current = hint;
-    const target = hint?.cells[0];
-    if (target === undefined) return;
-    sectionRef.current?.querySelector<HTMLButtonElement>(`[data-cell="${target}"]`)?.focus();
-  }, [hint]);
+  const status = boardStatus(t, puzzle, play, feedback, hintMessage, clueMessage);
 
   return (
     <section ref={sectionRef} aria-labelledby="murdoku-plattegrond">
       <h2 className="sr-only" id="murdoku-plattegrond">
-        De plattegrond
+        {t.heading}
       </h2>
       <MurdokuBoardPanel
         autoCross={autoCross}

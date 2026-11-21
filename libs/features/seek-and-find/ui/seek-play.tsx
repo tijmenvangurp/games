@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { findTarget } from "@entities/hidden-object";
+import { useTexts } from "@shared/i18n";
 import { playHaptic, playSound } from "@shared/lib";
 import { Button, Panel, RotateCcw, Search } from "@shared/ui";
+import { seekTexts } from "../model/texts";
 import { useSeekStore } from "../model/use-seek-store";
 import { CreatureGlyph } from "./creature-glyph";
 import { SeekScene } from "./seek-scene";
@@ -11,6 +13,7 @@ export function SeekPlay() {
   const found = useSeekStore((state) => state.found);
   const wrongId = useSeekStore((state) => state.wrongId);
   const hintVisible = useSeekStore((state) => state.hintVisible);
+  const t = useTexts(seekTexts);
 
   useEffect(() => {
     if (wrongId === null) {
@@ -33,11 +36,7 @@ export function SeekPlay() {
   }
 
   const target = findTarget(scene);
-  const status = found
-    ? "Gevonden!"
-    : wrongId !== null
-      ? "Nog niet — kijk goed naar de ster."
-      : null;
+  const status = found ? t.found : wrongId !== null ? t.notYet : null;
 
   const handleTap = (id: number) => {
     const wasFound = useSeekStore.getState().found;
@@ -56,7 +55,7 @@ export function SeekPlay() {
       <aside className="contents lg:order-2 lg:col-span-1 lg:block lg:space-y-3">
         <Panel className="order-1 flex items-center gap-3" padding="sm">
           <svg
-            aria-label="Doel: de Wobbel met een ster op de hoed"
+            aria-label={t.targetLabel}
             className="size-16 shrink-0"
             role="img"
             viewBox="-55 -55 110 110"
@@ -65,8 +64,8 @@ export function SeekPlay() {
             <CreatureGlyph creature={target} />
           </svg>
           <div className="min-w-0">
-            <p className="text-xs font-semibold text-muted-foreground">Zoek deze</p>
-            <p className="font-display text-lg leading-tight">Wobbel met de ster</p>
+            <p className="text-xs font-semibold text-muted-foreground">{t.lookFor}</p>
+            <p className="font-display text-lg leading-tight">{t.target}</p>
           </div>
         </Panel>
 
@@ -82,7 +81,7 @@ export function SeekPlay() {
               }}
             >
               <Search aria-hidden="true" className="size-4 text-warning" />
-              Hint
+              {t.hint}
             </Button>
             <Button
               variant="outline"
@@ -93,7 +92,7 @@ export function SeekPlay() {
               }}
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Nieuw zoekveld
+              {t.newScene}
             </Button>
           </div>
 

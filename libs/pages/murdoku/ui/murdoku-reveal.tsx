@@ -1,5 +1,7 @@
 import type { Ref } from "react";
+import { useTexts } from "@shared/i18n";
 import { Button, Panel, StatusBanner } from "@shared/ui";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
 
 interface MurdokuRevealProps {
   /** De afloopzin met de dief en de kamer van de buit. */
@@ -22,22 +24,22 @@ export function MurdokuReveal({
   ref,
   onRestart,
 }: MurdokuRevealProps) {
+  const t = useTexts(MURDOKU_PAGE_TEXTS).revealPanel;
+
   return (
     <Panel as="section" ref={ref} aria-labelledby="murdoku-afloop" padding="md" tabIndex={-1}>
       <h2 className="font-display text-xl" id="murdoku-afloop">
-        De dief
+        {t.heading}
       </h2>
       <p className="mt-1 text-base leading-relaxed">{sentence}</p>
-      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-        De buit staat ook op de plattegrond; de kamer van de buit is omlijnd.
-      </p>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.note}</p>
       {progressMessage ? (
         <StatusBanner className="mt-2 min-h-0 py-2 text-sm font-medium" tone="success">
           {progressMessage}
         </StatusBanner>
       ) : null}
       <Button className="mt-3 min-h-11" variant="outline" onClick={onRestart}>
-        Nog een keer
+        {t.again}
       </Button>
     </Panel>
   );

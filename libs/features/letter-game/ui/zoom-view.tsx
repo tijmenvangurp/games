@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import { LETTER_BY_ID, type LetterId, type ZoemQuestion } from "@entities/letter";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { useLetterStore } from "../model/use-letter-store";
+import { letterTexts } from "./texts";
 
 export function ZoomView({
   question,
@@ -13,6 +15,7 @@ export function ZoomView({
   filled: readonly LetterId[];
 }) {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const t = useTexts(letterTexts);
 
   const play = (src: string) => {
     const audio = audioRef.current;
@@ -47,18 +50,16 @@ export function ZoomView({
   return (
     <>
       <audio ref={audioRef} preload="auto" />
-      <p className="text-center text-sm font-semibold text-muted-foreground">
-        Lees het woord. Tik de letters van links naar rechts.
-      </p>
+      <p className="text-center text-sm font-semibold text-muted-foreground">{t.zoemPrompt}</p>
 
-      <div aria-label="Lees het woord" className="mt-4 flex justify-center gap-2" role="group">
+      <div aria-label={t.readWord} className="mt-4 flex justify-center gap-2" role="group">
         {question.word.letters.map((letter, index) => {
           const done = index < filled.length;
           const next = !answered && index === filled.length;
           return (
             <button
               key={`${letter}-${index}`}
-              aria-label={`Letter ${letter}`}
+              aria-label={t.letter(letter)}
               className={cn(
                 "flex size-16 items-center justify-center rounded-xl border-2 text-3xl font-black transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none",
                 done

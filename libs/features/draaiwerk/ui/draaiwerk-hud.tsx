@@ -12,10 +12,12 @@ import {
   Undo2,
 } from "@shared/ui";
 import { cn } from "@shared/lib";
-import type { DriveResult, Level, TrayItem } from "@entities/gear";
+import { useLanguage, useTexts } from "@shared/i18n";
+import { levelText, type DriveResult, type Level, type TrayItem } from "@entities/gear";
 import { chapterName, outputName } from "../model/labels";
 import { statusMessage } from "../model/feedback";
 import { useDraaiwerkStore, useSelectedTrayItem } from "../model/use-draaiwerk-store";
+import { draaiwerkTexts } from "../model/texts";
 import { SpeedGauge } from "./speed-gauge";
 
 interface DraaiwerkHudProps {
@@ -30,16 +32,20 @@ interface DraaiwerkHudProps {
   onNext: () => void;
 }
 
-function instructionFor(item: TrayItem | null, pendingGearKey: string | null): string {
+type DraaiwerkTexts = (typeof draaiwerkTexts)["nl"];
+
+function instructionFor(
+  t: DraaiwerkTexts,
+  item: TrayItem | null,
+  pendingGearKey: string | null,
+): string {
   if (!item) {
-    return pendingGearKey
-      ? "Tik nu een tweede tandwiel voor de ketting."
-      : "Kies een onderdeel of sleep een geplaatst onderdeel naar de la.";
+    return pendingGearKey ? t.instructionSecondGear : t.instructionChoose;
   }
   if (item.kind === "gear") {
-    return "Tik op een leeg gat voor het tandwiel.";
+    return t.instructionGear;
   }
-  return "Tik op een tandwiel om de ketting eromheen te hangen.";
+  return t.instructionChain;
 }
 
 export function DraaiwerkHud({
@@ -62,6 +68,8 @@ export function DraaiwerkHud({
   const feedback = useDraaiwerkStore((state) => state.feedback);
   const feedbackTone = useDraaiwerkStore((state) => state.feedbackTone);
   const solving = status === "solved";
+  const t = useTexts(draaiwerkTexts);
+  const text = levelText(level, useLanguage());
 
   const total = level.tray.length;
   const placedCount = solving ? total : usedTrayIds.length;
@@ -73,7 +81,7 @@ export function DraaiwerkHud({
       pose: result.outputs.find((candidate) => candidate.id === output.id),
     }));
 
-  const instruction = instructionFor(selectedItem, pendingGearKey);
+  const instruction = instructionFor(t, selectedItem, pendingGearKey);
   const statusText = statusMessage(level, result, feedback, instruction, allUsed);
 
   const tone = result.solved
@@ -87,22 +95,28 @@ export function DraaiwerkHud({
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold text-muted-foreground">
-            <span className="sm:hidden">Hoofdstuk {level.chapter}</span>
+            <span className="sm:hidden">{t.chapter(level.chapter)}</span>
             <span className="hidden sm:inline">
-              Hoofdstuk {level.chapter} · {chapterName(level.chapter)}
+              {t.chapter(level.chapter)} · {chapterName(level.chapter)}
             </span>
           </p>
           <h2 className="font-display text-lg leading-tight tracking-tight sm:text-xl">
-            Level {levelIndex + 1} · {level.name}
+            Level {levelIndex + 1} · {text.name}
           </h2>
         </div>
 
         <div className="flex shrink-0 items-center gap-0.5">
-          <Button aria-label="Hint" disabled={solving} size="icon" variant="ghost" onClick={onHint}>
+          <Button
+            aria-label={t.hint}
+            disabled={solving}
+            size="icon"
+            variant="ghost"
+            onClick={onHint}
+          >
             <Lightbulb aria-hidden="true" className="size-5 text-warning" />
           </Button>
           <Button
-            aria-label="Ongedaan maken"
+            aria-label={t.undo}
             disabled={solving || placements.length === 0}
             size="icon"
             variant="ghost"
@@ -110,10 +124,10 @@ export function DraaiwerkHud({
           >
             <Undo2 aria-hidden="true" className="size-5" />
           </Button>
-          <Button aria-label="Opnieuw" size="icon" variant="ghost" onClick={onReset}>
+          <Button aria-label={t.reset} size="icon" variant="ghost" onClick={onReset}>
             <RotateCcw aria-hidden="true" className="size-5" />
           </Button>
-          <Button aria-label="Kies level" size="icon" variant="ghost" onClick={onLevels}>
+          <Button aria-label={t.chooseLevel} size="icon" variant="ghost" onClick={onLevels}>
             <LayoutGrid aria-hidden="true" className="size-5" />
           </Button>
         </div>
@@ -122,21 +136,21 @@ export function DraaiwerkHud({
       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
         <p className="min-w-0 flex-1 text-xs font-medium leading-snug">
           <Badge className="mr-1.5 align-middle" size="sm" tone="primary">
-            Nieuw
+            {t.newBadge}
           </Badge>
-          {level.intro}
+          {text.intro}
         </p>
 
         <div className="flex shrink-0 items-center gap-2">
           <ProgressBar
             className="w-20"
-            label={`${placedCount} van ${total} onderdelen geplaatst`}
+            label={t.partsPlaced(placedCount, total)}
             max={total}
             tone={solving ? "success" : "primary"}
             value={placedCount}
           />
           <span className="text-xs font-bold tabular-nums text-muted-foreground">
-            {solving ? "klaar" : `${usedTrayIds.length}/${total}`}
+            {solving ? t.done : `${usedTrayIds.length}/${total}`}
           </span>
         </div>
       </div>
@@ -160,7 +174,7 @@ export function DraaiwerkHud({
         <StatusBanner
           action={
             <Button size="sm" variant="success" onClick={onNext}>
-              {hasNext ? "Volgende level" : "Opnieuw spelen"}
+              {hasNext ? t.nextLevel : t.playAgain}
             </Button>
           }
           className="mt-2 min-h-0 p-2"
@@ -168,7 +182,7 @@ export function DraaiwerkHud({
           tone="success"
         >
           <Confetti pieces={celebrate ? 48 : 30} variant="shower" />
-          <span className="text-sm font-bold">{hasNext ? "Gelukt!" : "Alle levels gehaald!"}</span>
+          <span className="text-sm font-bold">{hasNext ? t.success : t.allDone}</span>
         </StatusBanner>
       ) : null}
 

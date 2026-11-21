@@ -1,4 +1,6 @@
+import { useTexts } from "@shared/i18n";
 import { Confetti, StatusBanner } from "@shared/ui";
+import { sudokuTexts } from "../model/texts";
 
 interface SudokuStatusProps {
   hintMessage: string | null;
@@ -13,6 +15,7 @@ export function SudokuStatus({
   almostSolved,
   celebration,
 }: SudokuStatusProps) {
+  const t = useTexts(sudokuTexts).status;
   return (
     <div aria-live="polite" className="space-y-1.5 text-center text-xs text-muted-foreground">
       {celebration ? <Confetti key={celebration} /> : null}
@@ -27,7 +30,7 @@ export function SudokuStatus({
         </StatusBanner>
       ) : null}
       <p className="tabular-nums">{status}</p>
-      {almostSolved ? <p className="font-semibold text-primary">Nog één vakje!</p> : null}
+      {almostSolved ? <p className="font-semibold text-primary">{t.almostSolved}</p> : null}
     </div>
   );
 }

@@ -1,11 +1,13 @@
-import { Fragment, useMemo } from "react";
+import { Fragment } from "react";
 import type { PersonId, Puzzle } from "@entities/murdoku";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Panel } from "@shared/ui";
 import { suspectColor } from "../lib/palette";
 import { clueWords, sameClueFocus, type MurdokuClueFocus } from "../lib/clue-words";
-import { createMurdokuText } from "../lib/text";
 import { avatarDataUri } from "../lib/vendored/avatar";
+import { MURDOKU_UI_TEXTS } from "./texts";
+import { useMurdokuText } from "./use-murdoku-text";
 
 /** Een woord uit de zin als begin van de melding: "de keuken" → "De keuken". */
 function capitalise(text: string): string {
@@ -30,7 +32,7 @@ interface MurdokuClueCardsProps {
 
 /**
  * De personenkaarten van een zaak: portret, naam en per aanwijzing één
- * volledige Nederlandse zin. De zinnen komen uit dezelfde tekstlaag als het
+ * volledige zin in de gekozen taal. De zinnen komen uit dezelfde tekstlaag als het
  * bord en de hints, en zijn echte tekst — geen afbeelding.
  *
  * De naam is een knop: een kind kiest de persoon en tikt daarna op een vakje.
@@ -46,7 +48,8 @@ export function MurdokuClueCards({
   onFocusWord,
   className,
 }: MurdokuClueCardsProps) {
-  const text = useMemo(() => createMurdokuText(puzzle), [puzzle]);
+  const text = useMurdokuText(puzzle);
+  const t = useTexts(MURDOKU_UI_TEXTS).cards;
 
   return (
     <ul className={cn("grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4", className)}>
@@ -90,7 +93,7 @@ export function MurdokuClueCards({
                       word.focus ? (
                         <button
                           key={`${suspect.id}-${clueIndex}-${wordIndex}`}
-                          aria-label={`Toon ${word.text} op het bord`}
+                          aria-label={t.showWord(word.text)}
                           aria-pressed={sameClueFocus(activeWord, word.focus)}
                           className={cn(
                             "relative -my-1 inline touch-manipulation rounded-sm px-0.5 py-1 underline decoration-dotted decoration-2 underline-offset-2 transition-colors before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-[''] focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:outline-none",

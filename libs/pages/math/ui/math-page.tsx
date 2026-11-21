@@ -1,27 +1,33 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { MATH_LEVEL_INFO, MATH_MODE_INFO, type MathRound } from "@entities/math";
+import { mathTexts, type MathRound } from "@entities/math";
 import { MathPlay, MathSetup, useMathStore } from "@features/math-trainer";
 import { CelebrationDialog } from "@shared/ui";
+import { getTexts, useTexts } from "@shared/i18n";
 import { useGameSetupNavigation } from "@shared/lib";
 import { GameShell } from "@widgets/game-shell";
+import { mathPageTexts } from "./texts";
 
-function subtitleFor(round: MathRound | null): string {
+type PageTexts = (typeof mathPageTexts)["nl"];
+
+function subtitleFor(round: MathRound | null, t: PageTexts): string {
   if (!round) {
-    return "Kies wat je wilt oefenen";
+    return t.chooseSubtitle;
   }
-  return `${MATH_MODE_INFO[round.mode].label} · ${MATH_LEVEL_INFO[round.level].label}`;
+  const math = getTexts(mathTexts);
+  return `${math.modes[round.mode].label} · ${math.levels[round.level]}`;
 }
 
-function celebrationTitle(stars: number): string {
+function celebrationTitle(stars: number, t: PageTexts): string {
   if (stars === 10) {
-    return "Je bleef scherp!";
+    return t.allStars;
   }
-  return stars >= 7 ? "Je bleef rekenen!" : "Goed geoefend!";
+  return stars >= 7 ? t.manyStars : t.someStars;
 }
 
 export function MathPage() {
   const navigate = useNavigate();
+  const t = useTexts(mathPageTexts);
   const round = useMathStore((state) => state.round);
   const stars = useMathStore((state) => state.stars);
   const finished = useMathStore((state) => state.finished);
@@ -33,7 +39,7 @@ export function MathPage() {
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(round),
-    backToGameLabel: "Terug naar je sommen",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
@@ -44,7 +50,7 @@ export function MathPage() {
   };
 
   return (
-    <GameShell {...gameSetup} subtitle={subtitleFor(round)} title="Tafel Topper">
+    <GameShell {...gameSetup} subtitle={subtitleFor(round, t)} title={t.title}>
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
           <MathSetup
@@ -62,8 +68,8 @@ export function MathPage() {
       {finished && !setupVisible ? (
         <CelebrationDialog
           confetti
-          description={`Je haalde ${stars} van de 10 sterren.`}
-          title={celebrationTitle(stars)}
+          description={t.stars(stars)}
+          title={celebrationTitle(stars, t)}
           onAgain={() => useMathStore.getState().newRound()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

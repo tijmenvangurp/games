@@ -1,11 +1,19 @@
 import { useState } from "react";
-import { ELEMENTS, getElement, type AlchemyElement, type ElementId } from "@entities/alchemy";
+import {
+  ELEMENTS,
+  elementName,
+  getElement,
+  type AlchemyElement,
+  type ElementId,
+} from "@entities/alchemy";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { Button, Dialog, ProgressBar, X } from "@shared/ui";
 import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import { ElementDetail } from "./element-detail";
 import { ElementFilters } from "./element-filters";
 import { ElementToken } from "./element-token";
+import { alchemyTexts } from "./texts";
 
 interface LabBookDialogProps {
   open: boolean;
@@ -17,6 +25,8 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [sort, setSort] = useState<ElementSort>("new");
   const [selectedId, setSelectedId] = useState<ElementId | null>(null);
+  const language = useLanguage();
+  const t = useTexts(alchemyTexts);
 
   if (!open) {
     return null;
@@ -29,7 +39,7 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
       .filter((element): element is AlchemyElement => element !== undefined),
     ...ELEMENTS.filter((element) => !found.has(element.id)),
   ];
-  const visibleElements = filterAndSortElements(orderedElements, category, sort);
+  const visibleElements = filterAndSortElements(orderedElements, category, sort, language);
   const selectedElement = selectedId ? getElement(selectedId) : undefined;
 
   const close = () => {
@@ -42,26 +52,26 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-2xl tracking-tight" id="lab-book-title">
-            Labboek
+            {t.labBook}
           </h2>
           <p className="text-sm tabular-nums text-muted-foreground">
-            {discovered.length} van {ELEMENTS.length} elementen ontdekt
+            {t.discoveredCount(discovered.length, ELEMENTS.length)}
           </p>
         </div>
-        <Button aria-label="Sluit labboek" size="icon" variant="ghost" onClick={close}>
+        <Button aria-label={t.closeLabBook} size="icon" variant="ghost" onClick={close}>
           <X aria-hidden="true" className="size-5" />
         </Button>
       </div>
 
       <ProgressBar
         className="mt-3"
-        label={`${discovered.length} van ${ELEMENTS.length} elementen ontdekt`}
+        label={t.discoveredCount(discovered.length, ELEMENTS.length)}
         max={ELEMENTS.length}
         size="md"
         value={discovered.length}
       />
 
-      <p className="mt-2 text-xs text-muted-foreground">Iconen: Microsoft Fluent Emoji · MIT</p>
+      <p className="mt-2 text-xs text-muted-foreground">{t.iconCredit}</p>
 
       {selectedElement ? (
         <div className="mt-4">
@@ -87,7 +97,7 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
               found.has(element.id) ? (
                 <button
                   key={element.id}
-                  aria-label={`Bekijk ${element.name}`}
+                  aria-label={t.view(elementName(element.id, language))}
                   className="flex justify-center rounded-xl p-1 transition hover:bg-muted focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
                   type="button"
                   onClick={() => setSelectedId(element.id)}
@@ -97,20 +107,18 @@ export function LabBookDialog({ open, onClose }: LabBookDialogProps) {
               ) : (
                 <div key={element.id} className="flex flex-col items-center gap-1">
                   <ElementToken element={element} undiscovered />
-                  <span className="text-xs font-bold text-muted-foreground">Onbekend</span>
+                  <span className="text-xs font-bold text-muted-foreground">{t.unknown}</span>
                 </div>
               ),
             )}
           </div>
 
           {visibleElements.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              Geen elementen in deze categorie.
-            </p>
+            <p className="py-4 text-center text-sm text-muted-foreground">{t.noneInCategory}</p>
           ) : null}
 
           <Button className="mt-5 w-full" size="lg" onClick={close}>
-            Terug naar de werkbank
+            {t.backToWorkbench}
           </Button>
         </>
       )}

@@ -1,5 +1,7 @@
 import { ELEMENTS } from "@entities/alchemy";
+import { useTexts } from "@shared/i18n";
 import { Button, LayoutGrid, Lightbulb, Panel, RotateCcw } from "@shared/ui";
+import { alchemyTexts } from "./texts";
 
 interface AlchemyToolbarProps {
   discoveredCount: number;
@@ -16,6 +18,8 @@ export function AlchemyToolbar({
   onOpenLabBook,
   onClear,
 }: AlchemyToolbarProps) {
+  const t = useTexts(alchemyTexts);
+
   return (
     <Panel
       className="flex flex-wrap items-center justify-between gap-2 px-3.5 py-2.5"
@@ -23,7 +27,7 @@ export function AlchemyToolbar({
     >
       <p className="text-sm font-bold tabular-nums" data-testid="alchemy-progress">
         <span className="text-lg font-black">{discoveredCount}</span>{" "}
-        <span className="text-muted-foreground">/ {ELEMENTS.length} ontdekt</span>
+        <span className="text-muted-foreground">{t.discoveredOf(ELEMENTS.length)}</span>
       </p>
 
       <div className="grid w-full grid-cols-3 gap-1.5 sm:flex sm:w-auto sm:items-center">
@@ -33,7 +37,7 @@ export function AlchemyToolbar({
           onClick={onHint}
         >
           <Lightbulb aria-hidden="true" className="size-4 text-warning" />
-          Hint
+          {t.hint}
         </Button>
         <Button
           className="h-11 justify-center px-2 text-xs sm:px-4 sm:text-sm"
@@ -41,7 +45,7 @@ export function AlchemyToolbar({
           onClick={onOpenLabBook}
         >
           <LayoutGrid aria-hidden="true" className="size-4" />
-          Labboek
+          {t.labBook}
         </Button>
         <Button
           className="h-11 justify-center px-2 text-xs sm:px-4 sm:text-sm"
@@ -50,7 +54,7 @@ export function AlchemyToolbar({
           onClick={onClear}
         >
           <RotateCcw aria-hidden="true" className="size-4" />
-          Opruimen
+          {t.clear}
         </Button>
       </div>
     </Panel>

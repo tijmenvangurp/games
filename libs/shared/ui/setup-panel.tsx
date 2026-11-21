@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Panel } from "./panel";
 import { SetupActions } from "./setup-actions";
@@ -18,7 +19,7 @@ interface SetupPanelProps {
 }
 
 export function SetupPanel({
-  title = "Nieuw spel",
+  title,
   subtitle,
   headerAddon,
   note,
@@ -29,11 +30,12 @@ export function SetupPanel({
   className,
   children,
 }: SetupPanelProps) {
+  const { t } = useTranslation();
   return (
     <Panel as="section" className={cn("animate-rise", className)} padding="lg">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h2 className="font-display text-2xl tracking-tight">{title}</h2>
+          <h2 className="font-display text-2xl tracking-tight">{title ?? t("setup.title")}</h2>
           {subtitle ? (
             <p className="text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
           ) : null}

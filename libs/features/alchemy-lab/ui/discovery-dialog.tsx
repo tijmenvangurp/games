@@ -1,12 +1,16 @@
 import { m } from "motion/react";
 import { Badge, Button, Confetti, Dialog, Sparkles } from "@shared/ui";
-import { elementName, findRecipeFor, getElement } from "@entities/alchemy";
+import { elementFact, elementName, findRecipeFor, getElement } from "@entities/alchemy";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { useAlchemyStore } from "../model/use-alchemy-store";
 import { ElementToken } from "./element-token";
+import { alchemyTexts } from "./texts";
 
 export function DiscoveryDialog() {
   const feedback = useAlchemyStore((state) => state.feedback);
   const dismiss = useAlchemyStore((state) => state.dismissFeedback);
+  const language = useLanguage();
+  const t = useTexts(alchemyTexts);
 
   if (!feedback || feedback.kind !== "new") {
     return null;
@@ -30,7 +34,7 @@ export function DiscoveryDialog() {
       <div className="flex justify-center">
         <Badge tone="success">
           <Sparkles aria-hidden="true" className="size-3.5" />
-          Nieuw ontdekt
+          {t.newDiscovery}
         </Badge>
       </div>
 
@@ -54,20 +58,22 @@ export function DiscoveryDialog() {
       </div>
 
       <h2 className="mt-3 font-display text-3xl tracking-tight" id="discovery-title">
-        {element.name}
+        {elementName(element.id, language)}
       </h2>
 
       {recipe ? (
         <p className="mt-1 text-sm font-semibold text-muted-foreground">
-          {elementName(recipe.a)} + {elementName(recipe.b)}
+          {elementName(recipe.a, language)} + {elementName(recipe.b, language)}
         </p>
       ) : null}
 
-      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{element.fact}</p>
+      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        {elementFact(element.id, language)}
+      </p>
 
       <Button autoFocus className="mt-6 w-full" size="lg" variant="success" onClick={dismiss}>
         <Sparkles aria-hidden="true" className="size-5" />
-        Verder ontdekken
+        {t.keepDiscovering}
       </Button>
     </Dialog>
   );

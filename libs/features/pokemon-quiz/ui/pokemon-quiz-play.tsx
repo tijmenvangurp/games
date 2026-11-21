@@ -1,13 +1,16 @@
 import { getPokemon, type Pokemon } from "@entities/pokedex";
 import { playHaptic, playSound, praiseFor } from "@shared/lib";
+import { useTexts } from "@shared/i18n";
 import { Panel } from "@shared/ui";
 import { isFragmentDifficulty, isSilhouetteDifficulty } from "../model/quiz";
+import { pokemonQuizTexts } from "../model/texts";
 import { usePokemonQuizStore } from "../model/use-pokemon-quiz-store";
 import { QuizArtwork } from "./quiz-artwork";
 import { QuizFeedback } from "./quiz-feedback";
 import { QuizOption } from "./quiz-option";
 
 export function PokemonQuizPlay() {
+  const t = useTexts(pokemonQuizTexts);
   const question = usePokemonQuizStore((state) => state.question);
   const selectedId = usePokemonQuizStore((state) => state.selectedId);
   const answered = usePokemonQuizStore((state) => state.answered);
@@ -58,17 +61,15 @@ export function PokemonQuizPlay() {
 
       <aside className="order-2 space-y-3 lg:col-span-2">
         <Panel className="flex items-center justify-between gap-3" padding="md">
-          <p className="text-sm font-bold tabular-nums">
-            {correctCount} van {rounds} goed
-          </p>
+          <p className="text-sm font-bold tabular-nums">{t.score(correctCount, rounds)}</p>
 
           <div className="text-right tabular-nums">
             <p className="text-3xl font-black leading-none">{rounds}</p>
-            <p className="text-xs text-muted-foreground">rondes</p>
+            <p className="text-xs text-muted-foreground">{t.rounds}</p>
           </div>
         </Panel>
 
-        <div aria-label="Kies de juiste naam" className="grid gap-2" role="group">
+        <div aria-label={t.optionsLabel} className="grid gap-2" role="group">
           {options.map((option, index) => (
             <QuizOption
               key={option.id}
@@ -91,7 +92,7 @@ export function PokemonQuizPlay() {
           />
         ) : (
           <p aria-live="polite" className="text-center text-xs text-muted-foreground">
-            Kies een naam.
+            {t.chooseName}
           </p>
         )}
       </aside>

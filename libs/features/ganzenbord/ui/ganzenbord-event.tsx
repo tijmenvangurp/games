@@ -12,28 +12,12 @@ import {
   Trophy,
 } from "@phosphor-icons/react";
 import type { GanzenbordGame, TurnEvent, TurnEventKind } from "@entities/ganzenbord";
+import { useTexts } from "@shared/i18n";
 import { Button, Dialog } from "@shared/ui";
 import { eventArt } from "../model/event-art";
 import { eventMessage } from "../model/presentation";
+import { ganzenbordUiTexts } from "../model/texts";
 import { GooseMark } from "./goose-mark";
-
-const TITLES: Readonly<Record<TurnEventKind, string>> = {
-  roll: "Worp",
-  move: "Verplaatsen",
-  "first-throw": "Eerste worp 9",
-  goose: "Gans!",
-  bounce: "Te ver!",
-  bridge: "De brug",
-  inn: "De herberg",
-  well: "In de put",
-  prison: "De gevangenis",
-  maze: "Het doolhof",
-  death: "De dood",
-  free: "Weer vrij!",
-  skip: "Beurt overslaan",
-  win: "Finish!",
-  draw: "Gelijkspel",
-};
 
 interface IconProps {
   readonly className?: string;
@@ -69,6 +53,7 @@ interface GanzenbordEventProps {
 }
 
 export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProps) {
+  const t = useTexts(ganzenbordUiTexts);
   const message = eventMessage(game, event);
   const art = eventArt(event);
 
@@ -92,13 +77,13 @@ export function GanzenbordEvent({ game, event, onContinue }: GanzenbordEventProp
         )}
         <div className="min-w-0">
           <h2 className="font-display text-xl tracking-tight" id="ganzenbord-event-title">
-            {TITLES[event.kind]}
+            {t.eventTitles[event.kind]}
           </h2>
           {message ? <p className="mt-1 text-sm leading-snug opacity-85">{message}</p> : null}
         </div>
       </div>
       <Button autoFocus className="mt-4 w-full" size="lg" variant="outline" onClick={onContinue}>
-        Verder
+        {t.continue}
       </Button>
     </Dialog>
   );

@@ -1,9 +1,11 @@
 import { useMemo } from "react";
 import type { Puzzle } from "@entities/murdoku";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Check, Panel, X } from "@shared/ui";
-import { MURDOKU_V1_LEGEND, murdokuLegend } from "../lib/legend";
+import { murdokuLegend, murdokuV1Legend } from "../lib/legend";
 import { MurdokuObjectIcon } from "./murdoku-object-icon";
+import { MURDOKU_UI_TEXTS } from "./texts";
 
 interface MurdokuObjectLegendProps {
   /** De zaak waarvan de legenda uit het bord komt. Weglaten bij de uitleg. */
@@ -22,10 +24,15 @@ interface MurdokuObjectLegendProps {
  * en is geen meubel; hij staat daarom in een eigen regel.
  */
 export function MurdokuObjectLegend({ puzzle, lootName, className }: MurdokuObjectLegendProps) {
-  const legend = useMemo(() => (puzzle ? murdokuLegend(puzzle) : MURDOKU_V1_LEGEND), [puzzle]);
+  const language = useLanguage();
+  const t = useTexts(MURDOKU_UI_TEXTS).legend;
+  const legend = useMemo(
+    () => (puzzle ? murdokuLegend(puzzle, language) : murdokuV1Legend(language)),
+    [puzzle, language],
+  );
   const groups = [
-    { occupiable: true, label: "Hier mag je staan" },
-    { occupiable: false, label: "Hier mag je niet staan" },
+    { occupiable: true, label: t.canStand },
+    { occupiable: false, label: t.cannotStand },
   ] as const;
 
   return (
@@ -59,8 +66,8 @@ export function MurdokuObjectLegend({ puzzle, lootName, className }: MurdokuObje
         </div>
       ))}
       <p className="text-xs leading-relaxed text-muted-foreground sm:col-span-2">
-        Een raam is geen vakje: het zit op de muur.
-        {lootName ? <> De buit ({lootName}) heeft een eigen icoon en is geen meubel.</> : null}
+        {t.window}
+        {lootName ? t.loot(lootName) : null}
       </p>
     </Panel>
   );

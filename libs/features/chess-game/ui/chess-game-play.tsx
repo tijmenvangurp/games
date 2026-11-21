@@ -8,6 +8,7 @@ import {
   type ChessMode,
   type ChessResult,
 } from "@entities/chess";
+import { useTexts } from "@shared/i18n";
 import { chessBoardOptions, chessSquareStyles } from "@shared/lib";
 import {
   Button,
@@ -20,32 +21,32 @@ import {
   Undo2,
   type StatusTone,
 } from "@shared/ui";
-import {
-  capturedBy,
-  feedbackText,
-  resultCopy,
-  statusText,
-  SIDE_LABEL,
-} from "../model/presentation";
+import { capturedBy, feedbackText, resultCopy, sideLabel, statusText } from "../model/presentation";
 import { resultOf, useChessGameStore, type ChessStore } from "../model/use-chess-game-store";
 import { MoveList } from "./move-list";
 import { PlayerCard } from "./player-card";
 import { PromotionPicker } from "./promotion-picker";
+import { chessGameTexts } from "./texts";
+
+type ChessGameTexts = (typeof chessGameTexts)["nl"];
 
 interface ChessGamePlayProps {
   readonly onHome: () => void;
 }
 
-function hintLabelFor(state: Pick<ChessStore, "hint" | "hintTarget" | "hintThinking">): string {
+function hintLabelFor(
+  state: Pick<ChessStore, "hint" | "hintTarget" | "hintThinking">,
+  t: ChessGameTexts,
+): string {
   if (state.hintThinking) {
-    return "Hint…";
+    return t.hintThinking;
   }
 
   if (!state.hint) {
-    return "Hint";
+    return t.hint;
   }
 
-  return state.hintTarget ? "Wis hint" : "Toon zet";
+  return state.hintTarget ? t.clearHint : t.showMove;
 }
 
 function canHumanPlay(state: ChessStore, result: ChessResult, turn: Color): boolean {
@@ -100,13 +101,18 @@ interface StatusPanelProps {
 }
 
 function StatusPanel({ feedback, status, result, mode, humanColor }: StatusPanelProps) {
+  const t = useTexts(chessGameTexts);
+
   return (
     <StatusBanner aria-atomic="true" tone={statusToneFor(feedback, result)}>
       <p className="text-base font-bold leading-snug sm:text-lg">{feedback ?? status}</p>
       <p className="mt-0.5 text-xs font-medium opacity-80">
         {mode === "computer"
-          ? `Jij speelt met ${SIDE_LABEL[humanColor].toLowerCase()} · de computer met ${SIDE_LABEL[otherColor(humanColor)].toLowerCase()}.`
-          : "Jullie spelen om de beurt op dit scherm."}
+          ? t.computerSides(
+              sideLabel(humanColor).toLowerCase(),
+              sideLabel(otherColor(humanColor)).toLowerCase(),
+            )
+          : t.friendTurns}
       </p>
     </StatusBanner>
   );
@@ -131,6 +137,7 @@ function BoardPanel({
   onMove,
   onSelect,
 }: BoardPanelProps) {
+  const t = useTexts(chessGameTexts);
   const boardOptions: ChessboardOptions = chessBoardOptions({
     position,
     playerColor,
@@ -142,12 +149,7 @@ function BoardPanel({
     onSquareClick: onSelect,
   });
 
-  return (
-    <ChessBoard
-      label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk en daarna op een groene stip, of sleep het stuk."
-      options={boardOptions}
-    />
-  );
+  return <ChessBoard label={t.board} options={boardOptions} />;
 }
 
 interface GameActionsProps {
@@ -175,6 +177,8 @@ function GameActions({
   onResign,
   onSetup,
 }: GameActionsProps) {
+  const t = useTexts(chessGameTexts);
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <Button
@@ -193,7 +197,7 @@ function GameActions({
         onClick={onUndo}
       >
         <Undo2 aria-hidden="true" className="size-5" />
-        Ongedaan
+        {t.undo}
       </Button>
       <Button
         className="min-h-12 px-2 text-xs sm:text-sm"
@@ -202,17 +206,18 @@ function GameActions({
         onClick={onResign}
       >
         <Flag aria-hidden="true" className="size-5" />
-        Opgeven
+        {t.resign}
       </Button>
       <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onSetup}>
         <LayoutGrid aria-hidden="true" className="size-5" />
-        Instellingen
+        {t.settings}
       </Button>
     </div>
   );
 }
 
 export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
+  const t = useTexts(chessGameTexts);
   const state = useChessGameStore();
   const result = resultOf(state);
   const turn = turnOf(state.fen);
@@ -229,7 +234,7 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
   });
   const feedback = feedbackText(state.feedback);
   const copy = resultCopy(result, state.players, state.mode, state.humanColor);
-  const hintLabel = hintLabelFor(state);
+  const hintLabel = hintLabelFor(state, t);
 
   const squareStyles = useMemo(
     () =>
@@ -252,7 +257,7 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
   );
 
   return (
-    <section aria-label="Schaakpartij" className="mx-auto flex w-full max-w-xl flex-col gap-3">
+    <section aria-label={t.section} className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <PlayerCards activeColor={activeColor} state={state} />
       <StatusPanel
         feedback={feedback}
@@ -290,7 +295,7 @@ export function ChessGamePlay({ onHome }: ChessGamePlayProps) {
 
       {result.kind !== "playing" ? (
         <CelebrationDialog
-          chooseLabel="Nieuwe tegenstander"
+          chooseLabel={t.newOpponent}
           confetti={copy.confetti}
           description={copy.description}
           title={copy.title}

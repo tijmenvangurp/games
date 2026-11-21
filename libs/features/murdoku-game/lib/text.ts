@@ -1,9 +1,17 @@
 import type { Clue, Explanation, PersonId, Puzzle } from "@entities/murdoku";
-import { MURDOKU_NL_TEXTS } from "./nl";
+import { currentLanguage, type Language } from "@shared/i18n";
+import { MURDOKU_EN_TEXTS } from "./en";
+import { MURDOKU_NL_TEXTS, type MurdokuTextDictionary } from "./nl";
 import { Renderer } from "./vendored/renderer";
 
+/** De woordenlijst van de renderer per taal; Nederlands is de bron. */
+const DICTIONARIES: Readonly<Record<Language, MurdokuTextDictionary>> = {
+  nl: MURDOKU_NL_TEXTS,
+  en: MURDOKU_EN_TEXTS,
+};
+
 /**
- * De Nederlandse tekstlaag van Wie was het?.
+ * De tekstlaag van Wie was het? in de gekozen taal (Nederlands of Engels).
  *
  * De engine levert alleen keys en parameters; hier worden ze één keer tot een
  * volledige zin gemaakt. De aanwijzingen op de kaart noemen de persoon bij naam
@@ -15,7 +23,7 @@ export interface MurdokuText {
   clue(clue: Clue, subjectId: PersonId): string;
   /** Een engine-uitleg (hint, foutmelding) als lopende tekst. */
   explanation(explanation: Explanation, subjectId?: PersonId): string;
-  /** De Nederlandse kamernaam bij een `room.*`-key. */
+  /** De kamernaam (zonder lidwoord) bij een `room.*`-key. */
   roomName(nameKey: string): string;
   /** De kamer met lidwoord bij een kamer-id ("de keuken"). */
   roomPhrase(roomId: string): string;
@@ -35,8 +43,11 @@ export interface MurdokuText {
   rule(name: "aloneWithVictim" | "oneEachLine"): string;
 }
 
-export function createMurdokuText(puzzle: Puzzle): MurdokuText {
-  const renderer = new Renderer(MURDOKU_NL_TEXTS, puzzle);
+export function createMurdokuText(
+  puzzle: Puzzle,
+  language: Language = currentLanguage(),
+): MurdokuText {
+  const renderer = new Renderer(DICTIONARIES[language], puzzle);
   const sentence = (value: string): string => (/[.!?)]$/.test(value) ? value : `${value}.`);
 
   return {
@@ -46,7 +57,7 @@ export function createMurdokuText(puzzle: Puzzle): MurdokuText {
         subjectId ? renderer.namedClue(explanation, subjectId) : renderer.render(explanation),
       ),
     /** De kamernaam zonder lidwoord, voor het bord ("keuken", niet "de keuken"). */
-    roomName: (nameKey) => (renderer.lookup(nameKey) ?? nameKey).replace(/^(de|het) /, ""),
+    roomName: (nameKey) => (renderer.lookup(nameKey) ?? nameKey).replace(/^(de|het|the) /, ""),
     roomPhrase: (roomId) => renderer.resolveParam("room", roomId),
     linePhrase: (axis, index) => `${renderer.lookup(`line.${axis}`) ?? axis} ${index + 1}`,
     objectName: (type) => renderer.resolveParam("objName", type),

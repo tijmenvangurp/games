@@ -1,6 +1,7 @@
 import { useId, useMemo, useRef } from "react";
 import type { PieceSymbol } from "chess.js";
 import type { ChessboardOptions } from "react-chessboard";
+import { useTexts } from "@shared/i18n";
 import { chessBoardOptions, chessSquareStyles, cn, useAutoSpeech } from "@shared/lib";
 import {
   ArrowRight,
@@ -22,6 +23,7 @@ import {
 } from "@shared/ui";
 import { CHESS_LEVEL_LINES, coachSpeechFor, type CoachSpeech } from "../model/audio";
 import { levelFor, nextLevelId } from "../model/levels";
+import { levelTexts } from "../model/texts";
 import {
   TUTORIAL_LEVEL_IDS,
   type TutorialFeedback,
@@ -31,6 +33,9 @@ import {
   type TutorialStatus,
 } from "../model/types";
 import { useChessTutorial } from "../model/useChessTutorial";
+import { tutorialTexts } from "./texts";
+
+type TutorialTexts = (typeof tutorialTexts)["nl"];
 
 const PIECE_GLYPHS: Record<PieceSymbol, string> = {
   p: "♟",
@@ -53,6 +58,9 @@ interface TutorialHeaderProps {
 }
 
 function TutorialHeader({ currentIndex, level, titleId }: TutorialHeaderProps) {
+  const t = useTexts(tutorialTexts);
+  const copy = useTexts(levelTexts)[level.id];
+
   return (
     <header className="flex items-center gap-3">
       <span
@@ -63,13 +71,13 @@ function TutorialHeader({ currentIndex, level, titleId }: TutorialHeaderProps) {
       </span>
       <div className="min-w-0">
         <p className="text-xs font-semibold tabular-nums text-muted-foreground">
-          Les {currentIndex + 1} van {TUTORIAL_LEVEL_IDS.length}
+          {t.lessonOf(currentIndex + 1, TUTORIAL_LEVEL_IDS.length)}
         </p>
         <h2
           id={titleId}
           className="font-display text-2xl leading-tight tracking-tight text-foreground"
         >
-          {level.title}
+          {copy.title}
         </h2>
       </div>
     </header>
@@ -83,23 +91,26 @@ interface LevelPickerProps {
 
 function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const t = useTexts(tutorialTexts);
+  const copies = useTexts(levelTexts);
 
   return (
     <Disclosure
       detailsRef={detailsRef}
       icon={<LayoutGrid className="size-4 text-primary" />}
-      summary="Kies een les"
+      summary={t.chooseLesson}
     >
-      <nav aria-label="Kies een schaakles" className="grid grid-cols-5 gap-2 sm:grid-cols-9">
+      <nav aria-label={t.chooseChessLesson} className="grid grid-cols-5 gap-2 sm:grid-cols-9">
         {TUTORIAL_LEVEL_IDS.map((levelId, index) => {
           const level = levelFor(levelId);
+          const title = copies[levelId].title;
           const active = levelId === currentLevelId;
 
           return (
             <button
               key={levelId}
               type="button"
-              aria-label={`Les ${index + 1}: ${level.title}`}
+              aria-label={t.lessonButton(index + 1, title)}
               aria-pressed={active}
               className={cn(
                 "flex min-h-11 flex-col items-center justify-center rounded-xl border px-1 py-1 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
@@ -107,7 +118,7 @@ function LevelPicker({ currentLevelId, onSelect }: LevelPickerProps) {
                   ? "border-primary bg-primary-soft text-primary"
                   : "border-border bg-card text-muted-foreground hover:border-border-strong hover:bg-background-subtle",
               )}
-              title={level.title}
+              title={title}
               onClick={() => {
                 onSelect(levelId);
                 if (detailsRef.current) {
@@ -136,12 +147,9 @@ function BoardPanel({
   readonly label: string;
   readonly options: ChessboardOptions;
 }) {
-  return (
-    <ChessBoard
-      label={`Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten. ${label}`}
-      options={options}
-    />
-  );
+  const t = useTexts(tutorialTexts);
+
+  return <ChessBoard label={t.board(label)} options={options} />;
 }
 
 interface CoachBubbleProps {
@@ -208,9 +216,11 @@ function coachIcon(
 }
 
 function CoachBubble({ feedback, preview, speech, status }: CoachBubbleProps) {
+  const t = useTexts(tutorialTexts);
+
   return (
     <StatusBanner
-      action={<SpeechButton label="Beluister de coach" line={speech.lines} />}
+      action={<SpeechButton label={t.listenCoach} line={speech.lines} />}
       aria-atomic="true"
       className="min-h-14 text-base sm:text-lg"
       icon={coachIcon(status, feedback, preview)}
@@ -240,6 +250,8 @@ function TutorialActions({
   onPreview,
   onReset,
 }: TutorialActionsProps) {
+  const t = useTexts(tutorialTexts);
+
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-3 gap-2">
@@ -254,7 +266,7 @@ function TutorialActions({
           onClick={onPreview}
         >
           <Eye aria-hidden="true" className="size-5" />
-          Kijk
+          {t.look}
         </Button>
         <Button
           className="min-h-12 px-2 text-xs sm:text-sm"
@@ -263,50 +275,45 @@ function TutorialActions({
           onClick={onHint}
         >
           <Lightbulb aria-hidden="true" className="size-5 text-warning" />
-          Toon zet
+          {t.showMove}
         </Button>
         <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>
           <RotateCcw aria-hidden="true" className="size-5" />
-          Opnieuw
+          {t.reset}
         </Button>
       </div>
       {canContinue ? (
         <Button className="w-full animate-pop" size="lg" variant="success" onClick={onNext}>
           <Play aria-hidden="true" className="size-5" />
-          Volgende les
+          {t.nextLesson}
         </Button>
       ) : null}
     </div>
   );
 }
 
-function objectiveLabel(level: TutorialLevel): string {
-  switch (level.goal) {
-    case "check":
-      return "Doel: de zwarte koning schaak zetten.";
-    case "checkmate":
-      return "Doel: de zwarte koning schaakmat zetten.";
-    case "castle-kingside":
-      return "Doel: rokade, de koning naar g1.";
-    case "castle-queenside":
-      return "Doel: rokade, de koning naar c1.";
-    default:
-      return level.targetSquare ? `Doel: de ster op ${level.targetSquare}.` : "";
+function objectiveLabel(level: TutorialLevel, t: TutorialTexts): string {
+  if (level.goal) {
+    return t.goals[level.goal];
   }
+
+  return level.targetSquare ? t.starGoal(level.targetSquare) : "";
 }
 
 function WhyCard({ level }: { readonly level: TutorialLevel }) {
+  const t = useTexts(tutorialTexts);
+  const copy = useTexts(levelTexts)[level.id];
   const speech = CHESS_LEVEL_LINES[level.id];
 
   return (
-    <Disclosure icon={<Lightbulb className="size-4 text-warning" />} summary="Waarom?">
+    <Disclosure icon={<Lightbulb className="size-4 text-warning" />} summary={t.why}>
       <div className="space-y-2 text-sm font-medium text-muted-foreground">
-        <SpokenText line={speech.explanation} label="Beluister de uitleg" />
+        <SpokenText label={t.listenExplanation} line={speech.explanation} text={copy.explanation} />
         <SpokenText
           className="font-bold text-primary"
-          label="Beluister de tip"
+          label={t.listenTip}
           line={speech.hint}
-          text={`Tip: ${level.hint}`}
+          text={t.tip(copy.hint)}
         />
       </div>
     </Disclosure>
@@ -317,6 +324,7 @@ export function TutorialBoard({
   initialLevelId = TUTORIAL_LEVEL_IDS[0],
   onComplete,
 }: TutorialBoardProps) {
+  const t = useTexts(tutorialTexts);
   const tutorial = useChessTutorial({ initialLevelId, onComplete });
   const titleId = useId();
 
@@ -391,7 +399,7 @@ export function TutorialBoard({
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-3">
       <TutorialHeader currentIndex={currentIndex} level={tutorial.level} titleId={titleId} />
-      <BoardPanel label={objectiveLabel(tutorial.level)} options={boardOptions} />
+      <BoardPanel label={objectiveLabel(tutorial.level, t)} options={boardOptions} />
       <CoachBubble
         feedback={tutorial.feedback}
         preview={tutorial.preview}

@@ -13,6 +13,7 @@ export const aliases = {
   "@features": `${workspaceRoot}/libs/features`,
   "@entities": `${workspaceRoot}/libs/entities`,
   "@shared/lib": `${workspaceRoot}/libs/shared/lib`,
+  "@shared/i18n": `${workspaceRoot}/libs/shared/i18n`,
   "@shared/ui": `${workspaceRoot}/libs/shared/ui`,
   "@": `${workspaceRoot}/apps/games/src`,
 };

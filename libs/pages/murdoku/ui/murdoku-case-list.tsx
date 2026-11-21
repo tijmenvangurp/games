@@ -1,12 +1,21 @@
 import { useNavigate } from "@tanstack/react-router";
-import { MURDOKU_LADDER, loadMurdokuLevel, type MurdokuCase } from "@entities/murdoku";
+import {
+  MURDOKU_CASE_TEXTS,
+  MURDOKU_LADDER,
+  loadMurdokuLevel,
+  type MurdokuCase,
+} from "@entities/murdoku";
 import { murdokuCaseForLevel, useMurdokuStore } from "@features/murdoku-game";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Check, ChoiceCard, Play, Sparkles } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
 
-function statusLabel(solved: boolean): string {
-  return solved ? "Opgelost" : "Nog niet gespeeld";
+type MurdokuCaseListTexts = (typeof MURDOKU_PAGE_TEXTS)["nl"]["cases"];
+
+function statusLabel(solved: boolean, t: MurdokuCaseListTexts): string {
+  return solved ? t.solved : t.unplayed;
 }
 
 /**
@@ -18,6 +27,8 @@ function statusLabel(solved: boolean): string {
  */
 export function MurdokuCaseListPage() {
   const navigate = useNavigate();
+  const t = useTexts(MURDOKU_PAGE_TEXTS);
+  const caseTexts = useTexts(MURDOKU_CASE_TEXTS);
   const start = useMurdokuStore((state) => state.start);
   const solvedCaseIds = useMurdokuStore((state) => state.solvedCaseIds);
   const currentPlay = useMurdokuStore((state) => state.play);
@@ -36,19 +47,18 @@ export function MurdokuCaseListPage() {
 
   return (
     <GameShell
-      backLabel="Terug naar de zaak"
+      backLabel={t.backToCase}
       showSpeech={false}
-      subtitle="Twaalf eigen zaken"
-      title="Wie was het?"
+      subtitle={t.cases.subtitle}
+      title={t.title}
       onBack={() => navigate({ to: "/mysterie" })}
     >
       <div className="flex flex-col gap-4 pb-2">
         <h2 className="font-display text-xl" id="murdoku-kies">
-          Kies een zaak
+          {t.cases.heading}
         </h2>
         <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Begin met een kleine zaak of kies meteen een grote. De zaak met "Past bij jou" groeit met
-          je mee; je mag altijd zelf een andere kiezen.
+          {t.cases.intro}
         </p>
 
         <ul aria-labelledby="murdoku-kies" className="grid gap-3 sm:grid-cols-2">
@@ -56,12 +66,14 @@ export function MurdokuCaseListPage() {
             const isSolved = solved.has(entry.id);
             const isRecommended = entry.id === recommended.id;
             const { width, height } = entry.level.size;
+            const words = caseTexts[entry.id];
+            const status = statusLabel(isSolved, t.cases);
             return (
               <li key={entry.id}>
                 <ChoiceCard
-                  ariaLabel={`${entry.title}, ${width} × ${height}, ${statusLabel(isSolved).toLowerCase()}`}
+                  ariaLabel={`${words.title}, ${width} × ${height}, ${status.toLowerCase()}`}
                   className="min-h-28 w-full items-start gap-1 p-4 text-left"
-                  label={<span className="font-display text-lg leading-tight">{entry.title}</span>}
+                  label={<span className="font-display text-lg leading-tight">{words.title}</span>}
                   selected={isRecommended}
                   description={
                     <span className="flex w-full flex-col gap-1">
@@ -78,19 +90,19 @@ export function MurdokuCaseListPage() {
                         ) : (
                           <Play aria-hidden="true" className="size-3.5" />
                         )}
-                        {statusLabel(isSolved)}
+                        {status}
                       </span>
                       {isRecommended ? (
                         <span className="flex w-fit items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
                           <Sparkles aria-hidden="true" className="size-3.5" />
-                          Past bij jou
+                          {t.cases.recommended}
                         </span>
                       ) : null}
                       <span className="text-xs font-semibold text-muted-foreground">
                         {width} × {height}
                       </span>
                       <span className="text-sm leading-relaxed text-muted-foreground">
-                        {entry.intro}
+                        {words.intro}
                       </span>
                     </span>
                   }

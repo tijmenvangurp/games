@@ -1,10 +1,5 @@
-export {
-  BOARD_SHAPES,
-  BOARD_SIZE_INFO,
-  BOARD_SIZE_OPTIONS,
-  COMPUTER_LEVEL_INFO,
-  PLAYER_INFO,
-} from "./model/config";
+export { BOARD_SHAPES, BOARD_SIZE_INFO } from "./model/config";
+export { fourInARowLabels } from "./model/texts";
 export { chooseComputerColumn } from "./model/ai";
 export {
   applyDrop,

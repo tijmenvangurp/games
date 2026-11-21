@@ -4,7 +4,7 @@ import type { AlchemyElement, ElementId } from "./types";
  * The first vertical slice of Mengelmoes. Every icon is a local Fluent Emoji
  * Flat SVG; see LICENSES/fluent-emoji-MIT.txt for the source and license.
  */
-export const ELEMENTS: readonly AlchemyElement[] = [
+const ELEMENT_LIST = [
   {
     id: "water",
     name: "Water",
@@ -1699,7 +1699,12 @@ export const ELEMENTS: readonly AlchemyElement[] = [
     category: "tech",
     fact: "Een hoofdstad is de belangrijkste stad van een land.",
   },
-];
+] as const satisfies readonly AlchemyElement[];
+
+export const ELEMENTS: readonly AlchemyElement[] = ELEMENT_LIST;
+
+/** Elk element-id uit de lijst; de Engelse namen moeten precies deze ids dekken. */
+export type KnownElementId = (typeof ELEMENT_LIST)[number]["id"];
 
 export const BASE_ELEMENT_IDS: readonly ElementId[] = ["water", "fire", "earth", "air"];
 

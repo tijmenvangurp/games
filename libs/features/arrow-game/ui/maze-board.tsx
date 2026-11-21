@@ -2,6 +2,7 @@ import { useRef, type CSSProperties, type PointerEvent, type RefObject } from "r
 import {
   arrowDirection,
   directionBetween,
+  levelName,
   levelBounds,
   nearestArrow,
   visibleArrowPoints,
@@ -10,15 +11,10 @@ import {
   type MazeLevel,
   type Point,
 } from "@entities/arrow";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { pointAlongPolyline, polylineLength, trimPolyline } from "@shared/lib";
+import { arrowTexts } from "../model/texts";
 import type { FlyingArrow } from "../model/use-maze-actions";
-
-const DIRECTION_LABELS: Record<MazeDirection, string> = {
-  up: "boven",
-  right: "rechts",
-  down: "beneden",
-  left: "links",
-};
 
 interface MazeBoardProps {
   level: MazeLevel;
@@ -171,9 +167,10 @@ interface MazeArrowNodeProps {
 }
 
 function MazeArrowNode({ level, arrow, hintId, blockedId, disabled, onTap }: MazeArrowNodeProps) {
+  const t = useTexts(arrowTexts);
   return (
     <g
-      aria-label={`Pijl naar ${DIRECTION_LABELS[arrowDirection(arrow)]}`}
+      aria-label={t.arrow(t.directions[arrowDirection(arrow)])}
       className="maze-arrow"
       data-blocked={blockedId === arrow.id || undefined}
       data-hint={hintId === arrow.id || undefined}
@@ -440,6 +437,8 @@ export function MazeBoard({
   onTap,
   onFlyingEnd,
 }: MazeBoardProps) {
+  const t = useTexts(arrowTexts);
+  const language = useLanguage();
   const bounds = levelBounds(level);
   const removed = new Set(removedIds);
   const { ref, onPointerDown, onPointerMove, onPointerUp, onPointerCancel } = useMazePointer(
@@ -452,7 +451,7 @@ export function MazeBoard({
   return (
     <svg
       ref={ref}
-      aria-label={`${level.name}: pijlenpuzzel`}
+      aria-label={t.puzzle(levelName(level, language))}
       className="block w-full touch-manipulation select-none"
       role="group"
       viewBox={`${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}`}

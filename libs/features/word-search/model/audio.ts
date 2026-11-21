@@ -1,5 +1,7 @@
 import { WORD_SEARCH_WORDS } from "@entities/word-search";
+import { getTexts } from "@shared/i18n";
 import type { SpeechGroup, SpeechLine } from "@shared/lib";
+import { wordSearchFeedbackTexts } from "./texts";
 
 const FOLDER = "words";
 
@@ -58,37 +60,38 @@ export function wordSearchFeedbackSpeech({
   selectedCount,
   lastFound,
 }: FeedbackInput): WordSearchFeedback {
+  const t = getTexts(wordSearchFeedbackTexts);
   if (complete) {
     return {
       key: `word-complete-${puzzleId}`,
-      text: WORD_SEARCH_LINES.complete.text,
+      text: t.complete,
       lines: [WORD_SEARCH_LINES.complete],
     };
   }
   if (lastFound) {
     return {
       key: `word-found-${puzzleId}-${lastFound}`,
-      text: `${lastFound} gevonden`,
+      text: t.found(lastFound),
       lines: wordFoundSpeech(lastFound),
     };
   }
   if (wrong) {
     return {
       key: `word-wrong-${puzzleId}`,
-      text: WORD_SEARCH_LINES.wrong.text,
+      text: t.wrong,
       lines: [WORD_SEARCH_LINES.wrong],
     };
   }
   if (selectedCount === 1) {
     return {
       key: `word-last-${puzzleId}`,
-      text: WORD_SEARCH_LINES.lastLetter.text,
+      text: t.lastLetter,
       lines: [WORD_SEARCH_LINES.lastLetter],
     };
   }
   return {
     key: `word-instruction-${puzzleId}`,
-    text: WORD_SEARCH_LINES.instruction.text,
+    text: t.instruction,
     lines: [WORD_SEARCH_LINES.instruction],
   };
 }

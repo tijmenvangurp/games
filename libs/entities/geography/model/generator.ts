@@ -1,5 +1,8 @@
+import { currentLanguage, type Language } from "@shared/i18n";
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
 import { HARD_LEVEL_CHOICES, lookalikeCodes, regionLabel, subjectsFor } from "./config";
+import { subjectCapital, subjectNameInSentence } from "./names";
+import { geographyTexts } from "./texts";
 import {
   FLAG_DIRECTIONS,
   type FlagDirection,
@@ -143,22 +146,25 @@ export function createRound(
   return { scope, level, seed, questions };
 }
 
-function capitalSentence(subject: FlagSubject): string {
+function capitalSentence(subject: FlagSubject, language: Language): string {
   if (!subject.capital) {
     return "";
   }
+  const texts = geographyTexts[language];
+  const capital = subjectCapital(subject, language);
   // South Africa has three capitals; they are stored as "Bloemfontein, ...".
-  const plural = subject.capital.includes(",");
-  return ` De ${plural ? "hoofdsteden zijn" : "hoofdstad is"} ${subject.capital}.`;
+  return capital.includes(",") ? texts.capitals(capital) : texts.capital(capital);
 }
 
-export function explanationFor(question: FlagQuestion): string {
+export function explanationFor(
+  question: FlagQuestion,
+  language: Language = currentLanguage(),
+): string {
   const { subject, direction } = question;
-  const region = regionLabel(subject.region);
+  const texts = geographyTexts[language];
+  const name = subjectNameInSentence(subject, language);
+  const region = regionLabel(subject.region, language);
+  const sentence = direction === "vlag-naar-land" ? texts.flagOf : texts.rightFlag;
 
-  if (direction === "vlag-naar-land") {
-    return `Dit is de vlag van ${subject.name}. ${subject.name} ligt in ${region}.${capitalSentence(subject)}`;
-  }
-
-  return `De vlag van ${subject.name} is de juiste. ${subject.name} ligt in ${region}.${capitalSentence(subject)}`;
+  return `${sentence(name, region)}${capitalSentence(subject, language)}`;
 }

@@ -11,6 +11,7 @@ import {
   type FlagLevel,
   type FlagRound,
   type FlagScope,
+  type FlagSubject,
   type PuzzleMap,
   type PuzzleRound,
 } from "@entities/geography";
@@ -25,10 +26,11 @@ const PUZZLE_FRAMES = {
   nederland: { width: 320, height: 400 },
 } as const;
 
+/** The feedback keeps the subjects; the screen names them in the chosen language. */
 type PuzzleFeedback =
-  | { kind: "correct"; name: string }
-  | { kind: "revealed"; name: string }
-  | { kind: "wrong"; name: string; wrongName?: string };
+  | { kind: "correct"; subject: FlagSubject }
+  | { kind: "revealed"; subject: FlagSubject }
+  | { kind: "wrong"; subject: FlagSubject; wrong?: FlagSubject };
 
 export interface PuzzleState {
   round: PuzzleRound;
@@ -245,7 +247,7 @@ function lockPiece(
       ...puzzle,
       selected: null,
       placed,
-      feedback: { kind, name: question.subject.name },
+      feedback: { kind, subject: question.subject },
     },
     stars: nextStars,
     streak: firstTry ? streak + 1 : 0,
@@ -283,7 +285,7 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
 
   if (!targetCode) {
     // Dropped next to the map: no penalty, just point back to the board.
-    set({ puzzle: { ...puzzle, feedback: { kind: "wrong", name: question.subject.name } } });
+    set({ puzzle: { ...puzzle, feedback: { kind: "wrong", subject: question.subject } } });
     return;
   }
 
@@ -293,13 +295,13 @@ function placePiece(set: StoreSet, get: StoreGet, targetCode: string | undefined
     return;
   }
 
-  const names = puzzle.round.scope === "nederland" ? PROVINCES : COUNTRIES;
-  const wrongName = names.find((subject) => subject.code === targetCode)?.name;
+  const subjects = puzzle.round.scope === "nederland" ? PROVINCES : COUNTRIES;
+  const wrong = subjects.find((subject) => subject.code === targetCode);
   set({
     puzzle: {
       ...puzzle,
       mistakes: { ...puzzle.mistakes, [code]: mistakes },
-      feedback: { kind: "wrong", name: question.subject.name, wrongName },
+      feedback: { kind: "wrong", subject: question.subject, wrong },
     },
     streak: 0,
   });

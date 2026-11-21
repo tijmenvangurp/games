@@ -1,4 +1,5 @@
-import type { AlchemyElement, ElementCategory } from "@entities/alchemy";
+import { elementName, type AlchemyElement, type ElementCategory } from "@entities/alchemy";
+import { useLanguage } from "@shared/i18n";
 import { cn } from "@shared/lib";
 
 const CATEGORY_STYLES: Record<ElementCategory, string> = {
@@ -31,6 +32,7 @@ export function ElementToken({
   undiscovered = false,
   className,
 }: ElementTokenProps) {
+  const language = useLanguage();
   const size = variant === "overlay" ? "size-24" : variant === "board" ? "size-20" : "size-16";
 
   return (
@@ -59,7 +61,9 @@ export function ElementToken({
         )}
       </span>
       {showLabel && !undiscovered ? (
-        <span className="max-w-20 text-center text-xs font-bold leading-tight">{element.name}</span>
+        <span className="max-w-20 text-center text-xs font-bold leading-tight">
+          {elementName(element.id, language)}
+        </span>
       ) : null}
     </span>
   );

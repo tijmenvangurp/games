@@ -2,11 +2,15 @@ import {
   directionPrompt,
   explanationFor,
   flagSrc,
+  subjectName,
+  subjectNameInSentence,
   type FlagQuestion,
   type FlagScope,
 } from "@entities/geography";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { cn, praiseFor } from "@shared/lib";
 import { AnswerOption, Button, Flag, Panel, ScoreHeader, type AnswerState } from "@shared/ui";
+import { flagTexts } from "../model/texts";
 import { useFlagStore } from "../model/use-flags-store";
 import { PlaceMap } from "./place-map";
 
@@ -32,22 +36,21 @@ interface ChoiceProps {
 }
 
 function NameChoice({ subject, state, compact, onSelect }: ChoiceProps) {
+  const name = subjectName(subject, useLanguage());
+
   return (
-    <AnswerOption
-      aria-label={subject.name}
-      size={compact ? "sm" : "md"}
-      state={state}
-      onClick={onSelect}
-    >
-      {subject.name}
+    <AnswerOption aria-label={name} size={compact ? "sm" : "md"} state={state} onClick={onSelect}>
+      {name}
     </AnswerOption>
   );
 }
 
 function FlagChoice({ subject, state, compact, onSelect }: ChoiceProps) {
+  const name = subjectName(subject, useLanguage());
+
   return (
     <AnswerOption
-      aria-label={subject.name}
+      aria-label={name}
       className={compact ? "min-h-14 gap-1 p-1" : "min-h-16 gap-1 p-2"}
       state={state}
       onClick={onSelect}
@@ -81,6 +84,7 @@ function FlagChoices({
   wrongChoices: readonly string[];
   answered: boolean;
 }) {
+  const t = useTexts(flagTexts);
   const count = question.choices.length;
   const compact = count > 6;
   const columns =
@@ -97,7 +101,7 @@ function FlagChoices({
           : "grid-cols-2 sm:grid-cols-4";
 
   return (
-    <div aria-label="Kies het juiste antwoord" className={cn("grid gap-2", columns)} role="group">
+    <div aria-label={t.chooseAnswer} className={cn("grid gap-2", columns)} role="group">
       {question.choices.map((subject) => {
         const state = choiceState(question, subject.code, wrongChoices, answered);
         const select = () => useFlagStore.getState().chooseAnswer(subject.code);
@@ -135,6 +139,9 @@ function FlagFeedback({
   correct: boolean;
   praise: string;
 }) {
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
+
   if (!answered) {
     return (
       <Panel
@@ -149,17 +156,18 @@ function FlagFeedback({
           <Flag className="size-5" />
         </span>
         <p aria-live="polite" className="text-sm font-semibold text-muted-foreground">
-          Kies het juiste antwoord.
+          {t.chooseAnswerHint}
         </p>
       </Panel>
     );
   }
 
+  const answer = subjectNameInSentence(question.subject, language);
   const message = correct
     ? praise
     : question.direction === "vlag-naar-land"
-      ? `Het juiste antwoord is ${question.subject.name}.`
-      : `De juiste vlag is de vlag van ${question.subject.name}.`;
+      ? t.rightAnswer(answer)
+      : t.rightFlag(answer);
 
   return (
     <div className="space-y-2">
@@ -173,7 +181,7 @@ function FlagFeedback({
         {message}
       </p>
       <p className="text-center text-sm font-semibold text-muted-foreground">
-        {explanationFor(question)}
+        {explanationFor(question, language)}
       </p>
       <PlaceMap subject={question.subject} />
     </div>
@@ -195,13 +203,15 @@ function QuestionCard({
   const answered = useFlagStore((state) => state.answered);
   const correct = useFlagStore((state) => state.correct);
   const showsFlag = question.direction === "vlag-naar-land";
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
 
   return (
     <Panel as="section" padding="lg">
       <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-6">
         <div>
           <p className="text-center text-sm font-bold text-muted-foreground">
-            {directionPrompt(question.direction, scope)}
+            {directionPrompt(question.direction, scope, language)}
           </p>
 
           {showsFlag ? (
@@ -210,7 +220,7 @@ function QuestionCard({
             </div>
           ) : (
             <p className="mt-3 text-center font-display text-3xl tracking-tight sm:text-4xl">
-              {question.subject.name}
+              {subjectName(question.subject, language)}
             </p>
           )}
 
@@ -229,7 +239,7 @@ function QuestionCard({
               variant="success"
               onClick={() => useFlagStore.getState().next()}
             >
-              {isLast ? "Klaar" : "Volgende"}
+              {isLast ? t.done : t.next}
             </Button>
           ) : null}
         </div>
@@ -243,6 +253,7 @@ export function FlagsPlay() {
   const questionIndex = useFlagStore((state) => state.questionIndex);
   const stars = useFlagStore((state) => state.stars);
   const streak = useFlagStore((state) => state.streak);
+  const t = useTexts(flagTexts);
 
   const question = round?.questions[questionIndex];
   if (!round || !question) {
@@ -252,7 +263,7 @@ export function FlagsPlay() {
   return (
     <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
       <ScoreHeader
-        progress={`Vraag ${questionIndex + 1} van ${round.questions.length}`}
+        progress={t.question(questionIndex + 1, round.questions.length)}
         stars={stars}
         streak={streak}
       />

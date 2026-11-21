@@ -9,6 +9,7 @@ export {
   holeCenter,
 } from "./model/geometry";
 export { LEVEL_COUNT, allLevels, levelAt } from "./model/levels";
+export { levelText } from "./model/level-text";
 export {
   canPlace,
   drive,

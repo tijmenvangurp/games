@@ -1,5 +1,6 @@
 import { memo, type KeyboardEvent } from "react";
 import { useReducedMotion } from "motion/react";
+import { useTexts } from "@shared/i18n";
 import {
   gearPath,
   gearRadius,
@@ -12,6 +13,7 @@ import {
   type Placement,
   type TrayItem,
 } from "@entities/gear";
+import { draaiwerkTexts } from "../model/texts";
 
 export interface GearTone {
   fill: string;
@@ -172,7 +174,7 @@ export function BoardGear({ pose, tone, label, hint = false }: BoardGearProps) {
           letterSpacing="0.1em"
           textAnchor="middle"
           x={pose.center.x}
-          y={label === "Motor" ? pose.center.y - radius - 30 : pose.center.y + radius + 40}
+          y={pose.key === "motor" ? pose.center.y - radius - 30 : pose.center.y + radius + 40}
         >
           {label.toUpperCase()}
         </text>
@@ -193,9 +195,10 @@ interface GearHitTargetProps {
  * stay reliable while the gear turns.
  */
 export function GearHitTarget({ pose, label, onTap }: GearHitTargetProps) {
+  const t = useTexts(draaiwerkTexts);
   return (
     <circle
-      aria-label={label ? `${label}, tandwiel` : "Tandwiel"}
+      aria-label={label ? t.namedGear(label) : t.gear}
       className="draaiwerk-gear-hit"
       cx={pose.center.x}
       cy={pose.center.y}

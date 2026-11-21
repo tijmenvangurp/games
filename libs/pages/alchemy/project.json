@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["widgets-game-shell", "features-alchemy-lab"]
+  "implicitDependencies": ["widgets-game-shell", "features-alchemy-lab", "shared-i18n"]
 }

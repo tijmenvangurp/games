@@ -1,65 +1,71 @@
 import type { Color } from "chess.js";
-import {
-  CHESS_AVATARS,
-  COMPUTER_LEVELS,
-  COMPUTER_LEVEL_INFO,
-  type ChessMode,
-} from "@entities/chess";
+import { CHESS_AVATARS, COMPUTER_LEVELS, type ChessMode } from "@entities/chess";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Bot, Button, OptionPicker, Panel, Play, SetupPanel, TextInput, Users } from "@shared/ui";
-import { SIDE_LABEL } from "../model/presentation";
+import { localName, sideLabel } from "../model/presentation";
 import { MAX_NAME_LENGTH } from "../model/settings";
 import { useChessGameStore } from "../model/use-chess-game-store";
+import { chessGameTexts } from "./texts";
 
-const MODE_OPTIONS = [
-  {
-    value: "friend" as ChessMode,
-    label: "Samen spelen",
-    leading: <Users className="size-6" />,
-  },
-  {
-    value: "computer" as ChessMode,
-    label: "Computer",
-    leading: <Bot className="size-6" />,
-  },
-] as const;
+type ChessGameTexts = (typeof chessGameTexts)["nl"];
 
-const LEVEL_OPTIONS = COMPUTER_LEVELS.map((level) => ({
-  value: level,
-  label: COMPUTER_LEVEL_INFO[level].label,
-}));
+function modeOptions(t: ChessGameTexts) {
+  return [
+    {
+      value: "friend" as ChessMode,
+      label: t.modes.friend,
+      leading: <Users className="size-6" />,
+    },
+    {
+      value: "computer" as ChessMode,
+      label: t.modes.computer,
+      leading: <Bot className="size-6" />,
+    },
+  ] as const;
+}
 
-const SIDE_OPTIONS = [
-  {
-    value: "w" as Color,
-    label: "Wit",
-    leading: (
-      <span className="inline-block size-6 rounded-full border-2 border-foreground/40 bg-card shadow-xs" />
-    ),
-  },
-  {
-    value: "b" as Color,
-    label: "Zwart",
-    leading: (
-      <span className="inline-block size-6 rounded-full border-2 border-foreground/20 bg-foreground shadow-xs" />
-    ),
-  },
-] as const;
+function levelOptions(t: ChessGameTexts) {
+  return COMPUTER_LEVELS.map((level) => ({
+    value: level,
+    label: t.levels[level],
+  }));
+}
+
+function sideOptions() {
+  return [
+    {
+      value: "w" as Color,
+      label: sideLabel("w"),
+      leading: (
+        <span className="inline-block size-6 rounded-full border-2 border-foreground/40 bg-card shadow-xs" />
+      ),
+    },
+    {
+      value: "b" as Color,
+      label: sideLabel("b"),
+      leading: (
+        <span className="inline-block size-6 rounded-full border-2 border-foreground/20 bg-foreground shadow-xs" />
+      ),
+    },
+  ] as const;
+}
 
 function PlayerSetup({ color }: { readonly color: Color }) {
+  const t = useTexts(chessGameTexts);
   const mode = useChessGameStore((state) => state.mode);
   const humanColor = useChessGameStore((state) => state.humanColor);
   const player = useChessGameStore((state) => state.players[color]);
   const setPlayerName = useChessGameStore((state) => state.setPlayerName);
   const setPlayerAvatar = useChessGameStore((state) => state.setPlayerAvatar);
   const isComputer = mode === "computer" && color !== humanColor;
-  const label = SIDE_LABEL[color];
+  const label = sideLabel(color);
 
   return (
     <Panel as="fieldset" padding="sm" surface="subtle">
       <legend className="px-1.5 text-sm font-bold text-foreground">
         {label}
-        {isComputer ? " · computer" : ""}
+        {isComputer ? t.computerSuffix : ""}
       </legend>
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -69,27 +75,29 @@ function PlayerSetup({ color }: { readonly color: Color }) {
           {player.avatar}
         </span>
         {isComputer ? (
-          <p className="flex min-h-11 flex-1 items-center font-bold text-foreground">Computer</p>
+          <p className="flex min-h-11 flex-1 items-center font-bold text-foreground">
+            {t.computer}
+          </p>
         ) : (
           <TextInput
-            aria-label={`Naam voor ${label.toLowerCase()}`}
+            aria-label={t.nameFor(label.toLowerCase())}
             className="w-32 flex-1"
             maxLength={MAX_NAME_LENGTH}
             placeholder={label}
-            value={player.name}
+            value={localName(player.name)}
             onChange={(event) => setPlayerName(color, event.target.value)}
           />
         )}
       </div>
       <div
-        aria-label={`Kies een avatar voor ${label.toLowerCase()}`}
+        aria-label={t.avatarFor(label.toLowerCase())}
         className="mt-2.5 flex flex-wrap gap-1.5"
         role="group"
       >
         {CHESS_AVATARS.map((avatar) => (
           <button
             key={avatar}
-            aria-label={`Avatar ${avatar}`}
+            aria-label={t.avatar(avatar)}
             aria-pressed={player.avatar === avatar}
             className={cn(
               "grid size-11 place-items-center rounded-xl border text-xl transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
@@ -109,6 +117,7 @@ function PlayerSetup({ color }: { readonly color: Color }) {
 }
 
 export function ChessGameSetup() {
+  const t = useTexts(chessGameTexts);
   const mode = useChessGameStore((state) => state.mode);
   const level = useChessGameStore((state) => state.level);
   const humanColor = useChessGameStore((state) => state.humanColor);
@@ -123,32 +132,28 @@ export function ChessGameSetup() {
   return (
     <SetupPanel
       className="mx-auto w-full max-w-xl"
-      startLabel={canResume ? "Nieuwe partij" : "Spelen"}
-      subtitle="Kies je tegenstander, een avatar en een naam. Daarna zie je meteen wie aan zet is."
-      title="Nieuwe partij"
+      startLabel={canResume ? t.newGame : t.play}
+      subtitle={t.setupSubtitle}
+      title={t.newGame}
       onStart={startGame}
     >
       {canResume ? (
         <section className="flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary-soft p-3.5">
           <div className="min-w-0 flex-1">
-            <p className="font-bold text-foreground">Je partij is bewaard</p>
-            <p className="text-sm text-muted-foreground">
-              {moveCount === 1
-                ? "Er staat 1 zet op het bord."
-                : `Er staan ${moveCount} zetten op het bord.`}
-            </p>
+            <p className="font-bold text-foreground">{t.saved}</p>
+            <p className="text-sm text-muted-foreground">{t.movesOnBoard(moveCount)}</p>
           </div>
           <Button size="lg" variant="success" onClick={resumeGame}>
             <Play aria-hidden="true" className="size-5" />
-            Doorgaan
+            {t.resume}
           </Button>
         </section>
       ) : null}
 
       <OptionPicker
         columns={2}
-        legend="Tegen wie?"
-        options={MODE_OPTIONS}
+        legend={t.opponentLegend}
+        options={modeOptions(t)}
         selected={mode}
         onSelect={setMode}
       />
@@ -156,16 +161,16 @@ export function ChessGameSetup() {
       {mode === "computer" ? (
         <>
           <OptionPicker
-            legend="Hoe sterk is de computer?"
-            options={LEVEL_OPTIONS}
+            legend={t.levelLegend}
+            options={levelOptions(t)}
             selected={level}
             size="compact"
             onSelect={setLevel}
           />
           <OptionPicker
             columns={2}
-            legend="Met welke kleur speel jij?"
-            options={SIDE_OPTIONS}
+            legend={t.sideLegend}
+            options={sideOptions()}
             selected={humanColor}
             onSelect={setHumanColor}
           />

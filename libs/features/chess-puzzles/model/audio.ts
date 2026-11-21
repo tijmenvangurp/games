@@ -8,13 +8,13 @@ function line(id: string, text: string): SpeechLine {
   return { folder: FOLDER, id, text };
 }
 
-const PUZZLE_TITLES: Record<PuzzleKind, SpeechLine> = {
+export const PUZZLE_TITLES: Record<PuzzleKind, SpeechLine> = {
   mate: line("puzzle-mate-title", "Zet schaakmat!"),
   capture: line("puzzle-capture-title", "Win een stuk!"),
   tactic: line("puzzle-tactic-title", "Vind de beste zet!"),
 };
 
-const PROMPTS: Record<PuzzleKind, Record<"w" | "b", SpeechLine>> = {
+export const PROMPTS: Record<PuzzleKind, Record<"w" | "b", SpeechLine>> = {
   mate: {
     w: line("puzzle-mate-w", "Je bent wit. Zet de zwarte koning schaakmat."),
     b: line("puzzle-mate-b", "Je bent zwart. Zet de witte koning schaakmat."),
@@ -29,7 +29,7 @@ const PROMPTS: Record<PuzzleKind, Record<"w" | "b", SpeechLine>> = {
   },
 };
 
-const PUZZLE_STATUS_LINES = {
+export const PUZZLE_STATUS_LINES = {
   solvedMate: line("puzzle-solved-mate", "Schaakmat! Knap gedaan."),
   solvedCapture: line("puzzle-solved-capture", "Gelukt! Je hebt een stuk gewonnen."),
   solvedTactic: line("puzzle-solved-tactic", "Gelukt! Je hebt de beste zet gevonden."),
@@ -53,6 +53,37 @@ export function puzzlePromptSpeech(kind: PuzzleKind, color: "w" | "b"): SpeechLi
   return PROMPTS[kind][color];
 }
 
+export type PuzzleStatusKey = keyof typeof PUZZLE_STATUS_LINES;
+
+/** Welke statusregel past bij de stand van de puzzel; de UI toont hem in de actieve taal. */
+export function puzzleStatusKey(
+  feedback: PuzzleFeedback,
+  kind: PuzzleKind,
+  status: PuzzleStatus,
+  playerColor: Color,
+  selectedColor: Color | null,
+): PuzzleStatusKey {
+  if (status === "solved") {
+    if (kind === "mate") {
+      return "solvedMate";
+    }
+    if (kind === "capture") {
+      return "solvedCapture";
+    }
+    return "solvedTactic";
+  }
+  if (feedback === "wrong") {
+    return "wrong";
+  }
+  if (feedback === "correct") {
+    return "correct";
+  }
+  if (selectedColor && selectedColor !== playerColor) {
+    return "opponent";
+  }
+  return "idle";
+}
+
 export function puzzleStatusSpeech(
   feedback: PuzzleFeedback,
   kind: PuzzleKind,
@@ -60,25 +91,7 @@ export function puzzleStatusSpeech(
   playerColor: Color,
   selectedColor: Color | null,
 ): SpeechLine {
-  if (status === "solved") {
-    if (kind === "mate") {
-      return PUZZLE_STATUS_LINES.solvedMate;
-    }
-    if (kind === "capture") {
-      return PUZZLE_STATUS_LINES.solvedCapture;
-    }
-    return PUZZLE_STATUS_LINES.solvedTactic;
-  }
-  if (feedback === "wrong") {
-    return PUZZLE_STATUS_LINES.wrong;
-  }
-  if (feedback === "correct") {
-    return PUZZLE_STATUS_LINES.correct;
-  }
-  if (selectedColor && selectedColor !== playerColor) {
-    return PUZZLE_STATUS_LINES.opponent;
-  }
-  return PUZZLE_STATUS_LINES.idle;
+  return PUZZLE_STATUS_LINES[puzzleStatusKey(feedback, kind, status, playerColor, selectedColor)];
 }
 
 export const speechGroups = [

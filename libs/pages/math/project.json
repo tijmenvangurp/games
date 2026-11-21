@@ -14,5 +14,10 @@
       }
     }
   },
-  "implicitDependencies": ["widgets-game-shell", "features-math-trainer", "shared-ui"]
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-math-trainer",
+    "shared-ui",
+    "shared-i18n"
+  ]
 }
