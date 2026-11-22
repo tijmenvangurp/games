@@ -18,6 +18,7 @@ import {
   Target,
   TextAa,
   Translate,
+  Detective,
   type Icon,
   type IconProps,
 } from "@phosphor-icons/react";
@@ -41,6 +42,7 @@ const GAME_ICONS = {
   "four-in-a-row": CirclesFour,
   ganzenbord: Bird,
   typepret: Keyboard,
+  "geheime-code": Detective,
   murdoku: Fingerprint,
 } satisfies Record<string, Icon>;
 

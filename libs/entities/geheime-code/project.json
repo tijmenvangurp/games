@@ -1,0 +1,18 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "entities-geheime-code",
+  "projectType": "library",
+  "sourceRoot": "libs/entities/geheime-code",
+  "tags": ["layer:entities", "scope:geheime-code", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "options": {
+        "command": "oxlint .",
+        "cwd": "libs/entities/geheime-code"
+      }
+    }
+  },
+  "implicitDependencies": ["shared-lib"]
+}

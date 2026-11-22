@@ -14,6 +14,7 @@ import { FlagsPage } from "@pages/flags";
 import { FourInARowPage } from "@pages/four-in-a-row";
 import { GanzenbordPage } from "@pages/ganzenbord";
 import { FrenchLessonPage, FrenchPage, FrenchReviewPage, FrenchSortPage } from "@pages/french";
+import { GeheimeCodePage } from "@pages/geheime-code";
 import { HomePage } from "@pages/home";
 import { LettersPage } from "@pages/letter";
 import { TypepretPage } from "@pages/typepret";
@@ -67,6 +68,7 @@ export function createAppRouter(history?: RouterHistory) {
     gameRoute("/frans/sorteren", FrenchSortPage),
     gameRoute("/letters", LettersPage),
     gameRoute("/typepret", TypepretPage),
+    gameRoute("/geheime-code", GeheimeCodePage),
     frenchLessonRoute,
   ]);
 
