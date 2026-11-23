@@ -412,7 +412,7 @@ function BeltHitTarget({
   const [focused, setFocused] = useState(false);
   const t = useTexts(draaiwerkTexts);
 
-  if (!enabled || connection.kind === "chain") {
+  if (!enabled || connection.kind === "chain" || connection.kind === "axle") {
     return null;
   }
 
@@ -523,7 +523,10 @@ export function DraaiwerkBoard({
   };
   const status = result.solved ? "solved" : result.jammed ? "jammed" : "playing";
   const linkMode =
-    selectedItem?.kind === "belt" || selectedItem?.kind === "chain" || Boolean(pendingGearKey);
+    selectedItem?.kind === "belt" ||
+    selectedItem?.kind === "chain" ||
+    selectedItem?.kind === "axle" ||
+    Boolean(pendingGearKey);
 
   const handleBackgroundTap = (event: MouseEvent<SVGSVGElement>) => {
     const target = event.target as Element;

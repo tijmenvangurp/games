@@ -90,6 +90,38 @@ const ENGLISH_LEVELS: Readonly<Record<string, LevelText>> = {
     name: "The production line",
     intro: "A fast lamp, a slow lift and a goal that turns the other way.",
   },
+  "de-lange-trap": {
+    name: "The long staircase",
+    intro: "Three gears climb diagonally to the goal.",
+  },
+  "de-boog": {
+    name: "The arch",
+    intro: "The straight way is blocked. Three medium wheels go over the top.",
+  },
+  "drie-machines": {
+    name: "Three machines",
+    intro: "Two chains and a gear drive three goals.",
+  },
+  "de-dubbele-trap": {
+    name: "The double staircase",
+    intro: "Two goals, each with its own train of two wheels.",
+  },
+  "de-eerste-as": {
+    name: "The first axle",
+    intro: "An axle connects two wheels. Big on, small off: the goal turns slowly.",
+  },
+  "de-versnelling": {
+    name: "The speed-up",
+    intro: "Small on, big off: the goal turns three times as fast.",
+  },
+  "de-verdeelas": {
+    name: "The split axle",
+    intro: "The axle splits the motor: one goal turns at full speed, the other slowly.",
+  },
+  "de-sluis": {
+    name: "The lock",
+    intro: "The way is broken. The movement has to pass through the first goal.",
+  },
 };
 
 const LEVEL_TEXT: Readonly<Record<Language, (level: Level) => LevelText>> = {

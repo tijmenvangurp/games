@@ -51,16 +51,22 @@ export function PlaceMap({ subject }: { subject: FlagSubject }) {
   return (
     <svg
       aria-hidden="true"
-      className="mx-auto h-auto w-full rounded-2xl border bg-sky-50"
+      className="flag-map mx-auto h-auto w-full"
       data-testid="place-map"
       focusable="false"
       viewBox={`0 0 ${map.width} ${map.height}`}
     >
-      <path className="fill-emerald-50 stroke-emerald-200" d={map.land} strokeWidth={0.5} />
+      <path className="flag-map-land" d={map.land} strokeWidth={0.6} />
       {map.highlight ? (
-        <path className="fill-rose-400 stroke-rose-600" d={map.highlight} strokeWidth={1} />
+        <path className="flag-map-highlight" d={map.highlight} strokeWidth={0.9} />
       ) : null}
-      <circle className="fill-rose-600" cx={map.marker.x} cy={map.marker.y} r={3} />
+      <circle
+        className="flag-map-marker"
+        cx={map.marker.x}
+        cy={map.marker.y}
+        r={2.6}
+        strokeWidth={1}
+      />
     </svg>
   );
 }

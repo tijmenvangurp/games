@@ -19,7 +19,10 @@ function FlagPicture({ code, className }: { code: string; className?: string }) 
     <img
       alt=""
       aria-hidden="true"
-      className={cn("aspect-4/3 w-full rounded-xl border border-border object-cover", className)}
+      className={cn(
+        "aspect-4/3 h-auto w-full rounded-xl border border-border object-cover",
+        className,
+      )}
       height={480}
       src={flagSrc({ code })}
       width={640}

@@ -244,6 +244,60 @@ De banden zijn smaller (0,45–0,55) en elk level heeft meer dan één stap nodi
 De vaste instinkers uit eerdere hoofdstukken blijven: ze passen, maar draaien
 de verkeerde kant op of halen de band niet.
 
+## Addendum 2026-11-21: vier extra levels in hoofdstuk 7
+
+De catalogus groeit naar 29 levels in zeven hoofdstukken. Hoofdstuk 7,
+"De tandwielkamer", verdiept de tandwieltreinen: elk level heeft minstens
+drie plaatsingen nodig. Drie levels zijn tandwiel-only; level 28 combineert
+twee kettingen met één tandwiel.
+
+- **26 De lange trap.** Drie tandwielen (2, 3 en 2) klimmen diagonaal van de
+  motor naar het doel. Twee wielen halen de afstand niet.
+- **27 De boog.** Het rechte gat in het midden is geblokkeerd; drie middelgrote
+  wielen gaan over de bovenrand. De directe rij is geen oplossing.
+- **28 Drie machines.** Twee kettingen en één tandwiel bedienen drie doelen.
+  Met twee onderdelen blijven er altijd doelen onbediend.
+- **29 De dubbele trap.** Twee doelen, elk met een eigen trein van een klein en
+  een middelgroot tandwiel. Vier plaatsingen, en drie is niet genoeg.
+
+De levels zijn zo ontworpen dat de oplossing niet in één of twee stappen kan:
+de afstand tussen motor en doel is groter dan twee tandwielen kunnen
+overbruggen, of er zijn drie uitgangen die elk een eigen verbinding vragen.
+Een test controleert met een uitputtende zoektocht over één en twee
+plaatsingen dat geen van de nieuwe levels een kortere oplossing heeft.
+
+## Addendum 2026-11-21: de as als echte nieuwe overbrenging
+
+De catalogus groeit naar 33 levels in acht hoofdstukken. Hoofdstuk 8,
+"De aandrijving", voegt de **as** toe: een starre verbinding tussen twee
+tandwielen op verschillende gaatjes. De as heeft snelheidsfactor `1` en draait
+beide wielen dezelfde kant op. De twee wielen mogen elkaar niet raken, dus de
+afstand is groter dan de som van hun stralen.
+
+Daarmee verandert de wiskunde van het spel: bij tandwielen en kettingen
+telescopeert de snelheid naar `r_motor / r_doel`, maar een as onderbreekt die
+reeks. Groot op de as, klein eraf maakt het doel traag; klein erop, groot eraf
+maakt het snel. Snelheidsbanden worden daardoor echte route-eisen in plaats van
+alleen een maatkeuze.
+
+- **30 De eerste as.** Drie plaatsingen, doel op 1/3 snelheid. Zonder as is
+  1/3 onmogelijk tussen twee even grote wielen.
+- **31 De versnelling.** Dezelfde as, maar andersom: doel op 3×.
+- **32 De verdeelas.** Eén motor, twee doelen: één tak direct op 1×, één tak
+  via de as op 1/3×.
+- **33 De sluis.** Een as hangt aan het eerste doel en brengt de beweging door
+  naar een tweede doel. Een rij ontbrekende gaatjes maakt de korte route
+  onmogelijk; de speler moet door het doel heen.
+
+De levels zijn met dezelfde uitputtende test gecontroleerd: geen enkel nieuw
+level is met één of twee plaatsingen op te lossen. Een as tussen motor en doel
+is een geldige zet, maar geeft 1× en haalt de snelheidsband niet.
+
+De **tandheugel** is bewust nog niet toegevoegd. Met het huidige model is een
+heugel regeltechnisch gelijk aan een open ketting of een doel met een
+snelheidsband; dat zou alleen een nieuw plaatje zijn. Een echte heugel vraagt om
+een lineaire slag met een aanslag, en die valt buiten deze slice.
+
 ## Bronnen
 
 - [Research: Draaiwerk](../research/2026-11-14-draaiwerk.md)

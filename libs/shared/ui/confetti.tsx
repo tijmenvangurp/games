@@ -144,8 +144,29 @@ export function Confetti({ pieces = 18, variant = "burst" }: ConfettiProps) {
       if (cancelled) {
         return;
       }
-      reset = confettiModule.reset;
-      fireBursts(confettiModule, variant, pieces, () => cancelled);
+
+      // De standaard `canvas-confetti` gebruikt een blob-worker. De CSP van de
+      // app staat geen blob-scripts toe, waardoor de confetti op productie
+      // onzichtbaar bleef. Teken daarom op een eigen canvas in de hoofdthread.
+      const canvas = document.createElement("canvas");
+      canvas.style.position = "fixed";
+      canvas.style.top = "0px";
+      canvas.style.left = "0px";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.style.pointerEvents = "none";
+      canvas.style.zIndex = "60";
+      document.body.appendChild(canvas);
+
+      const fire = confettiModule.create(canvas, {
+        resize: true,
+        useWorker: false,
+      });
+      reset = () => {
+        fire.reset();
+        canvas.remove();
+      };
+      fireBursts(fire, variant, pieces, () => cancelled);
     });
 
     return () => {

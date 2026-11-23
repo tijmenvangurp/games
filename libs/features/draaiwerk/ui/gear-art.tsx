@@ -466,6 +466,42 @@ const ChainBand = memo(function ChainBand({ connection }: { connection: Connecti
   );
 });
 
+function AxleBand({ connection }: { connection: ConnectionPose }) {
+  const run = connection.runs?.[0];
+  if (!run) {
+    return null;
+  }
+
+  return (
+    <g data-axle="true" opacity={connection.active ? 1 : 0.55}>
+      <line
+        stroke="#4f5761"
+        strokeLinecap="round"
+        strokeWidth={9}
+        x1={run.from.x}
+        x2={run.to.x}
+        y1={run.from.y}
+        y2={run.to.y}
+      />
+      <line
+        stroke="#aeb6c0"
+        strokeLinecap="round"
+        strokeWidth={4}
+        x1={run.from.x}
+        x2={run.to.x}
+        y1={run.from.y}
+        y2={run.to.y}
+      />
+      {[run.from, run.to].map((point) => (
+        <g key={`${point.x}-${point.y}`}>
+          <circle cx={point.x} cy={point.y} fill="#39404f" r={7} stroke="#242a36" strokeWidth={1} />
+          <circle cx={point.x} cy={point.y} fill="#e8e3d6" r={2.4} />
+        </g>
+      ))}
+    </g>
+  );
+}
+
 export function ConnectionBand({ connection }: { connection: ConnectionPose }) {
   return (
     <g
@@ -473,7 +509,11 @@ export function ConnectionBand({ connection }: { connection: ConnectionPose }) {
       data-connection-key={connection.key}
       data-kind={connection.kind}
     >
-      <ChainBand connection={connection} />
+      {connection.kind === "axle" ? (
+        <AxleBand connection={connection} />
+      ) : (
+        <ChainBand connection={connection} />
+      )}
     </g>
   );
 }
@@ -514,6 +554,35 @@ export function TrayArt({ item }: { item: TrayItem }) {
     return (
       <svg aria-hidden="true" className="h-12 w-20" viewBox="0 0 64 44">
         {miniGear(item.size, 32, 22, radius)}
+      </svg>
+    );
+  }
+
+  if (item.kind === "axle") {
+    return (
+      <svg aria-hidden="true" className="h-12 w-20" viewBox="0 0 64 44">
+        <line
+          stroke="#4f5761"
+          strokeLinecap="round"
+          strokeWidth={9}
+          x1={14}
+          x2={50}
+          y1={22}
+          y2={22}
+        />
+        <line
+          stroke="#aeb6c0"
+          strokeLinecap="round"
+          strokeWidth={4}
+          x1={14}
+          x2={50}
+          y1={22}
+          y2={22}
+        />
+        <circle cx={14} cy={22} fill="#39404f" r={7} stroke="#242a36" strokeWidth={1} />
+        <circle cx={50} cy={22} fill="#39404f" r={7} stroke="#242a36" strokeWidth={1} />
+        <circle cx={14} cy={22} fill="#e8e3d6" r={2.4} />
+        <circle cx={50} cy={22} fill="#e8e3d6" r={2.4} />
       </svg>
     );
   }

@@ -45,6 +45,9 @@ function instructionFor(
   if (item.kind === "gear") {
     return t.instructionGear;
   }
+  if (item.kind === "axle") {
+    return pendingGearKey ? t.instructionSecondAxleGear : t.instructionAxle;
+  }
   return t.instructionChain;
 }
 

@@ -85,6 +85,10 @@ const ENGLISH_GAMES: Readonly<Record<GameId, GameText>> = {
     description:
       "Read the clues, fill in the floor plan and find the thief who was alone with the loot.",
   },
+  "geheime-code": {
+    name: "Secret Code",
+    description: "Find the letter for each symbol and crack the code.",
+  },
 };
 
 const ENGLISH_CATEGORIES: Readonly<Record<GameCategory, string>> = {

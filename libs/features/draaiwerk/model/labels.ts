@@ -27,6 +27,8 @@ export function trayShortLabel(item: TrayItem): string {
       return item.crossed === true ? t.shortCrossed : t.shortChain;
     case "chain":
       return t.shortChain;
+    case "axle":
+      return t.shortAxle;
   }
 }
 

@@ -16,7 +16,7 @@ import {
 import { animate } from "motion";
 import { drive, type GearPose, type TrayItem } from "@entities/gear";
 import { playHaptic, playSound } from "@shared/lib";
-import { connectionKey, isLinkPlacement, looseBeltTarget } from "../model/placement";
+import { connectionKey, isConnectionPlacement, looseBeltTarget } from "../model/placement";
 import { useDraaiwerkStore, useSelectedTrayItem } from "../model/use-draaiwerk-store";
 import {
   boardPointFromClient,
@@ -106,7 +106,11 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
           }
           return id.startsWith("hole:") || id === "tray-remove";
         }
-        if (activeItem?.kind === "belt" || activeItem?.kind === "chain") {
+        if (
+          activeItem?.kind === "belt" ||
+          activeItem?.kind === "chain" ||
+          activeItem?.kind === "axle"
+        ) {
           return id.startsWith("gear:");
         }
         return id.startsWith("hole:");
@@ -337,10 +341,13 @@ export function DraaiwerkPlay({ onLevels, onNext, hasNext, celebrate }: Draaiwer
     if (activePlacedKey.startsWith("belt:")) {
       const wantedKey = activePlacedKey.slice("belt:".length);
       const placement = placements.find(
-        (candidate) => isLinkPlacement(candidate) && connectionKey(candidate) === wantedKey,
+        (candidate) => isConnectionPlacement(candidate) && connectionKey(candidate) === wantedKey,
       );
       if (placement?.kind === "chain") {
         return { id: "drag", kind: "chain" };
+      }
+      if (placement?.kind === "axle") {
+        return { id: "drag", kind: "axle" };
       }
       if (placement?.kind === "open-belt" || placement?.kind === "crossed-belt") {
         return {

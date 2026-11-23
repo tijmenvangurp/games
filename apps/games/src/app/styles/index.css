@@ -108,6 +108,51 @@
 }
 
 @layer games {
+  /*
+   * Kaarten van Vlaggenreis. De continent- en puzzelkaart delen één palet:
+   * warmer water, lichte landvlakken met een zichtbare rand en indigo voor de
+   * plek die telt. Zo blijft elk land leesbaar op papier én op een tablet.
+   */
+  .flag-map {
+    border: 1px solid var(--border);
+    border-radius: var(--ds-radius-md);
+    background-color: var(--map-water);
+  }
+
+  .flag-map-land {
+    fill: var(--map-land);
+    stroke: var(--map-land-stroke);
+  }
+
+  .flag-map-highlight {
+    fill: var(--primary);
+    stroke: var(--primary-hover);
+  }
+
+  .flag-map-marker {
+    fill: var(--warning);
+    stroke: var(--foreground);
+  }
+
+  .flag-map-country {
+    fill: var(--map-land);
+    stroke: var(--map-land-stroke);
+  }
+
+  .flag-map-slot {
+    fill: color-mix(in oklab, var(--primary) 16%, var(--map-land));
+    stroke: var(--primary);
+  }
+
+  .flag-map-placed {
+    fill: var(--success);
+    stroke: var(--success-ink);
+  }
+
+  .flag-map-hint {
+    fill: var(--primary);
+  }
+
   .ganzenbord-board {
     border-radius: var(--ds-radius-md);
     box-shadow: 0 12px 30px -22px oklch(0.25 0.024 148 / 0.45);
@@ -769,6 +814,43 @@
 
     .draaiwerk-direction {
       display: inline;
+    }
+  }
+}
+
+@layer games {
+  /* De codekaart en de symbolen van Geheime Code. De tint per symbool komt
+     uit de bestaande accent- en pionkleuren; het inline `--code-tint` houdt
+     dezelfde ster in de codekaart en de woordrij dezelfde kleur. */
+  .code-card {
+    border-top: 2px solid color-mix(in oklab, var(--primary) 38%, var(--border));
+  }
+
+  .code-token {
+    border: 1px solid color-mix(in oklab, var(--code-tint, var(--primary)) 16%, var(--border));
+    background: color-mix(in oklab, var(--code-tint, var(--primary)) 10%, var(--card));
+  }
+
+  .code-shake {
+    animation: code-shake 280ms ease-out;
+  }
+
+  @keyframes code-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-3px);
+    }
+    75% {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code-shake {
+      animation: none;
     }
   }
 }

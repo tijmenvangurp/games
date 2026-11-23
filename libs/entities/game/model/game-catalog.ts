@@ -24,7 +24,8 @@ export type GameId =
   | "four-in-a-row"
   | "ganzenbord"
   | "typepret"
-  | "murdoku";
+  | "murdoku"
+  | "geheime-code";
 
 interface GameCatalogBase {
   id: GameId;
@@ -60,6 +61,7 @@ export type GameCatalogEntry = GameCatalogBase &
           | "/vier-op-een-rij"
           | "/ganzenbord"
           | "/typepret"
+          | "/geheime-code"
           | "/mysterie";
         thumbnail: string;
         /** Elke game kiest expliciet hoe het met spraak omgaat. */
@@ -233,6 +235,19 @@ export const gameCatalog: readonly GameCatalogEntry[] = [
     speech: {
       kind: "visual",
       reason: "Het toetsenbord en de doeltekens zijn visueel.",
+    },
+  },
+  {
+    id: "geheime-code",
+    name: "Geheime Code",
+    description: "Zoek bij elk symbool de letter en kraak de code.",
+    category: "taal-rekenen",
+    status: "available",
+    to: "/geheime-code",
+    thumbnail: "/thumbnails/geheime-code-052aa730.jpg",
+    speech: {
+      kind: "visual",
+      reason: "De codekaart en de woordrij zijn visueel.",
     },
   },
   {

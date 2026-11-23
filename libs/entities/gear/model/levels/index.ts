@@ -5,6 +5,8 @@ import { CHAPTER_3_LEVELS } from "./chapter-3";
 import { CHAPTER_4_LEVELS } from "./chapter-4";
 import { CHAPTER_5_LEVELS } from "./chapter-5";
 import { CHAPTER_6_LEVELS } from "./chapter-6";
+import { CHAPTER_7_LEVELS } from "./chapter-7";
+import { CHAPTER_8_LEVELS } from "./chapter-8";
 
 const ALL_LEVELS: readonly Level[] = [
   ...CHAPTER_1_LEVELS,
@@ -13,6 +15,8 @@ const ALL_LEVELS: readonly Level[] = [
   ...CHAPTER_4_LEVELS,
   ...CHAPTER_5_LEVELS,
   ...CHAPTER_6_LEVELS,
+  ...CHAPTER_7_LEVELS,
+  ...CHAPTER_8_LEVELS,
 ];
 
 export const LEVEL_COUNT = ALL_LEVELS.length;

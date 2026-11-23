@@ -54,6 +54,8 @@ function linkPair(fromHoleId: string, toHoleId: string): string {
 }
 
 export type LinkPlacement = Extract<Placement, { kind: LinkPlacementKind }>;
+export type AxlePlacement = Extract<Placement, { kind: "axle" }>;
+export type ConnectionPlacement = LinkPlacement | AxlePlacement;
 
 export function isLinkPlacement(placement: Placement): placement is LinkPlacement {
   return (
@@ -63,7 +65,11 @@ export function isLinkPlacement(placement: Placement): placement is LinkPlacemen
   );
 }
 
-export function connectionKey(placement: LinkPlacement): string {
+export function isConnectionPlacement(placement: Placement): placement is ConnectionPlacement {
+  return isLinkPlacement(placement) || placement.kind === "axle";
+}
+
+export function connectionKey(placement: ConnectionPlacement): string {
   return `${placement.kind}:${placement.fromHoleId}:${placement.toHoleId}`;
 }
 
@@ -114,7 +120,11 @@ function rejectLooseBelt(next: LooseBeltPlacement, slots: ReturnType<typeof gear
   return getTexts(draaiwerkTexts).chainHere;
 }
 
-function rejectLink(level: Level, placements: readonly Placement[], next: LinkPlacement): string {
+function rejectLink(
+  level: Level,
+  placements: readonly Placement[],
+  next: ConnectionPlacement,
+): string {
   const slots = gearSlots(level, placements);
   const from = slots.find((slot) => slot.holeId === next.fromHoleId);
   const to = slots.find((slot) => slot.holeId === next.toHoleId);
@@ -128,13 +138,19 @@ function rejectLink(level: Level, placements: readonly Placement[], next: LinkPl
   const pair = linkPair(next.fromHoleId, next.toHoleId);
   const duplicate = placements.some(
     (placement) =>
-      isLinkPlacement(placement) && linkPair(placement.fromHoleId, placement.toHoleId) === pair,
+      isConnectionPlacement(placement) &&
+      linkPair(placement.fromHoleId, placement.toHoleId) === pair,
   );
   if (duplicate) {
     return getTexts(draaiwerkTexts).alreadyLinked;
   }
 
   const span = distance(holeCenter(level, next.fromHoleId), holeCenter(level, next.toHoleId));
+  if (next.kind === "axle") {
+    return span <= gearRadius(from.size) + gearRadius(to.size)
+      ? getTexts(draaiwerkTexts).axleTooShort
+      : getTexts(draaiwerkTexts).doesNotFit;
+  }
   return span <= Math.abs(gearRadius(from.size) - gearRadius(to.size))
     ? getTexts(draaiwerkTexts).chainTooShort
     : getTexts(draaiwerkTexts).doesNotFit;
@@ -171,7 +187,7 @@ function sameLooseBelt(first: LooseBeltPlacement, second: LooseBeltPlacement): b
   return first.holeId === second.holeId && first.link === second.link;
 }
 
-function sameLink(first: LinkPlacement, second: LinkPlacement): boolean {
+function sameLink(first: ConnectionPlacement, second: ConnectionPlacement): boolean {
   return (
     linkPair(first.fromHoleId, first.toHoleId) === linkPair(second.fromHoleId, second.toHoleId)
   );
@@ -187,7 +203,7 @@ function samePlacement(first: Placement, second: Placement): boolean {
   if (first.kind === "loose-belt") {
     return sameLooseBelt(first, second as LooseBeltPlacement);
   }
-  return sameLink(first, second as LinkPlacement);
+  return sameLink(first, second as ConnectionPlacement);
 }
 
 /** The next part of the authored solution that is not on the board yet. */

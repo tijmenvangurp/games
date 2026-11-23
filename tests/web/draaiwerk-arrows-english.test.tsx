@@ -75,7 +75,7 @@ describe("Gearworks in English", () => {
     renderApp("/draaiwerk");
 
     expect(await screen.findByText("Gearworks")).toBeTruthy();
-    expect(screen.getByText("Gears · level 1 of 25")).toBeTruthy();
+    expect(screen.getByText(`Gears · level 1 of ${allLevels().length}`)).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Level 1 · First tooth" })).toBeTruthy();
     expect(screen.getByText("One gear touches the motor and the goal.")).toBeTruthy();
     expect(screen.getByText("New")).toBeTruthy();
@@ -110,14 +110,18 @@ describe("Gearworks in English", () => {
     fireEvent.click(screen.getByRole("button", { name: "Choose a level" }));
 
     expect(await screen.findByRole("button", { name: "Back to the game" })).toBeTruthy();
-    expect(screen.getByText("25 levels · 6 chapters")).toBeTruthy();
+    expect(
+      screen.getByText(
+        `${allLevels().length} levels · ${new Set(allLevels().map((entry) => entry.chapter)).size} chapters`,
+      ),
+    ).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Gears" })).toBeTruthy();
     expect(screen.getByText("Chapter 1 · levels 1–4")).toBeTruthy();
     expect(screen.getByText("1/4 done")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Level 1, First tooth, complete" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Level 2, Two in-between wheels" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Level 3, The chain loop, locked" })).toBeTruthy();
-    expect(screen.getByText("2 of 25 levels unlocked")).toBeTruthy();
+    expect(screen.getByText(`2 of ${allLevels().length} levels unlocked`)).toBeTruthy();
   });
 
   it("hangs a chain with English help", async () => {
