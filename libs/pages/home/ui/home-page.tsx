@@ -39,8 +39,8 @@ export function HomePage() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button size="sm" variant="soft" onClick={openRandomGame}>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <Button className="min-h-11" size="sm" variant="soft" onClick={openRandomGame}>
               <Dices aria-hidden="true" className="size-4" />
               {t("home.surprise")}
             </Button>
