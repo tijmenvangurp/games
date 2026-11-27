@@ -1,11 +1,13 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { m } from "motion/react";
-import { getElement } from "@entities/alchemy";
+import { elementName, getElement } from "@entities/alchemy";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { useAlchemyStore, type BoardElement } from "../model/use-alchemy-store";
 import { BOARD_ID, boardItemId } from "./dnd-ids";
 import { ElementToken } from "./element-token";
+import { alchemyTexts } from "./texts";
 
 function BoardToken({
   item,
@@ -21,6 +23,8 @@ function BoardToken({
   onMergedAnimationDone: () => void;
 }) {
   const element = getElement(item.elementId);
+  const language = useLanguage();
+  const t = useTexts(alchemyTexts);
   const { attributes, isDragging, listeners, setNodeRef } = useDraggable({
     id: boardItemId(item.instanceId),
   });
@@ -40,6 +44,8 @@ function BoardToken({
     return null;
   }
 
+  const name = elementName(element.id, language);
+
   const setRefs = (node: HTMLButtonElement | null) => {
     setNodeRef(node);
     setDropRef(node);
@@ -54,7 +60,7 @@ function BoardToken({
         ref={setRefs}
         {...attributes}
         {...listeners}
-        aria-label={`${element.name}${selected ? ", geselecteerd" : ""}`}
+        aria-label={selected ? t.selected(name) : name}
         aria-pressed={selected}
         className={cn(
           "touch-none rounded-xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
@@ -102,6 +108,7 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
   const lastMergedId = useAlchemyStore((state) => state.lastMergedId);
   const clearLastMerged = useAlchemyStore((state) => state.clearLastMerged);
   const { isOver, setNodeRef } = useDroppable({ id: BOARD_ID });
+  const t = useTexts(alchemyTexts);
 
   const setRefs = (node: HTMLDivElement | null) => {
     setNodeRef(node);
@@ -111,7 +118,7 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
   return (
     <div
       ref={setRefs}
-      aria-label="Werkbank"
+      aria-label={t.workbench}
       className={cn(
         "relative min-h-72 w-full overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card/85 p-3 shadow-xs transition sm:min-h-96 md:h-full md:min-h-0 md:landscape:col-span-3",
         isOver && "border-primary bg-primary-soft/60",
@@ -130,7 +137,7 @@ export function AlchemyBoard({ boardRef }: AlchemyBoardProps) {
 
       {board.length === 0 ? (
         <p className="absolute inset-0 z-0 grid place-items-center px-6 text-center text-sm font-medium text-muted-foreground">
-          Tik of sleep een element naar de werkbank. Kies daarna een tweede element om te mengen.
+          {t.workbenchEmpty}
         </p>
       ) : null}
 

@@ -1,8 +1,10 @@
 import type { GanzenbordGame } from "@entities/ganzenbord";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Badge, Lock, Panel, Trophy } from "@shared/ui";
 import type { Wins } from "../model/storage";
 import { playerShortName, positionText } from "../model/presentation";
+import { ganzenbordTexts, ganzenbordUiTexts } from "../model/texts";
 import { PlayerToken } from "./player-token";
 
 interface PlayerCardProps {
@@ -12,6 +14,8 @@ interface PlayerCardProps {
 }
 
 function PlayerCard({ game, playerId, wins }: PlayerCardProps) {
+  const t = useTexts(ganzenbordUiTexts);
+  const names = useTexts(ganzenbordTexts);
   const player = game.players.find((candidate) => candidate.id === playerId);
   if (!player) {
     return null;
@@ -30,10 +34,10 @@ function PlayerCard({ game, playerId, wins }: PlayerCardProps) {
         <PlayerToken color={player.color} className="size-5 shrink-0" />
         <span className="truncate text-sm font-bold">{playerShortName(player)}</span>
         <span className="text-xs text-muted-foreground">
-          · {player.controller === "computer" ? "Computer" : "Mens"}
+          · {names.controllers[player.controller]}
         </span>
         <span
-          aria-label={`${wins[player.id]} gewonnen partijen`}
+          aria-label={t.winsCount(wins[player.id])}
           className="ml-auto flex shrink-0 items-center gap-1 text-xs font-bold tabular-nums text-muted-foreground"
         >
           <Trophy aria-hidden="true" className="size-3.5" />
@@ -42,10 +46,10 @@ function PlayerCard({ game, playerId, wins }: PlayerCardProps) {
       </div>
       <div className="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
         <span className="truncate">{positionText(player)}</span>
-        {stuck ? <Lock aria-label="Vast" className="size-3 shrink-0 text-danger" /> : null}
+        {stuck ? <Lock aria-label={t.stuck} className="size-3 shrink-0 text-danger" /> : null}
         {player.skipTurns > 0 ? (
           <Badge size="sm" tone="warning">
-            beurt over
+            {t.skipBadge}
           </Badge>
         ) : null}
       </div>
@@ -59,8 +63,9 @@ interface GanzenbordHudProps {
 }
 
 export function GanzenbordHud({ game, wins }: GanzenbordHudProps) {
+  const t = useTexts(ganzenbordUiTexts);
   return (
-    <div aria-label="Spelers" className="grid grid-cols-2 gap-2 lg:grid-cols-1" role="list">
+    <div aria-label={t.players} className="grid grid-cols-2 gap-2 lg:grid-cols-1" role="list">
       {game.players.map((player) => (
         <div key={player.id} role="listitem">
           <PlayerCard game={game} playerId={player.id} wins={wins} />

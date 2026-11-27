@@ -1,28 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { WordSearchPlay, WordSearchSetup, useWordSearchStore } from "@features/word-search";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { CelebrationDialog } from "@shared/ui";
 import { useGameSetupNavigation } from "@shared/lib";
 import { GameShell } from "@widgets/game-shell";
+import { wordSearchPageTexts } from "./texts";
 
-const THEME_LABELS = {
-  tuin: "in de tuin",
-  onderwater: "onder water",
-  pokemon: "Pokémon",
-} as const;
+const EMPTY_FOUND: readonly string[] = [];
 
 export function WordSearchPage() {
   const navigate = useNavigate();
-  const puzzle = useWordSearchStore((state) => state.puzzle);
-  const found = useWordSearchStore((state) => state.found);
+  const language = useLanguage();
+  const t = useTexts(wordSearchPageTexts);
+  const puzzle = useWordSearchStore((state) => (state.language === language ? state.puzzle : null));
+  const found = useWordSearchStore((state) =>
+    state.language === language ? state.found : EMPTY_FOUND,
+  );
   const settings = useWordSearchStore((state) => state.settings);
   const [showSetup, setShowSetup] = useState(false);
+
+  useEffect(() => {
+    useWordSearchStore.getState().resetForLanguage(language);
+  }, [language]);
 
   const setupVisible = showSetup || !puzzle;
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(puzzle),
-    backToGameLabel: "Terug naar je woordzoeker",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
@@ -39,10 +45,10 @@ export function WordSearchPage() {
       {...gameSetup}
       subtitle={
         puzzle
-          ? `${puzzle.difficulty} · ${puzzle.size} × ${puzzle.size} · ${THEME_LABELS[puzzle.theme]}`
-          : "Kies je thema"
+          ? `${t.difficulties[puzzle.difficulty]} · ${puzzle.size} × ${puzzle.size} · ${t.themes[puzzle.theme]}`
+          : t.chooseTheme
       }
-      title="Woordzoeker"
+      title={t.title}
     >
       {setupVisible ? (
         <div className="mx-auto w-full max-w-xl">
@@ -62,8 +68,8 @@ export function WordSearchPage() {
       {complete && !setupVisible ? (
         <CelebrationDialog
           confetti
-          description={`Je vond alle ${puzzle.placements.length} woorden.`}
-          title="Gevonden!"
+          description={t.doneDescription(puzzle.placements.length)}
+          title={t.doneTitle}
           onAgain={() => useWordSearchStore.getState().newPuzzle()}
           onChoose={() => setShowSetup(true)}
           onHome={() => navigate({ to: "/" })}

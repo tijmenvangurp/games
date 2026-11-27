@@ -11,7 +11,8 @@ import {
   type TrayItem,
 } from "@entities/gear";
 import { playHaptic, playSound } from "@shared/lib";
-import { JAMMED } from "./feedback";
+import { getTexts } from "@shared/i18n";
+import { draaiwerkTexts } from "./texts";
 import {
   connectionKey,
   holeForGearKey,
@@ -106,7 +107,11 @@ function applyPlacements(
     finished: state.finished || (result.solved && state.levelIndex === LEVEL_COUNT - 1),
     status: result.solved ? "solved" : "playing",
     hintPlacement: null,
-    feedback: result.solved ? "Level gehaald." : result.jammed ? JAMMED : null,
+    feedback: result.solved
+      ? getTexts(draaiwerkTexts).solved
+      : result.jammed
+        ? getTexts(draaiwerkTexts).jammed
+        : null,
     feedbackTone: result.solved ? "success" : result.jammed ? "warn" : null,
   });
 
@@ -279,7 +284,7 @@ function selectLooseBeltAction(set: DraaiwerkSet, get: DraaiwerkGet, anchorHoleI
   set({
     selectedTrayId: null,
     pendingGearKey: pose.key,
-    feedback: "Tik nu een tweede tandwiel.",
+    feedback: getTexts(draaiwerkTexts).tapSecondGear,
     feedbackTone: "info",
   });
   playSound("select");
@@ -315,7 +320,7 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
 
   if (!canPlace(state.level, without, nextKind)) {
     set({
-      feedback: "Deze ketting kan niet van stand wisselen.",
+      feedback: getTexts(draaiwerkTexts).chainCannotToggle,
       feedbackTone: "warn",
     });
     playSound("almost");
@@ -326,7 +331,10 @@ function toggleBeltKindAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string)
   applyPlacements(set, get, nextPlacements);
   if (get().feedback === null) {
     set({
-      feedback: nextKind.kind === "crossed-belt" ? "Ketting gekruist." : "Ketting open.",
+      feedback:
+        nextKind.kind === "crossed-belt"
+          ? getTexts(draaiwerkTexts).chainCrossed
+          : getTexts(draaiwerkTexts).chainOpen,
       feedbackTone: "info",
     });
   }
@@ -445,7 +453,7 @@ function movePlacedAction(
   }
 
   if (!canPlace(state.level, without, next)) {
-    set({ feedback: "Daar past dit onderdeel niet.", feedbackTone: "warn" });
+    set({ feedback: getTexts(draaiwerkTexts).partDoesNotFit, feedbackTone: "warn" });
     playSound("almost");
     playHaptic("almost");
     return;
@@ -493,7 +501,9 @@ function removePlacedAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): 
     set,
     state,
     [found.placement, ...detached],
-    detached.length > 0 ? "Onderdeel en verbinding weggehaald." : "Onderdeel weggehaald.",
+    detached.length > 0
+      ? getTexts(draaiwerkTexts).partAndLinkRemoved
+      : getTexts(draaiwerkTexts).partRemoved,
   );
 }
 
@@ -510,7 +520,7 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
       get().tapGear(pose.key);
       return;
     }
-    set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
+    set({ feedback: getTexts(draaiwerkTexts).chooseFromTray, feedbackTone: "info" });
     playSound("tap");
     playHaptic("tap");
     return;
@@ -526,7 +536,7 @@ function tapHoleAction(set: DraaiwerkSet, get: DraaiwerkGet, holeId: string): vo
 
   const pose = drive(state.level, state.placements).gears.find((gear) => gear.holeId === holeId);
   if (!pose) {
-    set({ feedback: "Op dit gat zit nog geen tandwiel.", feedbackTone: "info" });
+    set({ feedback: getTexts(draaiwerkTexts).noGearHere, feedbackTone: "info" });
     return;
   }
   get().tapGear(pose.key);
@@ -556,7 +566,7 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
         return;
       }
     }
-    set({ feedback: "Kies eerst een onderdeel uit de la.", feedbackTone: "info" });
+    set({ feedback: getTexts(draaiwerkTexts).chooseFromTray, feedbackTone: "info" });
     return;
   }
 
@@ -564,7 +574,7 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
     if (!state.pendingGearKey) {
       set({
         pendingGearKey: key,
-        feedback: "Tik nu een tweede tandwiel voor de as.",
+        feedback: getTexts(draaiwerkTexts).instructionSecondAxleGear,
         feedbackTone: "info",
       });
       playSound("select");
@@ -600,7 +610,7 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
 
   const gears = drive(state.level, state.placements).gears;
   if (!gears.some((gear) => gear.key === key)) {
-    set({ feedback: "Dat tandwiel doet nog niet mee.", feedbackTone: "info" });
+    set({ feedback: getTexts(draaiwerkTexts).gearNotDriven, feedbackTone: "info" });
     return;
   }
 
@@ -614,7 +624,7 @@ function tapGearAction(set: DraaiwerkSet, get: DraaiwerkGet, key: string): void 
     set({
       selectedTrayId: null,
       pendingGearKey: key,
-      feedback: "Trek de ketting nu naar een ander tandwiel.",
+      feedback: getTexts(draaiwerkTexts).pullChain,
       feedbackTone: "info",
     });
   }
@@ -647,7 +657,7 @@ function hintAction(set: DraaiwerkSet, get: DraaiwerkGet): void {
   if (!placement) {
     set({
       hintPlacement: null,
-      feedback: "Bijna. Haal een onderdeel weg en probeer opnieuw.",
+      feedback: getTexts(draaiwerkTexts).almost,
       feedbackTone: "info",
     });
     return;

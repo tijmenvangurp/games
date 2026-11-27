@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-french", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-french", "shared-i18n", "shared-lib", "shared-ui"]
 }

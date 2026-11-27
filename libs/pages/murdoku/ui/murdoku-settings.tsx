@@ -1,5 +1,7 @@
 import type { MurdokuSettings } from "@features/murdoku-game";
+import { useTexts } from "@shared/i18n";
 import { Button, Panel } from "@shared/ui";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
 
 interface MurdokuSettingsSectionProps {
   settings: MurdokuSettings;
@@ -12,15 +14,14 @@ interface MurdokuSettingsSectionProps {
  * is een echte schakelaar: `aria-pressed` vertelt de stand.
  */
 export function MurdokuSettingsSection({ settings, onAutoCross }: MurdokuSettingsSectionProps) {
+  const t = useTexts(MURDOKU_PAGE_TEXTS).settings;
+
   return (
     <Panel as="section" aria-labelledby="murdoku-instellingen" padding="md">
       <h2 className="font-display text-xl" id="murdoku-instellingen">
-        Zo speel ik
+        {t.heading}
       </h2>
-      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-        Een kruisje betekent: hier kan niemand staan. Deze keuze geldt voor elke zaak en blijft
-        bewaard.
-      </p>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t.intro}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button
           aria-pressed={settings.autoCross}
@@ -28,13 +29,10 @@ export function MurdokuSettingsSection({ settings, onAutoCross }: MurdokuSetting
           variant={settings.autoCross ? "default" : "outline"}
           onClick={() => onAutoCross(!settings.autoCross)}
         >
-          Rij en kolom automatisch wegstrepen
+          {t.autoCross}
         </Button>
       </div>
-      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-        Automatisch wegstrepen zet zelf een kruisje in de rij en kolom van iemand die je plaatst. Zo
-        hoef je die vakjes niet zelf weg te strepen.
-      </p>
+      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.autoCrossNote}</p>
     </Panel>
   );
 }

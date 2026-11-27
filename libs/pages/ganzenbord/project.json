@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["features-ganzenbord", "entities-ganzenbord"]
+  "implicitDependencies": ["features-ganzenbord", "entities-ganzenbord", "shared-i18n"]
 }

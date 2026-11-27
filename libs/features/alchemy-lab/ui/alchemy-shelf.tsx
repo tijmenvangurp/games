@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
-import { ELEMENTS, getElement, type AlchemyElement } from "@entities/alchemy";
+import { ELEMENTS, elementName, getElement, type AlchemyElement } from "@entities/alchemy";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Panel } from "@shared/ui";
 import { filterAndSortElements, type CategoryFilter, type ElementSort } from "../model/filters";
@@ -8,12 +9,15 @@ import { useAlchemyStore } from "../model/use-alchemy-store";
 import { shelfIconItemId, shelfItemId } from "./dnd-ids";
 import { ElementFilters } from "./element-filters";
 import { ElementToken } from "./element-token";
+import { alchemyTexts } from "./texts";
 
 function ShelfToken({ element }: { element: AlchemyElement }) {
   const board = useAlchemyStore((state) => state.board);
   const selected = useAlchemyStore((state) => state.selected);
   const tileDrag = useDraggable({ id: shelfItemId(element.id) });
   const iconDrag = useDraggable({ id: shelfIconItemId(element.id) });
+  const language = useLanguage();
+  const t = useTexts(alchemyTexts);
   const tileWasDragging = useRef(false);
   const iconWasDragging = useRef(false);
 
@@ -65,7 +69,7 @@ function ShelfToken({ element }: { element: AlchemyElement }) {
         ref={tileDrag.setNodeRef}
         {...tileDrag.attributes}
         {...tileDrag.listeners}
-        aria-label={`${element.name} op de werkbank leggen`}
+        aria-label={t.putOnWorkbench(elementName(element.id, language))}
         className={cn(
           "touch-pan-x rounded-2xl p-1 transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 md:landscape:touch-pan-y",
           dragging && "opacity-30",
@@ -103,30 +107,30 @@ export function AlchemyShelf() {
   const selected = useAlchemyStore((state) => state.selected);
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [sort, setSort] = useState<ElementSort>("new");
+  const language = useLanguage();
+  const t = useTexts(alchemyTexts);
   const elements = discovered
     .map((id) => getElement(id))
     .filter((element): element is AlchemyElement => element !== undefined);
-  const visibleElements = filterAndSortElements(elements, category, sort);
+  const visibleElements = filterAndSortElements(elements, category, sort, language);
 
   return (
     <Panel
       as="section"
-      aria-label="Mijn elementen"
+      aria-label={t.myElements}
       className="flex min-h-0 min-w-0 flex-col md:h-full md:overflow-hidden md:portrait:h-auto md:landscape:col-span-2"
       padding="sm"
     >
       <div className="mb-2 shrink-0">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            Mijn elementen
+            {t.myElements}
           </h2>
           <p className="text-sm font-bold tabular-nums">
-            {elements.length} van {ELEMENTS.length}
+            {t.countOf(elements.length, ELEMENTS.length)}
           </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {selected ? "Kies een tweede element om te mengen" : "Tik of sleep naar de werkbank"}
-        </p>
+        <p className="text-xs text-muted-foreground">{selected ? t.pickSecond : t.tapOrDrag}</p>
       </div>
 
       {elements.length > 8 ? (
@@ -150,9 +154,7 @@ export function AlchemyShelf() {
           data-alchemy-shelf-scroll="true"
         >
           {visibleElements.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              Nog geen elementen in deze categorie.
-            </p>
+            <p className="py-4 text-center text-sm text-muted-foreground">{t.noneInCategoryYet}</p>
           ) : (
             <div className="flex shrink-0 gap-2 md:portrait:grid md:portrait:auto-cols-max md:portrait:grid-flow-col md:portrait:grid-rows-2 md:portrait:gap-1.5 md:landscape:grid md:landscape:grid-cols-4 md:landscape:gap-1.5 xl:gap-2">
               {visibleElements.map((element) => (

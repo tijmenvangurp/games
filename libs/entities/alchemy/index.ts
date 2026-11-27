@@ -3,7 +3,6 @@ export { RECIPES } from "./model/recipes";
 export {
   combine,
   createRecipeIndex,
-  elementName,
   findRecipeFor,
   findRecipesFor,
   getHint,
@@ -15,6 +14,7 @@ export {
   tierOf,
   totalElements,
 } from "./model/rules";
+export { categoryLabel, elementFact, elementName, missionTitle } from "./model/element-text";
 export {
   MISSIONS,
   completedMissionCount,

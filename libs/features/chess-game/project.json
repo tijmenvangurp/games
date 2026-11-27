@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-chess", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-chess", "shared-lib", "shared-ui", "shared-i18n"]
 }

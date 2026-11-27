@@ -19,10 +19,12 @@ import {
   type LetterId,
   type PlekQuestion,
 } from "@entities/letter";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import type { TileState } from "./letter-tile";
+import { letterTexts } from "./texts";
 
 function plekChoiceState(
   position: KlankPosition,
@@ -48,6 +50,7 @@ function LetterToken({ letter, disabled }: { letter: LetterId; disabled: boolean
     id: "plek-letter",
     disabled,
   });
+  const t = useTexts(letterTexts);
 
   const play = () => {
     const audio = audioRef.current;
@@ -67,7 +70,7 @@ function LetterToken({ letter, disabled }: { letter: LetterId; disabled: boolean
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        aria-label={`Letter ${letter}`}
+        aria-label={t.letter(letter)}
         className={cn(
           "flex size-16 touch-none items-center justify-center rounded-2xl border-2 border-primary bg-primary text-3xl font-black text-primary-foreground shadow-sm transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-40",
           isDragging && "opacity-30",
@@ -100,11 +103,12 @@ function PlekBox({
   onPlace: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: position, disabled });
+  const t = useTexts(letterTexts);
 
   return (
     <button
       ref={setNodeRef}
-      aria-label={`Vak ${index + 1}${revealed ? `: ${letter}` : ""}`}
+      aria-label={`${t.box(index + 1)}${revealed ? `: ${letter}` : ""}`}
       className={cn(
         "flex min-h-20 min-w-0 items-center justify-center rounded-2xl border-2 border-dashed text-3xl font-black transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:cursor-default disabled:active:scale-100",
         state === "default" && "border-border bg-muted/40",
@@ -132,6 +136,7 @@ export function PlekView({
   wrongChoices: readonly string[];
 }) {
   const [dragging, setDragging] = useState(false);
+  const t = useTexts(letterTexts);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 6 } }),
@@ -157,23 +162,17 @@ export function PlekView({
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
     >
-      <LetterAudio
-        autoPlay
-        label={`Luister naar ${question.word.word}`}
-        src={question.word.audio}
-      />
+      <LetterAudio autoPlay label={t.listenWord(question.word.word)} src={question.word.audio} />
       <div className="mt-3 text-center">
-        <p className="text-sm font-semibold text-muted-foreground">Waar hoor je deze klank?</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Sleep de letter naar het juiste vakje, of tik op een vakje.
-        </p>
+        <p className="text-sm font-semibold text-muted-foreground">{t.plekPrompt}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{t.plekHint}</p>
       </div>
 
       <div className="mt-3 flex justify-center">
         <LetterToken disabled={answered} letter={question.target} />
       </div>
 
-      <div aria-label="Kies het vak" className="mt-4 grid grid-cols-3 gap-2" role="group">
+      <div aria-label={t.chooseBox} className="mt-4 grid grid-cols-3 gap-2" role="group">
         {question.word.letters.map((letter, index) => {
           const position = KLANK_POSITIONS[index] ?? "begin";
           return (

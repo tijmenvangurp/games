@@ -7,8 +7,28 @@ export const GAME_CATEGORIES: readonly { readonly id: GameCategory; readonly lab
   { id: "ontdekken", label: "Ontdekken" },
 ];
 
+export type GameId =
+  | "sudoku"
+  | "math-trainer"
+  | "arrows"
+  | "seek"
+  | "word-search"
+  | "alchemy"
+  | "draaiwerk"
+  | "memory"
+  | "pokemon-quiz"
+  | "chess"
+  | "flags"
+  | "french-listening"
+  | "letters"
+  | "four-in-a-row"
+  | "ganzenbord"
+  | "typepret"
+  | "murdoku"
+  | "geheime-code";
+
 interface GameCatalogBase {
-  id: string;
+  id: GameId;
   name: string;
   description: string;
   category: GameCategory;

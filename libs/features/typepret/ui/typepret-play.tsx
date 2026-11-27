@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 import { currentTarget, fingerForKey, needsHint } from "@entities/typepret";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Panel, StatusBanner } from "@shared/ui";
 import { useNeedsKeyboard } from "../model/use-keyboard-hint";
 import { FINGER_COLORS } from "../model/finger-colors";
 import { useTypepretStore } from "../model/use-typepret-store";
 import { Keyboard } from "./keyboard";
+import { typepretTexts } from "./texts";
 
 function isTypingKey(event: KeyboardEvent): boolean {
   return (
@@ -33,6 +35,7 @@ export function TypepretPlay() {
   const round = useTypepretStore((state) => state.round);
   const needsKeyboard = useNeedsKeyboard();
   const focused = useWindowFocus();
+  const t = useTexts(typepretTexts);
 
   // Elke losse toets, op de getypte letter (`useKey`). Ctrl, Cmd, Alt en herhaalde
   // toetsen tellen niet mee; losse tekens blokkeren we, zodat ' of / geen snelzoekbalk opent.
@@ -61,12 +64,12 @@ export function TypepretPlay() {
     <section className="mx-auto flex w-full max-w-2xl flex-col gap-4">
       {needsKeyboard ? (
         <StatusBanner align="center" className="text-sm" role="status" tone="warning">
-          Sluit een toetsenbord aan om te oefenen. Blind leren typen kan niet op een aanraakscherm.
+          {t.playKeyboard}
         </StatusBanner>
       ) : null}
 
       <Panel
-        aria-label="Typ deze letters"
+        aria-label={t.typeThese}
         className="flex flex-wrap justify-center gap-x-5 gap-y-3"
         padding="lg"
         role="group"
@@ -119,8 +122,8 @@ export function TypepretPlay() {
               style={{ backgroundColor: FINGER_COLORS[finger.id] }}
             />
             <span>
-              {wrong ? "Probeer nog eens: " : "Gebruik je "}
-              {finger.label}
+              {wrong ? t.tryAgain : t.use}
+              {t.fingers[finger.id]}
             </span>
           </>
         ) : null}
@@ -130,12 +133,10 @@ export function TypepretPlay() {
 
       {!focused ? (
         <p className="text-center text-sm font-semibold text-muted-foreground" role="status">
-          Klik op het scherm om verder te typen.
+          {t.clickToContinue}
         </p>
       ) : (
-        <p className="text-center text-xs text-muted-foreground">
-          Voel de ribbeltjes op F en J en zet daar je wijsvingers.
-        </p>
+        <p className="text-center text-xs text-muted-foreground">{t.bumps}</p>
       )}
     </section>
   );

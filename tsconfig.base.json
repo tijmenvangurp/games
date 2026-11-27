@@ -23,6 +23,8 @@
       "@entities/*": ["./libs/entities/*/index.ts"],
       "@shared/lib": ["./libs/shared/lib/index.ts"],
       "@shared/lib/*": ["./libs/shared/lib/*"],
+      "@shared/i18n": ["./libs/shared/i18n/index.ts"],
+      "@shared/i18n/*": ["./libs/shared/i18n/*"],
       "@shared/ui": ["./libs/shared/ui/index.ts"],
       "@shared/ui/*": ["./libs/shared/ui/*"],
       "@/*": ["./apps/games/src/*"]

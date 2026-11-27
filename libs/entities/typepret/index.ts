@@ -17,5 +17,6 @@ export {
   startRound,
   verdictFor,
 } from "./model/round";
-export { WORDS } from "./model/words";
+export { lessonText } from "./model/texts";
+export { WORDS, wordsFor } from "./model/words";
 export type { FingerId, Progress, RoundResult, RoundState, Verdict } from "./model/types";

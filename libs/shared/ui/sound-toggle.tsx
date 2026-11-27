@@ -1,16 +1,19 @@
+import { useTranslation } from "@shared/i18n";
 import { toggleSound, useSoundEnabled } from "@shared/lib";
 import { Button } from "./button";
 import { Volume2, VolumeX } from "./icons";
 
 export function SoundToggle() {
   const enabled = useSoundEnabled();
+  const { t } = useTranslation();
+  const label = enabled ? t("shell.soundOff") : t("shell.soundOn");
 
   return (
     <Button
-      aria-label={enabled ? "Geluid uitzetten" : "Geluid aanzetten"}
+      aria-label={label}
       aria-pressed={enabled}
       size="icon"
-      title={enabled ? "Geluid uitzetten" : "Geluid aanzetten"}
+      title={label}
       variant="ghost"
       onClick={toggleSound}
     >

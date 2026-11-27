@@ -1,5 +1,7 @@
 import { useEffect, useId, useMemo, useRef } from "react";
 import type { ChessboardOptions } from "react-chessboard";
+import { useTexts } from "@shared/i18n";
+import type { SpeechLine } from "@shared/lib";
 import { chessBoardOptions, chessSquareStyles, useAutoSpeech } from "@shared/lib";
 import {
   Button,
@@ -13,10 +15,22 @@ import {
   StatusBanner,
   type StatusTone,
 } from "@shared/ui";
-import { puzzlePromptSpeech, puzzleStatusSpeech, puzzleTitleSpeech } from "../model/audio";
+import {
+  PUZZLE_STATUS_LINES,
+  puzzlePromptSpeech,
+  puzzleStatusKey,
+  type PuzzleStatusKey,
+} from "../model/audio";
 import { useChessPuzzle } from "../model/useChessPuzzle";
-import type { ChessPuzzle, PuzzleDifficulty, PuzzleFeedback, PuzzleStatus } from "../model/types";
+import type {
+  ChessPuzzle,
+  PuzzleDifficulty,
+  PuzzleFeedback,
+  PuzzleKind,
+  PuzzleStatus,
+} from "../model/types";
 import { PuzzleDifficultyPicker } from "./PuzzleDifficultyPicker";
+import { puzzleTexts } from "./texts";
 
 interface PuzzlePlayProps {
   readonly difficulty: PuzzleDifficulty;
@@ -31,54 +45,59 @@ interface PuzzlePlayProps {
 
 interface PuzzleHeaderProps {
   readonly index: number;
-  readonly prompt: ReturnType<typeof puzzlePromptSpeech>;
-  readonly title: ReturnType<typeof puzzleTitleSpeech>;
+  readonly kind: PuzzleKind;
+  readonly playerColor: "w" | "b";
   readonly titleId: string;
   readonly total: number;
 }
 
-function PuzzleHeader({ index, prompt, title, titleId, total }: PuzzleHeaderProps) {
+function PuzzleHeader({ index, kind, playerColor, titleId, total }: PuzzleHeaderProps) {
+  const t = useTexts(puzzleTexts);
+  const prompt = puzzlePromptSpeech(kind, playerColor);
+
   return (
     <header className="space-y-1 text-center">
       <p className="text-xs font-semibold tabular-nums text-muted-foreground">
-        Puzzel {index + 1} van {total}
+        {t.puzzleOf(index + 1, total)}
       </p>
       <h2 id={titleId} className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">
-        {title.text}
+        {t.titles[kind]}
       </h2>
       <div className="flex items-center justify-center gap-1">
-        <p className="text-sm font-semibold text-muted-foreground">{prompt.text}</p>
-        <SpeechButton className="shrink-0" label="Beluister de opdracht" line={prompt} />
+        <p className="text-sm font-semibold text-muted-foreground">
+          {t.prompts[kind][playerColor]}
+        </p>
+        <SpeechButton className="shrink-0" label={t.listenPrompt} line={prompt} />
       </div>
     </header>
   );
 }
 
 function BoardPanel({ options }: { readonly options: ChessboardOptions }) {
-  return (
-    <ChessBoard
-      label="Schaakbord met coördinaten a tot en met h en 1 tot en met 8. Tik op een stuk om te kijken waar het heen kan. Sleep een stuk om te zetten."
-      options={options}
-    />
-  );
+  const t = useTexts(puzzleTexts);
+
+  return <ChessBoard label={t.board} options={options} />;
 }
 
 interface PuzzleStatusProps {
-  readonly speech: ReturnType<typeof puzzleStatusSpeech>;
+  readonly statusKey: PuzzleStatusKey;
+  readonly speech: SpeechLine;
   readonly solved: boolean;
   readonly tone: StatusTone;
 }
 
-function PuzzleStatusBanner({ speech, solved, tone }: PuzzleStatusProps) {
+function PuzzleStatusBanner({ statusKey, speech, solved, tone }: PuzzleStatusProps) {
+  const t = useTexts(puzzleTexts);
+
   return (
     <StatusBanner
-      action={<SpeechButton label="Beluister de feedback" line={speech} />}
+      action={<SpeechButton label={t.listenFeedback} line={speech} />}
       align="center"
       className="text-sm"
       icon={solved ? <Check className="size-5" /> : undefined}
       tone={tone}
     >
-      {speech.text}
+      {t.status[statusKey]}
     </StatusBanner>
   );
 }
@@ -105,6 +124,8 @@ interface PuzzleActionsProps {
 }
 
 function PuzzleActions({ solved, onHint, onNext, onOverview, onReset }: PuzzleActionsProps) {
+  const t = useTexts(puzzleTexts);
+
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-3 gap-2">
@@ -115,20 +136,20 @@ function PuzzleActions({ solved, onHint, onNext, onOverview, onReset }: PuzzleAc
           onClick={onHint}
         >
           <Lightbulb aria-hidden="true" className="size-4 text-warning" />
-          Hint
+          {t.hint}
         </Button>
         <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onReset}>
           <RotateCcw aria-hidden="true" className="size-4" />
-          Opnieuw
+          {t.reset}
         </Button>
         <Button className="min-h-12 px-2 text-xs sm:text-sm" variant="outline" onClick={onOverview}>
           <LayoutGrid aria-hidden="true" className="size-4" />
-          Overzicht
+          {t.overview}
         </Button>
       </div>
       <Button className="w-full" disabled={!solved} size="lg" variant="success" onClick={onNext}>
         <Play aria-hidden="true" className="size-5" />
-        Volgende puzzel
+        {t.nextPuzzle}
       </Button>
     </div>
   );
@@ -147,15 +168,15 @@ export function PuzzlePlay({
   const puzzleState = useChessPuzzle(puzzle);
   const titleId = useId();
   const solvedRef = useRef(false);
-  const title = puzzleTitleSpeech(puzzle.kind);
   const prompt = puzzlePromptSpeech(puzzle.kind, puzzleState.playerColor);
-  const status = puzzleStatusSpeech(
+  const statusKey = puzzleStatusKey(
     puzzleState.feedback,
     puzzle.kind,
     puzzleState.status,
     puzzleState.playerColor,
     puzzleState.selectedColor,
   );
+  const status = PUZZLE_STATUS_LINES[statusKey];
   const solved = puzzleState.status === "solved";
   const tone = statusTone(puzzleState.status, puzzleState.feedback);
 
@@ -201,10 +222,16 @@ export function PuzzlePlay({
 
   return (
     <section aria-labelledby={titleId} className="mx-auto flex w-full max-w-xl flex-col gap-4">
-      <PuzzleHeader index={index} prompt={prompt} title={title} titleId={titleId} total={total} />
+      <PuzzleHeader
+        index={index}
+        kind={puzzle.kind}
+        playerColor={puzzleState.playerColor}
+        titleId={titleId}
+        total={total}
+      />
       <PuzzleDifficultyPicker current={difficulty} onSelect={onDifficultyChange} />
       <BoardPanel options={boardOptions} />
-      <PuzzleStatusBanner speech={status} solved={solved} tone={tone} />
+      <PuzzleStatusBanner speech={status} solved={solved} statusKey={statusKey} tone={tone} />
       <PuzzleActions
         solved={puzzleState.status === "solved"}
         onHint={puzzleState.showHint}

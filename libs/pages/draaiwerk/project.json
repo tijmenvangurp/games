@@ -19,6 +19,7 @@
     "features-draaiwerk",
     "entities-gear",
     "shared-lib",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

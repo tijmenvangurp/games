@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-geheime-code",
     "entities-geheime-code",
+    "shared-i18n",
     "shared-lib",
     "shared-ui"
   ]

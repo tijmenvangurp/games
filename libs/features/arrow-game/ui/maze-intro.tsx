@@ -1,5 +1,7 @@
-import type { MazeLevel } from "@entities/arrow";
+import { levelName, type MazeLevel } from "@entities/arrow";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { ArrowUp, Button, Home, LayoutGrid, Play, SoundToggle } from "@shared/ui";
+import { arrowTexts } from "../model/texts";
 
 interface MazeIntroProps {
   level: MazeLevel;
@@ -20,6 +22,8 @@ export function MazeIntro({
   onLevels,
   onHome,
 }: MazeIntroProps) {
+  const t = useTexts(arrowTexts);
+  const language = useLanguage();
   return (
     <main className="mx-auto flex min-h-svh w-full max-w-md flex-col gap-6 px-4 pb-safe pt-safe">
       <div className="flex justify-end">
@@ -31,34 +35,34 @@ export function MazeIntro({
           <span className="grid size-12 place-items-center rounded-lg bg-foreground text-background">
             <ArrowUp aria-hidden="true" className="size-7 stroke-2" />
           </span>
-          <span className="font-display text-4xl tracking-tight">Pijlen</span>
+          <span className="font-display text-4xl tracking-tight">{t.title}</span>
         </div>
 
         <p className="mt-8 text-sm font-bold uppercase tracking-widest text-muted-foreground">
-          Level {levelIndex + 1} van {levelCount}
+          {t.levelOf(levelIndex + 1, levelCount)}
         </p>
-        <h1 className="mt-1 font-display text-3xl tracking-tight">{level.name}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{level.arrows.length} pijlen</p>
+        <h1 className="mt-1 font-display text-3xl tracking-tight">{levelName(level, language)}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">{t.arrows(level.arrows.length)}</p>
 
         <Button className="mt-8 w-full max-w-xs" size="lg" variant="success" onClick={onPlay}>
           <Play aria-hidden="true" className="size-5" />
-          Spelen
+          {t.play}
         </Button>
 
         <div className="mt-3 flex w-full max-w-xs gap-2">
           <Button className="flex-1" variant="outline" onClick={onLevels}>
             <LayoutGrid aria-hidden="true" className="size-4" />
-            Levels
+            {t.levels}
           </Button>
           <Button className="flex-1" variant="ghost" onClick={onHome}>
             <Home aria-hidden="true" className="size-4" />
-            Menu
+            {t.menu}
           </Button>
         </div>
       </div>
 
       <p className="pb-2 text-center text-xs text-muted-foreground">
-        {unlocked} van {levelCount} levels vrijgespeeld
+        {t.unlocked(unlocked, levelCount)}
       </p>
     </main>
   );

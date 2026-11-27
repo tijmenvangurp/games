@@ -15,6 +15,8 @@ export { isFiniteNumber, isNonNegativeInteger, isNonNegativeNumber, isRecord } f
 export { isSoundEnabled, playSound, setSoundEnabled, toggleSound, useSoundEnabled } from "./sound";
 export {
   audioSrc,
+  hasRecordedSpeech,
+  useRecordedSpeech,
   isSpeechEnabled,
   setSpeechEnabled,
   speak,

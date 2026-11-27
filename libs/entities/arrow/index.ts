@@ -14,4 +14,5 @@ export {
   visibleArrowPoints,
 } from "./model/geometry";
 export { LEVEL_COUNT, MAZE_LEVELS, levelAt } from "./model/levels";
+export { levelName } from "./model/level-name";
 export type { MazeArrow, MazeDirection, MazeLevel, Point } from "./model/types";

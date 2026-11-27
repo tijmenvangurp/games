@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { createMurdokuPlay, everyonePlaced, useMurdokuStore } from "@features/murdoku-game";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
 import { useShallow } from "zustand/react/shallow";
 import { revealSentenceFor, progressSentenceFor } from "./murdoku-copy";
 import { MurdokuGameBody } from "./murdoku-game-body";
+import { MURDOKU_PAGE_TEXTS } from "./texts";
 import { useMurdokuSession } from "./use-murdoku-session";
 
 /**
@@ -20,6 +22,12 @@ import { useMurdokuSession } from "./use-murdoku-session";
  */
 export function MurdokuPage() {
   const navigate = useNavigate();
+  const language = useLanguage();
+  const t = useTexts(MURDOKU_PAGE_TEXTS);
+
+  useLayoutEffect(() => {
+    useMurdokuStore.setState({ clueFocus: null, clueFocusLabel: null });
+  }, [language]);
   const {
     start,
     selectPerson,
@@ -70,8 +78,8 @@ export function MurdokuPage() {
   // De eerste render gebeurt vóór de start-effect; een leeg bord is dan het
   // juiste beeld en houdt de pagina zonder flikkering bruikbaar.
   const play = storedPlay?.levelId === puzzle.id ? storedPlay : createMurdokuPlay(puzzle.id);
-  const revealSentence = revealSentenceFor(puzzle, text, play);
-  const progressMessage = progressSentenceFor(lastRound);
+  const revealSentence = revealSentenceFor(puzzle, text, play, t);
+  const progressMessage = progressSentenceFor(lastRound, t);
   const hintMessage = hint ? text.explanation(hint.explanation) : null;
   const clueMessage = clueFocusLabel
     ? text.explanation({ key: "board.wordOn", params: { word: clueFocusLabel } })
@@ -85,7 +93,7 @@ export function MurdokuPage() {
       }}
       showSpeech={false}
       subtitle={`${title} · ${puzzle.board.width} × ${puzzle.board.height}`}
-      title="Wie was het?"
+      title={t.title}
       wideLandscape
     >
       <MurdokuGameBody

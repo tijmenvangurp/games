@@ -7,7 +7,9 @@ import {
   holePoint,
   type Point,
 } from "./geometry";
+import { getTexts } from "@shared/i18n";
 import { allLevels } from "./levels";
+import { gearTexts } from "./texts";
 import type {
   ConnectionPose,
   DriveResult,
@@ -816,23 +818,17 @@ export function validateLevel(level: Level): string[] {
   return errors;
 }
 
-const SIZE_LABELS: Record<GearSize, string> = {
-  1: "klein",
-  2: "middelgroot",
-  3: "groot",
-};
-
+/** De naam van een onderdeel in de la, in de actieve taal. */
 export function trayLabel(item: TrayItem): string {
+  const t = getTexts(gearTexts);
   switch (item.kind) {
-    case "gear": {
-      const label = SIZE_LABELS[item.size];
-      return `${label.charAt(0).toUpperCase()}${label.slice(1)} tandwiel`;
-    }
+    case "gear":
+      return t.gears[item.size];
     case "belt":
-      return item.crossed === true ? "Gekruiste ketting" : "Ketting";
+      return item.crossed === true ? t.crossedChain : t.chain;
     case "chain":
-      return "Ketting";
+      return t.chain;
     case "axle":
-      return "As";
+      return t.axle;
   }
 }

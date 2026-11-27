@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
+import type { WordSearchPuzzle } from "@entities/word-search";
+import { useLanguage } from "@shared/i18n";
 import { playSound, useAutoSpeech } from "@shared/lib";
 import { wordSearchFeedbackSpeech } from "../model/audio";
 import { useWordSearchStore } from "../model/use-word-search-store";
 import { WordSearchBoard } from "./word-search-board";
 import { WordSearchSidebar } from "./word-search-sidebar";
+
+/** Een vaste sleutel per bord, zodat de spraak bij een nieuw bord opnieuw begint. */
+function puzzleKey(puzzle: WordSearchPuzzle | null): string {
+  return puzzle
+    ? `${puzzle.theme}:${puzzle.difficulty}:${puzzle.grid.map((row) => row.join("")).join("")}`
+    : "geen";
+}
 
 export function WordSearchPlay() {
   const puzzle = useWordSearchStore((state) => state.puzzle);
@@ -13,6 +22,8 @@ export function WordSearchPlay() {
   const wrong = useWordSearchStore((state) => state.wrong);
   const hint = useWordSearchStore((state) => state.hint);
   const [zoomed, setZoomed] = useState(false);
+  // De statustekst komt uit de actieve taal; zo rendert hij mee als de taal wisselt.
+  useLanguage();
 
   useEffect(() => {
     if (!wrong) {
@@ -32,11 +43,8 @@ export function WordSearchPlay() {
 
   const words = puzzle?.placements.map((placement) => placement.word) ?? [];
   const complete = puzzle !== null && found.length === words.length;
-  const puzzleId = puzzle
-    ? `${puzzle.theme}:${puzzle.difficulty}:${puzzle.grid.map((row) => row.join("")).join("")}`
-    : "geen";
   const feedback = wordSearchFeedbackSpeech({
-    puzzleId,
+    puzzleId: puzzleKey(puzzle),
     complete,
     wrong,
     selectedCount: selected.length,

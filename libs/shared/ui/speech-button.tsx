@@ -1,5 +1,5 @@
 import type { SpeechLine } from "@shared/lib";
-import { speak } from "@shared/lib";
+import { speak, useRecordedSpeech } from "@shared/lib";
 import { Button } from "./button";
 import { Ear } from "./icons";
 
@@ -11,6 +11,9 @@ interface SpeechButtonProps {
 
 /** Speelt een regel of reeks opnieuw. De tekst blijft zichtbaar in de UI. */
 export function SpeechButton({ line, label, className }: SpeechButtonProps) {
+  if (!useRecordedSpeech()) {
+    return null;
+  }
   return (
     <Button
       aria-label={label}

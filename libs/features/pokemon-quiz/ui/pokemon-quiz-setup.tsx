@@ -1,6 +1,8 @@
 import { PokemonAssetsCredits } from "@entities/pokedex";
+import { useTexts } from "@shared/i18n";
 import { OptionPicker, SetupPanel } from "@shared/ui";
-import { POKEMON_QUIZ_DIFFICULTY_OPTIONS, type PokemonQuizSettings } from "../model/settings";
+import { pokemonQuizDifficultyOptions, type PokemonQuizSettings } from "../model/settings";
+import { pokemonQuizTexts } from "../model/texts";
 import type { QuizDifficulty } from "../model/quiz";
 
 interface PokemonQuizSetupProps {
@@ -10,12 +12,13 @@ interface PokemonQuizSetupProps {
 }
 
 export function PokemonQuizSetup({ settings, onDifficultyChange, onStart }: PokemonQuizSetupProps) {
+  const t = useTexts(pokemonQuizTexts);
   return (
     <SetupPanel footer={<PokemonAssetsCredits />} onStart={onStart}>
       <OptionPicker
         columns={2}
-        legend="Moeilijkheid"
-        options={POKEMON_QUIZ_DIFFICULTY_OPTIONS}
+        legend={t.difficultyLegend}
+        options={pokemonQuizDifficultyOptions(t)}
         selected={settings.difficulty}
         onSelect={onDifficultyChange}
       />

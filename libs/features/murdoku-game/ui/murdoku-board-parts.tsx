@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import type { Cell, PersonId } from "@entities/murdoku";
 import type { MurdokuMode } from "../model/play";
+import { MURDOKU_UI_TEXTS } from "./texts";
 
 interface LabelsProps {
   width: number;
@@ -13,6 +15,8 @@ interface LabelsProps {
 /** De kolomlabels boven het bord (K1, K2, …). Puur visueel: de knoppen noemen
  * de rij en kolom al in hun toegankelijke naam. */
 export function MurdokuColumnLabels({ width, cell, labelSize }: Omit<LabelsProps, "height">) {
+  const t = useTexts(MURDOKU_UI_TEXTS).board;
+
   return (
     <div aria-hidden="true" className="flex">
       <span style={{ width: labelSize }} />
@@ -22,7 +26,7 @@ export function MurdokuColumnLabels({ width, cell, labelSize }: Omit<LabelsProps
       >
         {Array.from({ length: width }, (_, col) => (
           <span key={col} className="pb-1">
-            K{col + 1}
+            {`${t.colLetter}${col + 1}`}
           </span>
         ))}
       </div>
@@ -32,6 +36,8 @@ export function MurdokuColumnLabels({ width, cell, labelSize }: Omit<LabelsProps
 
 /** De rijlabels links van het bord (R1, R2, …). */
 export function MurdokuRowLabels({ height, cell, labelSize }: Omit<LabelsProps, "width">) {
+  const t = useTexts(MURDOKU_UI_TEXTS).board;
+
   return (
     <div
       aria-hidden="true"
@@ -40,7 +46,7 @@ export function MurdokuRowLabels({ height, cell, labelSize }: Omit<LabelsProps, 
     >
       {Array.from({ length: height }, (_, row) => (
         <span key={row} className="flex items-center justify-start">
-          R{row + 1}
+          {`${t.rowLetter}${row + 1}`}
         </span>
       ))}
     </div>
@@ -74,6 +80,7 @@ export function MurdokuCellGrid({
   onCellTap,
 }: CellGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
+  const t = useTexts(MURDOKU_UI_TEXTS).board;
 
   useEffect(() => {
     if (focusToken === 0) return;
@@ -88,14 +95,19 @@ export function MurdokuCellGrid({
     <div
       ref={gridRef}
       aria-describedby="murdoku-bordhulp"
-      aria-label="Vakjes van de plattegrond"
+      aria-label={t.cells}
       className="absolute inset-0 z-10 flex flex-col focus-visible:ring-4 focus-visible:ring-primary/40 focus-visible:ring-inset focus-visible:outline-none"
       data-board-grid="true"
       role="group"
       tabIndex={-1}
     >
       {rows.map((rowLabels, row) => (
-        <div key={row} aria-label={`Rij ${row + 1}`} className="flex min-h-0 flex-1" role="group">
+        <div
+          key={row}
+          aria-label={t.rowGroup(row + 1)}
+          className="flex min-h-0 flex-1"
+          role="group"
+        >
           {rowLabels.map((label, col) => {
             const index = row * width + col;
             return (

@@ -45,12 +45,6 @@ export const LETTER_LESSONS: readonly LetterLessonInfo[] = [
 
 export const KLANK_POSITIONS: readonly KlankPosition[] = ["begin", "midden", "eind"];
 
-export const KLANK_POSITION_PHRASES: Readonly<Record<KlankPosition, string>> = {
-  begin: "vooraan in",
-  midden: "in het midden van",
-  eind: "achteraan in",
-};
-
 export const LETTERS: readonly Letter[] = [
   { id: "i", glyph: "i", kind: "vowel", sound: sound("i", "mp3") },
   { id: "k", glyph: "k", kind: "consonant", sound: sound("k", "mp3") },

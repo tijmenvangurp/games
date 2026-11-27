@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { subjectName, subjectNameInSentence, type FlagSubject } from "@entities/geography";
+import { useLanguage, useTexts, type Language } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button, Panel, ScoreHeader } from "@shared/ui";
 import { PuzzleMap } from "./puzzle-map";
 import { DragGhost } from "./puzzle-ghost";
 import { PuzzleTray } from "./puzzle-tray";
+import { flagTexts } from "../model/texts";
 import { type PuzzleState, useFlagStore } from "../model/use-flags-store";
+
+type FlagTexts = (typeof flagTexts)[Language];
 
 /** Pointer travel below this is a tap, not a drag. */
 const DRAG_THRESHOLD = 8;
@@ -83,6 +88,8 @@ export function PuzzlePlay() {
   const dragRef = useRef<DragStart | null>(null);
   const dropAtRef = useRef(0);
   const [ghost, setGhost] = useState<Ghost | null>(null);
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
 
   useEffect(() => {
     const move = (event: PointerEvent) => {
@@ -127,7 +134,7 @@ export function PuzzlePlay() {
   if (loading) {
     return (
       <p aria-live="polite" className="text-center text-sm font-semibold text-muted-foreground">
-        Kaart laden…
+        {t.loadingMap}
       </p>
     );
   }
@@ -135,11 +142,9 @@ export function PuzzlePlay() {
   if (error || !puzzle) {
     return (
       <div className="space-y-3 text-center">
-        <p className="text-sm font-semibold text-muted-foreground">
-          De kaart kon niet laden. Probeer het nog eens.
-        </p>
+        <p className="text-sm font-semibold text-muted-foreground">{t.mapFailed}</p>
         <Button variant="outline" onClick={() => void useFlagStore.getState().startPuzzle()}>
-          Opnieuw
+          {t.retry}
         </Button>
       </div>
     );
@@ -148,12 +153,18 @@ export function PuzzlePlay() {
   const { round, map, selected, placed, feedback } = puzzle;
   const total = round.questions.length;
   const placedSet = new Set(placed);
+  const subjects = new Map(
+    round.questions.map((question) => [question.subject.code, question.subject]),
+  );
   const names = new Map(
-    round.questions.map((question) => [question.subject.code, question.subject.name]),
+    round.questions.map((question) => [
+      question.subject.code,
+      subjectName(question.subject, language),
+    ]),
   );
   const pieces = new Map(map.pieces.map((piece) => [piece.code, piece]));
-  const selectedName = selected ? names.get(selected) : undefined;
-  const feedbackText = describeFeedback(feedback, selectedName);
+  const selectedSubject = selected ? subjects.get(selected) : undefined;
+  const feedbackText = describeFeedback(feedback, selectedSubject, t, language);
 
   const startDrag = (event: ReactPointerEvent, code: string) => {
     event.preventDefault();
@@ -182,11 +193,7 @@ export function PuzzlePlay() {
 
   return (
     <div className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-3 lg:max-w-4xl">
-      <ScoreHeader
-        progress={`${placed.length} van ${total} geplaatst`}
-        stars={stars}
-        streak={streak}
-      />
+      <ScoreHeader progress={t.placed(placed.length, total)} stars={stars} streak={streak} />
 
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-2 lg:items-start">
         <Panel as="section" padding="sm">
@@ -238,20 +245,24 @@ export function PuzzlePlay() {
 
 function describeFeedback(
   feedback: PuzzleState["feedback"],
-  selectedName: string | undefined,
+  selected: FlagSubject | undefined,
+  t: FlagTexts,
+  language: Language,
 ): string {
+  const name = (subject: FlagSubject) => subjectNameInSentence(subject, language);
+
   if (!feedback) {
-    return selectedName ? `Waar ligt ${selectedName}?` : "Kies een stuk en leg het op de kaart.";
+    return selected ? t.whereIs(name(selected)) : t.pickPiece;
   }
   if (feedback.kind === "correct") {
-    return `Goed! ${feedback.name} ligt op de juiste plek.`;
+    return t.correct(name(feedback.subject));
   }
   if (feedback.kind === "revealed") {
-    return `Hier hoort ${feedback.name}.`;
+    return t.revealed(name(feedback.subject));
   }
-  if (feedback.wrongName) {
-    return `Dat is ${feedback.wrongName}. Zoek ${feedback.name}.`;
+  if (feedback.wrong) {
+    return t.wrongPlace(name(feedback.wrong), name(feedback.subject));
   }
 
-  return `Leg ${feedback.name} op het land.`;
+  return t.dropOnMap(name(feedback.subject));
 }

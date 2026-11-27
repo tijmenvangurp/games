@@ -1,12 +1,13 @@
 import {
   levelHint,
-  MATH_LEVEL_INFO,
   MATH_LEVELS,
-  MATH_MODE_INFO,
+  MATH_MODE_SYMBOLS,
   MATH_MODES,
+  mathTexts,
   type MathLevel,
   type MathMode,
 } from "@entities/math";
+import { getTexts } from "@shared/i18n";
 
 export interface MathSettings {
   mode: MathMode;
@@ -18,17 +19,22 @@ export const DEFAULT_MATH_SETTINGS: MathSettings = {
   level: "makkelijk",
 };
 
-export const MATH_MODE_OPTIONS = MATH_MODES.map((mode) => ({
-  value: mode,
-  label: MATH_MODE_INFO[mode].label,
-  hint: MATH_MODE_INFO[mode].hint,
-  symbol: MATH_MODE_INFO[mode].symbol,
-}));
+/** De soorten sommen met hun naam in de actieve taal. */
+export function modeOptions() {
+  const t = getTexts(mathTexts);
+  return MATH_MODES.map((mode) => ({
+    value: mode,
+    label: t.modes[mode].label,
+    hint: t.modes[mode].hint,
+    symbol: MATH_MODE_SYMBOLS[mode],
+  }));
+}
 
 export function levelOptionsFor(mode: MathMode) {
+  const t = getTexts(mathTexts);
   return MATH_LEVELS.map((level) => ({
     value: level,
-    label: MATH_LEVEL_INFO[level].label,
+    label: t.levels[level],
     hint: levelHint(mode, level),
   }));
 }

@@ -1,4 +1,6 @@
 import { Button, Panel, Volume2 } from "@shared/ui";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 interface FrenchAudioPanelProps {
   kind: "word" | "phrase";
@@ -6,9 +8,10 @@ interface FrenchAudioPanelProps {
 }
 
 export function FrenchAudioPanel({ kind, onReplay }: FrenchAudioPanelProps) {
+  const t = useTexts(frenchTexts);
   const isWord = kind === "word";
-  const label = isWord ? "Luister naar het woord" : "Luister naar de zin";
-  const ariaLabel = isWord ? "Beluister het Franse woord" : "Beluister de Franse zin";
+  const label = isWord ? t.listenWord : t.listenPhrase;
+  const ariaLabel = isWord ? t.playWord : t.playPhrase;
 
   return (
     <Panel className="text-center" padding="lg">
@@ -22,7 +25,7 @@ export function FrenchAudioPanel({ kind, onReplay }: FrenchAudioPanelProps) {
       </Button>
       <div className="mt-3 flex justify-center gap-2">
         <Button size="sm" variant="outline" onClick={() => onReplay(0.7)}>
-          Langzaam
+          {t.slow}
         </Button>
       </div>
     </Panel>

@@ -1,90 +1,54 @@
+import { currentLanguage, type Language } from "@shared/i18n";
 import { COUNTRIES } from "./countries";
 import { PROVINCES } from "./provinces";
-import {
-  CONTINENTS,
-  type Continent,
-  type FlagDirection,
-  type FlagLevel,
-  type FlagScope,
-  type FlagSubject,
-  type Region,
-} from "./types";
+import { geographyTexts } from "./texts";
+import type { Continent, FlagDirection, FlagLevel, FlagScope, FlagSubject, Region } from "./types";
 
 const FLAG_ASSET_ROOT = "/flags";
 
-interface RegionInfo {
-  label: string;
-}
-
-const REGION_INFO: Record<Region, RegionInfo> = {
-  europa: { label: "Europa" },
-  azie: { label: "Azië" },
-  afrika: { label: "Afrika" },
-  "noord-amerika": { label: "Noord-Amerika" },
-  "zuid-amerika": { label: "Zuid-Amerika" },
-  oceanie: { label: "Oceanië" },
-  nederland: { label: "Nederland" },
-};
-
 function countFor(continent: Continent): number {
   return COUNTRIES.filter((country) => country.region === continent).length;
-}
-
-interface ScopeInfo {
-  label: string;
-  hint: string;
 }
 
 /**
  * The areas to choose from. "wereld" is every country; a continent is its
  * countries; "nederland" is the twelve provinces.
  */
-export const FLAG_SCOPE_INFO: Record<FlagScope, ScopeInfo> = {
-  wereld: {
-    label: "Hele wereld",
-    hint: `Alle ${COUNTRIES.length} landen`,
-  },
-  ...Object.fromEntries(
-    CONTINENTS.map((continent) => [
-      continent,
-      {
-        label: REGION_INFO[continent].label,
-        hint: `${countFor(continent)} landen`,
-      },
-    ]),
-  ),
-  nederland: {
-    label: "Nederland",
-    hint: `${PROVINCES.length} provincies`,
-  },
-} as Record<FlagScope, ScopeInfo>;
+export function flagScopeLabel(scope: FlagScope, language: Language = currentLanguage()): string {
+  return geographyTexts[language].scopes[scope];
+}
 
-interface LevelInfo {
-  label: string;
-  hint: string;
+/** How many subjects a scope offers: "Alle 197 landen", "46 landen" or "12 provincies". */
+export function flagScopeHint(scope: FlagScope, language: Language = currentLanguage()): string {
+  const texts = geographyTexts[language];
+  if (scope === "wereld") {
+    return texts.allCountries(COUNTRIES.length);
+  }
+  if (scope === "nederland") {
+    return texts.provinces(PROVINCES.length);
+  }
+  return texts.countries(countFor(scope));
 }
 
 /** How many options the hardest level offers, per scope. */
 export const HARD_LEVEL_CHOICES = 12;
 
-export const FLAG_LEVEL_INFO: Record<FlagLevel, LevelInfo> = {
-  makkelijk: { label: "Makkelijk", hint: "3 keuzes" },
-  gemiddeld: { label: "Gemiddeld", hint: "4 keuzes" },
-  moeilijk: { label: "Moeilijk", hint: `${HARD_LEVEL_CHOICES} keuzes, lookalikes eerst` },
-};
+export function flagLevelLabel(level: FlagLevel, language: Language = currentLanguage()): string {
+  return geographyTexts[language].levels[level];
+}
 
 /**
  * The question for a direction, in the words that fit the scope: a country
  * scope asks for a country, the province scope asks for a province.
  */
-export function directionPrompt(direction: FlagDirection, scope: FlagScope): string {
-  const provinces = scope === "nederland";
+export function directionPrompt(
+  direction: FlagDirection,
+  scope: FlagScope,
+  language: Language = currentLanguage(),
+): string {
+  const prompts = geographyTexts[language].prompts[direction];
 
-  if (direction === "vlag-naar-land") {
-    return provinces ? "Welke provincie hoort bij deze vlag?" : "Welk land hoort bij deze vlag?";
-  }
-
-  return provinces ? "Welke vlag hoort bij deze provincie?" : "Welke vlag hoort bij dit land?";
+  return scope === "nederland" ? prompts.provinces : prompts.countries;
 }
 
 /**
@@ -184,21 +148,26 @@ export function flagSrc(subject: Pick<FlagSubject, "code">): string {
   return `${FLAG_ASSET_ROOT}/${subject.code}.svg`;
 }
 
-/** "Europa", "Afrika" or "Nederland". */
-export function regionLabel(region: Region): string {
-  return REGION_INFO[region].label;
+/** "Europa", "Afrika" or "Nederland", as it reads inside a sentence. */
+export function regionLabel(region: Region, language: Language = currentLanguage()): string {
+  return geographyTexts[language].regionsInSentence[region];
 }
 
 /** The level hint, which changes with the scope and its number of subjects. */
-export function levelHint(level: FlagLevel, scope: FlagScope): string {
+export function levelHint(
+  level: FlagLevel,
+  scope: FlagScope,
+  language: Language = currentLanguage(),
+): string {
+  const texts = geographyTexts[language];
   if (level !== "moeilijk") {
-    return FLAG_LEVEL_INFO[level].hint;
+    return level === "makkelijk" ? texts.easyHint : texts.mediumHint;
   }
   if (scope === "nederland") {
-    return `Alle ${PROVINCES.length} provincies`;
+    return texts.allProvinces(PROVINCES.length);
   }
 
   return scope === "wereld"
-    ? `${HARD_LEVEL_CHOICES} keuzes uit de hele wereld`
-    : `${HARD_LEVEL_CHOICES} keuzes uit hetzelfde continent`;
+    ? texts.worldChoices(HARD_LEVEL_CHOICES)
+    : texts.continentChoices(HARD_LEVEL_CHOICES);
 }

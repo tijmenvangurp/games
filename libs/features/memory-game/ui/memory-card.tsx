@@ -1,7 +1,9 @@
 import type { Pokemon } from "@entities/pokedex";
 import { PokeballMark, pokemonAnimatedSrc, pokemonArtworkSrc } from "@entities/pokedex";
+import { useTexts } from "@shared/i18n";
 import { Sparkles } from "@shared/ui";
 import { cn } from "@shared/lib";
+import { memoryTexts } from "../model/texts";
 
 interface MemoryCardProps {
   pokemon: Pokemon;
@@ -22,11 +24,8 @@ export function MemoryCard({
   hintLevel,
   onFlip,
 }: MemoryCardProps) {
-  const label = faceUp
-    ? matched
-      ? `${pokemon.name}, gevonden`
-      : pokemon.name
-    : "Omgedraaide kaart";
+  const t = useTexts(memoryTexts);
+  const label = faceUp ? (matched ? t.cardFound(pokemon.name) : pokemon.name) : t.cardHidden;
 
   return (
     <button

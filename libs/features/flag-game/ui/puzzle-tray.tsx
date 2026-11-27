@@ -1,7 +1,9 @@
 import type { PointerEvent as ReactPointerEvent } from "react";
-import type { PuzzlePiece } from "@entities/geography";
+import { subjectName, type FlagSubject, type PuzzlePiece } from "@entities/geography";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Check, Panel } from "@shared/ui";
+import { flagTexts } from "../model/texts";
 
 export function PieceShape({ piece }: { piece: PuzzlePiece | undefined }) {
   if (!piece) {
@@ -21,7 +23,7 @@ export function PieceShape({ piece }: { piece: PuzzlePiece | undefined }) {
 
 interface PuzzleTrayProps {
   pieces: ReadonlyMap<string, PuzzlePiece>;
-  subjects: readonly { code: string; name: string }[];
+  subjects: readonly FlagSubject[];
   placed: ReadonlySet<string>;
   selected: string | null;
   onGrab: (event: ReactPointerEvent, code: string) => void;
@@ -37,9 +39,12 @@ export function PuzzleTray({
   onGrab,
   onKeyboardSelect,
 }: PuzzleTrayProps) {
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
+
   return (
     <Panel as="section" padding="sm">
-      <p className="sr-only">Puzzelstukken</p>
+      <p className="sr-only">{t.pieces}</p>
       <div className="grid grid-cols-4 gap-2">
         {subjects.map((country) => {
           const isPlaced = placed.has(country.code);
@@ -48,7 +53,7 @@ export function PuzzleTray({
           return (
             <button
               key={country.code}
-              aria-label={`${country.name} (stuk)`}
+              aria-label={t.piece(subjectName(country, language))}
               aria-pressed={isSelected}
               className={cn(
                 "relative flex aspect-square touch-none items-center justify-center rounded-xl border bg-card p-1 transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",

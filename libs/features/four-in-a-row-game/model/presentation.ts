@@ -1,17 +1,20 @@
 import {
-  PLAYER_INFO,
+  fourInARowLabels,
   winnerOf,
   type FourInARowGame,
   type FourInARowMode,
   type Player,
 } from "@entities/four-in-a-row";
+import { getTexts } from "@shared/i18n";
+import { fourInARowTexts } from "./texts";
 
 /** Spelersnamen zoals het kind ze ziet; bij de computer heet speler een "Jij". */
 export function playerName(player: Player, mode: FourInARowMode): string {
+  const t = getTexts(fourInARowTexts);
   if (mode === "computer") {
-    return player === "one" ? "Jij" : "Computer";
+    return player === "one" ? t.you : t.computer;
   }
-  return PLAYER_INFO[player].label;
+  return getTexts(fourInARowLabels).players[player];
 }
 
 export function standText(score: Record<Player, number>, mode: FourInARowMode): string {
@@ -19,22 +22,25 @@ export function standText(score: Record<Player, number>, mode: FourInARowMode): 
 }
 
 function winText(winner: Player, mode: FourInARowMode): string {
+  const t = getTexts(fourInARowTexts);
   if (mode === "computer") {
-    return winner === "one" ? "Jij hebt vier op een rij!" : "De computer heeft vier op een rij!";
+    return t.computerWins[winner];
   }
-  return `${PLAYER_INFO[winner].label} heeft vier op een rij!`;
+  return t.playerWins(playerName(winner, mode));
 }
 
 export function winTitle(winner: Player, mode: FourInARowMode): string {
+  const t = getTexts(fourInARowTexts);
   if (mode === "computer") {
-    return winner === "one" ? "Jij wint!" : "De computer wint!";
+    return t.computerTitle[winner];
   }
-  return `${PLAYER_INFO[winner].label} wint!`;
+  return t.playerTitle(playerName(winner, mode));
 }
 
 export function statusText(game: FourInARowGame, mode: FourInARowMode): string {
+  const t = getTexts(fourInARowTexts);
   if (game.draw) {
-    return "Het bord is vol: gelijkspel!";
+    return t.draw;
   }
 
   const winner = winnerOf(game);
@@ -43,16 +49,16 @@ export function statusText(game: FourInARowGame, mode: FourInARowMode): string {
   }
 
   if (mode === "computer" && game.current === "two") {
-    return "De computer denkt na…";
+    return t.thinking;
   }
 
   if (game.drops.length === 0) {
-    return `${playerName(game.current, mode)} begint. Tik op een kolom om je schijf te laten vallen.`;
+    return t.starts(playerName(game.current, mode));
   }
 
   if (mode === "computer" && game.current === "one") {
-    return "Jij bent aan de beurt.";
+    return t.yourTurn;
   }
 
-  return `${playerName(game.current, mode)} is aan de beurt.`;
+  return t.turn(playerName(game.current, mode));
 }

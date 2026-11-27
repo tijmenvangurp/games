@@ -10,8 +10,6 @@ export type ToneId = "indigo" | "green" | "orange" | "pink" | "violet" | "blue";
 
 export interface CodeSymbol {
   readonly id: string;
-  /** Nederlandse naam voor de schermlezer en de symbolensheet. */
-  readonly name: string;
   readonly tone: ToneId;
 }
 

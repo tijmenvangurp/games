@@ -1,11 +1,13 @@
 import { useMemo, useRef, useState, type MouseEvent, type Ref } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { Panel } from "@shared/ui";
+import { useLanguage, useTexts } from "@shared/i18n";
 import {
   boardViewBox,
   connectionPath,
   gearRadius,
   holeCenter,
+  levelText,
   type DriveResult,
   type GearPose,
   type Hole,
@@ -16,6 +18,7 @@ import {
   type TrayItem,
 } from "@entities/gear";
 import { outputName } from "../model/labels";
+import { draaiwerkTexts } from "../model/texts";
 import {
   holesForPlacement,
   looseBeltTarget,
@@ -116,8 +119,9 @@ interface DraaiwerkHoleProps {
 function DraaiwerkHole({ level, hole, blocked, occupied, hint, onHole }: DraaiwerkHoleProps) {
   const { isOver, setNodeRef } = useDroppable({ id: `hole:${hole.id}` });
   const center = holeCenter(level, hole.id);
-  const label = `Gat ${hole.col}, ${hole.row}${
-    blocked ? ", geblokkeerd" : occupied ? ", bezet" : ""
+  const t = useTexts(draaiwerkTexts);
+  const label = `${t.hole(hole.col, hole.row)}${
+    blocked ? t.blockedSuffix : occupied ? t.occupiedSuffix : ""
   }`;
 
   return (
@@ -233,6 +237,7 @@ function PlacedGearHandle({ pose, enabled }: { pose: GearPose; enabled: boolean 
     id: `placed:${pose.key}`,
     disabled: !enabled,
   });
+  const t = useTexts(draaiwerkTexts);
 
   if (!enabled) {
     return null;
@@ -243,7 +248,7 @@ function PlacedGearHandle({ pose, enabled }: { pose: GearPose; enabled: boolean 
       ref={(node) => setNodeRef(node as unknown as HTMLElement)}
       {...attributes}
       {...listeners}
-      aria-label="Verplaats dit onderdeel"
+      aria-label={t.movePart}
       className="draaiwerk-placed-handle"
       cx={pose.center.x}
       cy={pose.center.y}
@@ -269,6 +274,7 @@ function PlacedConnectionHandle({
     id: `placed:belt:${connection.key}`,
     disabled: !enabled,
   });
+  const t = useTexts(draaiwerkTexts);
   const from = gears.find((pose) => pose.key === connection.fromKey);
   const to = gears.find((pose) => pose.key === connection.toKey);
 
@@ -284,7 +290,7 @@ function PlacedConnectionHandle({
       ref={(node) => setNodeRef(node as unknown as HTMLElement)}
       {...attributes}
       {...listeners}
-      aria-label="Verplaats of verwijder deze verbinding"
+      aria-label={t.moveConnection}
       className="draaiwerk-placed-handle"
       data-placed-key={`belt:${connection.key}`}
       style={{ touchAction: "none" }}
@@ -317,6 +323,7 @@ function LooseBeltBand({
     disabled: !enabled,
   });
   const pressPoint = useRef<{ x: number; y: number } | null>(null);
+  const t = useTexts(draaiwerkTexts);
 
   // A loose chain is a big loop draped over the gear, with the handle at the
   // bottom so it reads as something gravity is pulling on.
@@ -346,7 +353,7 @@ function LooseBeltBand({
         ref={(node) => setNodeRef(node as unknown as HTMLElement)}
         {...attributes}
         {...listeners}
-        aria-label="Trek de ketting naar een ander tandwiel"
+        aria-label={t.pullLooseChain}
         className="draaiwerk-loose-handle"
         data-placed-key={`loose:${pose.holeId}`}
         role="button"
@@ -403,15 +410,14 @@ function BeltHitTarget({
   onToggle: (key: string) => void;
 }) {
   const [focused, setFocused] = useState(false);
+  const t = useTexts(draaiwerkTexts);
 
   if (!enabled || connection.kind === "chain" || connection.kind === "axle") {
     return null;
   }
 
   const crossed = connection.kind === "crossed-belt";
-  const label = crossed
-    ? "Ketting, gekruist; tik om open te maken"
-    : "Ketting, open; tik om te kruisen";
+  const label = crossed ? t.chainCrossedToggle : t.chainOpenToggle;
   const toggle = () => onToggle(connection.key);
 
   return (
@@ -475,6 +481,8 @@ export function DraaiwerkBoard({
   onLoose,
   onToggleBelt,
 }: DraaiwerkBoardProps) {
+  const t = useTexts(draaiwerkTexts);
+  const language = useLanguage();
   const layout = useMemo(() => {
     const [x, y, width, height] = boardViewBox(level).split(" ").map(Number);
     return { x: x as number, y: y as number, width: width as number, height: height as number };
@@ -499,11 +507,11 @@ export function DraaiwerkBoard({
       result.gears.map((pose) => {
         const output = outputByPose.get(pose.key);
         const config = output ? outputById.get(output.id) : undefined;
-        const label = pose.key === "motor" ? "Motor" : config ? outputName(config.kind) : undefined;
+        const label = pose.key === "motor" ? t.motor : config ? outputName(config.kind) : undefined;
         return [pose.key, { output, config, label }] as const;
       }),
     );
-  }, [outputById, result.gears, result.outputs]);
+  }, [outputById, result.gears, result.outputs, t]);
   const toneFor = (pose: GearPose): GearTone => {
     const meta = poseMeta.get(pose.key);
     const output = meta?.output;
@@ -604,7 +612,7 @@ export function DraaiwerkBoard({
 
   return (
     <Panel
-      aria-label={`Tandwielbord van ${level.name}`}
+      aria-label={t.board(levelText(level, language).name)}
       as="section"
       className="relative min-h-72 overflow-hidden p-1 sm:min-h-80 sm:p-2 md:h-full md:min-h-0 md:landscape:col-span-5"
       data-draaiwerk-board="true"
@@ -614,7 +622,7 @@ export function DraaiwerkBoard({
     >
       <svg
         ref={svgRef}
-        aria-label={`Tandwielbord van ${level.name}`}
+        aria-label={t.board(levelText(level, language).name)}
         className="draaiwerk-board h-full w-full touch-manipulation select-none"
         preserveAspectRatio="xMidYMid meet"
         role="group"

@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-murdoku-game",
     "entities-murdoku",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

@@ -1,8 +1,8 @@
 export {
-  MURDOKU_INTRO_INTRO,
   MURDOKU_INTRO_LEVEL,
   MURDOKU_INTRO_LOOT,
   MURDOKU_INTRO_SOLUTION,
+  MURDOKU_INTRO_TEXTS,
 } from "./lib/intro-level";
 export { CANDIDATE_BLUE as MURDOKU_CANDIDATE_COLOR } from "./lib/palette";
 export { MURDOKU_NL_TEXTS } from "./lib/nl";

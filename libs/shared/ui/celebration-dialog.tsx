@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "@shared/i18n";
 import { playSound } from "@shared/lib";
 import { Button } from "./button";
 import { Confetti } from "./confetti";
@@ -23,11 +24,12 @@ export function CelebrationDialog({
   onAgain,
   onChoose,
   onHome,
-  againLabel = "Nog een keer",
-  chooseLabel = "Ander spel kiezen",
-  homeLabel = "Naar het menu",
+  againLabel,
+  chooseLabel,
+  homeLabel,
   confetti = false,
 }: CelebrationDialogProps) {
+  const { t } = useTranslation();
   useEffect(() => {
     playSound("win");
   }, []);
@@ -65,14 +67,14 @@ export function CelebrationDialog({
       <div className="mt-6 space-y-2">
         <Button autoFocus className="w-full" size="lg" variant="success" onClick={onAgain}>
           <Sparkles aria-hidden="true" className="size-5" />
-          {againLabel}
+          {againLabel ?? t("celebration.again")}
         </Button>
         <Button className="min-h-11 w-full" variant="outline" onClick={onChoose}>
           <LayoutGrid aria-hidden="true" className="size-4" />
-          {chooseLabel}
+          {chooseLabel ?? t("celebration.choose")}
         </Button>
         <Button className="min-h-11 w-full" variant="ghost" onClick={onHome}>
-          {homeLabel}
+          {homeLabel ?? t("celebration.home")}
         </Button>
       </div>
     </Dialog>

@@ -1,5 +1,6 @@
 import type { Cell, LevelJson, PersonId } from "@entities/murdoku";
 import type { MurdokuLoot } from "@entities/murdoku";
+import { defineTexts } from "@shared/i18n";
 import { roomTint } from "./palette";
 
 /**
@@ -9,8 +10,19 @@ import { roomTint } from "./palette";
 export const MURDOKU_INTRO_LOOT: MurdokuLoot = { name: "de taart", icon: "cake" };
 
 /** De intro die bij de instapzaak op de pagina staat. */
-export const MURDOKU_INTRO_INTRO =
+const MURDOKU_INTRO_INTRO =
   "Op de verjaardag is de taart ineens weg. Lees de aanwijzingen en vind de dief die als enige bij de buit was.";
+
+/** De titel en intro van de instapzaak, en de naam van de buit, per taal. */
+export const MURDOKU_INTRO_TEXTS = defineTexts(
+  { title: "De verdwenen taart", intro: MURDOKU_INTRO_INTRO, loot: "de taart" },
+  {
+    title: "The Missing Cake",
+    intro:
+      "At the birthday party, the cake is suddenly gone. Read the clues and find the thief who was the only one with the loot.",
+    loot: "the cake",
+  },
+);
 
 /**
  * De eigen 4×4-instapzaak van Wie was het?. Geen boekzaak: plattegrond, meubels
@@ -34,7 +46,7 @@ export const MURDOKU_INTRO_INTRO =
 export const MURDOKU_INTRO_LEVEL: LevelJson = {
   schema: 1,
   id: "intro-4x4-verjaardag",
-  title: "De verdwenen taart",
+  title: MURDOKU_INTRO_TEXTS.nl.title,
   size: { width: 4, height: 4 },
   rooms: {
     "1": { nameKey: "room.keuken", color: roomTint(0) },

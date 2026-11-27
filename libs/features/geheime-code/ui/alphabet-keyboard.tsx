@@ -1,4 +1,6 @@
+import { useTexts } from "@shared/i18n";
 import { Eraser } from "@shared/ui";
+import { geheimeCodePlayTexts } from "./texts";
 
 const ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"] as const;
 
@@ -8,8 +10,9 @@ interface AlphabetKeyboardProps {
 }
 
 export function AlphabetKeyboard({ onLetter, onClear }: AlphabetKeyboardProps) {
+  const t = useTexts(geheimeCodePlayTexts);
   return (
-    <div aria-label="Kies een letter" className="flex flex-col gap-0.5 sm:gap-1.5" role="group">
+    <div aria-label={t.chooseLetter} className="flex flex-col gap-0.5 sm:gap-1.5" role="group">
       {ROWS.map((row, rowIndex) => (
         <div key={row} className="grid grid-cols-10 gap-0.5 sm:gap-1.5">
           {rowIndex > 0 ? <span aria-hidden="true" /> : null}
@@ -26,7 +29,7 @@ export function AlphabetKeyboard({ onLetter, onClear }: AlphabetKeyboardProps) {
           ))}
           {rowIndex === 2 ? (
             <button
-              aria-label="Wissen"
+              aria-label={t.erase}
               className="col-span-2 flex h-11 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 sm:h-12"
               type="button"
               onClick={onClear}

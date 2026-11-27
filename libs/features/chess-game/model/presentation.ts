@@ -5,11 +5,27 @@ import {
   type ChessPlayer,
   type ChessResult,
 } from "@entities/chess";
+import { getTexts } from "@shared/i18n";
+import { presentationTexts } from "./texts";
 
-export const SIDE_LABEL: Record<Color, string> = { w: "Wit", b: "Zwart" };
+/** De Nederlandse kantnamen; gebruik `sideLabel` voor de actieve taal. */
+export const SIDE_LABEL: Record<Color, string> = presentationTexts.nl.side;
+
+export function sideLabel(color: Color): string {
+  return getTexts(presentationTexts).side[color];
+}
+
+/**
+ * De app vult zelf "Wit", "Zwart" en "Computer" in als naam. Die tonen we in de
+ * actieve taal; een zelfgekozen naam blijft zoals hij is.
+ */
+export function localName(name: string): string {
+  const names: Readonly<Record<string, string>> = getTexts(presentationTexts).builtInNames;
+  return Object.hasOwn(names, name) ? names[name] : name;
+}
 
 export function displayName(player: ChessPlayer, color: Color): string {
-  return player.name.trim() || SIDE_LABEL[color];
+  return localName(player.name.trim()) || sideLabel(color);
 }
 
 export function capturedBy(
@@ -29,33 +45,35 @@ export interface StatusInput {
 }
 
 export function statusText({ result, turn, players, thinking }: StatusInput): string {
+  const t = getTexts(presentationTexts).status;
+
   switch (result.kind) {
     case "checkmate":
-      return `${displayName(players[result.winner], result.winner)} wint met schaakmat.`;
+      return t.checkmate(displayName(players[result.winner], result.winner));
     case "stalemate":
-      return "Pat! Er is geen legale zet meer.";
+      return t.stalemate;
     case "draw":
-      return "Gelijkspel.";
+      return t.draw;
     case "resigned":
-      return `${displayName(players[result.winner], result.winner)} wint: de ander gaf op.`;
+      return t.resigned(displayName(players[result.winner], result.winner));
     case "playing":
       if (thinking) {
-        return "De computer denkt na…";
+        return t.thinking;
       }
       return result.check
-        ? `Schaak! ${displayName(players[turn], turn)} is aan zet.`
-        : `${displayName(players[turn], turn)} is aan zet.`;
+        ? t.check(displayName(players[turn], turn))
+        : t.turn(displayName(players[turn], turn));
   }
 }
 
 export function feedbackText(feedback: string): string | null {
+  const t = getTexts(presentationTexts).feedback;
+
   switch (feedback) {
     case "illegal":
-      return "Die zet mag niet. Kies een groene stip.";
     case "not-your-turn":
-      return "Dat stuk is niet aan de beurt.";
     case "engine-error":
-      return "De computer kon geen zet vinden. Probeer het nog eens.";
+      return t[feedback];
     default:
       return null;
   }
@@ -73,49 +91,38 @@ export function resultCopy(
   mode: ChessMode,
   humanColor: Color,
 ): ResultCopy {
+  const t = getTexts(presentationTexts);
+
   switch (result.kind) {
     case "checkmate":
       return {
-        title: `${displayName(players[result.winner], result.winner)} wint!`,
-        description: "Schaakmat! De koning kan nergens meer heen.",
+        title: t.result.wins(displayName(players[result.winner], result.winner)),
+        description: t.result.checkmate,
         confetti: mode === "friend" || result.winner === humanColor,
       };
     case "resigned":
       return {
-        title: `${displayName(players[result.winner], result.winner)} wint!`,
-        description: "De partij is gestopt omdat de ander opgaf.",
+        title: t.result.wins(displayName(players[result.winner], result.winner)),
+        description: t.result.resigned,
         confetti: mode === "friend" || result.winner === humanColor,
       };
     case "stalemate":
       return {
-        title: "Pat!",
-        description: "Er is geen legale zet meer. Daarom is het gelijkspel.",
+        title: t.result.stalemateTitle,
+        description: t.result.stalemate,
         confetti: false,
       };
     case "draw":
       return {
-        title: "Gelijkspel",
-        description: drawReason(result.reason),
+        title: t.result.drawTitle,
+        description: t.drawReasons[result.reason],
         confetti: false,
       };
     case "playing":
       return {
-        title: "De partij loopt nog",
-        description: "Er is nog geen winnaar.",
+        title: t.result.playingTitle,
+        description: t.result.playing,
         confetti: false,
       };
-  }
-}
-
-function drawReason(reason: Extract<ChessResult, { kind: "draw" }>["reason"]): string {
-  switch (reason) {
-    case "fifty-moves":
-      return "Er zijn vijftig zetten gedaan zonder slag of pionzet.";
-    case "repetition":
-      return "Dezelfde stelling kwam drie keer terug.";
-    case "insufficient-material":
-      return "Er zijn te weinig stukken over om nog schaakmat te zetten.";
-    case "draw":
-      return "Geen van beiden kan nog winnen.";
   }
 }

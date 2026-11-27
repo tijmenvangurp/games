@@ -1,11 +1,15 @@
 import type { ChessMoveRecord } from "@entities/chess";
+import { useTexts } from "@shared/i18n";
 import { Disclosure } from "@shared/ui";
+import { chessGameTexts } from "./texts";
 
 interface MoveListProps {
   readonly history: readonly ChessMoveRecord[];
 }
 
 export function MoveList({ history }: MoveListProps) {
+  const t = useTexts(chessGameTexts);
+
   if (history.length === 0) {
     return null;
   }
@@ -22,7 +26,7 @@ export function MoveList({ history }: MoveListProps) {
   }
 
   return (
-    <Disclosure summary={`Zetten (${history.length})`}>
+    <Disclosure summary={t.moves(history.length)}>
       <ol className="grid grid-cols-[2rem_1fr_1fr] gap-x-2 gap-y-1 text-sm font-semibold tabular-nums text-foreground">
         {rows.map((row) => (
           <li className="contents" key={row.number}>

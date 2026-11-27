@@ -1,17 +1,12 @@
+import { i18n } from "@shared/i18n";
+
 /**
  * Korte bemoedigingen voor spellen zonder eigen spraak. De reeks schuift per
  * ronde en per vraag op, zodat dezelfde beurt altijd dezelfde regel houdt.
+ * De teksten komen uit de actieve taal (`praise` in de locales).
  */
-const SIMPLE_PRAISE = [
-  "Goedzo!",
-  "Knap gedaan!",
-  "Top gedaan!",
-  "Helemaal goed!",
-  "Slim gedaan!",
-  "Super!",
-] as const;
-
 export function praiseFor(seed: number, index = 0): string {
-  const variant = Math.abs(Math.trunc(seed) + index) % SIMPLE_PRAISE.length;
-  return SIMPLE_PRAISE[variant];
+  const lines = i18n.t("praise", { returnObjects: true });
+  const variant = Math.abs(Math.trunc(seed) + index) % lines.length;
+  return lines[variant] ?? "";
 }

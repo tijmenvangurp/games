@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-ganzenbord", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-ganzenbord", "shared-lib", "shared-ui", "shared-i18n"]
 }

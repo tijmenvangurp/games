@@ -1,4 +1,6 @@
+import { useTexts } from "@shared/i18n";
 import { formatSpeed } from "../model/labels";
+import { draaiwerkTexts } from "../model/texts";
 
 interface SpeedGaugeProps {
   label: string;
@@ -63,20 +65,21 @@ export function SpeedGauge({ label, speed, minSpeed, maxSpeed, satisfied }: Spee
     x: CENTER_X + Math.cos(needleAngle) * (RADIUS - 7),
     y: CENTER_Y + Math.sin(needleAngle) * (RADIUS - 7),
   };
+  const t = useTexts(draaiwerkTexts);
   const verdict = satisfied
-    ? "goed"
+    ? t.verdictGood
     : value === 0
-      ? "stil"
+      ? t.verdictStill
       : minSpeed !== undefined && value < minSpeed
-        ? "te langzaam"
+        ? t.verdictSlow
         : maxSpeed !== undefined && value > maxSpeed
-          ? "te snel"
-          : "nog niet goed";
+          ? t.verdictFast
+          : t.verdictNotYet;
 
   return (
     <div className="flex flex-col items-center gap-0.5">
       <svg
-        aria-label={`Snelheid ${label.toLowerCase()}: ${formatSpeed(value)} keer de motor, ${verdict}`}
+        aria-label={t.gauge(label.toLowerCase(), formatSpeed(value), verdict)}
         className="h-12 w-24"
         role="img"
         viewBox="0 0 92 56"

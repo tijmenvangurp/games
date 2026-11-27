@@ -7,6 +7,8 @@ import {
   type PlayerState,
   type TurnEvent,
 } from "@entities/ganzenbord";
+import { getTexts } from "@shared/i18n";
+import { ganzenbordTexts } from "./texts";
 
 type NamedPlayer = Pick<PlayerState, "id" | "controller" | "name">;
 
@@ -19,9 +21,10 @@ export function playerName(player: NamedPlayer): string {
   if (custom) {
     return custom;
   }
+  const t = getTexts(ganzenbordTexts);
   return player.controller === "computer"
-    ? `Computer ${playerNumber(player.id)}`
-    : `Speler ${playerNumber(player.id)}`;
+    ? t.computer(playerNumber(player.id))
+    : t.player(playerNumber(player.id));
 }
 
 /** Korte naam voor de spelerskaarten; "Computer 2" wordt daar afgekapt. */
@@ -30,14 +33,15 @@ export function playerShortName(player: NamedPlayer): string {
   if (custom) {
     return custom;
   }
+  const t = getTexts(ganzenbordTexts);
   return player.controller === "computer"
-    ? `CPU ${playerNumber(player.id)}`
-    : `Speler ${playerNumber(player.id)}`;
+    ? t.cpu(playerNumber(player.id))
+    : t.player(playerNumber(player.id));
 }
 
 function nameOf(game: GanzenbordGame, id: PlayerId): string {
   const player = game.players.find((candidate) => candidate.id === id);
-  return player ? playerName(player) : `Speler ${playerNumber(id)}`;
+  return player ? playerName(player) : getTexts(ganzenbordTexts).player(playerNumber(id));
 }
 
 const COLOR_CLASSES: Readonly<Record<PlayerColor, string>> = {
@@ -49,67 +53,66 @@ const COLOR_CLASSES: Readonly<Record<PlayerColor, string>> = {
   pink: "bg-pawn-pink",
 };
 
-export const PLAYER_COLOR_OPTIONS: readonly { value: PlayerColor; label: string }[] = [
-  { value: "red", label: "Rood" },
-  { value: "orange", label: "Oranje" },
-  { value: "green", label: "Groen" },
-  { value: "blue", label: "Blauw" },
-  { value: "violet", label: "Paars" },
-  { value: "pink", label: "Roze" },
-];
-
 export function playerColorClass(color: PlayerColor): string {
   return COLOR_CLASSES[color];
 }
 
 export function positionText(player: PlayerState): string {
+  const t = getTexts(ganzenbordTexts).position;
   if (player.position >= 63) {
-    return "Bij de finish";
+    return t.finish;
   }
   if (player.stuckOn === 31) {
-    return "Zit in de put";
+    return t.well;
   }
   if (player.stuckOn === 52) {
-    return "Zit in de gevangenis";
+    return t.prison;
   }
   if (player.skipTurns > 0) {
-    return "Slaat een beurt over";
+    return t.skip;
   }
-  return player.position === 0 ? "Bij start" : `Vak ${player.position}`;
+  return player.position === 0 ? t.start : t.square(player.position);
 }
 
-const SIMPLE_EVENT_TEXT: Partial<Record<TurnEvent["kind"], string>> = {
-  bridge: "Brug: door naar 12.",
-  inn: "Herberg: één beurt overslaan.",
-  well: "In de put! Wacht tot iemand je aflost.",
-  prison: "Gevangenis! Wacht tot iemand je aflost.",
-  maze: "Doolhof: terug naar 37.",
-  death: "Dood: terug naar start.",
-};
+type SimpleEventKind = "bridge" | "inn" | "well" | "prison" | "maze" | "death";
+
+const SIMPLE_EVENTS: ReadonlySet<TurnEvent["kind"]> = new Set<SimpleEventKind>([
+  "bridge",
+  "inn",
+  "well",
+  "prison",
+  "maze",
+  "death",
+]);
+
+function isSimpleEvent(kind: TurnEvent["kind"]): kind is SimpleEventKind {
+  return SIMPLE_EVENTS.has(kind);
+}
 
 export function eventMessage(game: GanzenbordGame, event: TurnEvent): string | null {
+  const t = getTexts(ganzenbordTexts).events;
   if (event.kind === "first-throw") {
-    return `Eerste worp 9: meteen naar ${event.to}.`;
+    return t.firstThrow(event.to);
   }
   if (event.kind === "bounce") {
-    return `Voorbij 63: terug naar ${event.to}.`;
+    return t.bounce(event.to);
   }
   if (event.kind === "goose") {
-    return `Gans! Naar ${event.to}.`;
+    return t.goose(event.to);
   }
   if (event.kind === "free") {
-    return `${nameOf(game, event.player)} komt vrij!`;
+    return t.free(nameOf(game, event.player));
   }
   if (event.kind === "skip") {
-    return `${nameOf(game, event.player)} slaat een beurt over.`;
+    return t.skip(nameOf(game, event.player));
   }
   if (event.kind === "win") {
-    return `${nameOf(game, event.player)} bereikt vakje 63!`;
+    return t.win(nameOf(game, event.player));
   }
   if (event.kind === "draw") {
-    return "Alle spelers zitten vast.";
+    return t.draw;
   }
-  return SIMPLE_EVENT_TEXT[event.kind] ?? null;
+  return isSimpleEvent(event.kind) ? t[event.kind] : null;
 }
 
 /**
@@ -118,20 +121,19 @@ export function eventMessage(game: GanzenbordGame, event: TurnEvent): string | n
  * twee gebeurtenissen zijn genoeg.
  */
 export function turnText(game: GanzenbordGame, events: readonly TurnEvent[]): string {
+  const t = getTexts(ganzenbordTexts);
   if (game.status === "draw") {
-    return "Gelijkspel: iedereen zit vast.";
+    return t.drawTurn;
   }
   if (game.status === "finished" && game.winner) {
-    return `${nameOf(game, game.winner)} wint!`;
+    return t.wins(nameOf(game, game.winner));
   }
 
   const roll = events.find((event) => event.kind === "roll");
   const parts: string[] = [];
 
   if (roll?.dice) {
-    parts.push(
-      `${nameOf(game, roll.player)} gooit ${roll.dice[0]} + ${roll.dice[1]} = ${roll.value}.`,
-    );
+    parts.push(t.rolls(nameOf(game, roll.player), roll.dice[0], roll.dice[1], roll.value));
   }
 
   for (const event of events) {
@@ -144,12 +146,13 @@ export function turnText(game: GanzenbordGame, events: readonly TurnEvent[]): st
     }
   }
 
-  return parts.length > 0 ? parts.join(" ") : `${nameOf(game, game.current)} is aan de beurt.`;
+  return parts.length > 0 ? parts.join(" ") : t.turn(nameOf(game, game.current));
 }
 
 export function statusHint(game: GanzenbordGame): string {
+  const t = getTexts(ganzenbordTexts);
   if (isFinished(game)) {
-    return game.status === "draw" ? "Iedereen zit vast." : "De partij is klaar.";
+    return game.status === "draw" ? t.allStuck : t.finished;
   }
 
   const current = game.players.find((player) => player.id === game.current);
@@ -158,18 +161,18 @@ export function statusHint(game: GanzenbordGame): string {
   }
 
   if (current.controller === "computer") {
-    return `${playerName(current)} gooit zo…`;
+    return t.computerRolls(playerName(current));
   }
 
-  return `${playerName(current)} is aan de beurt.`;
+  return t.turn(playerName(current));
 }
 
 export function winnerTitle(game: GanzenbordGame): string {
-  return game.winner ? `${nameOf(game, game.winner)} wint!` : "Gelijkspel!";
+  const t = getTexts(ganzenbordTexts);
+  return game.winner ? t.wins(nameOf(game, game.winner)) : t.drawTitle;
 }
 
 export function winnerDescription(game: GanzenbordGame): string {
-  return game.winner
-    ? `${nameOf(game, game.winner)} bereikte als eerste vakje 63.`
-    : "Alle spelers zitten vast; er is geen winnaar.";
+  const t = getTexts(ganzenbordTexts);
+  return game.winner ? t.winnerDescription(nameOf(game, game.winner)) : t.drawDescription;
 }

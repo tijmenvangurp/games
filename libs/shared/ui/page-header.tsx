@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button } from "./button";
 import { ArrowLeft } from "./icons";
@@ -16,14 +17,20 @@ export function PageHeader({
   title,
   subtitle,
   onBack,
-  backLabel = "Terug naar het menu",
+  backLabel,
   actions,
   titleClassName,
 }: PageHeaderProps) {
+  const { t } = useTranslation();
   return (
     <header className="flex w-full min-w-0 flex-1 items-center gap-2">
       {onBack ? (
-        <Button aria-label={backLabel} size="icon" variant="outline" onClick={onBack}>
+        <Button
+          aria-label={backLabel ?? t("shell.back")}
+          size="icon"
+          variant="outline"
+          onClick={onBack}
+        >
           <ArrowLeft aria-hidden="true" className="size-5" />
         </Button>
       ) : (

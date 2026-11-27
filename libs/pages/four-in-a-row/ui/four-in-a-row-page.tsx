@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   BOARD_SIZE_INFO,
+  fourInARowLabels,
   isFinished,
   winnerOf,
   type FourInARowGame,
@@ -16,9 +17,11 @@ import {
   winTitle,
   type FourInARowSettings,
 } from "@features/four-in-a-row-game";
+import { useTexts } from "@shared/i18n";
 import { useDelayedVisible, useGameSetupState } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
+import { fourInARowPageTexts } from "./texts";
 
 /** Even wachten zodat de winnende rij te zien is voordat het venster opent. */
 const WIN_FLASH_MS = 600;
@@ -83,6 +86,7 @@ interface ResultDialogProps {
 
 function ResultDialog({ visible, draw, winner, mode, stand, onChoose }: ResultDialogProps) {
   const navigate = useNavigate();
+  const t = useTexts(fourInARowPageTexts);
 
   if (!visible || (!winner && !draw)) {
     return null;
@@ -90,15 +94,11 @@ function ResultDialog({ visible, draw, winner, mode, stand, onChoose }: ResultDi
 
   return (
     <CelebrationDialog
-      againLabel="Nog een potje"
-      chooseLabel={mode === "computer" ? "Andere instellingen" : "Andere grootte"}
+      againLabel={t.again}
+      chooseLabel={mode === "computer" ? t.chooseSettings : t.chooseSize}
       confetti={Boolean(winner)}
-      description={
-        winner
-          ? `Vier op een rij! De stand is nu ${stand}.`
-          : "Het bord is vol zonder vier op een rij."
-      }
-      title={winner ? winTitle(winner, mode) : "Gelijkspel!"}
+      description={winner ? t.winDescription(stand) : t.drawDescription}
+      title={winner ? winTitle(winner, mode) : t.drawTitle}
       onAgain={() => useFourInARowStore.getState().start()}
       onChoose={onChoose}
       onHome={() => navigate({ to: "/" })}
@@ -107,6 +107,8 @@ function ResultDialog({ visible, draw, winner, mode, stand, onChoose }: ResultDi
 }
 
 export function FourInARowPage() {
+  const t = useTexts(fourInARowPageTexts);
+  const labels = useTexts(fourInARowLabels);
   const game = useFourInARowStore((state) => state.game);
   const score = useFourInARowStore((state) => state.score);
   const settings = useFourInARowStore((state) => state.settings);
@@ -125,8 +127,8 @@ export function FourInARowPage() {
     <GameShell
       {...gameSetup}
       showSpeech={false}
-      subtitle={`${size.label} ${size.size}`}
-      title="Vier op een Rij"
+      subtitle={`${labels.boardSizes[settings.size]} ${size.size}`}
+      title={t.title}
     >
       {setupVisible ? (
         <SetupPane

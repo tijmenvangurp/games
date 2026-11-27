@@ -1,29 +1,29 @@
 import type { CodeSymbol } from "./types";
 
 /**
- * Eén symboolfamilie voor de codekaart. De namen zijn Nederlands en worden
- * ook de schermlezer-labels. De tint is een vaste eigenschap van het symbool,
+ * Eén symboolfamilie voor de codekaart. De namen per taal staan in
+ * `texts.ts` en zijn ook de schermlezer-labels. De tint is een vaste eigenschap van het symbool,
  * zodat dezelfde ster in de codekaart en de woordrij dezelfde kleur houdt.
  */
 export const SYMBOLS: readonly CodeSymbol[] = [
-  { id: "star", name: "ster", tone: "pink" },
-  { id: "heart", name: "hart", tone: "pink" },
-  { id: "moon", name: "maan", tone: "indigo" },
-  { id: "key", name: "sleutel", tone: "indigo" },
-  { id: "crown", name: "kroon", tone: "pink" },
-  { id: "fish", name: "vis", tone: "green" },
-  { id: "flower", name: "bloem", tone: "orange" },
-  { id: "boat", name: "boot", tone: "green" },
-  { id: "gift", name: "cadeau", tone: "orange" },
-  { id: "book", name: "boek", tone: "orange" },
-  { id: "carrot", name: "wortel", tone: "green" },
-  { id: "bag", name: "tas", tone: "indigo" },
-  { id: "bell", name: "bel", tone: "pink" },
-  { id: "anchor", name: "anker", tone: "blue" },
-  { id: "tree", name: "boom", tone: "green" },
-  { id: "house", name: "huis", tone: "orange" },
-  { id: "cat", name: "kat", tone: "violet" },
-  { id: "rocket", name: "raket", tone: "blue" },
+  { id: "star", tone: "pink" },
+  { id: "heart", tone: "pink" },
+  { id: "moon", tone: "indigo" },
+  { id: "key", tone: "indigo" },
+  { id: "crown", tone: "pink" },
+  { id: "fish", tone: "green" },
+  { id: "flower", tone: "orange" },
+  { id: "boat", tone: "green" },
+  { id: "gift", tone: "orange" },
+  { id: "book", tone: "orange" },
+  { id: "carrot", tone: "green" },
+  { id: "bag", tone: "indigo" },
+  { id: "bell", tone: "pink" },
+  { id: "anchor", tone: "blue" },
+  { id: "tree", tone: "green" },
+  { id: "house", tone: "orange" },
+  { id: "cat", tone: "violet" },
+  { id: "rocket", tone: "blue" },
 ];
 
 export const SYMBOL_BY_ID: Readonly<Record<string, CodeSymbol>> = Object.fromEntries(

@@ -23,7 +23,7 @@ export interface MurdokuCaseView {
 export interface MurdokuHintView {
   /** De hint die nu op het bord staat. */
   hint: MurdokuHintState | null;
-  /** De hint als leesbare Nederlandse zin. */
+  /** De hint als leesbare zin in de gekozen taal. */
   hintMessage: string | null;
   /** Het woord uit een aanwijzing dat op het bord oplicht. */
   clueFocus: MurdokuClueFocus | null;

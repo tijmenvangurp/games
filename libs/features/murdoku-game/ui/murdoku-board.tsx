@@ -1,5 +1,6 @@
 import { type ReactNode, type RefObject, useEffect, useState } from "react";
 import { VICTIM_ID, type Cell, type PersonId, type Puzzle } from "@entities/murdoku";
+import { useTexts } from "@shared/i18n";
 import type { MurdokuMode } from "../model/play";
 import { MURDOKU_HINT_COLOR } from "../lib/palette";
 import type { MurdokuText } from "../lib/text";
@@ -8,6 +9,10 @@ import type { HelpMarks } from "../lib/vendored/helpMarks";
 import { MurdokuCellGrid, MurdokuColumnLabels, MurdokuRowLabels } from "./murdoku-board-parts";
 import { useBoardCellSize, LABEL_SIZE } from "./use-board-cell-size";
 import { useMurdokuCanvas } from "./use-murdoku-canvas";
+import { MURDOKU_UI_TEXTS } from "./texts";
+
+/** De vaste woorden van het bord in de gekozen taal. */
+type BoardTexts = (typeof MURDOKU_UI_TEXTS)["nl"]["board"];
 
 /** De onthulling na een goede controle: de dader en het slachtoffer. */
 interface MurdokuBoardReveal {
@@ -73,17 +78,19 @@ function drawnHighlight(
 /** De toestand van een vakje in één woord: wie staat er, of juist niets. */
 function cellState(
   puzzle: Puzzle,
+  t: BoardTexts,
   person: PersonId | null,
   occupiable: boolean,
   crossed: boolean,
 ): string {
   if (person !== null) return puzzle.nameOf(person);
-  if (!occupiable) return "geen plek";
-  return crossed ? "kruisje" : "leeg";
+  if (!occupiable) return t.blocked;
+  return crossed ? t.crossed : t.empty;
 }
 
 /** Wat een tik op dit vakje nu doet, in de taal van het kind. */
 function cellAction(
+  t: BoardTexts,
   person: PersonId | null,
   selectedPerson: PersonId | null,
   occupiable: boolean,
@@ -91,14 +98,15 @@ function cellAction(
   selectedName: string | null,
 ): string | null {
   if (!occupiable) return null;
-  if (person !== null) return person === selectedPerson ? "tik om weg te halen" : null;
-  if (mode === "cross") return "tik om weg te strepen";
-  return selectedName === null ? null : `${selectedName} kan hier staan`;
+  if (person !== null) return person === selectedPerson ? t.tapToRemove : null;
+  if (mode === "cross") return t.tapToCross;
+  return selectedName === null ? null : t.canStandHere(selectedName);
 }
 
 function cellLabel(
   puzzle: Puzzle,
   text: MurdokuText,
+  t: BoardTexts,
   placements: ReadonlyMap<PersonId, Cell>,
   crosses: ReadonlySet<Cell>,
   focus: ReadonlySet<Cell> | null,
@@ -116,14 +124,14 @@ function cellLabel(
   const selectedName = selectedPerson === null ? null : puzzle.nameOf(selectedPerson);
 
   return [
-    cellState(puzzle, person, occupiable, crosses.has(cell)),
-    focus?.has(cell) === true && "licht op",
-    !occupiable && "hier mag niemand staan",
-    `rij ${row + 1}`,
-    `kolom ${col + 1}`,
+    cellState(puzzle, t, person, occupiable, crosses.has(cell)),
+    focus?.has(cell) === true && t.lit,
+    !occupiable && t.nobodyHere,
+    t.row(row + 1),
+    t.col(col + 1),
     room ? text.roomName(room.nameKey) : null,
-    objects.length > 0 ? objects.join(" en ") : null,
-    cellAction(person, selectedPerson, occupiable, mode, selectedName),
+    objects.length > 0 ? objects.join(t.objectsJoin) : null,
+    cellAction(t, person, selectedPerson, occupiable, mode, selectedName),
   ]
     .filter((part): part is string => Boolean(part))
     .join(", ");
@@ -133,6 +141,7 @@ function cellLabel(
 function boardLabels(
   puzzle: Puzzle,
   text: MurdokuText,
+  t: BoardTexts,
   placed: ReadonlyMap<PersonId, Cell>,
   crosses: ReadonlySet<Cell>,
   focus: ReadonlySet<Cell> | null,
@@ -141,7 +150,7 @@ function boardLabels(
 ): string[] {
   const total = puzzle.board.width * puzzle.board.height;
   return Array.from({ length: total }, (_, cell) =>
-    cellLabel(puzzle, text, placed, crosses, focus, cell, selectedPerson, mode),
+    cellLabel(puzzle, text, t, placed, crosses, focus, cell, selectedPerson, mode),
   );
 }
 
@@ -150,7 +159,11 @@ function boardLabels(
  * Dit is de tekstlaag van de overlay, zodat een schermlezer niet voor elk vakje
  * hoeft te horen wie waar staat. Het slachtoffer komt er pas bij de afloop bij.
  */
-function placementSummary(puzzle: Puzzle, placements: ReadonlyMap<PersonId, Cell>): string[] {
+function placementSummary(
+  puzzle: Puzzle,
+  t: BoardTexts,
+  placements: ReadonlyMap<PersonId, Cell>,
+): string[] {
   const people = [
     ...puzzle.suspects.map((suspect) => suspect.id),
     ...(placements.has(VICTIM_ID) ? [VICTIM_ID] : []),
@@ -158,16 +171,16 @@ function placementSummary(puzzle: Puzzle, placements: ReadonlyMap<PersonId, Cell
   return people.map((person) => {
     const name = puzzle.nameOf(person);
     const cell = placements.get(person);
-    if (cell === undefined) return `${name} is nog niet op het bord.`;
+    if (cell === undefined) return t.notPlaced(name);
     const { row, col } = puzzle.board.rc(cell);
-    return `${name} is op rij ${row + 1}, kolom ${col + 1}.`;
+    return t.placedAt(name, row + 1, col + 1);
   });
 }
 
 /** De per-persoon samenvatting onder de vakjes; visueel verborgen. */
-function MurdokuPersonSummary({ lines }: { lines: readonly string[] }) {
+function MurdokuPersonSummary({ lines, label }: { lines: readonly string[]; label: string }) {
   return (
-    <ul aria-label="Waar staat wie?" className="sr-only">
+    <ul aria-label={label} className="sr-only">
       {lines.map((line) => (
         <li key={line}>{line}</li>
       ))}
@@ -187,6 +200,7 @@ interface BoardGridProps {
   selectedPerson: PersonId | null;
   focusToken?: number;
   onCellTap?: (cell: Cell) => void;
+  t: BoardTexts;
 }
 
 /** Het canvas met het transparante knoppenrooster eroverheen. */
@@ -202,12 +216,13 @@ function BoardGrid({
   selectedPerson,
   focusToken,
   onCellTap,
+  t,
 }: BoardGridProps) {
   return (
     <div className="relative" style={{ width: width * cell, height: height * cell }}>
       <canvas
         ref={canvasRef}
-        aria-label={`Plattegrond van ${title}, ${width} bij ${height}`}
+        aria-label={t.label(title, width, height)}
         className="block rounded-sm"
         role="img"
       />
@@ -220,7 +235,7 @@ function BoardGrid({
         selectedPerson={selectedPerson}
         width={width}
       />
-      <MurdokuPersonSummary lines={summary} />
+      <MurdokuPersonSummary label={t.summary} lines={summary} />
     </div>
   );
 }
@@ -280,7 +295,7 @@ function useLootImage(lootIcon: string | undefined): HTMLImageElement | null {
  * Eén canvas met de plattegrond van een zaak: kamers, vloeren, meubels, ramen,
  * kamernamen en de geplaatste portretten. Boven en links staan de kolom- en
  * rijlabels; over het canvas ligt een transparant knoppenrooster met per vakje
- * een Nederlandse toegankelijke naam. Zo blijven de pixels snel en is de
+ * een toegankelijke naam in de gekozen taal. Zo blijven de pixels snel en is de
  * bediening echt met rollen en namen te testen.
  */
 // Een React-scherm met veel props, default-waarden en vier hooks; de
@@ -308,18 +323,20 @@ export function MurdokuBoard({
     fitLandscapeHeight: true,
   });
   const text = useMurdokuText(puzzle);
+  const t = useTexts(MURDOKU_UI_TEXTS).board;
   const lootImage = useLootImage(lootIcon);
   const placed = placements ?? NO_PLACEMENTS;
   const labels = boardLabels(
     puzzle,
     text,
+    t,
     placed,
     crosses,
     focus?.cells ?? null,
     selectedPerson,
     mode,
   );
-  const summary = placementSummary(puzzle, placed);
+  const summary = placementSummary(puzzle, t, placed);
   const drawn = drawnHighlight(focus, highlight);
   const canvasRef = useMurdokuCanvas({
     puzzle,
@@ -346,6 +363,7 @@ export function MurdokuBoard({
         mode={mode}
         selectedPerson={selectedPerson}
         summary={summary}
+        t={t}
         title={title}
         width={width}
         onCellTap={onCellTap}

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { currentLanguage, useLanguage } from "@shared/i18n";
 
 /**
  * Eén spraakregel uit een audiocatalogus. De folder en id bepalen samen het
@@ -88,6 +89,19 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
+/**
+ * De opnames bestaan alleen in het Nederlands. In een andere taal zwijgt de
+ * voorleesstem, zodat een kind geen Nederlandse stem bij Engelse tekst hoort.
+ */
+export function hasRecordedSpeech(): boolean {
+  return currentLanguage() === "nl";
+}
+
+/** Of de voorleesknoppen zin hebben in de gekozen taal. */
+export function useRecordedSpeech(): boolean {
+  return useLanguage() === "nl";
+}
+
 export function useSpeechEnabled(): boolean {
   return useSyncExternalStore(subscribe, isSpeechEnabled, isSpeechEnabled);
 }
@@ -152,7 +166,7 @@ function playNext(currentToken: number): void {
  * ontbreekt, zodat de aanroeper nooit hoeft te wachten op iets dat niet komt.
  */
 export function speak(lines: SpeechLine | readonly SpeechLine[]): Promise<void> {
-  if (!enabled) {
+  if (!enabled || !hasRecordedSpeech()) {
     return Promise.resolve();
   }
 
@@ -184,7 +198,9 @@ export function useAutoSpeech(
   key: string,
   lines: SpeechLine | readonly SpeechLine[] | null | undefined,
 ): void {
-  const enabled = useSpeechEnabled();
+  const speechEnabled = useSpeechEnabled();
+  const recorded = useRecordedSpeech();
+  const enabled = speechEnabled && recorded;
   const lastKey = useRef<string | null>(null);
 
   useEffect(() => {

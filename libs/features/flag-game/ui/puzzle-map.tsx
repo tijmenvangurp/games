@@ -1,6 +1,8 @@
 import type { RefObject } from "react";
 import type { PuzzleMapArea } from "@entities/geography";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
+import { flagTexts } from "../model/texts";
 
 const COUNTRY_CLASSES = {
   context: "flag-map-country",
@@ -99,13 +101,14 @@ export function PuzzleMap({
   svgRef,
   onPlace,
 }: PuzzleMapProps) {
+  const t = useTexts(flagTexts);
   const showHints = level !== "moeilijk";
   const pulse = level === "makkelijk";
   const openSlots = areas.filter((area) => names.has(area.code) && !placed.has(area.code));
 
   return (
     <svg
-      aria-label={`Kaart met ${total} lege plekken`}
+      aria-label={t.mapLabel(total)}
       className="flag-map w-full"
       data-testid="puzzle-map"
       ref={svgRef}

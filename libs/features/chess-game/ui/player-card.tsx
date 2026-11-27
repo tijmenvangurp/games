@@ -1,7 +1,10 @@
 import type { Color, PieceSymbol } from "chess.js";
 import type { ChessPlayer } from "@entities/chess";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Badge, Panel } from "@shared/ui";
+import { displayName, sideLabel } from "../model/presentation";
+import { chessGameTexts } from "./texts";
 
 const PIECE_GLYPHS: Record<PieceSymbol, string> = {
   p: "♟",
@@ -21,13 +24,14 @@ interface PlayerCardProps {
 }
 
 export function PlayerCard({ player, color, active, thinking, captured }: PlayerCardProps) {
-  const label = color === "w" ? "Wit" : "Zwart";
-  const name = player.name.trim() || label;
+  const t = useTexts(chessGameTexts);
+  const label = sideLabel(color);
+  const name = displayName(player, color);
 
   return (
     <Panel
       as="section"
-      aria-label={`${name}, speelt met ${label.toLowerCase()}${active ? ", is aan zet" : ""}`}
+      aria-label={t.playerCard(name, label.toLowerCase(), active)}
       className={cn(
         "relative flex min-w-0 flex-1 items-center gap-2.5 transition-all",
         active ? "border-primary ring-2 ring-primary/20" : "opacity-80",
@@ -58,7 +62,7 @@ export function PlayerCard({ player, color, active, thinking, captured }: Player
       </div>
       {active ? (
         <Badge className="absolute -top-2.5 right-2 shadow-xs" size="sm" tone="primarySolid">
-          {thinking ? "Denkt…" : "Aan zet"}
+          {thinking ? t.thinking : t.toMove}
         </Badge>
       ) : null}
     </Panel>

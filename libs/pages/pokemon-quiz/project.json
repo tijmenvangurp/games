@@ -14,5 +14,10 @@
       }
     }
   },
-  "implicitDependencies": ["widgets-game-shell", "features-pokemon-quiz", "shared-ui"]
+  "implicitDependencies": [
+    "widgets-game-shell",
+    "features-pokemon-quiz",
+    "shared-ui",
+    "shared-i18n"
+  ]
 }

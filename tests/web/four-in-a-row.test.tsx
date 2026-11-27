@@ -135,7 +135,7 @@ describe("vier op een rij", () => {
 
     expect(screen.queryByRole("heading", { name: "Blauw wint!" })).toBeNull();
     expect(screen.getByText(/Rood begint\./)).toBeTruthy();
-    expect(screen.getByLabelText("1 gewonnen partijen")).toBeTruthy();
+    expect(screen.getByLabelText("1 gewonnen partij")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Nieuw spel" }));
     expect(await screen.findByRole("heading", { name: "Nieuw spel" })).toBeTruthy();

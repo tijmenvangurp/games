@@ -10,7 +10,7 @@
  * `[[woord:tip]]` is een tikbaar sleutelwoord en `_one` is het enkelvoud.
  */
 
-type MurdokuTextDictionary = {
+export type MurdokuTextDictionary = {
   [key: string]: string | MurdokuTextDictionary;
 };
 

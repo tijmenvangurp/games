@@ -1,5 +1,8 @@
 import { createSeed, mulberry32, shuffledIndexes } from "@shared/lib";
-import { MATH_MODE_INFO } from "./config";
+import { getTexts } from "@shared/i18n";
+import { MATH_PRAISE_LINES, praiseSpeech } from "./audio";
+import { MATH_MODE_SYMBOLS } from "./config";
+import { mathTexts } from "./texts";
 import type { MathLevel, MathMode, MathQuestion, MathRound } from "./types";
 
 const ROUND_SIZE = 10;
@@ -125,7 +128,7 @@ function makeQuestion(
   random: () => number,
 ): MathQuestion {
   const operands = operandsFor(mode, level, random);
-  const symbol = MATH_MODE_INFO[mode].symbol;
+  const symbol = MATH_MODE_SYMBOLS[mode];
 
   return {
     id,
@@ -182,19 +185,24 @@ export function groupingFor(question: MathQuestion): DotGrouping {
 
 export function explanationFor(question: MathQuestion): string {
   const { mode, left, right, answer } = question;
+  const t = getTexts(mathTexts);
+  const sum = `${left} ${MATH_MODE_SYMBOLS[mode]} ${right} = ${answer}.`;
 
   switch (mode) {
     case "plus":
-      return `${left} + ${right} = ${answer}. Tel verder vanaf ${left}.`;
+      return `${sum} ${t.countOn(left)}`;
     case "min":
-      return `${left} − ${right} = ${answer}. Tel terug vanaf ${left}.`;
-    case "keer": {
-      const { groups, perGroup } = groupingFor(question);
-      return `${left} × ${right} = ${answer}. Dat zijn ${groups} groepjes van ${perGroup}.`;
-    }
+      return `${sum} ${t.countBack(left)}`;
+    case "keer":
     case "deel": {
       const { groups, perGroup } = groupingFor(question);
-      return `${left} ÷ ${right} = ${answer}. Dat zijn ${groups} groepjes van ${perGroup}.`;
+      return `${sum} ${t.thatIs(t.groupsOf(groups, perGroup))}`;
     }
   }
+}
+
+/** De bemoediging die op het scherm staat; in het Nederlands gelijk aan `praiseSpeech`. */
+export function praiseText(seed: number, question: MathQuestion): string {
+  const index = MATH_PRAISE_LINES.indexOf(praiseSpeech(seed, question));
+  return getTexts(mathTexts).praise[index];
 }

@@ -19,6 +19,7 @@
     "features-chess-tutorial",
     "features-chess-game",
     "shared-lib",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

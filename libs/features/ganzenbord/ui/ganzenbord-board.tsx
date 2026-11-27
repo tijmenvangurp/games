@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { GanzenbordGame, PlayerState } from "@entities/ganzenbord";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { loadCellPoints, START_POINT, type BoardPoint } from "../model/board-points";
 import { playerName, positionText } from "../model/presentation";
+import { ganzenbordUiTexts } from "../model/texts";
 import { GanzenbordPawn } from "./ganzenbord-pawn";
 
 interface Offset {
@@ -48,11 +50,10 @@ function groupPlayers(players: readonly PlayerState[]): Map<number, PlayerState[
   return groups;
 }
 
-function boardSummary(game: GanzenbordGame): string {
-  const positions = game.players
+function boardPositions(game: GanzenbordGame): string {
+  return game.players
     .map((player) => `${playerName(player)}: ${positionText(player).toLowerCase()}`)
     .join(", ");
-  return `Ganzenbord met 63 vakjes. ${positions}.`;
 }
 
 const ZOOM_SCALE = 1.8;
@@ -73,13 +74,18 @@ interface GanzenbordBoardProps {
 }
 
 export function GanzenbordBoard({ game, zoomPosition = null }: GanzenbordBoardProps) {
+  const t = useTexts(ganzenbordUiTexts);
   const [points] = useState(loadCellPoints);
   const groups = groupPlayers(game.players);
   const focus =
     zoomPosition === null ? null : zoomPosition === 0 ? START_POINT : points[zoomPosition];
 
   return (
-    <div aria-label={boardSummary(game)} className="ganzenbord-board relative" role="img">
+    <div
+      aria-label={t.boardSummary(boardPositions(game))}
+      className="ganzenbord-board relative"
+      role="img"
+    >
       <div
         className="ganzenbord-zoom"
         style={focus ? { transform: cameraTransform(focus) } : undefined}

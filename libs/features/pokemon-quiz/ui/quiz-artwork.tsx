@@ -1,6 +1,8 @@
 import { PokeballMark, pokemonArtworkSrc, type Pokemon } from "@entities/pokedex";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Panel } from "@shared/ui";
+import { pokemonQuizTexts } from "../model/texts";
 
 interface QuizArtworkProps {
   target: Pokemon;
@@ -12,6 +14,7 @@ interface QuizArtworkProps {
 }
 
 export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtworkProps) {
+  const t = useTexts(pokemonQuizTexts);
   // Easy and medium show the colours right away; hard waits for the answer.
   const revealed = !silhouette || answered;
   const fragmentVisible = fragment && !answered;
@@ -42,7 +45,7 @@ export function QuizArtwork({ target, answered, silhouette, fragment }: QuizArtw
         )}
         data-artwork-label={answered ? target.name : ""}
       >
-        {answered ? target.name : fragment ? "Je ziet steeds een stukje…" : "Wie is deze Pokémon?"}
+        {answered ? target.name : fragment ? t.fragmentPrompt : t.prompt}
       </p>
     </Panel>
   );

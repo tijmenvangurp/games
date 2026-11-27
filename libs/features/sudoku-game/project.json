@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["entities-sudoku", "shared-lib", "shared-ui"]
+  "implicitDependencies": ["entities-sudoku", "shared-lib", "shared-ui", "shared-i18n"]
 }

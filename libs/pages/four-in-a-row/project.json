@@ -14,5 +14,5 @@
       }
     }
   },
-  "implicitDependencies": ["features-four-in-a-row-game", "entities-four-in-a-row"]
+  "implicitDependencies": ["features-four-in-a-row-game", "entities-four-in-a-row", "shared-i18n"]
 }

@@ -1,12 +1,22 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { allFrenchItems, dueItemIds, lessonStars, listPublishedLessons } from "@entities/french";
+import {
+  allFrenchItems,
+  dueItemIds,
+  lessonStars,
+  listPublishedLessons,
+  localizeLesson,
+} from "@entities/french";
 import { useFrenchProgressStore } from "@features/french-listening";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
 import { Button, GameIcon, LayoutGrid, Panel, Star } from "@shared/ui";
+import { frenchPageTexts } from "./texts";
 
 export function FrenchPage() {
   const navigate = useNavigate();
-  const lessons = listPublishedLessons();
+  const language = useLanguage();
+  const t = useTexts(frenchPageTexts);
+  const lessons = listPublishedLessons().map((lesson) => localizeLesson(lesson, language));
   const progress = useFrenchProgressStore((state) => state.progress);
   const dueCount = dueItemIds(progress, allFrenchItems()).length;
 
@@ -14,18 +24,16 @@ export function FrenchPage() {
     <GameShell
       onBack={() => navigate({ to: "/" })}
       showSpeech={false}
-      subtitle="Frans luisteren · A1.2"
+      subtitle={t.homeSubtitle}
       title="Bonjour !"
       titleClassName="text-xl sm:text-2xl"
     >
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-        <p className="text-muted-foreground">
-          Kies een les. Je hoort Frans en kiest de juiste Nederlandse vertaling.
-        </p>
+        <p className="text-muted-foreground">{t.intro}</p>
 
         {lessons.length === 0 ? (
           <p className="rounded-lg border border-dashed bg-card/60 p-6 text-center text-muted-foreground">
-            Er zijn nog geen lessen gepubliceerd.
+            {t.noLessons}
           </p>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
@@ -52,13 +60,9 @@ export function FrenchPage() {
                     <p className="mt-1 text-sm text-muted-foreground">{lesson.subtitle}</p>
                     <div className="mt-auto flex items-center justify-between gap-2 pt-4">
                       <span className="text-sm font-bold tabular-nums text-primary">
-                        {lesson.items.length} items · {lesson.level}
+                        {t.items(lesson.items.length, lesson.level)}
                       </span>
-                      <span
-                        aria-label={`${stars} van 3 sterren`}
-                        className="flex gap-0.5"
-                        role="img"
-                      >
+                      <span aria-label={t.stars(stars)} className="flex gap-0.5" role="img">
                         {[0, 1, 2].map((index) => (
                           <Star
                             key={index}
@@ -81,19 +85,17 @@ export function FrenchPage() {
 
         {dueCount > 0 ? (
           <Button size="lg" variant="outline" onClick={() => navigate({ to: "/frans/herhalen" })}>
-            Herhaal {dueCount} {dueCount === 1 ? "item" : "items"}
+            {t.reviewDue(dueCount)}
           </Button>
         ) : null}
 
         <Button size="lg" variant="outline" onClick={() => navigate({ to: "/frans/sorteren" })}>
           <LayoutGrid aria-hidden="true" className="size-5" />
-          Sorteer de woorden
+          {t.sortWords}
         </Button>
 
-        <p className="text-center text-xs text-muted-foreground">Meer lessen komen eraan.</p>
-        <p className="text-center text-xs text-muted-foreground">
-          Audio: Piper (MIT) · stem Tom (dataset AGPLv3).
-        </p>
+        <p className="text-center text-xs text-muted-foreground">{t.moreLessons}</p>
+        <p className="text-center text-xs text-muted-foreground">{t.audioCredit}</p>
       </div>
     </GameShell>
   );

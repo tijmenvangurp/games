@@ -1,13 +1,15 @@
 import type { FlagLevel, FlagScope } from "@entities/geography";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { OptionPicker, SetupPanel } from "@shared/ui";
 import {
   flagLevelOptions,
-  FLAG_MODE_OPTIONS,
-  FLAG_SCOPE_OPTIONS,
+  flagModeOptions,
+  flagScopeOptions,
   scoreKey,
   type FlagMode,
   type FlagSettings,
 } from "../model/settings";
+import { flagTexts } from "../model/texts";
 
 interface FlagsSetupProps {
   settings: FlagSettings;
@@ -27,32 +29,31 @@ export function FlagsSetup({
   onStart,
 }: FlagsSetupProps) {
   const bestScore = best[scoreKey(settings.mode, settings.scope, settings.level)] ?? 0;
+  const language = useLanguage();
+  const t = useTexts(flagTexts);
 
   return (
-    <SetupPanel
-      note={bestScore > 0 ? `Beste score: ${bestScore} sterren` : "Nog geen score"}
-      onStart={onStart}
-    >
+    <SetupPanel note={bestScore > 0 ? t.bestScore(bestScore) : t.noScore} onStart={onStart}>
       <OptionPicker
         columns={2}
-        legend="Wat wil je spelen?"
-        options={FLAG_MODE_OPTIONS}
+        legend={t.whatToPlay}
+        options={flagModeOptions(language)}
         selected={settings.mode}
         onSelect={onModeChange}
       />
 
       <OptionPicker
         columns="2-3"
-        legend="Waar wil je spelen?"
-        options={FLAG_SCOPE_OPTIONS}
+        legend={t.whereToPlay}
+        options={flagScopeOptions(language)}
         selected={settings.scope}
         size="compact"
         onSelect={onScopeChange}
       />
 
       <OptionPicker
-        legend="Niveau"
-        options={flagLevelOptions(settings.scope)}
+        legend={t.level}
+        options={flagLevelOptions(settings.scope, language)}
         selected={settings.level}
         size="compact"
         onSelect={onLevelChange}

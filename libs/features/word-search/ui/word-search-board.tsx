@@ -1,5 +1,7 @@
 import type { Cell, WordSearchPlacement, WordSearchPuzzle } from "@entities/word-search";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
+import { wordSearchTexts } from "./texts";
 import { useWordSearchDrag } from "./use-word-search-drag";
 import { WordSearchStrokes } from "./word-search-strokes";
 
@@ -43,7 +45,10 @@ function letterSize(size: number): string {
   return size >= 12 ? "text-xs sm:text-sm" : "text-sm sm:text-base";
 }
 
+type BoardTexts = (typeof wordSearchTexts)["nl"];
+
 function cellLabel(
+  t: BoardTexts,
   letter: string,
   cell: Cell,
   found: boolean,
@@ -51,11 +56,11 @@ function cellLabel(
   selected: boolean,
 ): string {
   const flags = [
-    found ? "gevonden" : null,
-    hint ? "hint" : null,
-    selected ? "gekozen" : null,
+    found ? t.found : null,
+    hint ? t.hinted : null,
+    selected ? t.selected : null,
   ].filter(Boolean);
-  return `${letter}, rij ${cell.row + 1}, kolom ${cell.col + 1}${
+  return `${t.cell(letter, cell.row + 1, cell.col + 1)}${
     flags.length > 0 ? `, ${flags.join(", ")}` : ""
   }`;
 }
@@ -89,9 +94,10 @@ function WordSearchCell({
   wrong,
   onSelect,
 }: WordSearchCellProps) {
+  const t = useTexts(wordSearchTexts);
   return (
     <button
-      aria-label={cellLabel(letter, cell, found, hint, selected)}
+      aria-label={cellLabel(t, letter, cell, found, hint, selected)}
       aria-pressed={selected}
       className={cn(
         "relative z-0 grid aspect-square min-h-0 min-w-0 place-items-center rounded-sm border border-border font-bold leading-none text-foreground transition-colors",
@@ -172,6 +178,7 @@ export function WordSearchBoard({
   const foundKeys = foundCellKeys(puzzle, found);
   const foundPlacements = foundPlacementsFor(puzzle, found);
   const drag = useWordSearchDrag(!zoomed);
+  const t = useTexts(wordSearchTexts);
 
   const handleCellClick = (cell: Cell) => {
     if (!drag.consumeClick()) {
@@ -181,7 +188,7 @@ export function WordSearchBoard({
 
   return (
     <div
-      aria-label={`Woordzoeker van ${puzzle.size} bij ${puzzle.size}`}
+      aria-label={t.board(puzzle.size)}
       className={cn(
         "select-none rounded-lg border border-border bg-card p-1",
         zoomed ? "overflow-x-auto" : "overflow-hidden",

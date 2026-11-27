@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import {
-  FLAG_LEVEL_INFO,
-  FLAG_SCOPE_INFO,
+  flagLevelLabel,
+  flagScopeLabel,
   type FlagLevel,
   type FlagScope,
 } from "@entities/geography";
@@ -14,27 +14,31 @@ import {
   type FlagMode,
   type FlagSettings,
 } from "@features/flag-game";
+import { useLanguage, useTexts, type Language } from "@shared/i18n";
 import { useGameSetupNavigation } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
+import { flagsPageTexts } from "./texts";
+
+type FlagsPageTexts = (typeof flagsPageTexts)[Language];
 
 interface RoundSummary {
   scope: FlagScope;
   level: FlagLevel;
 }
 
-function subtitleFor(round: RoundSummary | null): string {
+function subtitleFor(round: RoundSummary | null, t: FlagsPageTexts, language: Language): string {
   if (!round) {
-    return "Kies een gebied";
+    return t.chooseArea;
   }
-  return `${FLAG_SCOPE_INFO[round.scope].label} · ${FLAG_LEVEL_INFO[round.level].label}`;
+  return `${flagScopeLabel(round.scope, language)} · ${flagLevelLabel(round.level, language)}`;
 }
 
-function celebrationTitle(stars: number, total: number): string {
+function celebrationTitle(stars: number, total: number, t: FlagsPageTexts): string {
   if (stars === total) {
-    return "Perfect!";
+    return t.perfect;
   }
-  return stars >= total - 2 ? "Wat een wereldreiziger!" : "Goed geoefend!";
+  return stars >= total - 2 ? t.traveller : t.practised;
 }
 
 interface BodyProps {
@@ -69,10 +73,12 @@ interface CelebrationProps {
 }
 
 function Celebration({ stars, total, onAgain, onChoose, onHome }: CelebrationProps) {
+  const t = useTexts(flagsPageTexts);
+
   return (
     <CelebrationDialog
-      description={`Je haalde ${stars} van de ${total} sterren.`}
-      title={celebrationTitle(stars, total)}
+      description={t.stars(stars, total)}
+      title={celebrationTitle(stars, total, t)}
       onAgain={onAgain}
       onChoose={onChoose}
       onHome={onHome}
@@ -90,13 +96,15 @@ export function FlagsPage() {
   const settings = useFlagStore((state) => state.settings);
   const best = useFlagStore((state) => state.best);
   const [showSetup, setShowSetup] = useState(false);
+  const language = useLanguage();
+  const t = useTexts(flagsPageTexts);
 
   const activeRound = mode === "vlaggen" ? round : (puzzle?.round ?? null);
   const setupVisible = showSetup || !activeRound;
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(activeRound),
-    backToGameLabel: "Terug naar je spel",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
@@ -123,8 +131,8 @@ export function FlagsPage() {
     <GameShell
       {...gameSetup}
       showSpeech={false}
-      subtitle={subtitleFor(activeRound)}
-      title="Vlaggenreis"
+      subtitle={subtitleFor(activeRound, t, language)}
+      title={t.title}
     >
       <Body
         best={best}

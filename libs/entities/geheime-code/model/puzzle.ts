@@ -1,5 +1,6 @@
 import { shuffledIndexes } from "@shared/lib";
 import { SYMBOLS, SYMBOL_ORDER } from "./symbols";
+import { symbolName } from "./texts";
 import type { CodeTableCell, CodeWordCell, CodeWordRow, Puzzle, WordSet } from "./types";
 
 function shuffled<T>(items: readonly T[], random: () => number): T[] {
@@ -19,9 +20,9 @@ function assignSymbols(
   const mapping: Record<string, string> = {};
 
   for (const letter of letters) {
-    // Vermijd dat de beginletter van de Nederlandse naam de letter verklapt.
+    // Vermijd dat de beginletter van de naam in de actieve taal de letter verklapt.
     const preferred = pool.find(
-      (symbol) => !used.has(symbol.id) && symbol.name[0]?.toLowerCase() !== letter,
+      (symbol) => !used.has(symbol.id) && symbolName(symbol.id)[0]?.toLowerCase() !== letter,
     );
     const fallback = pool.find((symbol) => !used.has(symbol.id));
     const chosen = preferred ?? fallback;

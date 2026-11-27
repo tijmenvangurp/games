@@ -1,4 +1,6 @@
-import { groupingFor, type MathQuestion } from "@entities/math";
+import { groupingFor, mathTexts, type MathQuestion } from "@entities/math";
+import { useTexts } from "@shared/i18n";
+import { mathTrainerTexts } from "../model/texts";
 
 interface NumberLineSvgProps {
   question: MathQuestion;
@@ -9,13 +11,14 @@ interface NumberLineSvgProps {
 }
 
 function NumberLineSvg({ question, max, ticks, x, showLabel }: NumberLineSvgProps) {
+  const t = useTexts(mathTrainerTexts);
   const forward = question.answer >= question.left;
   const startAnchor = forward ? "end" : "start";
   const endAnchor = forward ? "start" : "end";
 
   return (
     <svg
-      aria-label={`Getallenlijn van 0 tot ${max}. ${question.left} naar ${question.answer}.`}
+      aria-label={t.numberLine(max, question.left, question.answer)}
       className="w-full"
       role="img"
       viewBox="0 0 320 88"
@@ -92,11 +95,13 @@ function NumberLine({ question }: { question: MathQuestion }) {
 }
 
 function DotGroups({ question }: { question: MathQuestion }) {
+  const t = useTexts(mathTrainerTexts);
+  const groupsOf = useTexts(mathTexts).groupsOf;
   const { groups, perGroup } = groupingFor(question);
   const columns = perGroup <= 5 ? perGroup : Math.ceil(perGroup / 2);
 
   return (
-    <div aria-label={`${groups} groepjes van ${perGroup} stippen`} className="space-y-2" role="img">
+    <div aria-label={t.dots(groups, perGroup)} className="space-y-2" role="img">
       <div className="flex flex-wrap justify-center gap-1.5">
         {Array.from({ length: groups }, (_, groupIndex) => (
           <div
@@ -113,7 +118,7 @@ function DotGroups({ question }: { question: MathQuestion }) {
       <p className="text-center text-xs font-semibold text-muted-foreground">
         {question.mode === "keer"
           ? `${groups} × ${perGroup} = ${groups * perGroup}`
-          : `${groups} groepjes van ${perGroup}`}
+          : groupsOf(groups, perGroup)}
       </p>
     </div>
   );

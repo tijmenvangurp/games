@@ -5,7 +5,9 @@ import {
   type LetterLesson,
   type LetterProgressMap,
 } from "@entities/letter";
+import { useTexts } from "@shared/i18n";
 import { BookOpen, Button, Ear, Eye, Panel, Play, SetupPanel, TrainFront } from "@shared/ui";
+import { letterTexts } from "./texts";
 
 interface LetterSetupProps {
   progress: LetterProgressMap;
@@ -30,13 +32,13 @@ function LessonIcon({ lesson }: { lesson: LetterLesson }) {
 
 export function LetterSetup({ progress, onStart }: LetterSetupProps) {
   const known = knownLetters(progress);
+  const t = useTexts(letterTexts);
 
   return (
-    <SetupPanel
-      className="mx-auto w-full max-w-xl"
-      subtitle="10 letters · 6 vragen per les. Hoor de klank en kies de letter, lees woorden of bouw ze zelf."
-      title="Kies je les"
-    >
+    <SetupPanel className="mx-auto w-full max-w-xl" subtitle={t.setupSubtitle} title={t.setupTitle}>
+      {t.languageNote ? (
+        <p className="text-sm font-semibold text-muted-foreground">{t.languageNote}</p>
+      ) : null}
       <div className="grid gap-2">
         {LETTER_LESSONS.map((lesson) => (
           <Button
@@ -48,9 +50,11 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
           >
             <span className="flex items-center gap-2 text-base font-bold">
               <LessonIcon lesson={lesson.id} />
-              {lesson.title}
+              {t.lessons[lesson.id].title}
             </span>
-            <span className="text-sm font-medium opacity-85">{lesson.description}</span>
+            <span className="text-sm font-medium opacity-85">
+              {t.lessons[lesson.id].description}
+            </span>
           </Button>
         ))}
       </div>
@@ -67,17 +71,12 @@ export function LetterSetup({ progress, onStart }: LetterSetupProps) {
       </div>
 
       <p className="text-sm font-semibold text-muted-foreground">
-        {known.length > 0
-          ? `Deze letters ken je al: ${known.join(", ")}.`
-          : "We beginnen met i, k, m, s, p, v, e, n, t en a."}
+        {known.length > 0 ? t.known(known.join(", ")) : t.startLetters}
       </p>
 
       <Panel className="text-sm" padding="sm" surface="subtle">
-        <p className="font-bold">Tip voor ouders</p>
-        <p className="mt-1 leading-relaxed text-muted-foreground">
-          Laat je kind na de ronde een letter op papier schrijven of een gelezen woord aanwijzen in
-          een boek. Dat helpt bij het onthouden.
-        </p>
+        <p className="font-bold">{t.parentTipTitle}</p>
+        <p className="mt-1 leading-relaxed text-muted-foreground">{t.parentTip}</p>
       </Panel>
     </SetupPanel>
   );

@@ -1,28 +1,6 @@
+import { currentLanguage, type Language } from "@shared/i18n";
 import type { LevelId, ThemeId, WordSet } from "./types";
-
-export const THEME_LABEL: Readonly<Record<ThemeId, string>> = {
-  sinterklaas: "Sinterklaas",
-  tuin: "Tuin",
-  onderwater: "Onder water",
-};
-
-export const THEME_DESCRIPTION: Readonly<Record<ThemeId, string>> = {
-  sinterklaas: "Pakjes, pepernoten en de boot.",
-  tuin: "Bloemen, dieren en de slak.",
-  onderwater: "Vissen, koraal en de zee.",
-};
-
-export const LEVEL_LABEL: Readonly<Record<LevelId, string>> = {
-  1: "Kijk & schrijf",
-  2: "Zoek & schrijf",
-  3: "Kraak de code",
-};
-
-export const LEVEL_DESCRIPTION: Readonly<Record<LevelId, string>> = {
-  1: "Vier korte woorden. De code staat open.",
-  2: "Zes woorden en meer letters.",
-  3: "De volle code, zonder hulp.",
-};
+import { ENGLISH_WORD_SETS } from "./words-en";
 
 /**
  * Twee gecureerde rondes per thema en niveau. De letters van een set blijven
@@ -159,10 +137,22 @@ export const WORD_SETS: readonly WordSet[] = [
   },
 ];
 
+const SETS_BY_LANGUAGE: Readonly<Record<Language, readonly WordSet[]>> = {
+  nl: WORD_SETS,
+  en: ENGLISH_WORD_SETS,
+};
+
+/** De woordensets van de actieve taal. */
+function activeSets(): readonly WordSet[] {
+  return SETS_BY_LANGUAGE[currentLanguage()];
+}
+
 export function setsFor(theme: ThemeId, level: LevelId): readonly WordSet[] {
-  return WORD_SETS.filter((set) => set.theme === theme && set.level === level);
+  return activeSets().filter((set) => set.theme === theme && set.level === level);
 }
 
 export function setFor(theme: ThemeId, level: LevelId, round: 1 | 2): WordSet | undefined {
-  return WORD_SETS.find((set) => set.theme === theme && set.level === level && set.round === round);
+  return activeSets().find(
+    (set) => set.theme === theme && set.level === level && set.round === round,
+  );
 }

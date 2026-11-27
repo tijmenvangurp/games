@@ -1,6 +1,8 @@
-import { SYMBOL_BY_ID, type CodeWordRow } from "@entities/geheime-code";
+import { symbolName, type CodeWordRow } from "@entities/geheime-code";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { SymbolTile } from "./code-token";
+import { geheimeCodePlayTexts } from "./texts";
 
 interface CodeWordProps {
   row: CodeWordRow;
@@ -19,13 +21,13 @@ export function CodeWord({
   wordDone,
   onSelect,
 }: CodeWordProps) {
+  const t = useTexts(geheimeCodePlayTexts);
   return (
-    <div aria-label="Woord" className="flex justify-center gap-2 sm:gap-3" role="group">
+    <div aria-label={t.word} className="flex justify-center gap-2 sm:gap-3" role="group">
       {row.cells.map((cell, index) => {
-        const symbol = SYMBOL_BY_ID[cell.symbolId];
         const filled = entries[index] ?? "";
         const active = !wordDone && index === activeCell;
-        const label = `${symbol?.name ?? "symbool"}, ${filled ? `letter ${filled}` : "leeg"}`;
+        const label = `${symbolName(cell.symbolId)}, ${filled ? t.letter(filled) : t.empty}`;
 
         return (
           <button

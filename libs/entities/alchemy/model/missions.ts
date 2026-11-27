@@ -12,7 +12,7 @@ export interface Mission {
  * targets are ordered by recipe depth; tests enforce that order so a child
  * never gets a mission that needs an element they cannot reach yet.
  */
-export const MISSIONS: readonly Mission[] = [
+const MISSION_LIST = [
   { id: "mud", title: "Maak modder.", target: "mud", set: 1 },
   { id: "steam", title: "Maak stoom.", target: "steam", set: 1 },
   { id: "rain", title: "Laat het regenen.", target: "rain", set: 1 },
@@ -43,7 +43,12 @@ export const MISSIONS: readonly Mission[] = [
   { id: "huisdier", title: "Zoek een huisdier.", target: "dog", set: 3 },
   { id: "whale", title: "Maak een walvis.", target: "whale", set: 3 },
   { id: "unicorn", title: "Maak een eenhoorn.", target: "unicorn", set: 3 },
-];
+] as const satisfies readonly Mission[];
+
+export const MISSIONS: readonly Mission[] = MISSION_LIST;
+
+/** Elk opdracht-id uit de lijst; de Engelse titels moeten precies deze ids dekken. */
+export type KnownMissionId = (typeof MISSION_LIST)[number]["id"];
 
 export function missionById(id: string | null | undefined): Mission | undefined {
   return id ? MISSIONS.find((mission) => mission.id === id) : undefined;

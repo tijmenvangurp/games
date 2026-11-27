@@ -15,6 +15,8 @@ export { Panel } from "./panel";
 export { ProgressBar } from "./progress-bar";
 export { ScoreHeader } from "./score-header";
 export { SetupPanel } from "./setup-panel";
+export { LanguageSwitcher } from "./language-switcher";
+export { LevelStatusBadge } from "./level-status-badge";
 export { SoundToggle } from "./sound-toggle";
 export { SpeechButton } from "./speech-button";
 export { SpeechToggle } from "./speech-toggle";

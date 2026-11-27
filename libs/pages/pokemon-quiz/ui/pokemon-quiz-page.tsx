@@ -6,9 +6,12 @@ import {
   usePokemonQuizStore,
 } from "@features/pokemon-quiz";
 import { GameShell } from "@widgets/game-shell";
+import { useTexts } from "@shared/i18n";
 import { useGameSetupNavigation } from "@shared/lib";
+import { pokemonQuizPageTexts } from "./texts";
 
 export function PokemonQuizPage() {
+  const t = useTexts(pokemonQuizPageTexts);
   const question = usePokemonQuizStore((state) => state.question);
   const settings = usePokemonQuizStore((state) => state.settings);
   const [showSetup, setShowSetup] = useState(false);
@@ -17,7 +20,7 @@ export function PokemonQuizPage() {
   const gameSetup = useGameSetupNavigation({
     setupVisible,
     hasActiveGame: Boolean(question),
-    backToGameLabel: "Terug naar je spel",
+    backToGameLabel: t.backToGame,
     onCloseSetup: () => setShowSetup(false),
     onOpenSetup: () => setShowSetup(true),
   });
@@ -32,9 +35,11 @@ export function PokemonQuizPage() {
       {...gameSetup}
       showSpeech={false}
       subtitle={
-        question ? `${question.difficulty} · ${question.optionIds.length} namen` : "Kies je spel"
+        question
+          ? t.subtitle(t.difficulties[question.difficulty], question.optionIds.length)
+          : t.chooseSubtitle
       }
-      title="Wie is deze Pokémon?"
+      title={t.title}
       titleClassName="text-xl sm:text-2xl"
     >
       {setupVisible ? (

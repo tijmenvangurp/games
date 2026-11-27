@@ -11,7 +11,7 @@ import {
   type PlayerSetup,
 } from "@entities/ganzenbord";
 
-const PLAYER_COUNTS = [2, 3, 4] as const;
+export const PLAYER_COUNTS = [2, 3, 4] as const;
 
 export type PlayerCount = (typeof PLAYER_COUNTS)[number];
 
@@ -51,16 +51,6 @@ export const DEFAULT_SETTINGS: GanzenbordSettings = {
   names: NO_NAMES,
   colors: DEFAULT_PLAYER_COLORS,
 };
-
-export const PLAYER_COUNT_OPTIONS = PLAYER_COUNTS.map((value) => ({
-  value,
-  label: `${value} spelers`,
-}));
-
-export const CONTROLLER_OPTIONS: readonly { value: Controller; label: string }[] = [
-  { value: "human", label: "Mens" },
-  { value: "computer", label: "Computer" },
-];
 
 export function isController(value: unknown): value is Controller {
   return typeof value === "string" && (CONTROLLERS as readonly string[]).includes(value);

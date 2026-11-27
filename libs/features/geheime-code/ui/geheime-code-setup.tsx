@@ -1,14 +1,13 @@
 import {
-  LEVEL_DESCRIPTION,
-  LEVEL_LABEL,
+  geheimeCodeTexts,
   LEVELS,
-  THEME_DESCRIPTION,
-  THEME_LABEL,
   THEMES,
   type LevelId,
   type ThemeId,
 } from "@entities/geheime-code";
+import { useTexts } from "@shared/i18n";
 import { OptionPicker, SetupPanel } from "@shared/ui";
+import { geheimeCodePlayTexts } from "./texts";
 
 interface GeheimeCodeSetupProps {
   theme: ThemeId;
@@ -25,26 +24,28 @@ export function GeheimeCodeSetup({
   onLevel,
   onStart,
 }: GeheimeCodeSetupProps) {
+  const names = useTexts(geheimeCodeTexts);
+  const t = useTexts(geheimeCodePlayTexts);
   return (
-    <SetupPanel title="Kies je code" onStart={onStart}>
+    <SetupPanel title={t.setupTitle} onStart={onStart}>
       <OptionPicker
         columns="2-3"
-        legend="Thema"
+        legend={t.theme}
         options={THEMES.map((option) => ({
           value: option,
-          label: THEME_LABEL[option],
-          description: THEME_DESCRIPTION[option],
+          label: names.themes[option],
+          description: names.themeDescriptions[option],
         }))}
         selected={theme}
         onSelect={onTheme}
       />
       <OptionPicker
         columns="2-3"
-        legend="Niveau"
+        legend={t.level}
         options={LEVELS.map((option) => ({
           value: option,
-          label: LEVEL_LABEL[option],
-          description: LEVEL_DESCRIPTION[option],
+          label: names.levels[option],
+          description: names.levelDescriptions[option],
         }))}
         selected={level}
         onSelect={onLevel}

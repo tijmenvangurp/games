@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { GameShell } from "@widgets/game-shell";
+import { useTexts } from "@shared/i18n";
 import { GraduationCap, Panel, Play, Puzzle, Swords } from "@shared/ui";
+import { chessPageTexts } from "./texts";
 
 interface ChessHubCardProps {
   readonly to: "/schaken/les" | "/schaken/partij" | "/puzzels";
@@ -11,6 +13,8 @@ interface ChessHubCardProps {
 }
 
 function ChessHubCard({ to, icon, title, description }: ChessHubCardProps) {
+  const t = useTexts(chessPageTexts);
+
   return (
     <Link className="group flex focus-visible:outline-none" to={to}>
       <Panel
@@ -31,42 +35,37 @@ function ChessHubCard({ to, icon, title, description }: ChessHubCardProps) {
         </div>
         <h2 className="mt-4 font-display text-xl leading-snug tracking-tight">{title}</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{description}</p>
-        <span className="mt-auto pt-4 text-sm font-bold text-primary">Spelen</span>
+        <span className="mt-auto pt-4 text-sm font-bold text-primary">{t.play}</span>
       </Panel>
     </Link>
   );
 }
 
 export function ChessPage() {
+  const t = useTexts(chessPageTexts);
   const navigate = useNavigate();
 
   return (
-    <GameShell
-      subtitle="Les, puzzels of een partij"
-      title="Schaken"
-      onBack={() => navigate({ to: "/" })}
-    >
+    <GameShell subtitle={t.hubSubtitle} title={t.hubTitle} onBack={() => navigate({ to: "/" })}>
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-4">
-        <p className="text-muted-foreground">
-          Leer de stukken, los een puzzel op of speel een partij tegen de computer of een vriend.
-        </p>
+        <p className="text-muted-foreground">{t.hubIntro}</p>
         <div className="grid gap-3 sm:grid-cols-3">
           <ChessHubCard
-            description="Leer stap voor stap alle stukken en zet je eerste schaakmat."
+            description={t.lessonDescription}
             icon={<GraduationCap className="size-6" />}
-            title="Schaakles"
+            title={t.lessonTitle}
             to="/schaken/les"
           />
           <ChessHubCard
-            description="Speel tegen de computer of samen op dit scherm. Kies een avatar en zie meteen wie aan zet is."
+            description={t.gameDescription}
             icon={<Swords className="size-6" />}
-            title="Schaakpartij"
+            title={t.gameTitle}
             to="/schaken/partij"
           />
           <ChessHubCard
-            description="Los korte puzzels op: zet schaakmat of win een stuk."
+            description={t.puzzlesDescription}
             icon={<Puzzle className="size-6" />}
-            title="Schaakpuzzels"
+            title={t.puzzlesTitle}
             to="/puzzels"
           />
         </div>

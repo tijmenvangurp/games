@@ -1,5 +1,7 @@
 import { useRef } from "react";
 import type { Cell, Player } from "@entities/four-in-a-row";
+import { useTexts } from "@shared/i18n";
+import { fourInARowTexts } from "../model/texts";
 import { FourInARowDisc } from "./four-in-a-row-disc";
 
 interface FourInARowColumnProps {
@@ -34,11 +36,12 @@ export function FourInARowColumn({
   // Een tik op een aanraakscherm kan de knop ook focus geven; dan tonen we
   // geen hint, want op touch bestaat hover niet.
   const touched = useRef(false);
+  const t = useTexts(fourInARowTexts);
 
   return (
     <button
       type="button"
-      aria-label={`Kolom ${index + 1}`}
+      aria-label={t.column(index + 1)}
       className="four-in-a-row-column flex flex-1 flex-col-reverse gap-0.5 rounded-md transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:gap-1"
       disabled={disabled}
       onBlur={() => onHover(null)}

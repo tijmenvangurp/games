@@ -1,6 +1,8 @@
 import type { Color } from "chess.js";
+import { getTexts } from "@shared/i18n";
 import type { SpeechGroup, SpeechLine } from "@shared/lib";
 import { TUTORIAL_LEVELS } from "./levels";
+import { coachTexts, levelTexts } from "./texts";
 import type {
   TutorialFeedback,
   TutorialLevel,
@@ -20,19 +22,18 @@ const AUDIO_TEXT_OVERRIDES: Readonly<Record<string, string>> = {
   "castling-hint": "Sleep de koning van e één naar g één.",
 };
 
+const COACH = coachTexts.nl;
+
 const CHESS_COACH_LINES = {
-  stuck: line("coach-stuck", "Oei! De rokade kan niet meer. Druk op Opnieuw."),
-  illegal: line("coach-illegal", "Die mag niet. Sleep naar een groene stip."),
-  hint: line("coach-hint", "Kijk! Sleep naar de groene stip."),
-  movedTarget: line("coach-moved-target", "Goed! Ga verder naar de ster."),
-  movedFree: line("coach-moved-free", "Goed! Nog een zet."),
-  selectedOpponent: line(
-    "coach-selected-opponent",
-    "Kijk! Dit is een zwart stuk. Sleep je eigen stuk om te zetten.",
-  ),
-  selectedOwn: line("coach-selected-own", "Sleep naar een groene stip."),
-  successFallback: line("coach-success", "Ster! Knap gedaan."),
-  previewTap: line("coach-preview-tap", "Tik op het stuk om te kijken."),
+  stuck: line("coach-stuck", COACH.stuck),
+  illegal: line("coach-illegal", COACH.illegal),
+  hint: line("coach-hint", COACH.hint),
+  movedTarget: line("coach-moved-target", COACH.movedTarget),
+  movedFree: line("coach-moved-free", COACH.movedFree),
+  selectedOpponent: line("coach-selected-opponent", COACH.selectedOpponent),
+  selectedOwn: line("coach-selected-own", COACH.selectedOwn),
+  successFallback: line("coach-success", COACH.successFallback),
+  previewTap: line("coach-preview-tap", COACH.previewTap),
 } as const;
 
 interface LevelSpeech {
@@ -86,7 +87,8 @@ function coachKey(
 
 /**
  * Dezelfde tekst die de coachbubbel toont en de spraakregels die daarbij horen.
- * Eén bron, zodat een kind nooit iets anders hoort dan er staat.
+ * Eén bron, zodat een kind nooit iets anders hoort dan er staat. In het Engels
+ * is er geen spraak; dan komt de tekst uit de Engelse lesteksten.
  */
 export function coachSpeechFor(
   level: TutorialLevel,
@@ -99,6 +101,8 @@ export function coachSpeechFor(
 ): CoachSpeech {
   const key = coachKey(level, feedback, preview, selectedColor, selectedSquare, status, moveCount);
   const levelSpeech = CHESS_LEVEL_LINES[level.id];
+  const copy = getTexts(levelTexts)[level.id];
+  const coach = getTexts(coachTexts);
 
   const terminal = (text: string, speech: SpeechLine): CoachSpeech => ({
     key,
@@ -108,35 +112,32 @@ export function coachSpeechFor(
 
   if (status === "completed") {
     const speech = levelSpeech.success ?? CHESS_COACH_LINES.successFallback;
-    return terminal(level.success ?? speech.text, speech);
+    return terminal(copy.success ?? coach.successFallback, speech);
   }
   if (status === "stuck") {
-    return terminal(CHESS_COACH_LINES.stuck.text, CHESS_COACH_LINES.stuck);
+    return terminal(coach.stuck, CHESS_COACH_LINES.stuck);
   }
   if (feedback === "illegal") {
-    return terminal(CHESS_COACH_LINES.illegal.text, CHESS_COACH_LINES.illegal);
+    return terminal(coach.illegal, CHESS_COACH_LINES.illegal);
   }
   if (feedback === "hint") {
-    return terminal(CHESS_COACH_LINES.hint.text, CHESS_COACH_LINES.hint);
+    return terminal(coach.hint, CHESS_COACH_LINES.hint);
   }
   if (feedback === "moved") {
-    const fallback = level.targetSquare
-      ? CHESS_COACH_LINES.movedTarget
-      : CHESS_COACH_LINES.movedFree;
-    const speech = levelSpeech.nextStep ?? fallback;
-    return terminal(speech.text, speech);
+    const fallback = level.targetSquare ? "movedTarget" : "movedFree";
+    const speech = levelSpeech.nextStep ?? CHESS_COACH_LINES[fallback];
+    return terminal(copy.nextStep ?? coach[fallback], speech);
   }
   if (preview) {
-    const text = `${level.preview} ${CHESS_COACH_LINES.previewTap.text}`;
+    const text = `${copy.preview} ${coach.previewTap}`;
     return { key, text, lines: [levelSpeech.preview, CHESS_COACH_LINES.previewTap] };
   }
   if (selectedSquare) {
-    const speech =
-      selectedColor === "b" ? CHESS_COACH_LINES.selectedOpponent : CHESS_COACH_LINES.selectedOwn;
-    return terminal(speech.text, speech);
+    const choice = selectedColor === "b" ? "selectedOpponent" : "selectedOwn";
+    return terminal(coach[choice], CHESS_COACH_LINES[choice]);
   }
 
-  return terminal(levelSpeech.instruction.text, levelSpeech.instruction);
+  return terminal(copy.instruction, levelSpeech.instruction);
 }
 
 const allLevelLines = Object.values(CHESS_LEVEL_LINES).flatMap((speech) => [

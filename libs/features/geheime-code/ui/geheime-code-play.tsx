@@ -1,4 +1,5 @@
 import type { Puzzle } from "@entities/geheime-code";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { Button, Confetti, Panel } from "@shared/ui";
 import { useGeheimeCodeKeyboard } from "../model/use-geheime-code-keyboard";
@@ -6,6 +7,9 @@ import { useGeheimeCodeStore } from "../model/use-geheime-code-store";
 import { AlphabetKeyboard } from "./alphabet-keyboard";
 import { CodeTable } from "./code-table";
 import { CodeWord } from "./code-word";
+import { geheimeCodePlayTexts } from "./texts";
+
+type PlayTexts = (typeof geheimeCodePlayTexts)["nl"];
 
 interface RoundViewProps {
   puzzle: Puzzle;
@@ -17,12 +21,12 @@ interface RoundViewProps {
   wordDone: boolean;
 }
 
-function announcementFor(wordDone: boolean, wrongCell: number | null): string {
+function announcementFor(t: PlayTexts, wordDone: boolean, wrongCell: number | null): string {
   if (wordDone) {
-    return "Woord klaar.";
+    return t.wordDone;
   }
   if (wrongCell !== null) {
-    return "Probeer nog eens.";
+    return t.tryAgain;
   }
   return "";
 }
@@ -56,6 +60,7 @@ function RoundView({
   wrongCell,
   wordDone,
 }: RoundViewProps) {
+  const t = useTexts(geheimeCodePlayTexts);
   const row = puzzle.rows[activeRow];
   if (!row) {
     return null;
@@ -64,7 +69,7 @@ function RoundView({
 
   return (
     <section
-      aria-label="Geheime code"
+      aria-label={t.secretCode}
       className="mx-auto flex w-full max-w-2xl flex-col gap-3 sm:gap-4"
     >
       <CodeTable hintLetter={hintLetter} puzzle={puzzle} />
@@ -84,14 +89,14 @@ function RoundView({
             <Confetti key={`word-${activeRow}`} pieces={18} variant="burst" />
             <div className="mt-4 flex justify-center">
               <Button size="lg" onClick={() => useGeheimeCodeStore.getState().nextWord()}>
-                {last ? "Klaar" : "Volgende"}
+                {last ? t.done : t.next}
               </Button>
             </div>
           </>
         ) : null}
 
         <p aria-live="polite" className="sr-only">
-          {announcementFor(wordDone, wrongCell)}
+          {announcementFor(t, wordDone, wrongCell)}
         </p>
       </Panel>
 

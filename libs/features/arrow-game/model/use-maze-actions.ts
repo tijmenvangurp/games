@@ -5,7 +5,9 @@ import {
   type MazeDirection,
   type MazeLevel,
 } from "@entities/arrow";
+import { getTexts } from "@shared/i18n";
 import { playHaptic, playSound } from "@shared/lib";
+import { arrowTexts } from "./texts";
 import { useArrowsStore, type ArrowsTapResult } from "./use-arrow-store";
 
 export interface FlyingArrow {
@@ -107,14 +109,15 @@ export function statusTextFor(
   blockedId: number | null,
   hintId: number | null,
 ): string {
+  const t = getTexts(arrowTexts);
   if (status === "won") {
-    return "Alle pijlen zijn weg!";
+    return t.allGone;
   }
   if (blockedId !== null) {
-    return "Die pijl kan nog niet weg. Kijk welke pijl vrij is.";
+    return t.blocked;
   }
   if (hintId !== null) {
-    return "De gemarkeerde pijl kan weg.";
+    return t.hinted;
   }
-  return "Tik op een pijl die vrij kan wegvliegen.";
+  return t.tapArrow;
 }

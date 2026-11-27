@@ -2,6 +2,8 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 import { cn } from "@shared/lib";
 import type { SortCategory, SortWord } from "../model/sort";
 import { isSortCorrect } from "../model/sort";
+import { useTexts } from "@shared/i18n";
+import { frenchTexts } from "./texts";
 
 interface CategoryBoxProps {
   category: SortCategory;
@@ -22,6 +24,7 @@ export function SortCategoryBox({
     id: category.lessonId,
     disabled: checked,
   });
+  const t = useTexts(frenchTexts);
 
   return (
     <section
@@ -42,7 +45,7 @@ export function SortCategoryBox({
       </button>
       <div className="mt-2 flex flex-wrap content-start gap-1.5">
         {placed.length === 0 ? (
-          <span className="p-1 text-xs text-muted-foreground">Tik hier</span>
+          <span className="p-1 text-xs text-muted-foreground">{t.tapHere}</span>
         ) : (
           placed.map((word) => {
             const correct = isSortCorrect(word, category.lessonId);
@@ -50,7 +53,7 @@ export function SortCategoryBox({
             return (
               <button
                 key={word.item.id}
-                aria-label={`Verwijder ${word.item.fr}`}
+                aria-label={t.remove(word.item.fr)}
                 className={cn(
                   "min-h-11 rounded-lg border px-2.5 py-1.5 text-sm font-bold transition active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 disabled:pointer-events-none",
                   state === "correct" && "border-success/45 bg-success/10 text-success",

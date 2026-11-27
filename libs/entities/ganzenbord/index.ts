@@ -7,7 +7,7 @@ export {
   isPlayerColor,
   normalizePlayerName,
 } from "./model/player";
-export { CONTROLLERS, MAX_PLAYERS, MIN_PLAYERS, PLAYER_IDS } from "./model/types";
+export { CONTROLLERS, MAX_PLAYERS, MIN_PLAYERS, PLAYER_COLORS, PLAYER_IDS } from "./model/types";
 export type {
   Controller,
   Dice,

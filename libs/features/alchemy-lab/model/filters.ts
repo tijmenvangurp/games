@@ -1,44 +1,42 @@
 import {
   ELEMENT_CATEGORIES,
-  ELEMENT_CATEGORY_LABELS,
+  elementName,
   type AlchemyElement,
   type ElementCategory,
 } from "@entities/alchemy";
+import { currentLanguage, type Language } from "@shared/i18n";
 
 export type CategoryFilter = ElementCategory | "all";
 export type ElementSort = "new" | "category" | "name";
 
-export const CATEGORY_FILTER_OPTIONS = [
-  { value: "all", label: "Alles" },
-  ...ELEMENT_CATEGORIES.map((category) => ({
-    value: category,
-    label: ELEMENT_CATEGORY_LABELS[category],
-  })),
-] as const satisfies readonly { value: CategoryFilter; label: string }[];
+export const CATEGORY_FILTERS = [
+  "all",
+  ...ELEMENT_CATEGORIES,
+] as const satisfies readonly CategoryFilter[];
 
-export const SORT_OPTIONS = [
-  { value: "new", label: "Nieuw" },
-  { value: "category", label: "Categorie" },
-  { value: "name", label: "A–Z" },
-] as const satisfies readonly { value: ElementSort; label: string }[];
+export const ELEMENT_SORTS = ["new", "category", "name"] as const satisfies readonly ElementSort[];
 
+/** Sorteert en filtert op de naam in de gekozen taal, zodat A–Z ook in het Engels klopt. */
 export function filterAndSortElements(
   elements: readonly AlchemyElement[],
   category: CategoryFilter,
   sort: ElementSort,
+  language: Language = currentLanguage(),
 ): AlchemyElement[] {
   const filtered =
     category === "all" ? [...elements] : elements.filter((item) => item.category === category);
+  const byName = (first: AlchemyElement, second: AlchemyElement) =>
+    elementName(first.id, language).localeCompare(elementName(second.id, language), language);
 
   if (sort === "name") {
-    return filtered.sort((first, second) => first.name.localeCompare(second.name, "nl"));
+    return filtered.sort(byName);
   }
 
   if (sort === "category") {
     return filtered.sort((first, second) => {
       const difference =
         ELEMENT_CATEGORIES.indexOf(first.category) - ELEMENT_CATEGORIES.indexOf(second.category);
-      return difference === 0 ? first.name.localeCompare(second.name, "nl") : difference;
+      return difference === 0 ? byName(first, second) : difference;
     });
   }
 

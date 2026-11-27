@@ -1,4 +1,6 @@
 import { SCENE_SIZE, findTarget, type SeekScene as SeekSceneData } from "@entities/hidden-object";
+import { useTexts } from "@shared/i18n";
+import { seekTexts } from "../model/texts";
 import { CreatureGlyph } from "./creature-glyph";
 import { DecorationGlyph } from "./decoration-glyph";
 
@@ -11,6 +13,7 @@ interface SeekSceneProps {
 }
 
 export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSceneProps) {
+  const t = useTexts(seekTexts);
   const gradientId = `seek-sky-${scene.seed}-${scene.difficulty}`;
   const target = hintVisible ? findTarget(scene) : null;
   const garden = scene.theme === "tuin";
@@ -18,7 +21,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
       <svg
-        aria-label="Zoek de Wobbel met de ster tussen alle andere Wobbels"
+        aria-label={t.sceneLabel}
         className="block h-auto w-full touch-manipulation"
         role="group"
         viewBox={`0 0 ${SCENE_SIZE} ${SCENE_SIZE}`}
@@ -73,7 +76,7 @@ export function SeekScene({ scene, found, wrongId, hintVisible, onTap }: SeekSce
           return (
             <g
               key={creature.id}
-              aria-label={`Wobbel ${index + 1}`}
+              aria-label={t.creature(index + 1)}
               className="cursor-pointer transition-opacity focus-visible:outline-none"
               data-creature-id={creature.id}
               opacity={faded ? 0.3 : 1}

@@ -19,6 +19,7 @@
     "entities-memory",
     "entities-pokedex",
     "shared-lib",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

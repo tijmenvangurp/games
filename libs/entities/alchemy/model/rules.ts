@@ -1,4 +1,4 @@
-import { BASE_ELEMENT_IDS, ELEMENTS, getElement } from "./elements";
+import { BASE_ELEMENT_IDS, ELEMENTS } from "./elements";
 import { RECIPES } from "./recipes";
 import type { ElementId, Hint, Recipe } from "./types";
 
@@ -77,10 +77,6 @@ export function findRecipeFor(result: ElementId): Recipe | undefined {
 
 export function recipesUsing(elementId: ElementId, recipes: readonly Recipe[] = RECIPES): Recipe[] {
   return recipes.filter((recipe) => recipe.a === elementId || recipe.b === elementId);
-}
-
-export function elementName(id: ElementId): string {
-  return getElement(id)?.name ?? id;
 }
 
 /**

@@ -1,0 +1,58 @@
+import { defineTexts } from "@shared/i18n";
+
+export const wordSearchTexts = defineTexts(
+  {
+    difficulty: "Moeilijkheid",
+    theme: "Welk thema?",
+    themes: {
+      tuin: { label: "Tuin", hint: "Bloemen en beestjes" },
+      onderwater: { label: "Onder water", hint: "Vissen en schelpen" },
+      pokemon: { label: "Pokémon", hint: "Generatie 1" },
+    },
+    difficulties: {
+      makkelijk: { label: "Makkelijk", hint: "10 × 10 · 8 woorden" },
+      gemiddeld: { label: "Gemiddeld", hint: "12 × 12 · 10 woorden" },
+      moeilijk: { label: "Moeilijk", hint: "14 × 14 · 12 woorden" },
+    },
+    toFind: "Te zoeken",
+    wordsToFind: "Te zoeken woorden",
+    hint: "Hint",
+    newBoard: "Nieuw bord",
+    wholeBoard: "Heel bord",
+    zoomIn: "Vergroot",
+    listenInstructions: "Beluister de uitleg",
+    listenWord: (word: string) => `Beluister ${word}`,
+    board: (size: number) => `Woordzoeker van ${size} bij ${size}`,
+    cell: (letter: string, row: number, col: number) => `${letter}, rij ${row}, kolom ${col}`,
+    found: "gevonden",
+    hinted: "hint",
+    selected: "gekozen",
+  },
+  {
+    difficulty: "Difficulty",
+    theme: "Which theme?",
+    themes: {
+      tuin: { label: "Garden", hint: "Flowers and minibeasts" },
+      onderwater: { label: "Under water", hint: "Fish and shells" },
+      pokemon: { label: "Pokémon", hint: "Generation 1" },
+    },
+    difficulties: {
+      makkelijk: { label: "Easy", hint: "10 × 10 · 8 words" },
+      gemiddeld: { label: "Medium", hint: "12 × 12 · 10 words" },
+      moeilijk: { label: "Hard", hint: "14 × 14 · 12 words" },
+    },
+    toFind: "To find",
+    wordsToFind: "Words to find",
+    hint: "Hint",
+    newBoard: "New board",
+    wholeBoard: "Whole board",
+    zoomIn: "Zoom in",
+    listenInstructions: "Listen to the instructions",
+    listenWord: (word: string) => `Listen to ${word}`,
+    board: (size: number) => `Word search of ${size} by ${size}`,
+    cell: (letter: string, row: number, col: number) => `${letter}, row ${row}, column ${col}`,
+    found: "found",
+    hinted: "hint",
+    selected: "selected",
+  },
+);

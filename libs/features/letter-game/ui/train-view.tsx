@@ -13,10 +13,12 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import type { LetterId, TreinQuestion } from "@entities/letter";
+import { useTexts } from "@shared/i18n";
 import { cn } from "@shared/lib";
 import { useLetterStore } from "../model/use-letter-store";
 import { LetterAudio } from "./letter-audio";
 import type { TileState } from "./letter-tile";
+import { letterTexts } from "./texts";
 
 function TrainLetter({
   letter,
@@ -33,13 +35,14 @@ function TrainLetter({
     id: letter,
     disabled,
   });
+  const t = useTexts(letterTexts);
 
   return (
     <button
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      aria-label={`Letter ${letter}`}
+      aria-label={t.letter(letter)}
       className={cn(
         "flex min-h-20 min-w-0 touch-none items-center justify-center rounded-2xl border-2 text-4xl font-black transition active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/30 disabled:pointer-events-none",
         state === "default" && "border-border bg-card hover:bg-muted",
@@ -72,11 +75,12 @@ function TrainSlot({
     id: `slot-${index}`,
     disabled,
   });
+  const t = useTexts(letterTexts);
 
   return (
     <div
       ref={setNodeRef}
-      aria-label={`Vak ${index + 1}${letter ? `: ${letter}` : ""}`}
+      aria-label={`${t.box(index + 1)}${letter ? `: ${letter}` : ""}`}
       className={cn(
         "flex size-16 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/40 text-3xl font-black",
         isOver && "border-primary bg-primary/5 ring-2 ring-primary/20",
@@ -101,6 +105,7 @@ export function TrainView({
 }) {
   const [active, setActive] = useState<LetterId | null>(null);
   const draggedRef = useRef(false);
+  const t = useTexts(letterTexts);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 120, tolerance: 6 } }),
@@ -147,18 +152,12 @@ export function TrainView({
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
     >
-      <LetterAudio
-        autoPlay
-        label={`Luister naar ${question.word.word}`}
-        src={question.word.audio}
-      />
+      <LetterAudio autoPlay label={t.listenWord(question.word.word)} src={question.word.audio} />
       <div className="mt-3">
-        <p className="text-center text-sm font-semibold text-muted-foreground">
-          Bouw het woord. Sleep of tik de letters.
-        </p>
+        <p className="text-center text-sm font-semibold text-muted-foreground">{t.trainPrompt}</p>
       </div>
 
-      <div aria-label="Woordvakken" className="mt-4 flex justify-center gap-2" role="group">
+      <div aria-label={t.wordBoxes} className="mt-4 flex justify-center gap-2" role="group">
         {question.word.letters.map((letter, index) => (
           <TrainSlot
             key={`${letter}-${index}`}
@@ -170,7 +169,7 @@ export function TrainView({
         ))}
       </div>
 
-      <div aria-label="Kies letters" className="mt-4 grid grid-cols-4 gap-2" role="group">
+      <div aria-label={t.chooseLetters} className="mt-4 grid grid-cols-4 gap-2" role="group">
         {question.tiles.map((letter, index) => (
           <TrainLetter
             key={`${letter}-${index}`}
@@ -190,7 +189,7 @@ export function TrainView({
 
       {hinted ? (
         <p className="mt-3 text-center text-sm font-bold text-success" aria-live="polite">
-          De volgende letter is {expected}.
+          {t.nextLetter(expected)}
         </p>
       ) : null}
 

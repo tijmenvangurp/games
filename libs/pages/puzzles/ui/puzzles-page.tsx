@@ -7,9 +7,12 @@ import {
   usePuzzleProgress,
   type PuzzleDifficulty,
 } from "@features/chess-puzzles";
+import { useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
+import { puzzlesPageTexts } from "./texts";
 
 export function PuzzlesPage() {
+  const t = useTexts(puzzlesPageTexts);
   const navigate = useNavigate();
   const [difficulty, setDifficulty] = useState<PuzzleDifficulty>("easy");
   const [selectedPuzzleId, setSelectedPuzzleId] = useState<string | null>(null);
@@ -40,11 +43,7 @@ export function PuzzlesPage() {
   };
 
   return (
-    <GameShell
-      onBack={() => navigate({ to: "/" })}
-      subtitle="Kies je moeilijkheid"
-      title="Schaakpuzzels"
-    >
+    <GameShell onBack={() => navigate({ to: "/" })} subtitle={t.subtitle} title={t.title}>
       {puzzle ? (
         <PuzzlePlay
           key={puzzle.id}

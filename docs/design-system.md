@@ -89,6 +89,8 @@ zodat een rode schijf nooit als fout leest.
 - `ScoreHeader` — gedeelde ronde-HUD met voortgangstekst, sterren en reeks (`tabular-nums`).
 - `Badge` — compacte pil voor status, labels en aantallen (`tabular-nums`).
 - `Disclosure` — uitklappaneel (`<details>`) met draaiende chevron en 44 px tikdoel.
+- `LanguageSwitcher` — compacte NL/EN-keuze in de kop van het beginscherm; de keuze
+  blijft op het apparaat bewaard en past `<html lang>` aan.
 - `GameIcon` — Phosphor-icoon per spel of les.
 - `ChessBoard` — schaakbord met de coördinaten buiten de velden: rijnummers links, kolomletters
   onder. Draait mee met de bordstand.
@@ -97,7 +99,8 @@ zodat een rode schijf nooit als fout leest.
 ## Spraak
 
 - `GameShell` toont `SpeechToggle` naast `SoundToggle` als de game spraak heeft. Voorlezen en
-  geluidseffecten zijn apart te bedienen.
+  geluidseffecten zijn apart te bedienen. In het Engels verbergt `GameShell` de voorleesknop:
+  de opnames zijn alleen Nederlands.
 - `SpeechButton` herhaalt één spraakregel; `SpokenText` toont tekst en een sprekerknop.
 - `useAutoSpeech` leest een nieuwe opdracht of feedback automatisch voor, maar pas na de eerste tik.
 - Elke game met spraak heeft een `model/audio.ts` met `speechGroups`. De generator ontdekt die zelf.

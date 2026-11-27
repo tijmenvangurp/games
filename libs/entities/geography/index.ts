@@ -2,14 +2,16 @@ export { COUNTRIES } from "./model/countries";
 export { PROVINCES } from "./model/provinces";
 export {
   directionPrompt,
-  FLAG_LEVEL_INFO,
+  flagLevelLabel,
   FLAG_LOOKALIKES,
-  FLAG_SCOPE_INFO,
+  flagScopeHint,
+  flagScopeLabel,
   flagSrc,
   levelHint,
   lookalikeCodes,
   subjectsFor,
 } from "./model/config";
+export { subjectName, subjectNameInSentence } from "./model/names";
 export { createRound, explanationFor } from "./model/generator";
 export { createPuzzleRound } from "./model/puzzle";
 export type { PuzzleRound } from "./model/puzzle";

@@ -14,5 +14,11 @@
       }
     }
   },
-  "implicitDependencies": ["entities-adaptive", "entities-murdoku", "shared-lib", "shared-ui"]
+  "implicitDependencies": [
+    "entities-adaptive",
+    "entities-murdoku",
+    "shared-lib",
+    "shared-ui",
+    "shared-i18n"
+  ]
 }

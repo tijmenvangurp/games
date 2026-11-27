@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/react/shallow";
 import { MEMORY_LEVELS } from "@entities/memory";
+import { useTexts } from "@shared/i18n";
 import { cn, playHaptic, playSound } from "@shared/lib";
 import { Button, Lightbulb, Panel, RotateCcw, Sparkles } from "@shared/ui";
+import { memoryTexts, type MemoryTexts } from "../model/texts";
 import { useMemoryStore } from "../model/use-memory-store";
 import { MemoryBoard } from "./memory-board";
 
@@ -13,17 +15,18 @@ interface HeaderCardProps {
 }
 
 function HeaderCard({ matchedPairs, pairs, mode }: HeaderCardProps) {
+  const t = useTexts(memoryTexts);
   return (
     <Panel className="order-1 flex items-center justify-between gap-3" padding="md">
       <div>
-        <p className="font-display text-lg leading-tight">Vind alle paren</p>
+        <p className="font-display text-lg leading-tight">{t.heading}</p>
         <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">
-          {matchedPairs} van {pairs} paren · {mode === "auto" ? "groeit mee" : "zelf gekozen"}
+          {t.progress(matchedPairs, pairs, t.modes[mode].short)}
         </p>
       </div>
       <div className="text-right tabular-nums">
         <p className="text-3xl font-black leading-none">{pairs}</p>
-        <p className="text-xs text-muted-foreground">paren</p>
+        <p className="text-xs text-muted-foreground">{t.pairs}</p>
       </div>
     </Panel>
   );
@@ -46,10 +49,11 @@ function ActionButtons({
   onHint,
   onAgain,
 }: ActionButtonsProps) {
+  const t = useTexts(memoryTexts);
   return (
     <div className="grid grid-cols-3 gap-2">
       <Button
-        aria-label="Hint"
+        aria-label={t.hint}
         className={cn(
           "min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm",
           suggestHint && "border-warning ring-2 ring-warning/35",
@@ -59,7 +63,7 @@ function ActionButtons({
         onClick={onHint}
       >
         <Lightbulb aria-hidden="true" className="size-4 shrink-0 text-warning" />
-        Hint
+        {t.hint}
       </Button>
       <Button
         className="min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm"
@@ -68,7 +72,7 @@ function ActionButtons({
         onClick={onChallenge}
       >
         <Sparkles aria-hidden="true" className="size-4 shrink-0 text-warning" />
-        Uitdaging
+        {t.challenge}
       </Button>
       <Button
         className="min-h-12 gap-1.5 px-2 text-xs sm:px-3 sm:text-sm"
@@ -76,35 +80,34 @@ function ActionButtons({
         onClick={onAgain}
       >
         <RotateCcw aria-hidden="true" className="size-4 shrink-0" />
-        Opnieuw
+        {t.again}
       </Button>
     </div>
   );
 }
 
-function statusFor(locked: boolean, found: boolean, hint: boolean): string {
+function statusFor(t: MemoryTexts, locked: boolean, found: boolean, hint: boolean): string {
   if (locked) {
-    return "Nog niet. De kaarten draaien zo terug.";
+    return t.status.locked;
   }
   if (found) {
-    return "Alle Pokémon gevonden!";
+    return t.status.found;
   }
   if (hint) {
-    return "Kijk naar de kaarten met de gele rand.";
+    return t.status.hint;
   }
-  return "Draai twee kaarten om en zoek hetzelfde Pokémon-paar.";
+  return t.status.idle;
 }
 
 function StatusLine({ status, moves }: { status: string; moves: number }) {
+  const t = useTexts(memoryTexts);
   return (
     <>
       <p aria-live="polite" className="text-center text-xs text-muted-foreground">
         {status}
       </p>
       <p className="text-center text-xs tabular-nums text-muted-foreground">
-        {moves > 0
-          ? `Je deed ${moves} ${moves === 1 ? "poging" : "pogingen"}.`
-          : "Zoek rustig verder."}
+        {moves > 0 ? t.moves(moves) : t.noMoves}
       </p>
     </>
   );
@@ -123,6 +126,7 @@ export function MemoryPlay() {
       settings: state.settings,
     })),
   );
+  const t = useTexts(memoryTexts);
   const [idle, setIdle] = useState(false);
 
   useEffect(() => {
@@ -149,7 +153,7 @@ export function MemoryPlay() {
   const matchedPairs = matched.filter(Boolean).length / 2;
   const misses = outcomes.filter((ok) => !ok).length;
   const suggestHint = !found && !locked && !hint && (idle || misses >= 2);
-  const status = statusFor(locked, found, Boolean(hint));
+  const status = statusFor(t, locked, found, Boolean(hint));
 
   return (
     <div className="flex flex-col gap-3 lg:grid lg:grid-cols-3 lg:items-start lg:gap-4">

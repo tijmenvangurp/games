@@ -1,9 +1,14 @@
+import { useTexts } from "@shared/i18n";
+import { pokedexTexts } from "./texts";
+
 export function PokemonAssetsCredits() {
+  const t = useTexts(pokedexTexts);
+
   return (
     <details className="mt-4 text-center text-xs leading-relaxed text-muted-foreground">
-      <summary className="cursor-pointer font-semibold">Bronnen en credits</summary>
+      <summary className="cursor-pointer font-semibold">{t.creditsSummary}</summary>
       <p className="mt-2">
-        Pokémon © Nintendo, Creatures en GAME FREAK. Fanproject zonder officiële band. Assets:{" "}
+        {t.creditsIntro}{" "}
         <a
           className="font-semibold underline"
           href="https://github.com/PokeAPI/sprites/tree/master/sprites/pokemon/other/official-artwork"
@@ -12,14 +17,14 @@ export function PokemonAssetsCredits() {
         >
           PokeAPI artwork
         </a>{" "}
-        en{" "}
+        {t.and}{" "}
         <a
           className="font-semibold underline"
           href="https://play.pokemonshowdown.com/sprites/ani/"
           rel="noreferrer"
           target="_blank"
         >
-          Showdown-sprites
+          {t.showdown}
         </a>
         .
       </p>

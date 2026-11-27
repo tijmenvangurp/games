@@ -1,16 +1,25 @@
-import { toggleSpeech, useSpeechEnabled } from "@shared/lib";
+import { useTranslation } from "@shared/i18n";
+import { toggleSpeech, useRecordedSpeech, useSpeechEnabled } from "@shared/lib";
 import { Button } from "./button";
 import { Ear, EarOff } from "./icons";
 
 export function SpeechToggle() {
   const enabled = useSpeechEnabled();
+  const { t } = useTranslation();
+  const recorded = useRecordedSpeech();
+  const label = enabled ? t("shell.speechOff") : t("shell.speechOn");
+
+  // De voorleesstem is alleen in het Nederlands opgenomen.
+  if (!recorded) {
+    return null;
+  }
 
   return (
     <Button
-      aria-label={enabled ? "Voorlezen uitzetten" : "Voorlezen aanzetten"}
+      aria-label={label}
       aria-pressed={enabled}
       size="icon"
-      title={enabled ? "Voorlezen uitzetten" : "Voorlezen aanzetten"}
+      title={label}
       variant="ghost"
       onClick={toggleSpeech}
     >

@@ -8,6 +8,7 @@ import {
   type WordSearchPuzzle,
   type WordSearchTheme,
 } from "@entities/word-search";
+import { currentLanguage, type Language } from "@shared/i18n";
 import { playHaptic, playSound } from "@shared/lib";
 import { loadWordSearchState, saveWordSearchState } from "./storage";
 import type { WordSearchSettings } from "./settings";
@@ -20,6 +21,8 @@ interface Hint {
 }
 
 interface WordSearchStore {
+  /** De taal waarin de puzzel is gemaakt; een taalwissel maakt hem ongeldig. */
+  language: Language;
   puzzle: WordSearchPuzzle | null;
   found: readonly string[];
   lastFound: string | null;
@@ -40,6 +43,8 @@ interface WordSearchStore {
   clearWrong: () => void;
   showHint: (word: string) => void;
   clearHint: () => void;
+  /** Verwijdert een puzzel die in een andere taal is gemaakt. */
+  resetForLanguage: (language: Language) => void;
 }
 
 type StoreSet = (
@@ -52,6 +57,7 @@ function startGame(set: StoreSet, get: StoreGet): void {
   const { settings } = get();
   const puzzle = createWordSearch(settings.theme, settings.difficulty);
   set({
+    language: currentLanguage(),
     puzzle,
     found: [],
     lastFound: null,
@@ -190,6 +196,7 @@ function handleHint(set: StoreSet, get: StoreGet, word: string): void {
 const initial = loadWordSearchState();
 
 export const useWordSearchStore = create<WordSearchStore>((set, get) => ({
+  language: currentLanguage(),
   puzzle: initial.puzzle,
   found: initial.found,
   lastFound: null,
@@ -211,4 +218,24 @@ export const useWordSearchStore = create<WordSearchStore>((set, get) => ({
   clearWrong: () => set({ selected: [], dragStart: null, wrong: false }),
   showHint: (word) => handleHint(set, get, word),
   clearHint: () => set({ hint: null }),
+  resetForLanguage: (language) => {
+    const state = get();
+    if (state.language === language) {
+      return;
+    }
+    const hadPuzzle = state.puzzle !== null;
+    set({
+      language,
+      puzzle: null,
+      found: [],
+      lastFound: null,
+      selected: [],
+      dragStart: null,
+      wrong: false,
+      hint: null,
+    });
+    if (hadPuzzle) {
+      saveWordSearchState({ settings: state.settings, puzzle: null, found: [] });
+    }
+  },
 }));
