@@ -8,15 +8,21 @@ import {
   type WordSearchPuzzle,
   type WordSearchTheme,
 } from "@entities/word-search";
+import { currentLanguage, type Language } from "@shared/i18n";
 import { readStoredJson, writeStoredJson } from "@shared/lib";
 import { DEFAULT_WORD_SEARCH_SETTINGS, type WordSearchSettings } from "./settings";
 
-const STORAGE_KEY = "games.word-search.v1";
+const STORAGE_KEY = "games.word-search.v2";
+const LEGACY_STORAGE_KEY = "games.word-search.v1";
 
 export interface StoredWordSearchState {
   settings: WordSearchSettings;
   puzzle: WordSearchPuzzle | null;
   found: readonly string[];
+}
+
+interface StoredWordSearchFile extends StoredWordSearchState {
+  language: Language;
 }
 
 const FALLBACK: StoredWordSearchState = {
@@ -151,13 +157,10 @@ function isPuzzle(value: unknown): value is WordSearchPuzzle {
   );
 }
 
-export function loadWordSearchState(): StoredWordSearchState {
-  const parsed = readStoredJson(STORAGE_KEY);
-  if (!isRecord(parsed)) {
-    return FALLBACK;
-  }
-
-  const settings = isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings;
+function readState(
+  parsed: Record<string, unknown>,
+  settings: WordSearchSettings,
+): StoredWordSearchState {
   const puzzle = isPuzzle(parsed.puzzle) ? parsed.puzzle : null;
   const found =
     puzzle && Array.isArray(parsed.found)
@@ -175,6 +178,32 @@ export function loadWordSearchState(): StoredWordSearchState {
   return { settings, puzzle, found };
 }
 
+function settingsOf(parsed: Record<string, unknown>): WordSearchSettings {
+  return isSettings(parsed.settings) ? parsed.settings : FALLBACK.settings;
+}
+
+export function loadWordSearchState(): StoredWordSearchState {
+  const language = currentLanguage();
+  const parsed = readStoredJson(STORAGE_KEY);
+  if (isRecord(parsed)) {
+    const settings = settingsOf(parsed);
+    // Een puzzel uit een andere taal past niet bij de UI; de instellingen blijven.
+    return parsed.language === language
+      ? readState(parsed, settings)
+      : { settings, puzzle: null, found: [] };
+  }
+
+  // Versie 1 had nog geen taal. Die puzzels zijn altijd Nederlands.
+  const legacy = readStoredJson(LEGACY_STORAGE_KEY);
+  if (isRecord(legacy)) {
+    const settings = settingsOf(legacy);
+    return language === "nl" ? readState(legacy, settings) : { settings, puzzle: null, found: [] };
+  }
+
+  return FALLBACK;
+}
+
 export function saveWordSearchState(state: StoredWordSearchState): void {
-  writeStoredJson(STORAGE_KEY, state);
+  const file: StoredWordSearchFile = { language: currentLanguage(), ...state };
+  writeStoredJson(STORAGE_KEY, file);
 }

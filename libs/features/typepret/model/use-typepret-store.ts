@@ -10,11 +10,14 @@ import {
   type RoundResult,
   type RoundState,
 } from "@entities/typepret";
+import { currentLanguage, type Language } from "@shared/i18n";
 import { createSeed, mulberry32 } from "@shared/lib";
 import { loadTypepretProgress, saveTypepretProgress } from "./storage";
 
 interface TypepretStore {
   progress: Progress;
+  /** De taal van de lopende ronde; `null` zonder ronde. */
+  language: Language | null;
   lessonId: string | null;
   round: RoundState | null;
   /** Wordt gevuld zodra de ronde klaar is. */
@@ -23,10 +26,13 @@ interface TypepretStore {
   press: (key: string) => void;
   /** Terug naar de leskeuze, zonder de ronde af te maken. */
   leave: () => void;
+  /** Stopt een ronde die in een andere taal is gestart. */
+  resetForLanguage: (language: Language) => void;
 }
 
 export const useTypepretStore = create<TypepretStore>((set, get) => ({
   progress: loadTypepretProgress(),
+  language: null,
   lessonId: null,
   round: null,
   result: null,
@@ -37,7 +43,7 @@ export const useTypepretStore = create<TypepretStore>((set, get) => ({
       return;
     }
     const round = createRound(lesson, mulberry32(createSeed()));
-    set({ lessonId, round: startRound(round), result: null });
+    set({ language: currentLanguage(), lessonId, round: startRound(round), result: null });
   },
 
   press: (key) => {
@@ -60,4 +66,10 @@ export const useTypepretStore = create<TypepretStore>((set, get) => ({
   },
 
   leave: () => set({ lessonId: null, round: null, result: null }),
+  resetForLanguage: (language) => {
+    if (get().language === language) {
+      return;
+    }
+    set({ language, lessonId: null, round: null, result: null });
+  },
 }));

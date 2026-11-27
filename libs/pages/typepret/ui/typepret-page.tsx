@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { LESSON_BY_ID, lessonText, ROUND_LENGTH, type Verdict } from "@entities/typepret";
 import { TypepretPlay, TypepretSetup, useTypepretStore } from "@features/typepret";
@@ -10,11 +11,17 @@ export function TypepretPage() {
   const navigate = useNavigate();
   const language = useLanguage();
   const t = useTexts(typepretPageTexts);
-  const round = useTypepretStore((state) => state.round);
-  const result = useTypepretStore((state) => state.result);
-  const lessonId = useTypepretStore((state) => state.lessonId);
+  const round = useTypepretStore((state) => (state.language === language ? state.round : null));
+  const result = useTypepretStore((state) => (state.language === language ? state.result : null));
+  const lessonId = useTypepretStore((state) =>
+    state.language === language ? state.lessonId : null,
+  );
   const progress = useTypepretStore((state) => state.progress);
   const lesson = lessonId ? LESSON_BY_ID[lessonId] : undefined;
+
+  useEffect(() => {
+    useTypepretStore.getState().resetForLanguage(language);
+  }, [language]);
   // Elke uitslag heeft een titel en uitleg in beide talen.
   const verdicts: Readonly<Record<Verdict, { title: string; description: string }>> = t.verdicts;
   const message = result ? verdicts[result.verdict] : undefined;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { allLevels, LEVEL_COUNT, levelAt } from "@entities/gear";
 import {
@@ -7,7 +7,7 @@ import {
   DraaiwerkPlay,
   useDraaiwerkStore,
 } from "@features/draaiwerk";
-import { useTexts } from "@shared/i18n";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
 import { draaiwerkPageTexts } from "./texts";
 
@@ -39,7 +39,12 @@ export function DraaiwerkScreen({ onHome }: DraaiwerkScreenProps) {
   const finished = useDraaiwerkStore((state) => state.finished);
   const status = useDraaiwerkStore((state) => state.status);
   const [screen, setScreen] = useState<DraaiwerkScreenName>("play");
+  const language = useLanguage();
   const t = useTexts(draaiwerkPageTexts);
+
+  useLayoutEffect(() => {
+    useDraaiwerkStore.setState({ feedback: null, feedbackTone: null });
+  }, [language]);
 
   const hasNext = levelIndex + 1 < LEVEL_COUNT;
   const followingLevel = hasNext ? levelAt(levelIndex + 1) : null;

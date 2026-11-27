@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { geheimeCodeTexts, type RoundResult } from "@entities/geheime-code";
 import { GeheimeCodePlay, GeheimeCodeSetup, useGeheimeCodeStore } from "@features/geheime-code";
-import { useTexts } from "@shared/i18n";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { useGameSetupState } from "@shared/lib";
 import { CelebrationDialog } from "@shared/ui";
 import { GameShell } from "@widgets/game-shell";
@@ -17,13 +18,22 @@ function resultText(t: PageTexts, result: RoundResult): string {
 
 export function GeheimeCodePage() {
   const navigate = useNavigate();
+  const language = useLanguage();
   const t = useTexts(geheimeCodePageTexts);
   const names = useTexts(geheimeCodeTexts);
-  const puzzle = useGeheimeCodeStore((state) => state.puzzle);
-  const result = useGeheimeCodeStore((state) => state.result);
+  const puzzle = useGeheimeCodeStore((state) =>
+    state.language === language ? state.puzzle : null,
+  );
+  const result = useGeheimeCodeStore((state) =>
+    state.language === language ? state.result : null,
+  );
   const theme = useGeheimeCodeStore((state) => state.theme);
   const level = useGeheimeCodeStore((state) => state.level);
   const { setupVisible, setShowSetup, navigation } = useGameSetupState(Boolean(puzzle));
+
+  useEffect(() => {
+    useGeheimeCodeStore.getState().resetForLanguage(language);
+  }, [language]);
 
   const start = () => {
     useGeheimeCodeStore.getState().start();

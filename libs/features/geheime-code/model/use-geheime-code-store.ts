@@ -11,6 +11,7 @@ import {
   type RoundResult,
   type ThemeId,
 } from "@entities/geheime-code";
+import { currentLanguage, type Language } from "@shared/i18n";
 import { createSeed, mulberry32, playHaptic, playSound } from "@shared/lib";
 import { loadProgress, saveProgress } from "./storage";
 
@@ -21,6 +22,8 @@ interface GeheimeCodeStore {
   theme: ThemeId;
   level: LevelId;
   round: 1 | 2;
+  /** De taal van de lopende puzzel; `null` zonder puzzel. */
+  language: Language | null;
   puzzle: Puzzle | null;
   entries: readonly (readonly string[])[];
   activeRow: number;
@@ -42,6 +45,8 @@ interface GeheimeCodeStore {
   clearCell: () => void;
   selectCell: (cell: number) => void;
   nextWord: () => void;
+  /** Stopt een puzzel die in een andere taal is gestart. */
+  resetForLanguage: (language: Language) => void;
 }
 
 type SetState = (
@@ -54,6 +59,7 @@ const INITIAL_STATE = {
   theme: "sinterklaas" as ThemeId,
   level: 1 as LevelId,
   round: 1 as 1 | 2,
+  language: null as Language | null,
   puzzle: null,
   entries: [],
   activeRow: 0,
@@ -85,6 +91,7 @@ function startRound(set: SetState, theme: ThemeId, level: LevelId, round: 1 | 2)
     theme,
     level,
     round: wordSet.round,
+    language: currentLanguage(),
     puzzle,
     entries,
     activeRow: 0,
@@ -263,4 +270,25 @@ export const useGeheimeCodeStore = create<GeheimeCodeStore>((set, get) => ({
   clearCell: () => clearCell(set, get),
   selectCell: (cell) => selectCell(set, get, cell),
   nextWord: () => nextWord(set, get),
+  resetForLanguage: (language) => {
+    const state = get();
+    if (state.language === language) {
+      return;
+    }
+    set({
+      language,
+      puzzle: null,
+      entries: [],
+      activeRow: 0,
+      activeCell: 0,
+      hintLetter: null,
+      wrongCell: null,
+      wordMistakes: 0,
+      wordHints: 0,
+      firstTry: 0,
+      wordDone: false,
+      result: null,
+      progress: state.progress,
+    });
+  },
 }));

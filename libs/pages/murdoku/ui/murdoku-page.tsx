@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { createMurdokuPlay, everyonePlaced, useMurdokuStore } from "@features/murdoku-game";
-import { useTexts } from "@shared/i18n";
+import { useLanguage, useTexts } from "@shared/i18n";
 import { GameShell } from "@widgets/game-shell";
 import { useShallow } from "zustand/react/shallow";
 import { revealSentenceFor, progressSentenceFor } from "./murdoku-copy";
@@ -22,7 +22,12 @@ import { useMurdokuSession } from "./use-murdoku-session";
  */
 export function MurdokuPage() {
   const navigate = useNavigate();
+  const language = useLanguage();
   const t = useTexts(MURDOKU_PAGE_TEXTS);
+
+  useLayoutEffect(() => {
+    useMurdokuStore.setState({ clueFocus: null, clueFocusLabel: null });
+  }, [language]);
   const {
     start,
     selectPerson,
