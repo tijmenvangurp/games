@@ -61,6 +61,24 @@ describe("taalkeuze", () => {
     expect(localStorage.getItem(STORAGE_KEY)).toBe("nl");
   });
 
+  it("werkt de meta description bij", () => {
+    const meta = document.createElement("meta");
+    meta.name = "description";
+    document.head.append(meta);
+
+    try {
+      act(() => setLanguage("en"));
+      expect(meta.content).toBe("Sudoku and other games for kids. Works on phone and tablet.");
+
+      act(() => setLanguage("nl"));
+      expect(meta.content).toBe(
+        "Sudoku en andere spelletjes voor kinderen. Werkt op telefoon en tablet.",
+      );
+    } finally {
+      meta.remove();
+    }
+  });
+
   it("vertaalt de gedeelde spelknoppen", async () => {
     act(() => setLanguage("en"));
     renderApp("/sudoku");

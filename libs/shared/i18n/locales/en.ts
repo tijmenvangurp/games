@@ -10,6 +10,9 @@ export const en = {
     nl: "Nederlands",
     en: "English",
   },
+  meta: {
+    description: "Sudoku and other games for kids. Works on phone and tablet.",
+  },
   home: {
     title: "Games",
     surprise: "Surprise me!",

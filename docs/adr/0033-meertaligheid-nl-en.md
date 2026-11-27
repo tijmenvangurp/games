@@ -64,6 +64,11 @@ De alternatieven:
   naam en beschrijving in `@entities/game`.
 - **Tests:** bestaande tests blijven Nederlands, omdat dat de standaard is. Per
   groep spellen controleert een Engelse test de belangrijkste schermen.
+- **Lopend spel:** taalgebonden inhoud wordt bij een taalwissel niet hergebruikt.
+  Een lopende Woordzoeker, Typepret-ronde of Geheime Code-puzzel gaat terug naar
+  de start, een opgeslagen Woordzoeker-puzzel uit een andere taal wordt niet
+  hervat en Draaiwerk-feedback verdwijnt. Instellingen en voortgang blijven
+  bewaard.
 - **Spraak:** Engelse opnames ontbreken. Als die later komen, kan
   `hasRecordedSpeech()` per taal kijken en kan `audioSrc` de taal in het pad
   opnemen (`/audio/en/...`).

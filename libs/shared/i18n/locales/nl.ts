@@ -10,6 +10,9 @@ export const nl = {
     nl: "Nederlands",
     en: "English",
   },
+  meta: {
+    description: "Sudoku en andere spelletjes voor kinderen. Werkt op telefoon en tablet.",
+  },
   home: {
     title: "Spellen",
     surprise: "Verras me!",

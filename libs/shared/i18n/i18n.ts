@@ -26,6 +26,10 @@ function syncDocumentLanguage(language: string): void {
   if (typeof document !== "undefined") {
     document.documentElement.lang = language;
     document.title = i18next.t("home.title");
+    const description = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (description) {
+      description.content = i18next.t("meta.description");
+    }
   }
 }
 

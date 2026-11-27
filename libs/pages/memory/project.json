@@ -18,6 +18,7 @@
     "widgets-game-shell",
     "features-memory-game",
     "entities-memory",
-    "shared-ui"
+    "shared-ui",
+    "shared-i18n"
   ]
 }

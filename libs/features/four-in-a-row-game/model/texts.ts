@@ -1,4 +1,4 @@
-import { defineTexts } from "@shared/i18n";
+import { defineTexts, plural } from "@shared/i18n";
 
 export const fourInARowTexts = defineTexts(
   {
@@ -15,7 +15,8 @@ export const fourInARowTexts = defineTexts(
     turn: (name: string) => `${name} is aan de beurt.`,
     board: "Speelbord",
     column: (number: number) => `Kolom ${number}`,
-    wins: (count: number) => `${count} gewonnen partijen`,
+    wins: (count: number) =>
+      plural(count, { one: `${count} gewonnen partij`, other: `${count} gewonnen partijen` }, "nl"),
     undo: "Ongedaan maken",
     restart: "Opnieuw beginnen",
     modes: { friend: "Samen spelen", computer: "Computer" },
@@ -47,7 +48,8 @@ export const fourInARowTexts = defineTexts(
     turn: (name: string) => `It's ${name}'s turn.`,
     board: "Game board",
     column: (number: number) => `Column ${number}`,
-    wins: (count: number) => `${count} games won`,
+    wins: (count: number) =>
+      plural(count, { one: `${count} game won`, other: `${count} games won` }, "en"),
     undo: "Undo",
     restart: "Start again",
     modes: { friend: "Play together", computer: "Computer" },

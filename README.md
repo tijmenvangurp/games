@@ -18,6 +18,7 @@ libs/features/*      spellogica en UX per feature
 libs/entities/*      domeinmodellen en pure regels
 libs/shared/lib      herbruikbare helpers
 libs/shared/ui       UI-primitives en iconen
+libs/shared/i18n     vertalingen (Nederlands en Engels) en taalkeuze
 tests/               gedeelde Vitest-suites
 ```
 

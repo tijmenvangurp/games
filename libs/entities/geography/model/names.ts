@@ -15,13 +15,15 @@ type SubjectRef = Pick<FlagSubject, "code" | "name">;
 
 const REGION_NAMES = new Intl.DisplayNames(["en"], { type: "region" });
 
-function englishCountryName(code: string): string {
-  return ENGLISH_COUNTRY_NAME_OVERRIDES[code] ?? String(REGION_NAMES.of(code.toUpperCase()));
+function englishCountryName(code: string, fallback: string): string {
+  return ENGLISH_COUNTRY_NAME_OVERRIDES[code] ?? REGION_NAMES.of(code.toUpperCase()) ?? fallback;
 }
 
 // Provincienamen zijn eigennamen: in het Engels blijven ze Nederlands.
 const ENGLISH_NAMES: NameTable = new Map([
-  ...COUNTRIES.map((country) => [country.code, englishCountryName(country.code)] as const),
+  ...COUNTRIES.map(
+    (country) => [country.code, englishCountryName(country.code, country.name)] as const,
+  ),
   ...PROVINCES.map((province) => [province.code, province.name] as const),
 ]);
 

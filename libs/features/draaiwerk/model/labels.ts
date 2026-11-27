@@ -1,5 +1,5 @@
 import type { GearSize, OutputKind, TrayItem } from "@entities/gear";
-import { getTexts } from "@shared/i18n";
+import { currentLanguage, getTexts, type Language } from "@shared/i18n";
 import { draaiwerkTexts } from "./texts";
 
 export function chapterName(chapter: number): string {
@@ -36,10 +36,19 @@ export function outputName(kind: OutputKind): string {
   return getTexts(draaiwerkTexts).outputs[kind];
 }
 
+const NUMBER_FORMATS = new Map<Language, Intl.NumberFormat>();
+
+function numberFormat(language: Language): Intl.NumberFormat {
+  const existing = NUMBER_FORMATS.get(language);
+  if (existing) {
+    return existing;
+  }
+  const format = new Intl.NumberFormat(language, { maximumFractionDigits: 2 });
+  NUMBER_FORMATS.set(language, format);
+  return format;
+}
+
 /** 0.5 -> "0,5" in het Nederlands en "0.5" in het Engels, 2 -> "2". */
 export function formatSpeed(speed: number): string {
-  const rounded = Math.round(speed * 100) / 100;
-  return Number.isInteger(rounded)
-    ? String(rounded)
-    : rounded.toFixed(2).replace(/0$/, "").replace(".", getTexts(draaiwerkTexts).decimalSeparator);
+  return numberFormat(currentLanguage()).format(speed);
 }

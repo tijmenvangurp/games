@@ -73,15 +73,16 @@ Toegestane scopes: `app`, `pages`, `widgets`, `features`, `entities`, `shared`,
 De repo gebruikt Nx en Feature-Sliced Design. Elke slice is een eigen
 Nx-project met een `project.json`, `tsconfig.json` en `index.ts`.
 
-| Laag              | Wat er hoort                                              |
-| ----------------- | --------------------------------------------------------- |
-| `libs/entities`   | Pure domeinregels en data, zonder React.                  |
-| `libs/features`   | Spelstate (Zustand) en de UX van één feature.             |
-| `libs/widgets`    | Samengestelde UI-blokken die meerdere features gebruiken. |
-| `libs/pages`      | Schermen die lagen samenstellen.                          |
-| `libs/shared/ui`  | UI-primitives en iconen.                                  |
-| `libs/shared/lib` | Herbruikbare helpers zonder UI.                           |
-| `apps/games`      | Router, providers, globale styles en `public/`.           |
+| Laag               | Wat er hoort                                              |
+| ------------------ | --------------------------------------------------------- |
+| `libs/entities`    | Pure domeinregels en data, zonder React.                  |
+| `libs/features`    | Spelstate (Zustand) en de UX van één feature.             |
+| `libs/widgets`     | Samengestelde UI-blokken die meerdere features gebruiken. |
+| `libs/pages`       | Schermen die lagen samenstellen.                          |
+| `libs/shared/ui`   | UI-primitives en iconen.                                  |
+| `libs/shared/lib`  | Herbruikbare helpers zonder UI.                           |
+| `libs/shared/i18n` | Vertalingen (Nederlands en Engels) en de taalkeuze.       |
+| `apps/games`       | Router, providers, globale styles en `public/`.           |
 
 Een laag mag alleen van lager gelegen lagen importeren. Importeer via de
 public API en de aliassen (`@app`, `@pages`, `@widgets`, `@features`,
@@ -99,7 +100,10 @@ tests. Leg een nieuwe mechanic of een nieuwe assetbron vast in een ADR.
 - Geen `!important` in CSS; gebruik cascade layers of een specifiekere selector.
 - Gebruik bestaande componenten (`GameShell`, `game-panel`, `Button`,
   `ChoiceCard`) voordat je iets nieuws maakt.
-- Teksten zijn Nederlands, kort en kindgericht. Vermijd Engels in de UI.
+- Nederlands is de standaard, kort en kindgericht. Elke UI-tekst heeft een
+  Engelse tegenhanger: spelteksten staan per slice in `texts.ts` met
+  `defineTexts`, gedeelde teksten in `libs/shared/i18n/locales`. Ontbreekt de
+  Engelse kant, dan faalt de typecheck.
 - Voeg geen externe fonts, CDN's, trackers of remote images toe.
 
 ## Bibliotheken

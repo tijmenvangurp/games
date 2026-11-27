@@ -56,7 +56,6 @@ export const draaiwerkTexts = defineTexts(
     shortAxle: "As",
     outputs: { generator: "Lamp", lift: "Lift", target: "Doel" },
     motor: "Motor",
-    decimalSeparator: ",",
 
     // Statusregels in de HUD.
     solved: "Level gehaald.",
@@ -212,7 +211,6 @@ export const draaiwerkTexts = defineTexts(
     shortAxle: "Axle",
     outputs: { generator: "Lamp", lift: "Lift", target: "Goal" },
     motor: "Motor",
-    decimalSeparator: ".",
 
     solved: "Level complete.",
     jammed: "Stuck! The parts bump into each other. Take a part away or try another spot.",

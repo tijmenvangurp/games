@@ -404,6 +404,13 @@ describe("Engelse teksten van Memory, Pokémon-quiz, Vier op een Rij en Ganzenbo
     expect(screen.getByText("Square 12")).toBeTruthy();
   });
 
+  it("gebruikt het enkelvoud bij één gewonnen partij", () => {
+    expect(fourInARowTexts.en.wins(1)).toBe("1 game won");
+    expect(fourInARowTexts.en.wins(2)).toBe("2 games won");
+    expect(ganzenbordUiTexts.en.winsCount(1)).toBe("1 game won");
+    expect(ganzenbordUiTexts.en.winsCount(2)).toBe("2 games won");
+  });
+
   it("geeft Ganzenbordberichten in het Engels", () => {
     const game = createGame(
       [

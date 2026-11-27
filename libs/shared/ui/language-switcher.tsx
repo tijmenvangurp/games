@@ -29,6 +29,7 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
           key={item}
           aria-label={t(`language.${item}`)}
           aria-pressed={language === item}
+          className="min-h-11 min-w-11"
           lang={item}
           size="sm"
           title={t(`language.${item}`)}

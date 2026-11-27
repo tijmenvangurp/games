@@ -1,4 +1,4 @@
-import { defineTexts } from "@shared/i18n";
+import { defineTexts, plural } from "@shared/i18n";
 
 export const ganzenbordTexts = defineTexts(
   {
@@ -13,7 +13,8 @@ export const ganzenbordTexts = defineTexts(
       violet: "Paars",
       pink: "Roze",
     },
-    playerCount: (count: number) => `${count} spelers`,
+    playerCount: (count: number) =>
+      plural(count, { one: `${count} speler`, other: `${count} spelers` }, "nl"),
     controllers: { human: "Mens", computer: "Computer" },
     position: {
       finish: "Bij de finish",
@@ -62,7 +63,8 @@ export const ganzenbordTexts = defineTexts(
       violet: "Purple",
       pink: "Pink",
     },
-    playerCount: (count: number) => `${count} players`,
+    playerCount: (count: number) =>
+      plural(count, { one: `${count} player`, other: `${count} players` }, "en"),
     controllers: { human: "Human", computer: "Computer" },
     position: {
       finish: "At the finish",
@@ -113,7 +115,8 @@ export const ganzenbordUiTexts = defineTexts(
       "Kies per speler of die door een mens of door de computer wordt gespeeld. Speler 1 begint. Een eigen naam en kleur zijn optioneel.",
     boardSummary: (positions: string) => `Ganzenbord met 63 vakjes. ${positions}.`,
     players: "Spelers",
-    winsCount: (count: number) => `${count} gewonnen partijen`,
+    winsCount: (count: number) =>
+      plural(count, { one: `${count} gewonnen partij`, other: `${count} gewonnen partijen` }, "nl"),
     stuck: "Vast",
     skipBadge: "beurt over",
     roll: "Gooi met de dobbelstenen",
@@ -183,7 +186,8 @@ export const ganzenbordUiTexts = defineTexts(
       "Choose for each player whether a person or the computer plays. Player 1 goes first. Your own name and colour are optional.",
     boardSummary: (positions: string) => `Game of the Goose board with 63 squares. ${positions}.`,
     players: "Players",
-    winsCount: (count: number) => `${count} games won`,
+    winsCount: (count: number) =>
+      plural(count, { one: `${count} game won`, other: `${count} games won` }, "en"),
     stuck: "Stuck",
     skipBadge: "misses a turn",
     roll: "Roll the dice",

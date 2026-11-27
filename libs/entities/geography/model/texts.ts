@@ -1,4 +1,4 @@
-import { defineTexts } from "@shared/i18n";
+import { defineTexts, plural } from "@shared/i18n";
 
 /** Gebieden, niveaus, vragen en uitleg van Vlaggenreis in elke taal. */
 export const geographyTexts = defineTexts(
@@ -24,8 +24,10 @@ export const geographyTexts = defineTexts(
       nederland: "Nederland",
     },
     allCountries: (count: number) => `Alle ${count} landen`,
-    countries: (count: number) => `${count} landen`,
-    provinces: (count: number) => `${count} provincies`,
+    countries: (count: number) =>
+      plural(count, { one: `${count} land`, other: `${count} landen` }, "nl"),
+    provinces: (count: number) =>
+      plural(count, { one: `${count} provincie`, other: `${count} provincies` }, "nl"),
     allProvinces: (count: number) => `Alle ${count} provincies`,
     levels: { makkelijk: "Makkelijk", gemiddeld: "Gemiddeld", moeilijk: "Moeilijk" },
     easyHint: "3 keuzes",
@@ -70,8 +72,10 @@ export const geographyTexts = defineTexts(
       nederland: "the Netherlands",
     },
     allCountries: (count: number) => `All ${count} countries`,
-    countries: (count: number) => `${count} countries`,
-    provinces: (count: number) => `${count} provinces`,
+    countries: (count: number) =>
+      plural(count, { one: `${count} country`, other: `${count} countries` }, "en"),
+    provinces: (count: number) =>
+      plural(count, { one: `${count} province`, other: `${count} provinces` }, "en"),
     allProvinces: (count: number) => `All ${count} provinces`,
     levels: { makkelijk: "Easy", gemiddeld: "Medium", moeilijk: "Hard" },
     easyHint: "3 choices",

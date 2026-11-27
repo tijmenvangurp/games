@@ -1,11 +1,12 @@
-import { defineTexts } from "@shared/i18n";
+import { defineTexts, plural } from "@shared/i18n";
 
 /** Alle teksten van Pijlen (Engels: Arrows). Nederlands is de bron. */
 export const arrowTexts = defineTexts(
   {
     title: "Pijlen",
     levelOf: (level: number, total: number) => `Level ${level} van ${total}`,
-    arrows: (count: number) => `${count} pijlen`,
+    arrows: (count: number) =>
+      plural(count, { one: `${count} pijl`, other: `${count} pijlen` }, "nl"),
     play: "Spelen",
     levels: "Levels",
     menu: "Menu",
@@ -33,7 +34,8 @@ export const arrowTexts = defineTexts(
   {
     title: "Arrows",
     levelOf: (level: number, total: number) => `Level ${level} of ${total}`,
-    arrows: (count: number) => `${count} arrows`,
+    arrows: (count: number) =>
+      plural(count, { one: `${count} arrow`, other: `${count} arrows` }, "en"),
     play: "Play",
     levels: "Levels",
     menu: "Menu",
